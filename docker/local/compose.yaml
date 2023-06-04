@@ -1,0 +1,31 @@
+version: '2.1'
+services: 
+  sb_nocodb: 
+    depends_on: 
+      sb_db: 
+        condition: service_healthy
+    env_file:
+      - .env
+    image: "nocodb/nocodb:latest"
+    ports: 
+      - "8080:8080"
+    restart: always
+    volumes: 
+      - "nc_data:/usr/app/data"
+  sb_db:
+    env_file:
+      - .env
+    healthcheck: 
+      interval: 10s
+      retries: 10
+      test: "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
+      timeout: 2s
+    image: postgres
+    ports: 
+      - "5432:5432"
+    restart: always
+    volumes: 
+      - "db_data:/var/lib/postgresql/data"
+volumes: 
+  db_data: {}
+  nc_data: {}
