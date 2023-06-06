@@ -1,0 +1,11 @@
+{
+    "extends": "@tsconfig/react-native/tsconfig.json",
+    "include": [
+        "**/*.ts",
+        "**/*.tsx"
+    ],
+    "compilerOptions": {
+      "types": ["node"],
+      "typeRoots": ["./types"]
+    }
+}
