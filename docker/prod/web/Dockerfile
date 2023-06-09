@@ -7,6 +7,8 @@ RUN adduser -S nextjs -u 1001
 
 WORKDIR /app
 
+RUN mkdir logs; chown -R nextjs:nodejs logs;
+
 COPY --chown=nextjs:nodejs /public ./public
 
 # Automatically leverage output traces to reduce image size

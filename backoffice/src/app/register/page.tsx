@@ -1,6 +1,6 @@
 "use client"
-import Login from "@/components/user/Login"
-import { Box, Container, Link, Typography } from "@mui/material"
+import Register from "@/components/user/Register"
+import { Box, Container, Typography } from "@mui/material"
 import { useRouter } from "next/navigation"
 
 export default function Home() {
@@ -8,11 +8,10 @@ export default function Home() {
   return (
     <Container sx={{ height: '100vh' }}>
       <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h1">Connection</Typography>
-        <Login onSuccess={() => {
-          router.push('/home')
+        <Typography variant="h1">Inscription</Typography>
+        <Register onSuccess={() => {
+          router.push('/')
         }}/>
-        <Link href="/register">Pas encore inscrit ?</Link>
       </Box>
     </Container>
   )
