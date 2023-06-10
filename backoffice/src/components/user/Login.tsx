@@ -4,14 +4,16 @@ import { Formik } from "formik"
 import * as yup from 'yup'
 import LoginIcon from '@mui/icons-material/LoginTwoTone'
 import Feedback from "@/components/Feedback"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import axios from "axios"
+import { AppContext } from "../AppContextProvider"
 
 interface Props {
     onSuccess: () => void
 }
 
 const Login = ({ onSuccess }: Props) => {
+    const appContext = useContext(AppContext)
     const [errorInfo, setErrorInfo] = useState({ message: '', detail: '' })
 
     return <Formik initialValues={{ email: '', password: '' }}
@@ -19,6 +21,7 @@ const Login = ({ onSuccess }: Props) => {
             try {
                 const res = await axios.post('/api/auth', { email: values.email, password: values.password})
                 localStorage.setItem('token', res.data.token)
+                appContext.loggedIn(res.data.account)
                 onSuccess()
             } catch(e: any) {
                 setErrorInfo({ message: 'Echec de l\'authentification.', detail: e.toString() })

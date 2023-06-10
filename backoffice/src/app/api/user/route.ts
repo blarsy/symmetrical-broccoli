@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const { name, email, password } = await request.json()
     const salt = await bcrypt.genSalt()
     const hash = await bcrypt.hash(password, salt)
-    create('comptes', { email, Nom: name, salt, hash, balance: INITIAL_BALANCE  })
+    create('comptes', { email, nom: name, salt, hash, balance: INITIAL_BALANCE  })
     return createSuccessResponse()
   } catch(e: any) {
     return createFailureResponse(e)

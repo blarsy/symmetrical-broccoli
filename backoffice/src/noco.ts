@@ -13,9 +13,9 @@ const logData = (context: string, result: object) => {
   log.info(`${context}. ${JSON.stringify(result)}`)
 }
 
-export const list = async (tableName: string, filter?: string): Promise<any[]> => {
+export const list = async (tableName: string, filter?: string, fields?: string[]): Promise<any[]> => {
     try{
-      const res = await api.dbTableRow.list('v1', process.env.NOCO_PROJET_NAME as string, tableName, { where: filter})
+      const res = await api.dbTableRow.list('v1', process.env.NOCO_PROJET_NAME as string, tableName, { where: filter, fields})
       logData(`Querying ${tableName} with filter ${filter}`, res)
       return res.list
     } catch(e: any) {

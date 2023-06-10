@@ -1,29 +1,36 @@
 "use client"
 import Feedback from "@/components/Feedback"
-import { CircularProgress, Container, Typography } from "@mui/material"
+import Dashboard from "@/components/resource/Dashboard"
+import { CircularProgress } from "@mui/material"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { fromData, fromError, initial } from "../DataLoadState"
+import LoggedInLayout from "@/components/LoggedInLayout"
+import AppContextProvider from "@/components/AppContextProvider"
 
 const Home = () => {
-    const [name, setName] = useState({ data: '', loading: true, error: {} as { message?: string, detail?: string}})
+    const [account, setAccount] = useState(initial())
     useEffect(() => {
         const load = async() => {
             try {
                 const res = await axios.get(`/api/user/${localStorage.getItem('token')}`)
-                setName({ data: res.data.account.Nom, error: {}, loading: false })
+                setAccount(fromData(res.data))
             } catch(e: any) {
-                setName({ data: '', loading: false, error: { message: 'Echec du chargement', detail: e.toString() }})
+                setAccount(fromError(e, 'Echec du chargement.'))
             }
         }
         load()
     }, [])
-    return <Container sx={{ height: '100vh' }}>
-        <Typography variant="h1">Tableau de bord</Typography>
-        { name.loading && <CircularProgress /> }
-        { name.data && <Typography variant="body1">Bienvenue {name.data}</Typography> }
-        { name.error.message && <Feedback message={name.error.message!} detail={name.error.detail} severity="error"
-            onClose={() => setName({data: '', loading: false, error: {}})}/>}
-    </Container>
+    return <AppContextProvider>
+        <LoggedInLayout title="Tableau de bord">
+            { account.loading ? <CircularProgress /> :
+                account.data ? <Dashboard /> :
+                account.error.message && <Feedback message={account.error.message!} detail={account.error.detail} 
+                severity="error" onClose={() => setAccount({data: {}, loading: false, error: {}})}/>
+            }
+        </LoggedInLayout> 
+    </AppContextProvider>
+
 }
 
 export default Home
