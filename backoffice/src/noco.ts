@@ -24,10 +24,11 @@ export const list = async (tableName: string, filter?: string, fields?: string[]
     }
 }
 
-export const create = async (tableName: string, data: object): Promise<void> => {
+export const create = async (tableName: string, data: object): Promise<any> => {
   try {
     const res = await api.dbTableRow.create('v1', process.env.NOCO_PROJET_NAME as string, tableName, data)
     logData(`Created item in ${tableName}: ${data}`, res)
+    return res
   } catch(e: any) {
     logData(`Error trying to create item in ${tableName}: ${data}`, e)
     throw e

@@ -5,7 +5,7 @@ interface Props {
     message: string
     detail?: string
     severity: AlertColor
-    onClose: () => void
+    onClose?: () => void
 }
 
 const Feedback = ({ message, detail, severity, onClose }: Props) => {

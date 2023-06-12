@@ -4,6 +4,7 @@ import { Fragment, useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { fromData, fromError, initial } from "@/app/DataLoadState"
 import { useRouter } from "next/navigation"
+import Feedback from "./Feedback"
 
 interface Props {
     title?: string,
@@ -27,8 +28,8 @@ const LoggedInLayout = ({ title, children }: Props) => {
                     setAccount(fromData(res.data.account))
                 } catch (e: any) {
                     setAccount(fromError(e, 'Echec lors du chargement du compte.'))
+                    router.push('/')
                 }
-
             }
         }
         load()
@@ -40,6 +41,9 @@ const LoggedInLayout = ({ title, children }: Props) => {
         content = <Box display="flex" flexDirection="column" alignItems="center">
             <CircularProgress />
         </Box>
+    } else if (account.error.message){
+        content = <Feedback message="La connexion a échoué. Vous allez pouvoir vous reconnecter dans quelques instants." 
+            detail="" severity="error"/>
     } else {
         content = <Fragment>
             <Box height="1.5rem" display="flex" justifyContent="space-between">
