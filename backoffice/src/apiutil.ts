@@ -1,14 +1,6 @@
 import { JwtPayload, verify } from "jsonwebtoken"
 import { list } from "./noco"
-
-export interface Account {
-    name: string,
-    id: string,
-    email: string,
-    balance: number,
-    hash: string,
-    resources: any[]
-}
+import { Account, Resource, ResourceStatus } from "./schema"
 
 const secret = process.env.JWT_SECRET as string
 
@@ -22,7 +14,7 @@ export const getJwt = async (token: string): Promise<JwtPayload> => {
 }
 
 export const queryAccount = async (query: string, fields?: string[]): Promise<Account> => {
-    const accounts = await list('comptes', query, fields || ['Id', 'nom', 'email', 'balance'])
+    const accounts = await list('comptes', query, fields || ['Id', 'nom', 'email', 'balance', 'ressources'])
     if(accounts.length === 1) {
         return {
             id: accounts[0].Id,
@@ -30,10 +22,17 @@ export const queryAccount = async (query: string, fields?: string[]): Promise<Ac
             email: accounts[0].email,
             balance: accounts[0].balance,
             hash: accounts[0].hash,
-            resources: accounts[0].ressources
+            resources: accounts[0].ressources ? accounts[0].ressources.map((rawResource: any): Resource => ({
+                id: rawResource.Id,
+                description: rawResource.description,
+                title: rawResource.titre,
+                status: rawResource.status === 'actif' ? ResourceStatus.active : ResourceStatus.expired,
+                expiration: new Date(rawResource.expiration),
+                images: rawResource.images
+            })) : []
         }
     }
-    throw new Error('Error when querying for logged in account.')
+    throw new Error(`Error when querying for account with query ${query}.`)
 }
 
 export const getAccount = async (token: string): Promise<Account> => {

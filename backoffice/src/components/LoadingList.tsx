@@ -18,13 +18,13 @@ const LoadingList = ({ displayItem, loadState, onErrorClosed}: Props) => {
                 content = loadState.data.map((item: any) => displayItem(item))
             }
         } else {
-            content = <Feedback message={loadState.error.message!} detail={loadState.error.detail} severity="error"
+            content = <Feedback message={loadState.error!.message!} detail={loadState.error!.detail} severity="error"
             onClose={() => onErrorClosed()} />
         }
     }
-    return <Paper sx={{ display:'flex', padding: '1rem', flexDirection: 'column', alignSelf: 'stretch' }}>
+    return <Box sx={{ display:'flex', flexDirection: 'column', alignSelf: 'stretch', gap: '0.5rem' }}>
         {content}
-    </Paper>
+    </Box>
 }
 
 export default LoadingList

@@ -7,7 +7,7 @@ interface Props {
 
 const ClientLayout = ({ title, children }: Props) => {
     return <Container sx={{ height: '100vh' }}>
-        { title && <Typography variant="h1">{ title }</Typography> }
+        { title && <Typography textAlign="center" variant="h1">{ title }</Typography> }
         { children }
     </Container>
 }

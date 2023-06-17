@@ -1,4 +1,3 @@
-import { list } from '@/noco'
 import { createSuccessResponse, createFailureResponse } from '@/respond'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcrypt'
@@ -30,8 +29,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
       return createSuccessResponse({ token, account: accountToReturn })
     }
-    return createFailureResponse('Auth failed')
+    return createFailureResponse(request, 'Auth failed')
   } catch(e: any) {
-    return createFailureResponse(e)
+    return createFailureResponse(request, e)
   }
 }

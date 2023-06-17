@@ -4,7 +4,7 @@ import MyResources from "./MyRessources"
 
 const Dashboard = () => {
     return <Box display="flex" flexDirection="column" alignContent="center">
-        <Box display="flex" flexDirection="row" justifyContent="space-between">
+        <Box display="flex" flexDirection="row" justifyContent="space-between" gap="1rem">
             <Suggestions />
             <MyResources />
         </Box>

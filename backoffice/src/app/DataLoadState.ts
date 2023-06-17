@@ -1,24 +1,24 @@
-class DataLoadState {
-    data: any
+class DataLoadState<T> {
+    data?: T
     loading: boolean
-    error: { message?: string, detail?: string}
-    constructor(data: any, loading: boolean, error: { message?: string, detail?: string}) {
+    error?: { message?: string, detail?: string}
+    constructor(data: T|undefined, loading: boolean, error?: { message?: string, detail?: string}) {
         this.data = data
         this.loading = loading
         this.error = error
     }
 }
 
-export const fromData = (data: any): DataLoadState => {
-    return new DataLoadState(data, false, {})
+export function fromData<M> (data: M): DataLoadState<M> {
+    return new DataLoadState(data, false, undefined)
 }
 
-export const initial = (): DataLoadState => {
-    return new DataLoadState({}, true, {})
+export function initial<M> (): DataLoadState<M> {
+    return new DataLoadState<M>(undefined, true, undefined)
 }
 
-export const fromError = (err: any, message: string) => {
-    return new DataLoadState({}, false, { message, detail: err.toString() })
+export function fromError<M> (err: any, message: string): DataLoadState<M> {
+    return new DataLoadState<M>(undefined, false, { message, detail: err.toString() })
 }
 
 export default DataLoadState
