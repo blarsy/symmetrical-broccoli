@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <ClientLayout>
       <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h1">Connection</Typography>
+        <Typography variant="h1">Connexion</Typography>
         <Login onSuccess={() => {
           router.push('/home')
         }}/>

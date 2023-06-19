@@ -1,6 +1,6 @@
 import { JwtPayload, verify } from "jsonwebtoken"
-import { list } from "./noco"
-import { Account, Resource, ResourceStatus } from "./schema"
+import { getOne, list } from "./noco"
+import { Account, Resource } from "./schema"
 
 const secret = process.env.JWT_SECRET as string
 
@@ -14,25 +14,23 @@ export const getJwt = async (token: string): Promise<JwtPayload> => {
 }
 
 export const queryAccount = async (query: string, fields?: string[]): Promise<Account> => {
-    const accounts = await list('comptes', query, fields || ['Id', 'nom', 'email', 'balance', 'ressources'])
-    if(accounts.length === 1) {
-        return {
-            id: accounts[0].Id,
-            name: accounts[0].nom,
-            email: accounts[0].email,
-            balance: accounts[0].balance,
-            hash: accounts[0].hash,
-            resources: accounts[0].ressources ? accounts[0].ressources.map((rawResource: any): Resource => ({
-                id: rawResource.Id,
-                description: rawResource.description,
-                title: rawResource.titre,
-                status: rawResource.status === 'actif' ? ResourceStatus.active : ResourceStatus.expired,
-                expiration: new Date(rawResource.expiration),
-                images: rawResource.images
-            })) : []
-        }
+    const account = await getOne('comptes', query, fields || ['Id', 'nom', 'email', 'balance', 'ressources'])
+
+    if(!account) throw new Error(`No account found with query ${query}.`)
+    return {
+        id: account.Id,
+        name: account.nom,
+        email: account.email,
+        balance: account.balance,
+        hash: account.hash,
+        resources: account.ressources ? account.ressources.map((rawResource: any): Resource => ({
+            id: rawResource.Id,
+            description: rawResource.description,
+            title: rawResource.titre,
+            expiration: new Date(rawResource.expiration),
+            images: rawResource.images
+        })) : []
     }
-    throw new Error(`Error when querying for account with query ${query}.`)
 }
 
 export const getAccount = async (token: string): Promise<Account> => {

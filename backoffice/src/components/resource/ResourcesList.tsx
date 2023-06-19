@@ -5,7 +5,11 @@ import { useEffect, useState } from "react"
 import LoadingList from "../LoadingList"
 import { Resource } from "@/schema"
 
-const ResourcesList = () => {
+interface Props {
+    onEditRequested: (res: Resource) => void
+}
+
+const ResourcesList = ({ onEditRequested }: Props) => {
     const [resources, setResources] = useState(initial<Resource[]>())
     useEffect(() => {
         const load = async () => {
@@ -19,8 +23,9 @@ const ResourcesList = () => {
         load()
     }, [])
 
-    return <LoadingList loadState={resources} onErrorClosed={() => setResources(initial<Resource[]>())}
-        displayItem={(item: Resource) => <Card key={item.id} sx={{ display: 'flex', flexDirection: 'row', padding: '0.5rem' }}>
+    return <LoadingList<Resource> loadState={resources} onErrorClosed={() => setResources(initial<Resource[]>())}
+        displayItem={(item: Resource) => <Card onClick={() => onEditRequested(item)} key={item.id}
+            sx={{ display: 'flex', flexDirection: 'row', padding: '0.5rem', cursor: 'pointer' }}>
             <Typography variant="body1">{item.title}</Typography>
         </Card>} />
 }

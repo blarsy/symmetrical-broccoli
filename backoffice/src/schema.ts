@@ -1,6 +1,6 @@
 export interface Account {
     name: string,
-    id: string,
+    id: number,
     email: string,
     balance: number,
     hash: string,
@@ -14,16 +14,17 @@ export interface Image {
     mimetype: string
 }
 
-export enum ResourceStatus {
-    active,
-    expired
+export interface Condition {
+    title: string,
+    description: string,
+    resourceId: number
 }
 
 export interface Resource {
-    id: string,
+    id: number,
     images: Image[],
+    conditions: Condition[],
     title: string,
     description: string,
-    status: ResourceStatus,
-    expiration: Date
+    expiration?: Date
 }

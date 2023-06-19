@@ -12,12 +12,12 @@ export const createSuccessResponse = (body?: object): NextResponse => {
       })
 }
 
-export const createFailureResponse = (req: NextRequest, error: any): NextResponse => {
+export const createFailureResponse = (req: NextRequest, error: any, statusCode: number = 500): NextResponse => {
     try{
       logger.error(`Exception during request processing: path: ${req.url}`, error)
     } finally {
       return new NextResponse(error.toString(), {
-        status: 500,
+        status: statusCode,
         headers
       })
     }

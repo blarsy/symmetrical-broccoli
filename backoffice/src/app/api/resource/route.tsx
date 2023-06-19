@@ -17,8 +17,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const token = request.headers.get('Authorization') as string
-        const { title, description, status, expiration } = await request.json()
-        const res = await create('ressources', { titre: title , description, status, expiration })
+        const { title, description, expiration } = await request.json()
+
+        const res = await create('ressources', { titre: title , description, expiration })
         const account = await getAccount(token)
         await link('comptes', account.id, 'ressources', res.Id)
         return createSuccessResponse(res)

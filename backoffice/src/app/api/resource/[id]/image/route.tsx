@@ -12,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         const data = await request.formData()
         const file = data.get('file') as Blob
 
-        await uploadResourceImage('ressources/images', account, params.id, file)
+        await uploadResourceImage('ressources/images', account, Number(params.id), file)
         
         return createSuccessResponse()
 

@@ -35,6 +35,16 @@ export const list = async (tableName: string, filter?: string, fields?: string[]
     }
 }
 
+export const update = async (tableName: string, itemId: number, data: any): Promise<any> => {
+  try {
+    const res = await api.dbTableRow.update('v1', projectName, tableName, itemId, data)
+    logData(`Updated item with id ${itemId} in ${tableName}: ${data}`, res)
+  } catch(e: any) {
+    logData(`Error trying to update item with id ${itemId} in ${tableName}: ${data}`, e, true)
+    throw e
+  }
+}
+
 export const create = async (tableName: string, data: object): Promise<any> => {
   try {
     const res = await api.dbTableRow.create('v1', projectName, tableName, data)
@@ -58,21 +68,10 @@ export const link = async (tableName: string, sourceItemId: string, columnName: 
   }
 }
 
-// export const update = async (tableName: string, data: any): Promise<any> => {
-//   try {
-//     const res = await api.dbTableRow.update('v1', projectName, tableName, data.Id, data)
-//     logData(`Updated item in ${tableName}: ${data}`, res)
-//     return res
-//   } catch (e: any) {
-//     logData(`Error trying to update item in ${tableName}: ${data}`, e, true)
-//     throw e
-//   }
-// }
-
-export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: string, fileBlob: Blob): Promise<void> => {
+export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, fileBlob: Blob): Promise<void> => {
   const formData = new FormData()
   const logicalPath = `noco/${projectName}/${attachmentPath}`
-  const resource = account.resources.find(resouce => resouce.id === resourceId)
+  const resource = account.resources.find(resource => resource.id === resourceId)
   if(!resource) throw new Error(`Resource with id ${resourceId} not found.`)
   try {
     formData.append('path', fileBlob)
@@ -95,6 +94,17 @@ export const uploadResourceImage = async (attachmentPath: string, account: Accou
     }
   } catch(e: any) {
     logData(`Error trying to upload file to ${logicalPath}`, e, true)
+    throw e
+  }
+}
+
+export const getOne = async (tableName: string, query: string, fields: string[]): Promise<any> => {
+  try{
+    const res = await api.dbTableRow.findOne('v1', projectName, tableName, { where: query, fields})
+    logData(`Querying ${tableName} with filter ${query}`, res)
+    return res
+  } catch(e: any) {
+    logData(`Error when querying ${tableName} with filter ${query}`, e, true)
     throw e
   }
 }

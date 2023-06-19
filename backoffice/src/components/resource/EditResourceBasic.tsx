@@ -1,33 +1,40 @@
 import { Box, TextField } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add'
 import { DateTimePicker } from '@mui/x-date-pickers'
-import axios from "axios"
 import { Formik } from "formik"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import * as yup from 'yup'
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../Feedback"
 import dayjs, { Dayjs } from "dayjs"
-import { Resource } from "@/apiutil"
+import { Condition, Image, Resource } from "@/schema"
+import ResourceImages from "./ResourceImages"
+import ResourceConditions from "./ResourceConditions"
 
 interface Props {
     onSuccess: (itemSaved: any) => void,
-    data: Resource
+    data: Resource,
+    buttonName?: string,
+    buttonIcon?: ReactNode,
+    onSubmit: (values: {
+        title: string
+        description: string
+        expiration: dayjs.Dayjs
+    }) => Promise<any>
 }
 
-const EditResource = ({ data, onSuccess }: Props ) => {
-    const [ errorInfo, setErrorInfo ] = useState({} as { message: string, detail: string })
-    const minExpiration = new Date(Date.now() + 60 * 60 * 1000)
+const EditResourceBasic = ({ data, onSuccess, onSubmit, buttonName = 'Créer', buttonIcon = <AddIcon/> }: Props ) => {
+    const [ errorInfo, setErrorInfo ] = useState({} as { message?: string, detail?: string })
+    const minExpiration = dayjs(new Date(Date.now() + 60 * 60 * 1000))
     return <Formik initialValues={{ title: data.title, description: data.description, 
-        expiration: data.expiration}}
+        expiration: dayjs(data.expiration), images: [] as Image[], conditions: [] as Condition[]}}
         onSubmit={async (values, { setSubmitting }) => {
             try {
-                const res = await axios.post('/api/resource', { 
-                    title: values.title, description: values.description, expiration: values.expiration },
-                    { headers: { Authorization: localStorage.getItem('token') }})
-                onSuccess(res)
+                const res = await onSubmit(values)
+                setErrorInfo({})
+                onSuccess(res.data)
             } catch(e: any) {
-                setErrorInfo({ message: 'Echec de l\'authentification.', detail: e.toString() })
+                setErrorInfo({ message: 'Echec de la sauvegarde.', detail: e.toString() })
             } finally {
                 setSubmitting(false)
             }
@@ -36,7 +43,7 @@ const EditResource = ({ data, onSuccess }: Props ) => {
             description: yup.string().required('Ce champ est requis'),
             expiration: yup.date().transform((value: Dayjs) => isNaN(value.valueOf()) ? undefined : value).typeError('Veuillez entrer une date valide')
                 .test('expirationIsEnoughInTheFuture', 'Cette offre doit durer au moins une heure', val => {
-                    return !!val && val > minExpiration
+                    return !!val && val > minExpiration.toDate()
                 })
         })} >
         {({
@@ -71,11 +78,13 @@ const EditResource = ({ data, onSuccess }: Props ) => {
                             error: touched.expiration && !!errors.expiration
                         }}}
                         />
+                    <ResourceImages />
+                    <ResourceConditions />
                     <LoadingButton loading={isSubmitting}
                         loadingPosition="start"
-                        startIcon={<AddIcon />}
+                        startIcon={buttonIcon}
                         type="submit"
-                        variant="contained">Créer</LoadingButton>
+                        variant="contained">{buttonName}</LoadingButton>
                     {errorInfo.message && <Feedback severity="error" message={errorInfo.message} 
                         detail={errorInfo.detail} 
                         onClose={() => setErrorInfo({ message: '', detail: '' })}/>}
@@ -86,4 +95,4 @@ const EditResource = ({ data, onSuccess }: Props ) => {
     </Formik>
 }
 
-export default EditResource
+export default EditResourceBasic
