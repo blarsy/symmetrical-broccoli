@@ -1,4 +1,4 @@
-import { Box, TextField } from "@mui/material"
+import { Box, TextField, Typography } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add'
 import { DateTimePicker } from '@mui/x-date-pickers'
 import { Formik } from "formik"
@@ -10,9 +10,9 @@ import dayjs, { Dayjs } from "dayjs"
 import { Condition, Image, Resource } from "@/schema"
 import ResourceImages from "./ResourceImages"
 import ResourceConditions from "./ResourceConditions"
+import { fromData, fromError, initial } from "@/app/DataLoadState"
 
 interface Props {
-    onSuccess: (itemSaved: any) => void,
     data: Resource,
     buttonName?: string,
     buttonIcon?: ReactNode,
@@ -20,21 +20,25 @@ interface Props {
         title: string
         description: string
         expiration: dayjs.Dayjs
-    }) => Promise<any>
+    }, images: File[]) => Promise<any>,
+    onImagesSelected?: (files: File[]) => void,
+    onRequestImageDelete: (image: Image) => Promise<void>
 }
 
-const EditResourceBasic = ({ data, onSuccess, onSubmit, buttonName = 'Créer', buttonIcon = <AddIcon/> }: Props ) => {
-    const [ errorInfo, setErrorInfo ] = useState({} as { message?: string, detail?: string })
+const EditResourceBasic = ({ data, onSubmit, buttonName = 'Créer', 
+        buttonIcon = <AddIcon/>, onImagesSelected, onRequestImageDelete}: Props ) => {
+    const [ feedback, setFeedback ] = useState(initial<null>(false))
+    const [ images, setImages ] = useState([] as File[])
+    
     const minExpiration = dayjs(new Date(Date.now() + 60 * 60 * 1000))
     return <Formik initialValues={{ title: data.title, description: data.description, 
-        expiration: dayjs(data.expiration), images: [] as Image[], conditions: [] as Condition[]}}
+        expiration: dayjs(data.expiration), images: data.images as Image[], conditions: [] as Condition[]}}
         onSubmit={async (values, { setSubmitting }) => {
             try {
-                const res = await onSubmit(values)
-                setErrorInfo({})
-                onSuccess(res.data)
+                const res = await onSubmit(values, images)
+                setFeedback(fromData(null))
             } catch(e: any) {
-                setErrorInfo({ message: 'Echec de la sauvegarde.', detail: e.toString() })
+                setFeedback(fromError(e, 'Echec de la sauvegarde.'))
             } finally {
                 setSubmitting(false)
             }
@@ -58,7 +62,7 @@ const EditResourceBasic = ({ data, onSuccess, onSubmit, buttonName = 'Créer', b
         }) => (
         <form onSubmit={handleSubmit}>
             <Box display="flex" padding="1rem" justifyContent="center">
-                <Box display="flex" flexDirection="column" maxWidth="25em" gap="0.5rem">
+                <Box display="flex" flexDirection="column" gap="0.5rem" flex="1">
                     <TextField size="small" id="title" variant="standard" type="text" {...getFieldProps('title')} 
                         label="Titre" error={!!errors.title} helperText={touched.title && errors.title}/>
                     <TextField id="description" size="small" name="description" multiline
@@ -78,16 +82,20 @@ const EditResourceBasic = ({ data, onSuccess, onSubmit, buttonName = 'Créer', b
                             error: touched.expiration && !!errors.expiration
                         }}}
                         />
-                    <ResourceImages />
+                    <Typography variant="body1">Photos</Typography>
+                    <ResourceImages justifySelf="stretch" images={images} setImages={setImages} 
+                        existingImages={data.images} onImagesSelected={onImagesSelected} 
+                        onRequestImageDelete={onRequestImageDelete}/>
+                    <Typography variant="body1">Conditions</Typography>
                     <ResourceConditions />
                     <LoadingButton loading={isSubmitting}
                         loadingPosition="start"
                         startIcon={buttonIcon}
                         type="submit"
                         variant="contained">{buttonName}</LoadingButton>
-                    {errorInfo.message && <Feedback severity="error" message={errorInfo.message} 
-                        detail={errorInfo.detail} 
-                        onClose={() => setErrorInfo({ message: '', detail: '' })}/>}
+                    {feedback.error?.message && <Feedback severity="error" message={feedback.error!.message} 
+                        detail={feedback.error!.detail} 
+                        onClose={() => setFeedback(initial<null>(false))}/>}
                 </Box>
             </Box>
         </form>

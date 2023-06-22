@@ -19,6 +19,8 @@ const ResourcePage = ({ params }: { params: { id: string } }) => {
                 const res = await axios.get(`/api/resource/${params.id}`, { headers: {
                     Authorization: localStorage.getItem('token') as string
                 }})
+                // workaround the fact that res.data.image returns as a string, while it obviously is JSON
+                res.data.images = JSON.parse(res.data.images)
                 setResource(fromData(res.data))
             } catch (e: any) {
                 setResource(fromError(e, 'Erreur au chargement de la ressource.'))
@@ -33,10 +35,21 @@ const ResourcePage = ({ params }: { params: { id: string } }) => {
             detail={resource.error.detail} />
     } else {
         content = <EditResourceBasic buttonIcon={<EditIcon />} buttonName="Modifier" 
-            data={resource.data!} onSuccess={() => {}} 
-            onSubmit={async values => {
+            data={resource.data!}
+            onSubmit={async (values: any) => {
                 return await axios.post(`/api/resource/${params.id}`, values, 
                     { headers: { Authorization: localStorage.getItem('token') }})
+            }} onImagesSelected={async files => {
+                const res = await axios.post(`/api/resource/${params.id}/image`, { files } , { headers: {
+                    Authorization: localStorage.getItem('token') as string,
+                    "Content-Type": "multipart/form-data"
+                }})
+                setResource(fromData(res.data))
+            }} onRequestImageDelete={async image => {
+                const res = await axios.patch(`/api/resource/${params.id}/image`, { path: image.path }, { headers: {
+                    Authorization: localStorage.getItem('token') as string
+                }})
+                setResource(fromData(res.data))
             }}/>
     }
 

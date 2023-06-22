@@ -7,7 +7,7 @@ import EditResourceBasic from "@/components/resource/EditResourceBasic"
 import { Box } from "@mui/material"
 import Feedback from "@/components/Feedback"
 import { useState } from "react"
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromError, initial } from "@/app/DataLoadState"
 import axios from "axios"
 
 const Create = () => {
@@ -16,20 +16,22 @@ const Create = () => {
         <ClientWrapper>
             <LoggedInLayout title="Créer une ressource">
                 <Box>
-                    <EditResourceBasic data={{ id: '', title: '', description: '', 
+                    <EditResourceBasic data={{ id: 0, title: '', description: '', 
                         expiration: new Date(Date.now().valueOf() + 2 * 24 * 60 * 60 * 1000),
-                        images: [] }} onSuccess={async (resource: Resource) => {
+                        images: [], conditions: [] }} onSubmit={async (values, images) => {
                             try {
-                                await axios.post(`/resource/${resource.id}`, resource)
-                                setBasicFeedback(fromData<null>(null))
-                            } catch(e: any) {
-                                setBasicFeedback(fromError(e, 'Erreur lors de la sauvegarde de la ressource.'))
+                                const res = await axios.post('/api/resource', { 
+                                    title: values.title, description: values.description, 
+                                    expiration: values.expiration ? values.expiration.toDate(): undefined },
+                                    { headers: { Authorization: localStorage.getItem('token') }})
+                                await axios.postForm(`/api/resource/${res.data.Id}/image`, { files: images } , { headers: {
+                                    Authorization: localStorage.getItem('token') as string,
+                                    "Content-Type": "multipart/form-data"
+                                }})
+                                return res
+                            } catch (e: any) {
+                                setBasicFeedback(fromError(e, 'Erreur pendant la sauvegarde'))
                             }
-                        }} onSubmit={async values => {
-                            return await axios.post('/api/resource', { 
-                                title: values.title, description: values.description, 
-                                expiration: values.expiration ? values.expiration.toDate(): undefined },
-                                { headers: { Authorization: localStorage.getItem('token') }})
                         }}/>
                     { basicFeedback.error && <Feedback message={basicFeedback.error.message!}
                         detail={basicFeedback.error.detail} severity="error"/>}

@@ -13,8 +13,12 @@ export function fromData<M> (data: M): DataLoadState<M> {
     return new DataLoadState(data, false, undefined)
 }
 
-export function initial<M> (): DataLoadState<M> {
+export function beginOperation<M>(): DataLoadState<M> {
     return new DataLoadState<M>(undefined, true, undefined)
+}
+
+export function initial<M> (loading: boolean = true): DataLoadState<M> {
+    return new DataLoadState<M>(undefined, loading, undefined)
 }
 
 export function fromError<M> (err: any, message: string): DataLoadState<M> {

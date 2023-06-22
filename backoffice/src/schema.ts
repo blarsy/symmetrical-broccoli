@@ -28,3 +28,12 @@ export interface Resource {
     description: string,
     expiration?: Date
 }
+
+export const fromRawResource = (raw: any): Resource => ({
+    id: raw.Id,
+    title: raw.titre,
+    description: raw.description,
+    expiration: raw.expiration,
+    images: raw.images,
+    conditions: raw.conditions
+})
