@@ -1,6 +1,6 @@
 import { JwtPayload, verify } from "jsonwebtoken"
-import { getOne, list } from "./noco"
-import { Account, Resource } from "./schema"
+import { getOne } from "./noco"
+import { Account, Resource } from "../schema"
 
 const secret = process.env.JWT_SECRET as string
 
@@ -28,7 +28,8 @@ export const queryAccount = async (query: string, fields?: string[]): Promise<Ac
             description: rawResource.description,
             title: rawResource.titre,
             expiration: new Date(rawResource.expiration),
-            images: rawResource.images
+            images: rawResource.images,
+            conditions: rawResource.conditions
         })) : []
     }
 }

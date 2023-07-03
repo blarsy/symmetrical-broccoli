@@ -1,7 +1,7 @@
-import { Box, TextField, Typography } from "@mui/material"
+import { Box, Button, IconButton, TextField, Typography } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add'
 import { DateTimePicker } from '@mui/x-date-pickers'
-import { Formik } from "formik"
+import { FieldArray, Form, Formik, FormikErrors, FormikTouched, getIn } from "formik"
 import { ReactNode, useState } from "react"
 import * as yup from 'yup'
 import { LoadingButton } from "@mui/lab"
@@ -9,8 +9,10 @@ import Feedback from "../Feedback"
 import dayjs, { Dayjs } from "dayjs"
 import { Condition, Image, Resource } from "@/schema"
 import ResourceImages from "./ResourceImages"
-import ResourceConditions from "./ResourceConditions"
 import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { ResourceImage } from "./ResourceImage"
+import CreateIcon from '@mui/icons-material/Create'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 interface Props {
     data: Resource,
@@ -19,23 +21,37 @@ interface Props {
     onSubmit: (values: {
         title: string
         description: string
-        expiration: dayjs.Dayjs
-    }, images: File[]) => Promise<any>,
-    onImagesSelected?: (files: File[]) => void,
-    onRequestImageDelete: (image: Image) => Promise<void>
+        expiration: dayjs.Dayjs,
+        conditions: Condition[]
+    }, images: ResourceImage[]) => Promise<any>,
+    onImageSelected?: (file: ResourceImage ) => void,
+    onRequestImageDelete?: (image: Image) => Promise<void>
 }
 
-const EditResourceBasic = ({ data, onSubmit, buttonName = 'Créer', 
-        buttonIcon = <AddIcon/>, onImagesSelected, onRequestImageDelete}: Props ) => {
+interface FormValues {
+    title: string, description: string, 
+    expiration: dayjs.Dayjs, images: Image[], conditions: Condition[]
+}
+
+const isTouched = (touched: FormikTouched<FormValues>, idx: number, propName: string):boolean => {
+    return !!touched.conditions && !!touched.conditions[idx] && !!(touched.conditions[idx] as any)[propName]
+}
+
+const errorMessage = (touched: FormikTouched<FormValues>, idx: number, errors: FormikErrors<FormValues>, propName: string): string | undefined => {
+    return isTouched(touched, idx, propName) && errors.conditions && errors.conditions[idx] && (errors.conditions[idx] as any)[propName]
+}
+
+const EditResource = ({ data, onSubmit, buttonName = 'Créer', 
+        buttonIcon = <AddIcon/>, onImageSelected, onRequestImageDelete}: Props ) => {
     const [ feedback, setFeedback ] = useState(initial<null>(false))
-    const [ images, setImages ] = useState([] as File[])
+    const [ images, setImages ] = useState([] as ResourceImage[])
     
     const minExpiration = dayjs(new Date(Date.now() + 60 * 60 * 1000))
     return <Formik initialValues={{ title: data.title, description: data.description, 
-        expiration: dayjs(data.expiration), images: data.images as Image[], conditions: [] as Condition[]}}
+        expiration: dayjs(data.expiration), images: data.images, conditions: data.conditions} as FormValues}
         onSubmit={async (values, { setSubmitting }) => {
             try {
-                const res = await onSubmit(values, images)
+                await onSubmit(values, images)
                 setFeedback(fromData(null))
             } catch(e: any) {
                 setFeedback(fromError(e, 'Echec de la sauvegarde.'))
@@ -47,20 +63,24 @@ const EditResourceBasic = ({ data, onSubmit, buttonName = 'Créer',
             description: yup.string().required('Ce champ est requis'),
             expiration: yup.date().transform((value: Dayjs) => isNaN(value.valueOf()) ? undefined : value).typeError('Veuillez entrer une date valide')
                 .test('expirationIsEnoughInTheFuture', 'Cette offre doit durer au moins une heure', val => {
-                    return !!val && val > minExpiration.toDate()
-                })
+                    return !!val && !!(data.id || val > minExpiration.toDate())
+                }),
+            conditions: yup.array(yup.object({
+                title: yup.string().max(30, 'Ce titre est trop long.').required('Ce champ est requis.'),
+                description: yup.string().max(8000, 'Cette valeur est trop longue.').required('Ce champ est requis.')
+            }))
         })} >
         {({
             values,
             errors,
             touched,
             handleChange,
-            handleSubmit,
             isSubmitting,
             getFieldProps, 
-            setFieldValue
+            setFieldValue,
+            handleBlur
         }) => (
-        <form onSubmit={handleSubmit}>
+        <Form>
             <Box display="flex" padding="1rem" justifyContent="center">
                 <Box display="flex" flexDirection="column" gap="0.5rem" flex="1">
                     <TextField size="small" id="title" variant="standard" type="text" {...getFieldProps('title')} 
@@ -84,10 +104,26 @@ const EditResourceBasic = ({ data, onSubmit, buttonName = 'Créer',
                         />
                     <Typography variant="body1">Photos</Typography>
                     <ResourceImages justifySelf="stretch" images={images} setImages={setImages} 
-                        existingImages={data.images} onImagesSelected={onImagesSelected} 
-                        onRequestImageDelete={onRequestImageDelete}/>
+                        existingImages={data.images} onImageSelected={onImageSelected} 
+                        onRequestImageDelete={onRequestImageDelete || (async () => {})}/>
                     <Typography variant="body1">Conditions</Typography>
-                    <ResourceConditions />
+                    <Box>
+                        <FieldArray name="conditions" 
+                            render={arrayHelpers => <Box display="flex" flexDirection="column" gap="0.5rem">
+                                {values.conditions.map((condition, idx) => <Box key={idx} display="flex" flexDirection="row">
+                                    <TextField sx={{ flex: '1 0 30%' }} id="title" size="small" name={`conditions[${idx}].title`} multiline
+                                        label="Titre" type="text" variant="standard" value={condition.title} 
+                                        onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'title')} 
+                                        helperText={errorMessage(touched, idx, errors, 'title')}/>
+                                    <TextField sx={{ flex: '1 0 70%' }} id="description" size="small" name={`conditions[${idx}].description`} multiline
+                                        label="Description" type="text" variant="standard" value={condition.description} 
+                                        onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'description')} 
+                                        helperText={errorMessage(touched, idx, errors, 'description')}/>
+                                    <IconButton onClick={() => arrayHelpers.remove(idx)}><DeleteIcon /></IconButton>
+                                </Box>)}
+                                <Button sx={{ alignSelf: 'flex-start' }} variant="outlined" startIcon={<CreateIcon />} onClick={() => arrayHelpers.push({})}>Ajouter</Button>
+                            </Box>} />
+                    </Box>
                     <LoadingButton loading={isSubmitting}
                         loadingPosition="start"
                         startIcon={buttonIcon}
@@ -98,9 +134,9 @@ const EditResourceBasic = ({ data, onSubmit, buttonName = 'Créer',
                         onClose={() => setFeedback(initial<null>(false))}/>}
                 </Box>
             </Box>
-        </form>
+        </Form>
         )}
     </Formik>
 }
 
-export default EditResourceBasic
+export default EditResource

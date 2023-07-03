@@ -1,9 +1,7 @@
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 
 const Suggestions = () => {
-    return <Box flex={1}>
-        Suggestions
-    </Box>
+    return <Typography variant="h2">Suggestions</Typography>
 }
 
 export default Suggestions

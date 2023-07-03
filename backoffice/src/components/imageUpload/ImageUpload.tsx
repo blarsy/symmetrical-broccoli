@@ -3,20 +3,19 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
 import DataLoadState from "@/app/DataLoadState"
 
 interface Props {
-    onImagesSelected: (list: FileList) => Promise<void>
+    onImageSelected: (file: File) => Promise<void>
 }
 
-const FileUpload = ({ onImagesSelected }: Props) => {
+const ImageUpload = ({ onImageSelected }: Props) => {
     return <Box>
         <input
             accept="image/*"
             id="file-img"
-            multiple
             hidden
             type="file"
             onChange={async e => {
                 if(e.target.files && e.target.files.length > 0) {
-                    onImagesSelected(e.target.files)
+                    onImageSelected(e.target.files.item(0) as File)
                 }
             }}
         />
@@ -26,4 +25,4 @@ const FileUpload = ({ onImagesSelected }: Props) => {
     </Box>
 }
 
-export default FileUpload
+export default ImageUpload

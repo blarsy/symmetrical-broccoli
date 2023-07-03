@@ -1,6 +1,6 @@
-import { getAccount } from "@/apiutil"
-import { getOne, update, uploadResourceImage } from "@/noco"
-import { createFailureResponse, createSuccessResponse } from "@/respond"
+import { getAccount } from "@/server/apiutil"
+import { getOne, update, uploadResourceImage } from "@/server/noco"
+import { createFailureResponse, createSuccessResponse } from "@/server/respond"
 import { Image, fromRawResource } from "@/schema"
 import { NextRequest } from "next/server"
 
@@ -39,7 +39,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
         const { path } = await request.json()
 
-        const resource = await getOne('ressources', `(Id,eq,${params.id}`, ['images'])
+        const resource = await getOne('ressources', `(Id,eq,${params.id})`, ['images'])
         resource.images = JSON.parse(resource.images)
 
         const imageToDelete = resource.images.find((image: Image) => image.path === path)

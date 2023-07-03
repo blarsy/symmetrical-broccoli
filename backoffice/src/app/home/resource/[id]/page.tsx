@@ -4,7 +4,7 @@ import AppContextProvider from "@/components/AppContextProvider"
 import ClientWrapper from "@/components/ClientWrapper"
 import Feedback from "@/components/Feedback"
 import LoggedInLayout from "@/components/LoggedInLayout"
-import EditResourceBasic from "@/components/resource/EditResourceBasic"
+import EditResource from "@/components/resource/EditResource"
 import { Resource } from "@/schema"
 import { CircularProgress } from "@mui/material"
 import axios from "axios"
@@ -34,13 +34,13 @@ const ResourcePage = ({ params }: { params: { id: string } }) => {
         content = <Feedback severity="error" message={resource.error.message!}
             detail={resource.error.detail} />
     } else {
-        content = <EditResourceBasic buttonIcon={<EditIcon />} buttonName="Modifier" 
+        content = <EditResource buttonIcon={<EditIcon />} buttonName="Modifier" 
             data={resource.data!}
             onSubmit={async (values: any) => {
                 return await axios.post(`/api/resource/${params.id}`, values, 
                     { headers: { Authorization: localStorage.getItem('token') }})
-            }} onImagesSelected={async files => {
-                const res = await axios.post(`/api/resource/${params.id}/image`, { files } , { headers: {
+            }} onImageSelected={async file => {
+                const res = await axios.post(`/api/resource/${params.id}/image`, { files: [ file.blob ] } , { headers: {
                     Authorization: localStorage.getItem('token') as string,
                     "Content-Type": "multipart/form-data"
                 }})

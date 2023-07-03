@@ -1,42 +1,39 @@
 import { Box, Chip, CircularProgress } from "@mui/material"
-import FileUpload from "../FileUpload"
 import { beginOperation, fromData, fromError, initial } from "@/app/DataLoadState"
 import { Image as ImageData } from "@/schema"
 import { useState } from "react"
 import Feedback from "../Feedback"
-import EnlargableImage from "../EnlargableImage"
+import EnlargableImage from "../imageUpload/EnlargableImage"
+import CroppedImageUpload from "../imageUpload/CroppedImageUpload"
+import { ResourceImage } from "./ResourceImage"
 
 const imagePublicBaseUrl = process.env.NEXT_PUBLIC_NOCO_API_URL
 
 interface Props {
-    images: File[],
-    setImages: (files: File[]) => void,
-    onImagesSelected?: (files: File[]) => void,
+    images: ResourceImage[],
+    setImages: (files: ResourceImage[]) => void,
+    onImageSelected?: (file: ResourceImage) => void,
     existingImages: ImageData[],
     onRequestImageDelete: (image: ImageData) => Promise<void>,
     justifySelf: string
 }
 const imageSize = 150
 
-const ResourceImages = ({ images, setImages, onImagesSelected, onRequestImageDelete, existingImages, justifySelf="center" }: Props) => {
+const ResourceImages = ({ images, setImages, onImageSelected, onRequestImageDelete, existingImages, justifySelf="center" }: Props) => {
     const [feedback, setFeedback] = useState(initial<null>(false))
     return <Box justifySelf={justifySelf}>
-        <FileUpload onImagesSelected={async files => {
+        <CroppedImageUpload onImageSelected={async (file: ResourceImage) => {
             setFeedback(beginOperation())
-            const filesToAdd: File[] = []
-            for(let i = 0; i < files.length; i++) {
-                filesToAdd.push(files[i])
-            }
             
             try {
-                if(!onImagesSelected) {
-                    setImages([ ...images, ...filesToAdd])
+                if(!onImageSelected) {
+                    setImages([ ...images, file])
                 } else {
-                    onImagesSelected && onImagesSelected(filesToAdd)
+                    onImageSelected && onImageSelected(file)
                 }
                 setFeedback(fromData(null))
             } catch (e: any) {
-                setImages([ ...images, ...filesToAdd])
+                setImages([ ...images, file])
                 setFeedback(fromError(e, 'Error processing selected image(s)'))
             }
         }} />

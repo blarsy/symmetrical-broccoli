@@ -17,6 +17,7 @@ const Register = ({ onSuccess }: Props) => {
     return <Formik initialValues={{ email: '', password: '', name: '' }}
         onSubmit={(values, { setSubmitting }) => {
             try {
+                setSubmitting(true)
                 axios.post('/api/user', { email: values.email, name: values.name, password: values.password})
                 onSuccess()
             } catch(e: any) {

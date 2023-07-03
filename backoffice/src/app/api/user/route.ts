@@ -1,8 +1,8 @@
-import { create } from '@/noco'
-import { createSuccessResponse, createFailureResponse } from '@/respond'
+import { create } from '@/server/noco'
+import { createSuccessResponse, createFailureResponse } from '@/server/respond'
 import { NextRequest } from 'next/server'
 import bcrypt from 'bcrypt'
-import { getJwt, queryAccount } from '@/apiutil'
+import { getJwt, queryAccount } from '@/server/apiutil'
 
 const INITIAL_BALANCE = 5
 

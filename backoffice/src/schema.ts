@@ -17,7 +17,7 @@ export interface Image {
 export interface Condition {
     title: string,
     description: string,
-    resourceId: number
+    id: number
 }
 
 export interface Resource {
@@ -35,5 +35,21 @@ export const fromRawResource = (raw: any): Resource => ({
     description: raw.description,
     expiration: raw.expiration,
     images: raw.images,
-    conditions: raw.conditions
+    conditions: conditionsFromRaw(raw.conditions)
 })
+
+export const conditionsFromRaw = (raws: any[]): Condition[] => {
+    return raws.map((raw: any) => ({
+        id: raw.Id as number,
+        title: raw.titre as string,
+        description: raw.description as string
+    }))
+}
+
+export const conditionsToRaw = (conditions: Condition[]): any[] => {
+    return conditions.map((condition: any) => ({
+        Id: condition.id,
+        titre: condition.title,
+        description: condition.description
+    }))
+}

@@ -1,8 +1,8 @@
-import { createSuccessResponse, createFailureResponse } from '@/respond'
+import { createSuccessResponse, createFailureResponse } from '@/server/respond'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
-import { queryAccount } from '@/apiutil'
+import { queryAccount } from '@/server/apiutil'
 
 const createToken = async (secret: string, data: any): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -19,6 +19,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { email, password } = await request.json()
 
     const account = await queryAccount(`(email,eq,${email})`, ['Id', 'nom', 'email', 'balance', 'hash'])
+    console.log(email)
     const success = await bcrypt.compare(password, account.hash)
     if(success) {
       const token = await createToken(process.env.JWT_SECRET as string, { email })

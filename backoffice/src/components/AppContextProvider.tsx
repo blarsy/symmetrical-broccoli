@@ -1,5 +1,4 @@
-import { Account } from "@/apiutil"
-import { useRouter } from "next/router"
+import { Account } from "@/schema"
 import { createContext, useState } from "react"
 
 interface AppStateData {
