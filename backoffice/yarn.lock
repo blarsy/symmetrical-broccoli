@@ -780,6 +780,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/formidable@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "@types/formidable@npm:3.4.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 8136835e4964015a389595bea39a271e65fa8dce2590770b0e69cb8f29cbd2cd2f7376a8714766fda5796838c426929a3f575cdd565ecf0f19b048f40e0d456f
+  languageName: node
+  linkType: hard
+
 "@types/json5@npm:^0.0.29":
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
@@ -1147,6 +1156,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"asap@npm:^2.0.0":
+  version: 2.0.6
+  resolution: "asap@npm:2.0.6"
+  checksum: b296c92c4b969e973260e47523207cd5769abd27c245a68c26dc7a0fe8053c55bb04360237cb51cab1df52be939da77150ace99ad331fb7fb13b3423ed73ff3d
+  languageName: node
+  linkType: hard
+
 "ast-types-flow@npm:^0.0.7":
   version: 0.0.7
   resolution: "ast-types-flow@npm:0.0.7"
@@ -1235,6 +1251,7 @@ __metadata:
     "@mui/system": ^5.8.0
     "@mui/x-date-pickers": ^6.7.0
     "@types/bcrypt": ^5.0.0
+    "@types/formidable": ^3.4.0
     "@types/jsonwebtoken": ^9.0.2
     "@types/node": 20.2.5
     "@types/react": 18.2.8
@@ -1244,6 +1261,7 @@ __metadata:
     dayjs: ^1.11.8
     eslint: 8.42.0
     eslint-config-next: 13.4.4
+    formidable: ^3.5.0
     formik: ^2.4.1
     jsonwebtoken: ^9.0.0
     next: 13.4.4
@@ -1707,6 +1725,16 @@ __metadata:
   version: 2.0.1
   resolution: "detect-libc@npm:2.0.1"
   checksum: ccb05fcabbb555beb544d48080179c18523a343face9ee4e1a86605a8715b4169f94d663c21a03c310ac824592f2ba9a5270218819bb411ad7be578a527593d7
+  languageName: node
+  linkType: hard
+
+"dezalgo@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "dezalgo@npm:1.0.4"
+  dependencies:
+    asap: ^2.0.0
+    wrappy: 1
+  checksum: 895389c6aead740d2ab5da4d3466d20fa30f738010a4d3f4dcccc9fc645ca31c9d10b7e1804ae489b1eb02c7986f9f1f34ba132d409b043082a86d9a4e745624
   languageName: node
   linkType: hard
 
@@ -2379,6 +2407,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"formidable@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "formidable@npm:3.5.0"
+  dependencies:
+    dezalgo: ^1.0.4
+    hexoid: ^1.0.0
+    once: ^1.4.0
+  checksum: 7b86a39987b93a22c1d57491b1a320f7f56320b34976077e1baaef452cadb43525bf523fe0fa6d8becfc8e6f5721f92dee8de56c0f18f2de1055da80972ecfc3
+  languageName: node
+  linkType: hard
+
 "formik@npm:^2.4.1":
   version: 2.4.1
   resolution: "formik@npm:2.4.1"
@@ -2713,6 +2752,13 @@ __metadata:
   dependencies:
     function-bind: ^1.1.1
   checksum: b9ad53d53be4af90ce5d1c38331e712522417d017d5ef1ebd0507e07c2fbad8686fffb8e12ddecd4c39ca9b9b47431afbb975b8abf7f3c3b82c98e9aad052792
+  languageName: node
+  linkType: hard
+
+"hexoid@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "hexoid@npm:1.0.0"
+  checksum: 27a148ca76a2358287f40445870116baaff4a0ed0acc99900bf167f0f708ffd82e044ff55e9949c71963852b580fc024146d3ac6d5d76b508b78d927fa48ae2d
   languageName: node
   linkType: hard
 
@@ -3880,7 +3926,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"once@npm:^1.3.0":
+"once@npm:^1.3.0, once@npm:^1.4.0":
   version: 1.4.0
   resolution: "once@npm:1.4.0"
   dependencies:

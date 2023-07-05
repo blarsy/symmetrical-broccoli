@@ -7,7 +7,7 @@ import EnlargableImage from "../imageUpload/EnlargableImage"
 import CroppedImageUpload from "../imageUpload/CroppedImageUpload"
 import { ResourceImage } from "./ResourceImage"
 
-const imagePublicBaseUrl = process.env.NEXT_PUBLIC_NOCO_API_URL
+const imagePublicBaseUrl = process.env.NEXT_PUBLIC_IMG_URL
 
 interface Props {
     images: ResourceImage[],

@@ -1,4 +1,4 @@
-import { JwtPayload, verify } from "jsonwebtoken"
+import { JwtPayload, sign, verify } from "jsonwebtoken"
 import { getOne } from "./noco"
 import { Account, Resource } from "../schema"
 
@@ -38,3 +38,13 @@ export const getAccount = async (token: string): Promise<Account> => {
     const jwt = await getJwt(token)
     return queryAccount(`(email,eq,${jwt.email})`)
 }
+
+export const createToken = async (secret: string, data: any): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      data.exp = Date.now() / 1000 + (60 * 60 * 24 * 2)
+      sign(data, secret, (err: Error | null, token?: string) => {
+        if(err) reject(err)
+        resolve(token!)
+      })
+    })
+  }

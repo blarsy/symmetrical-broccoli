@@ -3,6 +3,7 @@ import log from './logger'
 import axios from 'axios'
 import { Account, Image } from '../schema'
 import { randomUUID } from 'crypto'
+import { readFile } from 'fs/promises'
 
 const nocoUrl = process.env.NEXT_PUBLIC_NOCO_API_URL as string
 const nocoApiKey = process.env.NOCO_API_KEY as string
@@ -145,7 +146,7 @@ export const link = async (tableName: string, sourceItemId: number, columnName: 
   }
 }
 
-export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, fileBlobs: Blob[]): Promise<object> => {
+export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, filePaths: string[]): Promise<object> => {
   const formData = new FormData()
   const logicalPath = `noco/${projectName}/${attachmentPath}`
   if(!account.resources.find(resource => resource.id === resourceId)) throw new Error(`Resource with id ${resourceId} not found.`)
@@ -155,10 +156,12 @@ export const uploadResourceImage = async (attachmentPath: string, account: Accou
   resource.images = JSON.parse(resource.images)
 
   try {
-    fileBlobs.forEach(file => {
-      formData.append('files[]', file)
-      logData(`Uploading file at ${logicalPath}: ${file.name}`, file)
+    const promises = filePaths.map(async filePath => {
+      formData.append('files[]', new Blob([await readFile(filePath)]))
+      logData(`Uploading file at ${logicalPath}: ${filePath}`, {})
     })
+
+    await Promise.all(promises)
 
     const uploadRes = await axios.post(`${nocoUrl}/api/v1/db/storage/upload?path=${logicalPath}`, 
       formData, { headers: { 'xc-token': nocoApiKey } })
