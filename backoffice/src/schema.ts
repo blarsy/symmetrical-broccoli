@@ -3,8 +3,11 @@ export interface Account {
     id: number,
     email: string,
     balance: number,
-    hash: string,
-    resources: Resource[]
+    hash?: string,
+    resources?: Resource[],
+    linkedAccounts: Account[],
+    invitedAccounts: Account[],
+    invitedByAccounts: Account[]
 }
 
 export interface Image {
@@ -17,7 +20,7 @@ export interface Image {
 export interface Condition {
     title: string,
     description: string,
-    id: number
+    id?: number
 }
 
 export interface Resource {
@@ -29,13 +32,27 @@ export interface Resource {
     expiration?: Date
 }
 
+export interface AccountLinkRequest {
+    id: number,
+    requester: Account,
+    target: Account
+}
+
+export const fromRawAccount = (raw: any): Account => ({
+    id: raw.Id, name: raw.nom, balance: raw.balance, email: raw.email, hash: raw.hash,
+    resources: raw.ressources ? raw.ressources.map((rawRes:any) => fromRawResource(rawRes)): [],
+    linkedAccounts: raw.comptes_liés ? raw.comptes_liés.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+    invitedAccounts: raw.comptes_invites ? raw.comptes_invites.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+    invitedByAccounts: raw['comptes List1'] ? raw['comptes List1'].map((rawAccount: any) => fromRawAccount(rawAccount)) : []
+})
+
 export const fromRawResource = (raw: any): Resource => ({
     id: raw.Id,
     title: raw.titre,
     description: raw.description,
     expiration: raw.expiration,
     images: raw.images,
-    conditions: conditionsFromRaw(raw.conditions)
+    conditions: raw.conditions ? conditionsFromRaw(raw.conditions): []
 })
 
 export const conditionsFromRaw = (raws: any[]): Condition[] => {
@@ -53,3 +70,9 @@ export const conditionsToRaw = (conditions: Condition[]): any[] => {
         description: condition.description
     }))
 }
+
+export const linkRequestFromRaw = (rawLinkRequest: any): AccountLinkRequest => ({
+    id: rawLinkRequest.Id,
+    requester: fromRawAccount(rawLinkRequest.demandeur[0]),
+    target: fromRawAccount(rawLinkRequest.cible[0])
+})

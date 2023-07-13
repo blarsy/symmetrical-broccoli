@@ -1,11 +1,8 @@
-import { create } from '@/server/noco'
 import { getToken, respondWithFailure, respondWithSuccess } from '@/server/respond'
-import { NextRequest } from 'next/server'
-import bcrypt from 'bcrypt'
 import { getJwt, queryAccount } from '@/server/apiutil'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { create } from '@/server/dal/user'
 
-const INITIAL_BALANCE = 5
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if(req.method === 'GET') {
@@ -19,9 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if(req.method === 'POST') {
     try {
       const { name, email, password } = await req.body
-      const salt = await bcrypt.genSalt()
-      const hash = await bcrypt.hash(password, salt)
-      await create('comptes', { email, nom: name, salt, hash, balance: INITIAL_BALANCE  })
+      await create(name, email, password)
       respondWithSuccess(res)
     } catch(e: any) {
       respondWithFailure(req, res, e)

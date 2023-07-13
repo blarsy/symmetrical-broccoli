@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { id } = req.query
             const resourceId = Number(id)
             //check if resource belongs to the logged in account
-            if(!account.resources.find((res) => res.id == resourceId)) {
+            if(!account.resources || !account.resources.find((res) => res.id == resourceId)) {
                 respondWithFailure(req, res, new Error('Resource not found'), 404)
                 return
             }
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { id } = req.query
             const resourceId = Number(id)
 
-            if(!account.resources.find((res) => res.id == resourceId)) {
+            if(!account.resources || !account.resources.find((res) => res.id == resourceId)) {
                 respondWithFailure(req, res, new Error('Resource not found'), 404)
                 return
             }

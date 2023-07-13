@@ -10,7 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const account = await getAccount(getToken(req))
             const { id } = req.query
             const resourceId = Number(id)
-            if(!account.resources.find(res => res.id == resourceId)) {
+            
+            if(!account.resources || !account.resources.find(res => res.id == resourceId)) {
                 respondWithFailure(req, res, new Error('Resource not found'), 404)
                 return
             }
@@ -29,7 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const account = await getAccount(getToken(req))
             const { title, description, expiration, conditions } = req.body
     
-            if(!account.resources.find(res => res.id === resourceId)) {
+            console.log('account', account, 'resourceId', resourceId)
+            if(!account.resources || !account.resources.some(res => res.id === resourceId)) {
                 respondWithFailure(req, res, 'Resource not found', 404)
                 return
             }

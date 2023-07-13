@@ -1,8 +1,7 @@
 import { getAccount, getJwt, queryAccount } from "@/server/apiutil"
-import { bulkCreate, create, link } from "@/server/noco"
-import { conditionsToRaw } from "@/schema"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
+import { create } from "@/server/dal/resource"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
@@ -17,16 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (req.method === 'POST') {
         try {
             const { title, description, expiration, conditions } = req.body
-    
             const account = await getAccount(getToken(req))
-            const resource = await create('ressources', { titre: title , description, expiration })
-            await link('comptes', account.id, 'ressources', resource.Id)
-
-            const conditionsRes = await bulkCreate('conditions', conditionsToRaw(conditions))
-            
-            await Promise.all(conditionsRes.map(async (condition: any) => {
-                return link('ressources', resource.Id, 'conditions', condition.id)
-            }))
+            const resource = await create(account.id, title, description, expiration, conditions)
     
             respondWithSuccess(res, resource)
         } catch(e: any) {

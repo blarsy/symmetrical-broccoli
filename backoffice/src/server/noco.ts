@@ -1,9 +1,10 @@
-import { Api, LinkToAnotherColumnReqType, NormalColumnRequestType } from 'nocodb-sdk'
-import log from './logger'
+import { Api, RequestParams } from 'nocodb-sdk'
+import { logData } from './logger'
 import axios from 'axios'
-import { Account, Image } from '../schema'
+import { Account, Image, fromRawAccount, fromRawResource } from '../schema'
 import { randomUUID } from 'crypto'
 import { readFile } from 'fs/promises'
+import { ensureDataStoreUptodate } from './databaseMaintenance'
 
 const nocoUrl = process.env.NEXT_PUBLIC_NOCO_API_URL as string
 const nocoApiKey = process.env.NOCO_API_KEY as string
@@ -17,83 +18,25 @@ const api = new Api({
     },timeout: 15000
   })
 
-const systemCols: NormalColumnRequestType[] = [
-  {"column_name":"id","title":"Id","dt":"int4","dtx":"integer","rqd":true,"pk":true,"un":false,"ai":true,"cdf":null,"np":11,"ns":0,"dtxp":"11","dtxs":"","uidt":"ID"},
-  {"column_name":"created_at","title":"CreatedAt","dt":"timestamp","dtx":"specificType","rqd":false,"pk":false,"un":false,"ai":false,"cdf":"now()","np":null,"ns":null,"dtxp":"","dtxs":"","uidt":"DateTime"},
-  {"column_name":"updated_at","title":"UpdatedAt","dt":"timestamp","dtx":"specificType","rqd":false,"pk":false,"un":false,"ai":false,"au":true,"cdf":"now()","np":null,"ns":null,"dtxp":"","dtxs":"","uidt":"DateTime"}
-]
+export const ensureDbUpToDate = async (): Promise<string> => {
+  return ensureDataStoreUptodate(api, projectName, orgs, nocoUrl)
+}
 
-export const ensureDataStoreCreated = async () => {
-  const projects = await api.project.list()
-  if(projects.list.some((proj) => proj.title === projectName)) {
-    logData(`Project ${projectName} detected, starting up ...`, {})
-  } else {
-    try {
-      await api.project.create({ title: projectName })
-      const projects = await api.project.list()
-      const projectInfo = projects.list.find(project => project.title === projectName)!
-      const projectId = projectInfo.id!
-      
-      const tokenRes = await api.apiToken.create(projectId, { description: 'apps' })
-
-      const apiInNewProject = new Api({
-        baseURL: nocoUrl,
-        headers: {
-          'xc-token': tokenRes.token
-        },timeout: 15000
-      })
-      const conditionsTable = await apiInNewProject.dbTable.create(projectId, { table_name: 'conditions', title:'conditions', columns: [
-        { column_name: 'titre', title: 'titre', uidt: 'SingleLineText', pv: true },
-        { column_name: 'description', title: 'description', uidt: 'LongText'},
-        ...systemCols
-
-      ] })
-      const resourcesTable = await apiInNewProject.dbTable.create(projectId, { table_name: 'ressources', title: 'ressources', columns: [
-        { column_name: 'titre', title: 'titre', uidt: 'SingleLineText', pv: true },
-        { column_name: 'description', title: 'description', uidt: 'LongText'},
-        { column_name: 'expiration', title: 'expiration', uidt: 'DateTime'},
-        { column_name: 'images', title: 'images', uidt: 'Attachment'},
-        ...systemCols,
-      ]  })
-      await apiInNewProject.dbTableColumn.create(resourcesTable.id!, {
-          childId: conditionsTable.id!, parentId: resourcesTable.id!, title: 'conditions',
-          type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
-        } as LinkToAnotherColumnReqType)
-      const accountsTable = await apiInNewProject.dbTable.create(projectId, { table_name: 'comptes', title: 'comptes', columns: [
-        { column_name: 'nom', title: 'nom', uidt: 'SingleLineText', pv: true },
-        { column_name: 'email', title: 'email', uidt: 'SingleLineText', pv: true},
-        { column_name: 'hash', title: 'hash', uidt: 'SingleLineText'},
-        { column_name: 'balance', title: 'balance', uidt: 'Currency'},
-        ...systemCols
-      ]  })
-      await apiInNewProject.dbTableColumn.create(accountsTable.id!, {
-        childId: resourcesTable.id!, parentId: accountsTable.id!, title: 'ressources',
-        type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
-      } as LinkToAnotherColumnReqType)
-      await apiInNewProject.dbTableColumn.create(accountsTable.id!, {
-        childId: accountsTable.id!, parentId: accountsTable.id!, title: 'comptes_liés',
-        type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
-      } as LinkToAnotherColumnReqType)
-        } catch (e: any) {
-      logData(`Error when creating project ${projectName}.`, e)
-      throw e
-    }
-    
+export const remove = async (tableName: string, itemId: string): Promise<number> => {
+  try{
+    const res = await api.dbTableRow.delete(orgs, projectName, tableName, itemId)
+    logData(`Deleted from ${tableName}, Id ${itemId}`, { res })
+    return res
+  } catch(e: any) {
+    logData(`Error when deleting from ${tableName} at Id ${itemId}`, e, true)
+    throw e
   }
 }
 
-const logData = (context: string, resultOrError: object, isError?: boolean) => {
-  if(isError) {
-    log.error(context, resultOrError)
-  } else {
-    log.info(`${context}. ${JSON.stringify(resultOrError)}`)
-  }
-}
-
-export const list = async (tableName: string, filter?: string, fields?: string[]): Promise<any[]> => {
+export const list = async (tableName: string, filter?: string, fields?: string[], otherParams?: RequestParams): Promise<any[]> => {
     try{
-      const res = await api.dbTableRow.list(orgs, projectName, tableName, { where: filter, fields})
-      logData(`Querying ${tableName} with filter ${filter}`, res)
+      const res = await api.dbTableRow.list(orgs, projectName, tableName, { where: filter, fields }, otherParams)
+      logData(`Querying ${tableName} with filter ${filter} ${otherParams && 'other params: ' + JSON.stringify(otherParams)}`, res)
       return res.list
     } catch(e: any) {
       logData(`Error when querying ${tableName} with filter ${filter}`, e, true)
@@ -146,10 +89,22 @@ export const link = async (tableName: string, sourceItemId: number, columnName: 
   }
 }
 
+export const unlink = async (tableName: string, sourceItemId: number, columnName: string, targetItemId: string): Promise<any> => {
+  try {
+    const res = await api.dbTableRow.nestedRemove(orgs, projectName, 
+      tableName, sourceItemId, 'hm', columnName, targetItemId)
+    logData(`Unlinking item from ${tableName} via column ${columnName}: `, res)
+    return res
+  } catch(e: any) {
+    logData(`Error trying to unlink item from ${tableName} via column ${columnName}: `, e, true)
+    throw e
+  }
+}
+
 export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, filePaths: string[]): Promise<object> => {
   const formData = new FormData()
   const logicalPath = `noco/${projectName}/${attachmentPath}`
-  if(!account.resources.find(resource => resource.id === resourceId)) throw new Error(`Resource with id ${resourceId} not found.`)
+  if(!account.resources || !account.resources.find(resource => resource.id === resourceId)) throw new Error(`Resource with id ${resourceId} not found.`)
   const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'images'])
   
   // some odd behavior here: JSON is returned as a string, so I parse it manually.
@@ -189,16 +144,16 @@ export const uploadResourceImage = async (attachmentPath: string, account: Accou
   }
 }
 
-export const getOne = async (tableName: string, query: string, fields: string[]): Promise<any> => {
+export const getOne = async (tableName: string, query: string, fields: string[], otherParams?: RequestParams): Promise<any> => {
   try{
-    const res = await api.dbTableRow.findOne(orgs, projectName, tableName, { where: query, fields })
+    const res = await api.dbTableRow.findOne(orgs, projectName, tableName, { where: query, fields }, otherParams)
     if(!(res as any)[fields[0]]) {
       throw new Error('Not found')
     }
-    logData(`Querying ${tableName} with filter ${query}`, res)
+    logData(`Querying ${tableName} with filter ${query} ${otherParams ? 'other params : ' + JSON.stringify(otherParams) : ''}`, res)
     return res
   } catch(e: any) {
-    logData(`Error when querying ${tableName} with filter ${query}`, e, true)
+    logData(`Error when querying ${tableName} with filter ${query} ${otherParams ? 'other params : ' + JSON.stringify(otherParams) : ''}`, e, true)
     throw e
   }
 }
@@ -226,9 +181,6 @@ export const bulkDelete = async (tableName: string, objectsToDelete: any[]): Pro
 
 export const bulkUpdate = async (tableName: string, data: any[]): Promise<any[]> => {
   try {
-    // const res = await Promise.all(
-    //   data.map((item: any) => update(tableName, item.Id, item))
-    // )
     const res = await api.dbTableRow.bulkUpdate(orgs, projectName, tableName, data)
     logData(`Updated objects from ${tableName}`, data)
     return res

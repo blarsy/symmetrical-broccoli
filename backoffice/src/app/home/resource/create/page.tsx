@@ -27,12 +27,12 @@ const Create = () => {
                                     conditions: values.conditions },
                                     { headers: { Authorization: localStorage.getItem('token') }})
                                 if(images.length > 0){
-                                    await axios.postForm(`/api/resource/${res.data.Id}/image`, { files: images.map(img => img.blob) } , { headers: {
+                                    await axios.postForm(`/api/resource/${res.data.id}/image`, { files: images.map(img => img.blob) } , { headers: {
                                         Authorization: localStorage.getItem('token') as string,
                                         "Content-Type": "multipart/form-data"
                                     }})
                                 }
-                                router.push(`/home/resource/${res.data.Id}`)
+                                router.push(`/home/resource/${res.data.id}`)
                                 return res
                             } catch (e: any) {
                                 setBasicFeedback(fromError(e, 'Erreur pendant la sauvegarde'))

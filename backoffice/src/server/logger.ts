@@ -39,4 +39,12 @@ const parseError = (e: any) => {
     return `name: ${e.name}\nmessage: ${e.message}\nstack: ${e.stack}`
 }
 
+export const logData = (context: string, resultOrError: object, isError?: boolean) => {
+    if(isError) {
+      logger!.error(context, resultOrError)
+    } else {
+      logger!.info(`${context}. ${JSON.stringify(resultOrError)}`)
+    }
+  }
+
 export default logger!

@@ -1,14 +1,12 @@
-
-import { ensureDbUpToDate } from "@/server/noco"
-import { respondWithFailure, respondWithSuccess } from "@/server/respond"
+import { getSuggestions } from "@/server/dal/resource"
+import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
         try {
-            const result = await ensureDbUpToDate()
-            
-            respondWithSuccess(res, { outcome: result })
+            const resources = await getSuggestions(getToken(req))
+            respondWithSuccess(res, resources)
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }
