@@ -5,6 +5,7 @@
         "**/*.tsx"
     ],
     "compilerOptions": {
+      "jsx": "react",
       "types": ["node"],
       "typeRoots": ["./types"]
     }

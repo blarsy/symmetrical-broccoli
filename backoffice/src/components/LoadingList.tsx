@@ -1,4 +1,4 @@
-import DataLoadState from "@/app/DataLoadState"
+import DataLoadState from "@/DataLoadState"
 import { Box, CircularProgress, List, ListItem, ListItemButton, ListItemText, Paper, Typography } from "@mui/material"
 import Feedback from "./Feedback"
 import { MouseEventHandler } from "react"

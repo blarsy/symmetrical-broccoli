@@ -1,7 +1,7 @@
 import { getToken, respondWithFailure, respondWithSuccess } from '@/server/respond'
 import { getJwt, queryAccount } from '@/server/apiutil'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { create } from '@/server/dal/user'
+import { create, updateAccount } from '@/server/dal/user'
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,7 +21,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch(e: any) {
       respondWithFailure(req, res, e)
     }
+  } else if(req.method === 'PATCH') {
+    try {
+        const { password, newPassword, name, email } = req.body
+        const updatedAccount = await updateAccount(getToken(req), password, newPassword, name, email)
+        respondWithSuccess(res, updatedAccount)
+    } catch (e: any) {
+        respondWithFailure(req, res, e)
+    }
   } else {
-    respondWithFailure(req, res, new Error('Not implemented'), 405)
+    res.end()
   }
 }

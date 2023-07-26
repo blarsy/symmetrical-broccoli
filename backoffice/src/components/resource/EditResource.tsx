@@ -9,7 +9,7 @@ import Feedback from "../Feedback"
 import dayjs, { Dayjs } from "dayjs"
 import { Condition, Image, Resource } from "@/schema"
 import ResourceImages from "./ResourceImages"
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import { ResourceImage } from "./ResourceImage"
 import CreateIcon from '@mui/icons-material/Create'
 import DeleteIcon from '@mui/icons-material/Delete'

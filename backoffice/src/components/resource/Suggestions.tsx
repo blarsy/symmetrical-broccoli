@@ -1,4 +1,4 @@
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import { Resource } from "@/schema"
 import { Box, Tooltip, Typography } from "@mui/material"
 import axios from "axios"

@@ -1,6 +1,6 @@
 import { Box, CircularProgress, IconButton, Tab, Tabs, Typography } from "@mui/material"
 import LoadingList from "../LoadingList"
-import { beginOperation, fromData, fromError, initial } from "@/app/DataLoadState"
+import { beginOperation, fromData, fromError, initial } from "@/DataLoadState"
 import { useEffect, useState } from "react"
 import { Account } from "@/schema"
 import axios from "axios"

@@ -1,4 +1,4 @@
-import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/app/DataLoadState"
+import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/DataLoadState"
 import { LoadingButton } from "@mui/lab"
 import { Button, Typography, Tooltip, Dialog, DialogActions, DialogContent } from "@mui/material"
 import { Box } from "@mui/system"

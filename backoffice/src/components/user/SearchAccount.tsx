@@ -2,7 +2,7 @@ import { Account } from "@/schema"
 import { Alert, Box, InputAdornment, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 import LoadingList from "../LoadingList"
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import axios from "axios"
 import SearchIcon from '@mui/icons-material/Search'
 

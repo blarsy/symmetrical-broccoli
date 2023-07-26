@@ -2,7 +2,7 @@ import { Typography, Container, Box, CircularProgress, IconButton, Link } from "
 import { AppContext } from "./AppContextProvider"
 import { Fragment, useContext, useEffect, useState } from "react"
 import axios from "axios"
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import { useRouter } from "next/navigation"
 import Feedback from "./Feedback"
 import HomeIcon from '@mui/icons-material/Home'

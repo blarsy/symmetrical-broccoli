@@ -1,4 +1,4 @@
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import { Card, Typography } from "@mui/material"
 import axios from "axios"
 import { useEffect, useState } from "react"

@@ -20,3 +20,6 @@ web-build/
 .env.production
 *.log
 web.zip
+
+android
+.yarn

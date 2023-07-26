@@ -6,7 +6,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if(req.method === 'POST') {
     try {
       const { email, password } = req.body
-      
       const result = await authenticate(email, password)
 
       respondWithSuccess(res, result)
@@ -14,6 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       respondWithFailure(req, res, e)
     }
   } else {
-    res.status(405).end()
+    res.end()
   }
 }

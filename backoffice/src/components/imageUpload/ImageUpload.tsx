@@ -1,6 +1,6 @@
 import { Box, Fab } from "@mui/material"
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate"
-import DataLoadState from "@/app/DataLoadState"
+import DataLoadState from "@/DataLoadState"
 
 interface Props {
     onImageSelected: (file: File) => Promise<void>

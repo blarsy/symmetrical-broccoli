@@ -1,5 +1,5 @@
 "use client"
-import { fromData, fromError, initial } from "@/app/DataLoadState"
+import { fromData, fromError, initial } from "@/DataLoadState"
 import AppContextProvider from "@/components/AppContextProvider"
 import ClientWrapper from "@/components/ClientWrapper"
 import Feedback from "@/components/Feedback"

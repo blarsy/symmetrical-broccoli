@@ -2,12 +2,14 @@ import { createToken, getAccount, queryAccount } from "../apiutil"
 import bcrypt from 'bcrypt'
 import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
+import * as yup from 'yup'
+import { isValidPassword } from "@/utils"
 
 const INITIAL_BALANCE = 5
 
 export const authenticate = async(email: string, password: string) => {
     const account = await queryAccount(`(email,eq,${email})`, ['Id', 'nom', 'email', 'balance', 'hash'])
-    console.log('email', email, 'password', password, 'hash', account.hash)
+
     const success = await bcrypt.compare(password, account.hash!)
     if(success) {
         const token = await createToken(process.env.JWT_SECRET as string, { email })
@@ -24,10 +26,15 @@ export const authenticate = async(email: string, password: string) => {
     }
 }
 
-export const create = async (name: string, email: string, password: string): Promise<Account> => {
+const hashFromPassword = async (password: string): Promise<string> => {
     const salt = await bcrypt.genSalt()
-    const hash = await bcrypt.hash(password, salt)
-    const accountRaw = await nocoCreate('comptes', { email, nom: name, salt, hash, balance: INITIAL_BALANCE  })
+    return bcrypt.hash(password, salt)
+}
+
+export const create = async (name: string, email: string, password: string): Promise<Account> => {
+    const hash = await hashFromPassword(password)
+
+    const accountRaw = await nocoCreate('comptes', { email, nom: name, hash, balance: INITIAL_BALANCE  })
     return fromRawAccount(accountRaw)
 }
 
@@ -79,4 +86,35 @@ export const getInvitableAccounts = async (search: string, token: string): Promi
         !sourceAccount.linkedAccounts.some(linked => linked.id === acc.id))
 
     return filteredResult
+}
+
+export const updateAccount = async (token: string, password: string, newPassword: string, name: string, email: string): Promise<Account> => {
+    if(!token) throw new Error('missing token')
+    if(!yup.string().email().validate(email)) throw new Error('invalid email')
+    if(!yup.string().max(30).validate(name)) throw new Error('invalid name')
+    if(newPassword || password) {
+        if(!isValidPassword(newPassword)) throw new Error('invalid new password')
+        if(!yup.string().required().validate(password)) throw new Error('missing password')
+    }
+
+    const sourceAccount = await getAccount(token, ['Id', 'nom', 'email', 'hash'])
+
+    const updatedAccount = sourceAccount
+
+    if(newPassword || password) {
+        if(!await bcrypt.compare(password, sourceAccount.hash!)) throw new Error('Authentication failed')
+        updatedAccount.hash = await hashFromPassword(newPassword)
+    }
+    
+    if(email) {
+        //TODO: email verification flow
+        updatedAccount.email = email
+    }
+
+    if(name) {
+        updatedAccount.name = name
+    }
+
+    const updated = update('comptes', sourceAccount.id, updatedAccount)
+    return fromRawAccount(updated)
 }

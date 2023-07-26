@@ -6,7 +6,7 @@ import EditResource from "@/components/resource/EditResource"
 import { Box } from "@mui/material"
 import Feedback from "@/components/Feedback"
 import { useState } from "react"
-import { fromError, initial } from "@/app/DataLoadState"
+import { fromError, initial } from "@/DataLoadState"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 

@@ -1,5 +1,5 @@
 import { Box, Chip, CircularProgress } from "@mui/material"
-import { beginOperation, fromData, fromError, initial } from "@/app/DataLoadState"
+import { beginOperation, fromData, fromError, initial } from "@/DataLoadState"
 import { Image as ImageData } from "@/schema"
 import { useState } from "react"
 import Feedback from "../Feedback"
