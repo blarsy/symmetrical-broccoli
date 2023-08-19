@@ -20,7 +20,7 @@ export const respondWithFailure = (req: NextApiRequest, res: NextApiResponse, er
     try{
       logger.error(`Exception during request processing: path: ${req.url}`, error)
     } finally {
-      res.status(statusCode).json({ error })
+      res.status(statusCode).send(error.toString ? error.toString(): error)
     }
   }
 }

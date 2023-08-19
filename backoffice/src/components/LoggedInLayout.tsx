@@ -32,6 +32,7 @@ const LoggedInLayout = ({ title, children }: Props) => {
                     setAccount(fromData<Account>(res.data.account))
                 } catch (e: any) {
                     setAccount(fromError(e, 'Echec lors du chargement du compte.'))
+                    localStorage.removeItem('token')
                     router.push('/')
                 }
             }

@@ -30,7 +30,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const account = await getAccount(getToken(req))
             const { title, description, expiration, conditions } = req.body
     
-            console.log('account', account, 'resourceId', resourceId)
             if(!account.resources || !account.resources.some(res => res.id === resourceId)) {
                 respondWithFailure(req, res, 'Resource not found', 404)
                 return

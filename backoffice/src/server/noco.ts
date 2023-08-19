@@ -1,7 +1,7 @@
 import { Api, RequestParams } from 'nocodb-sdk'
 import { logData } from './logger'
 import axios from 'axios'
-import { Account, Image, fromRawAccount, fromRawResource } from '../schema'
+import { Account, Image } from '../schema'
 import { randomUUID } from 'crypto'
 import { readFile } from 'fs/promises'
 import { ensureDataStoreUptodate } from './databaseMaintenance'

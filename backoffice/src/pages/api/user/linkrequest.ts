@@ -1,15 +1,13 @@
-import { linkRequestFromRaw } from "@/schema"
-import { getJwt, queryAccount } from "@/server/apiutil"
+import { getJwt } from "@/server/apiutil"
 import { answerInvite, invite, uninvite } from "@/server/dal/user"
-import { create, getOne, link, list, remove } from "@/server/noco"
+import { list } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { NextApiRequest, NextApiResponse } from "next"
 
-const getRequest = async (requester: string, targetAccount: number) => {
-    const myRequests = await list('demandes_liaison_comptes', `nested[demandeur][where]=(Id,eq,${requester})`, ['Id', 'demandeur', 'cible'])
-    console.log(JSON.stringify(myRequests), 'targetAccount', targetAccount)
-    return myRequests.find((request: any) => request.cible.length > 0 && request.cible[0].Id === targetAccount)
-}
+// const getRequest = async (requester: string, targetAccount: number) => {
+//     const myRequests = await list('demandes_liaison_comptes', `nested[demandeur][where]=(Id,eq,${requester})`, ['Id', 'demandeur', 'cible'])
+//     return myRequests.find((request: any) => request.cible.length > 0 && request.cible[0].Id === targetAccount)
+// }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {

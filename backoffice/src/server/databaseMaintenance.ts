@@ -2,9 +2,14 @@ import { NormalColumnRequestType, Api, LinkToAnotherColumnReqType } from "nocodb
 import { logData } from "./logger"
 import { answerInvite, create, invite } from "./dal/user"
 import { create as createResource} from './dal/resource'
+import { list } from "./noco"
 
 const systemTableName = 'systeme'
 const accountsTableName = 'comptes'
+
+const testPwd1 = process.env.TEST_PWD_1 as string
+const testPwd2 = process.env.TEST_PWD_2 as string
+const testPwd3 = process.env.TEST_PWD_3 as string
 
 const systemCols: NormalColumnRequestType[] = [
     {"column_name":"id","title":"Id","dt":"int4","dtx":"integer","rqd":true,"pk":true,"un":false,"ai":true,"cdf":null,"np":11,"ns":0,"dtxp":"11","dtxs":"","uidt":"ID"},
@@ -98,6 +103,15 @@ const insertTestData  = async () => {
         return Promise.all([
             answerInvite(accounts[1].email, accounts[0].id.toString(), true)
         ])
+    } else {
+        const testAccounts = await list('comptes', `(email,eq,test1@gmail.com`, ['Id'])
+        if(testAccounts.length === 0) {
+            await Promise.all([
+                create('Google test1', 'test1@gmail.com', testPwd1),
+                create('Google test2', 'test2@gmail.com', testPwd2),
+                create('Google test3', 'test3@gmail.com', testPwd3)
+            ])
+        }
     }
 }
 

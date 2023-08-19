@@ -20,6 +20,13 @@ web-build/
 .env.production
 *.log
 web.zip
+web/
 
-android
 .yarn
+.keystore
+app/android/app/src/
+app/android/app/build/
+app/android/.*
+app/android/**/*.jar
+app/android/app/*.keystore
+gradle.properties

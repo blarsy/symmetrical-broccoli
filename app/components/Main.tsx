@@ -10,15 +10,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import AppTabs from './AppTabs'
 import { IconComponentProvider, Icon, Box } from '@react-native-material/core'
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
+import { t } from '../i18n'
 
 const Tab = createBottomTabNavigator()
 
 const screens: { title: string, iconName: string, component: Element}[] = [
-    { title: 'Recherche', iconName: 'search', component: Search },
-    { title: 'Historique', iconName: 'history', component: History },
-    { title: 'Resource', iconName: 'edit', component: EditResource },
-    { title: 'Chat', iconName: 'chat-bubble-outline', component: Chat },
-    { title: 'Profil', iconName: 'account-circle', component: Profile },
+    { title: t('search_label'), iconName: 'search', component: Search },
+    { title: t('history_label'), iconName: 'history', component: History },
+    { title: t('resource_label'), iconName: 'edit', component: EditResource },
+    { title: t('chat_label'), iconName: 'chat-bubble-outline', component: Chat },
+    { title: t('profile_label'), iconName: 'account-circle', component: Profile },
 ]
 
 export default function Main () {
@@ -30,9 +31,9 @@ export default function Main () {
                         title: screen.title, 
                         tabBarIcon: () => <Icon size={30} name={screen.iconName} />,
                         headerTitleAlign: 'center',
-                        headerTitle: () => <Box style={{ display: 'flex', flexDirection: 'row', gap: '1rem', alignItems: 'center' }}>
+                        headerTitle: () => <Box style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center' }}>
                             <Icon size={30} name={screen.iconName} />
-                            <Text>{screen.title}</Text>
+                            <Text style={{ fontSize: 24 }}>{screen.title}</Text>
                         </Box>
                     }}/>) }
                 </Tab.Navigator>

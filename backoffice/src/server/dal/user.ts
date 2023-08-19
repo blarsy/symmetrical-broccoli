@@ -1,6 +1,6 @@
 import { createToken, getAccount, queryAccount } from "../apiutil"
 import bcrypt from 'bcrypt'
-import { link, list, create as nocoCreate, unlink, update } from '../noco'
+import { getOne, link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'
 import { isValidPassword } from "@/utils"
@@ -32,6 +32,8 @@ const hashFromPassword = async (password: string): Promise<string> => {
 }
 
 export const create = async (name: string, email: string, password: string): Promise<Account> => {
+    const duplicates = await list('comptes', `(email,eq,${email})`, ['Id'])
+    if(duplicates.length > 0) throw new Error('Already registered with this email address.')
     const hash = await hashFromPassword(password)
 
     const accountRaw = await nocoCreate('comptes', { email, nom: name, hash, balance: INITIAL_BALANCE  })
@@ -49,7 +51,6 @@ export const invite = async (email: string, target: string) => {
 
     if(Number(target) === account.id) throw new Error('Invalid')
     if(account.invitedAccounts.some(invited => invited.id === Number(target))) throw new Error('Duplicate request')
-    console.log(account.linkedAccounts)
     if(account.linkedAccounts.some(linked => linked.id === Number(target))) throw new Error('Already linked')
 
     await link('comptes', account.id, 'comptes_invites', target)

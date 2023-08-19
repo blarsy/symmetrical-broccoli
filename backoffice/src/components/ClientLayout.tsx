@@ -1,4 +1,5 @@
-import { Typography, Container } from "@mui/material"
+import { Typography, Container, Box } from "@mui/material"
+import Footer from '@/app/Footer'
 
 interface Props {
     title?: string,
@@ -6,9 +7,16 @@ interface Props {
 }
 
 const ClientLayout = ({ title, children }: Props) => {
-    return <Container sx={{ height: '100vh' }}>
-        { title && <Typography textAlign="center" variant="h1">{ title }</Typography> }
-        { children }
+    return <Container sx={{ height: '100vh', display: 'flex', alignItems: 'stretch', justifyContent: 'center' }}>
+        <Box display="flex" flexDirection="column" flex="1" justifyContent="flex-start">
+            <Box display="flex" flexDirection="column" justifyContent="space-between" flex="1">
+                <Box>
+                    { title && <Typography textAlign="center" variant="h1">{ title }</Typography> }
+                    { children }
+                </Box>
+                <Footer />
+            </Box>
+        </Box>
     </Container>
 }
 
