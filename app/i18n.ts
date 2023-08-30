@@ -2,6 +2,7 @@ import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 import LanguageDetector from 'i18next-browser-languagedetector'
 import RNLanguageDetector from '@os-team/i18next-react-native-language-detector'
+import { Platform } from 'react-native'
 
 const resources = {
   en: {
@@ -15,6 +16,7 @@ const resources = {
       "registration_error": "Error while signing up.",
       "email_label": "Email",
       "password_label": "Password",
+      "repeatpassword_label": "Repeat new password",
       "newpassword_label": "New password",
       "repeatnewpassword_label": "Repeat new password",
       "connection_label": "Connection",
@@ -32,7 +34,11 @@ const resources = {
       "register_page_title": "Sign up",
       "notsubscribedyet_label": "Not signed up yet ?",
       "cancel_caption": "Cancel",
-      "ok_caption": "Ok"
+      "ok_caption": "Ok",
+      "editProfileMenuTitle": "Account",
+      "friendsMenuTitle": "Network",
+      "requestError": "Error while processing request",
+      "noData": "No data"
     }
   },
   fr: {
@@ -64,13 +70,17 @@ const resources = {
       "register_page_title": "Inscription",
       "notsubscribedyet_label": "Pas encore inscrit ?",
       "cancel_caption": "Annuler",
-      "ok_caption": "Ok"
+      "ok_caption": "Ok",
+      "editProfileMenuTitle": "Compte",
+      "friendsMenuTitle": "Réseau",
+      "requestError": "Erreur pendant l'exécution de la requête",
+      "noData": "Pas de donnée"
     }
   }
 }
 
 i18n
-    .use(typeof window != 'undefined' ? LanguageDetector : RNLanguageDetector)
+    .use(Platform.OS === "web" ? LanguageDetector : RNLanguageDetector)
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         compatibilityJSON: 'v3',

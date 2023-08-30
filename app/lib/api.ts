@@ -23,7 +23,23 @@ export const getAccount = async (token: string): Promise<Account> => {
     const res = await apiCall(makeFetchCall(`${API_URL}/user`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }}))
-    return (await res.json()).account
+    if(res.status === 200) {
+        return (await res.json()).account
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const getNetwork = async (token: string): Promise<Account[]> => {
+    const res = await apiCall(makeFetchCall(`${API_URL}/user/network`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    }}))
+    if(res.status === 200) {
+        const network = (await res.json())
+        return network.linkedAccounts
+    } else {
+        throw new Error(res.statusText)
+    }
 }
 
 export const updateAccount = async (token: string, password: string, newPassword: string, name: string, email: string): Promise<Account> => {
@@ -31,7 +47,11 @@ export const updateAccount = async (token: string, password: string, newPassword
         'Authorization': token,
         'Content-Type': 'application/json'
     }}))
-    return res.json()
+    if(res.status === 200) {
+        return res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
 }
 
 const makeFetchCall = (input: RequestInfo, init?: RequestInit): Promise<Response> => {

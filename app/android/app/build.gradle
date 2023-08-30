@@ -80,8 +80,8 @@ android {
         applicationId "com.topela"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 10
-        versionName "0.0.1"
+        versionCode 25
+        versionName "0.0.13"
     }
     signingConfigs {
         debug {

@@ -1,28 +1,30 @@
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { Flex } from 'react-native-flex-layout'
-import { AppBar } from "@react-native-material/core"
-import { Text, View } from "react-native"
+import { AppBar, Stack } from "@react-native-material/core"
+import { Text } from "react-native"
 import React from "react"
 import { t } from 'i18next'
 import LoginForm from "./form/LoginForm"
 import RegisterForm from "./form/RegisterForm"
+import PrimaryColoredContainer from "./layout/PrimaryColoredContainer"
+import { primaryColor } from "./layout/constants"
 
 export default function Login () {
     const [registering, setRegistering] = useState(false)
     if(!registering) {
-        return <Fragment>
-            <AppBar title={color => <Text style={{ color: color.color, fontSize: 24 }}>{t('login_page_title')}</Text>} />
-            <Flex items="stretch" style={{ margin: '1rem', flex: 1, justifyContent: 'center' }}>
-                <LoginForm toggleRegistering={() => setRegistering(true) } />
-            </Flex>
-        </Fragment>
+        return <PrimaryColoredContainer>
+            <Stack style={{ flex: 1, alignItems: "center", margin: 10, justifyContent: "space-evenly", alignSelf: "stretch" }}>
+                <Text style={{ color: '#000', fontWeight: "bold", fontSize: 38, textTransform: "uppercase" }}>{t('login_page_title')}</Text>
+                <LoginForm style={{ alignSelf: 'stretch' }} toggleRegistering={() => setRegistering(true) } />
+            </Stack>
+        </PrimaryColoredContainer>
     } else {
-        return <Fragment>
-            <AppBar title={color => <Text style={{ color: color.color, fontSize: 24 }}>{t('register_page_title')}</Text>} />
-            <Flex items="stretch" style={{ margin: '1rem', flex: 1, justifyContent: 'center' }}>
-                <RegisterForm toggleRegistering={() => setRegistering(false)} />
-            </Flex>
-        </Fragment>
+        return <PrimaryColoredContainer>
+            <Stack style={{ flex: 1, alignItems: "center", margin: 10, justifyContent: "space-evenly", alignSelf: "stretch" }}>
+                <Text style={{ color: '#000', fontWeight: "bold", fontSize: 38, textTransform: "uppercase" }}>{t('register_page_title')}</Text>
+                <RegisterForm style={{ alignSelf: 'stretch' }} toggleRegistering={() => setRegistering(false)} />
+            </Stack>
+        </PrimaryColoredContainer>
     }
 
 }

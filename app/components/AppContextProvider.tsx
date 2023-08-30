@@ -5,6 +5,8 @@ import { getAccount } from "../lib/api"
 import React from "react"
 import DataLoadState, { fromData, initial } from "../lib/DataLoadState"
 
+const SPLASH_DELAY = 3000
+
 interface AppState {
     token: DataLoadState<string>,
     account?: Account
@@ -52,10 +54,11 @@ const AppContextProvider = ({ children }: Props) => {
         tryRestoreToken: async (): Promise<void> => {
             const token = await AsyncStorage.getItem('token')
             if(token) {
-                const account = await getAccount(token)
-                setAppState({ ...appState, ...{ token: fromData(token), account } })
+                const accountPromise = getAccount(token)
+                setTimeout(async () => setAppState({ ...appState, ...{ token: fromData(token), account: await accountPromise } }), SPLASH_DELAY)
+                
             } else {
-                setAppState({ ...appState, ...{ token: fromData('') } })
+                setTimeout(() => setAppState({ ...appState, ...{ token: fromData('') } }), SPLASH_DELAY)
             }
         },
         accountUpdated: async (updatedAccount: Account) => {

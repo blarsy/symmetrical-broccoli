@@ -21,6 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             respondWithFailure(req, res, e)
         }
     } else {
-        respondWithFailure(req, res, new Error('Not implemented'), 405)
+        res.end()
     }
 }
