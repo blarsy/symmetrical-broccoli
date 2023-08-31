@@ -10,12 +10,21 @@
       },
       "ios": {
         "buildConfiguration": "Debug"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://localhost:3000/api",
+        "EXPO_PUBLIC_DIAGNOSTIC": "1"
       }
     },
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://www.tope-la.com/api",
+        "EXPO_PUBLIC_DIAGNOSTIC": "1"
+      }
+    }
   },
   "submit": {
     "production": {}

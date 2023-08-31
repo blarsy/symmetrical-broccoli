@@ -24,9 +24,7 @@ web/
 
 .yarn
 .keystore
-app/android/app/src/
 app/android/app/build/
 app/android/.*
-app/android/**/*.jar
 app/android/app/*.keystore
-gradle.properties
+*.aab

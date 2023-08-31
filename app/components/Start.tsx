@@ -12,14 +12,17 @@ export const Start = () => {
     const { t } = i18n
     const appContext = useContext(AppContext)
     useEffect(() => {
-        try {
-            registerLoggedOutHandler(() => {
-                appContext.actions.setTokenState(fromData(''))
-            })
-            appContext.actions.tryRestoreToken()
-        } catch(e: any) {
-            appContext.actions.setTokenState(fromError(e, t('save_error')))
+        const load = async () => {
+            try {
+                registerLoggedOutHandler(() => {
+                    appContext.actions.setTokenState(fromData(''))
+                })
+                await appContext.actions.tryRestoreToken()
+            } catch(e: any) {
+                appContext.actions.setTokenState(fromError(e, t('save_error')))
+            }
         }
+        load()
     }, [])
     return <>
         { appContext.state.token.loading && <Splash />}

@@ -1,6 +1,5 @@
-import {API_URL} from 'react-native-dotenv'
 import { Account } from './schema'
-
+import { apiUrl } from './settings'
 let loggedOutHandler: () => void
 
 export const registerLoggedOutHandler = (handler: () => void) => {
@@ -8,21 +7,21 @@ export const registerLoggedOutHandler = (handler: () => void) => {
 }
 
 export const login = async (email: string, password: string) => {
-    return apiCall(makeFetchCall(`${API_URL}/auth`, { method: 'POST', body: JSON.stringify({email, password}), mode: 'cors', headers: {
+    return apiCall(`${apiUrl}/auth`, { method: 'POST', body: JSON.stringify({email, password}), mode: 'cors', headers: {
         'Content-Type': 'application/json'
-    }}))
+    }})
 }
 
 export const register = async (email: string, password: string, name: string) => {
-    return apiCall(makeFetchCall(`${API_URL}/user`, { method: 'POST', body: JSON.stringify({ name, email, password }), mode: 'cors', headers: {
+    return apiCall(`${apiUrl}/user`, { method: 'POST', body: JSON.stringify({ name, email, password }), mode: 'cors', headers: {
         'Content-Type': 'application/json'
-    }}))
+    }})
 }
 
 export const getAccount = async (token: string): Promise<Account> => {
-    const res = await apiCall(makeFetchCall(`${API_URL}/user`, { method: 'GET', mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}/user`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
-    }}))
+    }})
     if(res.status === 200) {
         return (await res.json()).account
     } else {
@@ -31,9 +30,9 @@ export const getAccount = async (token: string): Promise<Account> => {
 }
 
 export const getNetwork = async (token: string): Promise<Account[]> => {
-    const res = await apiCall(makeFetchCall(`${API_URL}/user/network`, { method: 'GET', mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}/user/network`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
-    }}))
+    }})
     if(res.status === 200) {
         const network = (await res.json())
         return network.linkedAccounts
@@ -43,10 +42,10 @@ export const getNetwork = async (token: string): Promise<Account[]> => {
 }
 
 export const updateAccount = async (token: string, password: string, newPassword: string, name: string, email: string): Promise<Account> => {
-    const res = await apiCall(makeFetchCall(`${API_URL}/user`, { method: 'PATCH', body: JSON.stringify({email, password, newPassword, name}), mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}/user`, { method: 'PATCH', body: JSON.stringify({email, password, newPassword, name}), mode: 'cors', headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
-    }}))
+    }})
     if(res.status === 200) {
         return res.json()
     } else {
@@ -54,26 +53,17 @@ export const updateAccount = async (token: string, password: string, newPassword
     }
 }
 
-const makeFetchCall = (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     console.log('API request : ', input, init)
-    return fetch(input, init)
-}
-
-const apiCall = async (call: Promise<Response>): Promise<Response> => {
-    try{
-        const res = await call
-        if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
-            if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')
-            loggedOutHandler()
-            return res
-        }
-        if(res.status >= 400) {
-            console.error('Error response returned.', res)
-            throw new Error(`Code ${res.status}, ${res.statusText}, ${await res.text()}`)
-        }
+    const res = await  fetch(input, init)
+    if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
+        if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')
+        loggedOutHandler()
         return res
-    } catch(e: any) {
-        console.error((e as Error).message, (e as Error).stack)
-        return new Response('', { status: 500, statusText: (e as Error).message })
     }
+    if(res.status >= 400) {
+        console.error('Error response returned.', res)
+        throw new Error(`Code ${res.status}, ${res.statusText}, ${await res.text()}\nRequest: ${input}, ${init && JSON.stringify(init)}`)
+    }
+    return res
 }

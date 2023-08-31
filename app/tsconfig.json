@@ -1,13 +1,12 @@
 {
-    "extends": "@tsconfig/react-native/tsconfig.json",
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ],
-    "compilerOptions": {
-      "jsx": "react",
-      "types": ["node"],
-      "typeRoots": ["./types"],
-      "lib": ["ES2017"]
-    }
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "include": [
+      "**/*.ts",
+      "**/*.tsx"
+  ],
+  "compilerOptions": {
+    "jsx": "react",
+    "types": ["node"],
+    "lib": ["ES2017"]
+  }
 }

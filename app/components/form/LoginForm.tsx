@@ -43,6 +43,7 @@ const LoginForm = ({ toggleRegistering, style }: Props) => {
                 setLoginstate(fromData(null))
             } catch(e: any) {
                 setLoginstate(fromError(e, t('connection_error')))
+                appContext.actions.setMessage(e)
             }
         }}>
         {({ handleChange, handleBlur, handleSubmit, values }) => (
