@@ -22,14 +22,14 @@ const AppTabs = ({ descriptors, navigation, state }: BottomTabBarProps) => {
                 accessibilityLabel={options.tabBarAccessibilityLabel}
                 onPress={() => {
                     const event = navigation.emit({
-                    type: 'tabPress',
-                    target: route.key,
-                    canPreventDefault: true,
-                    });
+                        type: 'tabPress',
+                        target: route.key,
+                        canPreventDefault: true,
+                    })
         
                     if (!isFocused && !event.defaultPrevented) {
-                    // The `merge: true` option makes sure that the params inside the tab screen are preserved
-                    navigation.navigate({ name: route.name, params: {}, merge: true });
+                        // The `merge: true` option makes sure that the params inside the tab screen are preserved
+                        navigation.navigate({ name: route.name, params: {}, merge: true })
                     }
                 }}
                 style={{ flex: 1 }} >

@@ -1645,6 +1645,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@egjs/hammerjs@npm:^2.0.17":
+  version: 2.0.17
+  resolution: "@egjs/hammerjs@npm:2.0.17"
+  dependencies:
+    "@types/hammerjs": ^2.0.36
+  checksum: 8945137cec5837edd70af3f2e0ea621543eb0aa3b667e6269ec6485350f4d120c2434b37c7c30b1cf42a65275dd61c1f24626749c616696d3956ac0c008c4766
+  languageName: node
+  linkType: hard
+
 "@expo/bunyan@npm:4.0.0, @expo/bunyan@npm:^4.0.0":
   version: 4.0.0
   resolution: "@expo/bunyan@npm:4.0.0"
@@ -2900,6 +2909,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hammerjs@npm:^2.0.36":
+  version: 2.0.41
+  resolution: "@types/hammerjs@npm:2.0.41"
+  checksum: d16fbd688fc9b18cc270abe8dea8d4c50ef7bd8375e593d92c233d299387933a6b003c8db69819344833052458bc5f9ef1b472001277a49f095928d184356006
+  languageName: node
+  linkType: hard
+
 "@types/html-minifier-terser@npm:^6.0.0":
   version: 6.1.0
   resolution: "@types/html-minifier-terser@npm:6.1.0"
@@ -3624,8 +3640,8 @@ __metadata:
     react-i18next: ^13.0.3
     react-native: 0.72.4
     react-native-dotenv: ^3.4.9
+    react-native-gesture-handler: ~2.12.0
     react-native-gradle-plugin: ^0.71.19
-    react-native-material-menu: ^2.0.0
     react-native-safe-area-context: 4.6.3
     react-native-screens: ~3.22.0
     react-native-web: ~0.19.6
@@ -10194,7 +10210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:*":
+"prop-types@npm:*, prop-types@npm:^15.7.2":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10444,20 +10460,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-gesture-handler@npm:~2.12.0":
+  version: 2.12.1
+  resolution: "react-native-gesture-handler@npm:2.12.1"
+  dependencies:
+    "@egjs/hammerjs": ^2.0.17
+    hoist-non-react-statics: ^3.3.0
+    invariant: ^2.2.4
+    lodash: ^4.17.21
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 1aec3d71c5fd3b8087e613708ee77a0ce7a1ac2bc87f5a6a22529300795b48aaa2359bcba7309f2c14f9de1ca1ffa4904d06b3cb7263820f657a4469976aecb3
+  languageName: node
+  linkType: hard
+
 "react-native-gradle-plugin@npm:^0.71.19":
   version: 0.71.19
   resolution: "react-native-gradle-plugin@npm:0.71.19"
   checksum: 2e3ab679f0b81edd81b9fb88a73a16c8b9b6dbef4e7158fd894c42e6dff04ba8d11f1b9663ffa2c30d0d9deee3cd44b033cd280322c010be3c290e4422088a7a
-  languageName: node
-  linkType: hard
-
-"react-native-material-menu@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "react-native-material-menu@npm:2.0.0"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 6aaf1f53f41c03803b37c84bde5d4b4994f76092e992a91523ab09879e042d0df931c0ba8d5f7ef24074ca5cb88fdd7defbfabb68aef209e1a0ad8202562aab1
   languageName: node
   linkType: hard
 

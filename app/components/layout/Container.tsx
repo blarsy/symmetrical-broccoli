@@ -16,7 +16,7 @@ const Container = ({ children, style }:Props) => {
         <View style={{...{ flex: 1, backgroundColor: primaryColor, alignItems: 'center', justifyContent: 'center' }, ...(style as Object) }}>
             {children}
         </View>
-        { appContext.state.message && diagnostic === '1' && <View style={{ backgroundColor: '#ddd', flexShrink: 1, flexBasis: '20%' }}>
+        { appContext.state.message && diagnostic === '1' && <View style={{ backgroundColor: '#ddd', flexGrow: 0, flexShrink: 1, flexBasis: '20%', overflow: 'scroll' }}>
             <Text>{appContext.state.message}</Text>
         </View>}
     </Stack>
