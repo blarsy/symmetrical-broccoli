@@ -8,7 +8,7 @@ import History from './History'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AppTabs from './AppTabs'
-import { Box, Flex, HStack } from '@react-native-material/core'
+import { Box, HStack } from '@react-native-material/core'
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import { t } from '../i18n'
 import { primaryColor } from './layout/constants'
