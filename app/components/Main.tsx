@@ -5,55 +5,54 @@ import Search from './Search'
 import Chat from './Chat'
 import EditResource from './EditResource'
 import History from './History'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AppTabs from './AppTabs'
-import { Box, HStack } from '@react-native-material/core'
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import { t } from '../i18n'
 import { primaryColor } from './layout/constants'
-import EditProfile from './form/EditProfile'
+import Profile from './Profile'
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
+import DealBoard from './DealBoard'
 
-const Tab = createBottomTabNavigator()
+const Tab = createMaterialBottomTabNavigator()
 const StackNav = createNativeStackNavigator()
 
-interface ScreenDescriptor { 
-    title: string, 
-    iconName: string, 
-    component: Element
-}
+// interface ScreenDescriptor { 
+//     title: string, 
+//     iconName: string, 
+//     component: Element
+// }
 
-const screens: ScreenDescriptor[] = [
-    { title: t('search_label'), iconName: 'search', component: Search },
-    { title: t('history_label'), iconName: 'history', component: History },
-    { title: t('resource_label'), iconName: 'edit', component: EditResource },
-    { title: t('chat_label'), iconName: 'chat-bubble-outline', component: Chat },
-]
+// const screens: ScreenDescriptor[] = [
+//     { title: t('search_label'), iconName: 'search', component: Search },
+//     { title: t('history_label'), iconName: 'history', component: History },
+//     { title: t('resource_label'), iconName: 'edit', component: EditResource },
+//     { title: t('chat_label'), iconName: 'chat-bubble-outline', component: Chat },
+// ]
 
-interface ScreenHeaderProps {
-    iconName: string,
-    title: string
-}
+// interface ScreenHeaderProps {
+//     iconName: string,
+//     title: string
+// }
 
-const ScreenHeader = ({ iconName, title }: ScreenHeaderProps) => <Box style={{ display: 'flex', flex: 1, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-    <MaterialIcons size={30} name={iconName} />
-    <Text style={{ fontSize: 24 }}>{title}</Text>
-</Box>
+// const ScreenHeader = ({ iconName, title }: ScreenHeaderProps) => <View style={{ display: 'flex', flex: 1, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+//     <MaterialIcons size={30} name={iconName} />
+//     <Text style={{ fontSize: 24 }}>{title}</Text>
+// </View>
 
-const makeTabScreen = (screenDescriptor: ScreenDescriptor, key: any ) => <Tab.Screen key={key} name={screenDescriptor.title} component={screenDescriptor.component} options={{
-    title: screenDescriptor.title,
-    tabBarIcon: (props) => <MaterialIcons name={screenDescriptor.iconName} size={props.size}/>,
-    headerTitleAlign: 'left',
-    headerTitle: () => <ScreenHeader iconName={screenDescriptor.iconName} title={screenDescriptor.title} />
-}}/>
+// const makeTabScreen = (screenDescriptor: ScreenDescriptor, key: any ) => <Tab.Screen key={key} name={screenDescriptor.title} component={screenDescriptor.component} options={{
+//     title: screenDescriptor.title,
+//     tabBarIcon: (props) => <MaterialIcons name={screenDescriptor.iconName} size={30}/>,
+//     headerTitleAlign: 'left',
+//     headerTitle: () => <ScreenHeader iconName={screenDescriptor.iconName} title={screenDescriptor.title} />
+// }}/>
 
-const MainNavigation = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => <Tab.Navigator
-    screenOptions={{ headerRight: () => <MaterialIcons.Button backgroundColor={primaryColor} onPress={() => {
-        console.log('route', route, 'navigation', navigation)
-        navigation.navigate('profile')
-    }} size={30} name="account-circle" color="#000"/> }} tabBar={props => <AppTabs {...props} />} >
-    { screens.map((screen, idx) => makeTabScreen(screen, idx)) }
-</Tab.Navigator>
+// const MainNavigation2 = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => <Tab.Navigator 
+//     screenOptions={{ headerRight: () => <MaterialIcons.Button backgroundColor={primaryColor} onPress={() => {
+//         navigation.navigate('profile')
+//     }} size={30} name="account-circle" color="#000"/> }} tabBar={props => <AppTabs {...props} />} >
+//     { screens.map((screen, idx) => makeTabScreen(screen, idx)) }
+// </Tab.Navigator>
 
 export default function Main () {
     return <NavigationContainer theme={{
@@ -63,12 +62,12 @@ export default function Main () {
         }, dark: false
     }}>
         <View style={{ flex: 1,alignItems: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
-            <StackNav.Navigator screenOptions={{ header: (props) => props.route.name === 'profile' ? <HStack items="center" style={{ backgroundColor: primaryColor, padding: 8 }}>
+            <StackNav.Navigator screenOptions={{ header: (props) => props.route.name === 'profile' ? <View style={{ flex:1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', backgroundColor: primaryColor, padding: 8 }}>
                     <MaterialIcons.Button color="#000" name="arrow-back" size={30} backgroundColor="transparent" onPress={() => props.navigation.goBack()} />
                     <Text style={{ fontSize: 24 }}>{t('profile_label')}</Text>
-                </HStack> : <></> }}>
-                <StackNav.Screen name="main" component={MainNavigation} key="main" />
-                <StackNav.Screen name="profile" component={EditProfile} key="profile"  />
+                </View> : <></> }}>
+                <StackNav.Screen name="main" component={DealBoard} key="main" />
+                <StackNav.Screen name="profile" component={Profile} key="profile"  />
             </StackNav.Navigator>
         </View>
     </NavigationContainer>

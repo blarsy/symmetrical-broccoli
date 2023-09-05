@@ -1,4 +1,3 @@
-import { Box } from "@react-native-material/core"
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs"
 import React from "react"
 import { Text, TouchableOpacity, View } from "react-native"
@@ -33,10 +32,10 @@ const AppTabs = ({ descriptors, navigation, state }: BottomTabBarProps) => {
                     }
                 }}
                 style={{ flex: 1 }} >
-                    <Box style={{ display: 'flex', flexDirection: 'column', justifyContent:'center', alignItems:'center' }}>
+                    <View style={{ display: 'flex', flexDirection: 'column', justifyContent:'center', alignItems:'center' }}>
                         {options.tabBarIcon  && options.tabBarIcon({ focused: isFocused, size: 30, color: isFocused ? primaryColor: '#000' })}
                         <Text style={{ color: isFocused ? primaryColor : '#222' }}>{label}</Text>
-                    </Box>
+                    </View>
             </TouchableOpacity>
         })}
     </View>

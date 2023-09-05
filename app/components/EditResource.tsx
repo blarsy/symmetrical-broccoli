@@ -1,17 +1,15 @@
-import { Button, VStack } from "@react-native-material/core"
 import React, { useEffect } from "react"
-import { Divider } from "react-native-flex-layout"
 import { t } from '../i18n'
+import { View } from "react-native"
+import { OrangeButton } from "./layout/lib"
 
 export default function EditResource () {
     useEffect(() => {
         
     }, [])
-    return <VStack>
-        <Button title={t('create_label')} onPress={e => {
+    return <View style={{ flex: 1, flexDirection: 'column' }}>
+        <OrangeButton onPress={e => {
 
-        }}/>
-        <Divider/>
-
-    </VStack>
+        }}>{t('create_label')}</OrangeButton>
+    </View>
 }

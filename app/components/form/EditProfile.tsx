@@ -1,4 +1,3 @@
-import { Button, Flex, HStack, Snackbar, Stack, TextInput } from "@react-native-material/core"
 import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
 import { beginOperation, fromData, fromError, initial } from "../../lib/DataLoadState"
@@ -9,6 +8,10 @@ import { AppContext } from "../AppContextProvider"
 import { isValidPassword } from "../../lib/utils"
 import { MaterialIcons } from "@expo/vector-icons"
 import { t } from '../../i18n'
+import OrangeTextInput from "./OrangeTextInput"
+import { WhiteButton } from "../layout/lib"
+import { View } from "react-native"
+import { Snackbar } from "react-native-paper"
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)
@@ -57,27 +60,31 @@ export default function EditProfile () {
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <Stack>
-            <HStack style={{ alignItems: "center" }}>
-                <TextInput style={{ flex: 1 }} label={t('name_label')} textContentType="name" value={values.name}
+        <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: "center" }}>
+                <OrangeTextInput style={{ flex: 1 }} label={t('name_label')} textContentType="name" value={values.name}
                     onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
                 <MaterialIcons.Button color="#000" backgroundColor="transparent" name="logout" onPress={e => appContext.actions.logout()} />
-            </HStack>
+            </View>
             <ErrorMessage component={ErrorText} name="name" />
-            <TextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={ErrorText} name="email" />
-            <TextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
+            <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={ErrorText} name="password" />
-            <TextInput label={t('newpassword_label')} textContentType="password" secureTextEntry value={values.newPassword}
+            <OrangeTextInput label={t('newpassword_label')} textContentType="password" secureTextEntry value={values.newPassword}
                 onChangeText={handleChange('newPassword')} onBlur={handleBlur('newPassword')} />
             <ErrorMessage component={ErrorText} name="newPassword" />
-            <TextInput label={t('repeatnewpassword_label')} textContentType="password" secureTextEntry value={values.passwordRepeat}
+            <OrangeTextInput label={t('repeatnewpassword_label')} textContentType="password" secureTextEntry value={values.passwordRepeat}
                 onChangeText={handleChange('passwordRepeat')} onBlur={handleBlur('passwordRepeat')} />
             <ErrorMessage component={ErrorText} name="passwordRepeat" />
-            <Button title={t('save_label')} variant="contained" onPress={e => handleSubmit()} loading={updateProfileState.loading}/>
-            {updateProfileState.error && updateProfileState.error.message && <Snackbar message={updateProfileState.error.message} /> }
-        </Stack>)}
+            <WhiteButton onPress={e => handleSubmit()} loading={updateProfileState.loading}>
+                {t('save_label')}
+            </WhiteButton>
+            <Snackbar visible={!!updateProfileState.error && !!updateProfileState.error.message} onDismiss={() => setUpdateProfileState(initial<null>(false))}>
+                {updateProfileState.error && updateProfileState.error.message}
+            </Snackbar>
+        </View>)}
     </Formik>
 }

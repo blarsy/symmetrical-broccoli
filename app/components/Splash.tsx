@@ -1,6 +1,7 @@
 import React from "react"
-import { ActivityIndicator, Image, View } from "react-native"
+import { Image } from "react-native"
 import PrimaryColoredContainer from "./layout/PrimaryColoredContainer"
+import { ActivityIndicator } from "react-native-paper"
 
 const Splash = () => {
     

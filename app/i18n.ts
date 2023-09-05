@@ -38,7 +38,10 @@ const resources = {
       "editProfileMenuTitle": "Account",
       "friendsMenuTitle": "Network",
       "requestError": "Error while processing request",
-      "noData": "No data"
+      "noData": "No data",
+      "myResourcesAccordionTitle": "My resources",
+      "profileSettingsAccordionTitle": "Settings",
+      "networkAccordionTitle": "My network"
     }
   },
   fr: {
@@ -74,7 +77,10 @@ const resources = {
       "editProfileMenuTitle": "Compte",
       "friendsMenuTitle": "Réseau",
       "requestError": "Erreur pendant l'exécution de la requête",
-      "noData": "Pas de donnée"
+      "noData": "Pas de donnée",
+      "myResourcesAccordionTitle": "Ressources",
+      "profileSettingsAccordionTitle": "Admin",
+      "networkAccordionTitle": "Réseau"
     }
   }
 }

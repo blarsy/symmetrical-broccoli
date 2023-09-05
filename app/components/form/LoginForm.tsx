@@ -1,4 +1,3 @@
-import { Button, Snackbar, TextInput, TextInputProps } from "@react-native-material/core"
 import { Formik, ErrorMessage } from "formik"
 import { t } from "i18next"
 import { StyleProp, View, ViewStyle } from "react-native"
@@ -8,23 +7,15 @@ import { OrangeBackedErrorText } from "./ErrorText"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
 import { AppContext } from "../AppContextProvider"
+import OrangeTextInput from "./OrangeTextInput"
+import { Button, Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
-import { primaryColor } from "../layout/constants"
+import { WhiteButton } from "../layout/lib"
 
 interface Props {
     toggleRegistering: () => void,
     style: StyleProp<ViewStyle>
 }
-
-const OrangeTextInput = (props: TextInputProps) => <TextInput variant="standard" color="#fff" inputContainerStyle={{
-    backgroundColor: primaryColor,
-}} inputStyle={{
-    backgroundColor: primaryColor,
-    color: '#fff'
-}} style={{
-    backgroundColor: primaryColor,
-    marginTop: 10,
-}}  {...props}/>
 
 const LoginForm = ({ toggleRegistering, style }: Props) => {
     const appContext = useContext(AppContext)
@@ -54,11 +45,19 @@ const LoginForm = ({ toggleRegistering, style }: Props) => {
                 <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
                     onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="password" />
-                <Button tintColor="#000" color="#fff" leading={props => <Icons {...props} name="sign-in" />} title={t('connection_label')} variant="contained" onPress={handleSubmit} loading={loginState.loading}/>
-                {loginState.error && loginState.error.message && <Snackbar message={loginState.error.message} /> }
-                <Button color="#fff" leading={props => <Icons {...props} name="user-plus" />} title={t('notsubscribedyet_label')} variant="text" onPress={() => {
-                    toggleRegistering()
-                }} />
+                <WhiteButton icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
+                    loading={loginState.loading}>
+                    {t('connection_label')}
+                </WhiteButton>
+                <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
+                    onPress={toggleRegistering} labelStyle={{ fontSize: 16 }}>
+                    {t('notsubscribedyet_label')}
+                </Button>
+                <Portal>
+                    <Snackbar role="alert" visible={!!loginState.error && !!loginState.error.message} onDismiss={() => setLoginstate(initial<null>(false))}>
+                        {loginState.error && loginState.error.message}
+                    </Snackbar>
+                </Portal>
             </View>)}
         </Formik>
     </View>

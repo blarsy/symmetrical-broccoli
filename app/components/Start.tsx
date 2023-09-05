@@ -8,7 +8,11 @@ import React from "react"
 import i18n from '../i18n'
 import Splash from "./Splash"
 
-export const Start = () => {
+interface Props {
+    loading: boolean
+}
+
+export const Start = ({ loading }: Props) => {
     const { t } = i18n
     const appContext = useContext(AppContext)
     useEffect(() => {
@@ -25,7 +29,7 @@ export const Start = () => {
         load()
     }, [])
     return <>
-        { appContext.state.token.loading && <Splash />}
+        { (appContext.state.token.loading || loading) && <Splash />}
         { appContext.state.token.data && <Main /> }
         { !appContext.state.token.loading && !appContext.state.token.data && <Login /> }
   </>

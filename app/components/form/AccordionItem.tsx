@@ -1,4 +1,3 @@
-import { Icon, IconComponentProvider } from '@react-native-material/core'
 import React from 'react'
 import { useState, type PropsWithChildren } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -9,18 +8,22 @@ const styles = StyleSheet.create({
       flex: 1
     },
     accordContainer: {
-      paddingBottom: 4
+      paddingBottom: 4,
+      margin: 4
     },
     accordHeader: {
       padding: 12,
-      backgroundColor: '#CCC',
-      color: '#eee',
+      backgroundColor: 'transparent',
+      color: '#fff',
       flex: 1,
       flexDirection: 'row',
-      justifyContent:'space-between'
+      justifyContent:'space-between',
+      borderBottomColor: '#fff',
+      borderBottomWidth: 1
     },
     accordTitle: {
       fontSize: 20,
+      color: '#fff'
     },
     accordBody: {
       padding: 4
@@ -51,7 +54,7 @@ function AccordionItem({ children, title }: AccordionItemPros): JSX.Element {
             <TouchableOpacity style={styles.accordHeader} onPress={ toggleItem }>
             <Text style={styles.accordTitle}>{ title }</Text>
             <Icons name={ expanded ? 'chevron-up' : 'chevron-down' }
-                    size={20} color="#bbb" />
+                    size={20} color="#fff" />
             </TouchableOpacity>
             { expanded && body }
         </View>
