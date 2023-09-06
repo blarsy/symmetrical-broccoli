@@ -1,58 +1,14 @@
-import {DefaultTheme, NavigationContainer, NavigationHelpers, ParamListBase} from '@react-navigation/native'
+import {DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import { Text, View } from 'react-native'
-import Search from './Search'
-import Chat from './Chat'
-import EditResource from './EditResource'
-import History from './History'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import AppTabs from './AppTabs'
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
 import { t } from '../i18n'
 import { primaryColor } from './layout/constants'
 import Profile from './Profile'
-import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import DealBoard from './DealBoard'
 
-const Tab = createMaterialBottomTabNavigator()
 const StackNav = createNativeStackNavigator()
-
-// interface ScreenDescriptor { 
-//     title: string, 
-//     iconName: string, 
-//     component: Element
-// }
-
-// const screens: ScreenDescriptor[] = [
-//     { title: t('search_label'), iconName: 'search', component: Search },
-//     { title: t('history_label'), iconName: 'history', component: History },
-//     { title: t('resource_label'), iconName: 'edit', component: EditResource },
-//     { title: t('chat_label'), iconName: 'chat-bubble-outline', component: Chat },
-// ]
-
-// interface ScreenHeaderProps {
-//     iconName: string,
-//     title: string
-// }
-
-// const ScreenHeader = ({ iconName, title }: ScreenHeaderProps) => <View style={{ display: 'flex', flex: 1, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-//     <MaterialIcons size={30} name={iconName} />
-//     <Text style={{ fontSize: 24 }}>{title}</Text>
-// </View>
-
-// const makeTabScreen = (screenDescriptor: ScreenDescriptor, key: any ) => <Tab.Screen key={key} name={screenDescriptor.title} component={screenDescriptor.component} options={{
-//     title: screenDescriptor.title,
-//     tabBarIcon: (props) => <MaterialIcons name={screenDescriptor.iconName} size={30}/>,
-//     headerTitleAlign: 'left',
-//     headerTitle: () => <ScreenHeader iconName={screenDescriptor.iconName} title={screenDescriptor.title} />
-// }}/>
-
-// const MainNavigation2 = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => <Tab.Navigator 
-//     screenOptions={{ headerRight: () => <MaterialIcons.Button backgroundColor={primaryColor} onPress={() => {
-//         navigation.navigate('profile')
-//     }} size={30} name="account-circle" color="#000"/> }} tabBar={props => <AppTabs {...props} />} >
-//     { screens.map((screen, idx) => makeTabScreen(screen, idx)) }
-// </Tab.Navigator>
 
 export default function Main () {
     return <NavigationContainer theme={{
@@ -64,7 +20,7 @@ export default function Main () {
         <View style={{ flex: 1,alignItems: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
             <StackNav.Navigator screenOptions={{ header: (props) => props.route.name === 'profile' ? <View style={{ flex:1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', backgroundColor: primaryColor, padding: 8 }}>
                     <MaterialIcons.Button color="#000" name="arrow-back" size={30} backgroundColor="transparent" onPress={() => props.navigation.goBack()} />
-                    <Text style={{ fontSize: 24 }}>{t('profile_label')}</Text>
+                    <Text style={{ fontSize: 24, fontFamily: 'DK-magical-brush', textTransform: 'uppercase', fontWeight: '400', textAlign: 'center', flex: 1 }}>{t('profile_label')}</Text>
                 </View> : <></> }}>
                 <StackNav.Screen name="main" component={DealBoard} key="main" />
                 <StackNav.Screen name="profile" component={Profile} key="profile"  />

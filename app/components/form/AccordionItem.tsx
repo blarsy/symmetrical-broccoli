@@ -1,7 +1,8 @@
 import React from 'react'
 import { useState, type PropsWithChildren } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Icons from '@expo/vector-icons/FontAwesome'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { IconButton } from 'react-native-paper'
+import Icon from 'react-native-paper/lib/typescript/components/Icon'
 
 const styles = StyleSheet.create({
     container: {
@@ -19,7 +20,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent:'space-between',
       borderBottomColor: '#fff',
-      borderBottomWidth: 1
+      borderBottomWidth: 1,
+      fontFamily: 'DK-magical-brush'
     },
     accordTitle: {
       fontSize: 20,
@@ -46,15 +48,17 @@ function AccordionItem({ children, title }: AccordionItemPros): JSX.Element {
     function toggleItem() {
       setExpanded(!expanded)
     }
-  
+
     const body = <View style={styles.accordBody}>{ children }</View>
   
     return (
         <View style={styles.accordContainer}>
             <TouchableOpacity style={styles.accordHeader} onPress={ toggleItem }>
-            <Text style={styles.accordTitle}>{ title }</Text>
-            <Icons name={ expanded ? 'chevron-up' : 'chevron-down' }
-                    size={20} color="#fff" />
+              <Text style={styles.accordTitle}>{ title }</Text>
+              {expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 20, height: 20, tintColor: '#000', 
+                transform: [{ rotate: '270deg' }] }}/>}
+              {!expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 20, height: 20, tintColor: '#fff', 
+                transform: [{ rotate: '90deg' }] }}/>}
             </TouchableOpacity>
             { expanded && body }
         </View>

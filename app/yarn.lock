@@ -3639,7 +3639,7 @@ __metadata:
     "@types/react-test-renderer": ^18.0.0
     expo: ^49.0.6
     expo-constants: ~14.4.2
-    expo-font: ~11.4.0
+    expo-font: 11.5.0
     expo-status-bar: ~1.6.0
     formik: ^2.4.2
     i18next: ^23.4.3
@@ -5766,6 +5766,17 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: d1bd26c05195c563300649c2ce6c1e8631e5fc928628bc6386cc57a6a47cec1b327333f75111ce7e943e95756f36d78e7201013fc494ef190342b528dd29f3bf
+  languageName: node
+  linkType: hard
+
+"expo-font@npm:11.5.0":
+  version: 11.5.0
+  resolution: "expo-font@npm:11.5.0"
+  dependencies:
+    fontfaceobserver: ^2.1.0
+  peerDependencies:
+    expo: "*"
+  checksum: a86981c07dbbc9a591dbb3c1f8c4a28d01c8457447ee09c4bef2b214bce758975fa258b0d43acdf37ca05fa506d652dbdefff4f8c8e28d06787638d96d8eedc0
   languageName: node
   linkType: hard
 

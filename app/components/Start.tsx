@@ -30,7 +30,7 @@ export const Start = ({ loading }: Props) => {
     }, [])
     return <>
         { (appContext.state.token.loading || loading) && <Splash />}
-        { appContext.state.token.data && <Main /> }
+        { appContext.state.token.data && !loading && <Main /> }
         { !appContext.state.token.loading && !appContext.state.token.data && <Login /> }
   </>
 }
