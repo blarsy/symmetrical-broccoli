@@ -1,9 +1,9 @@
 import { createContext, useState } from "react"
-import { Account } from "../lib/schema"
+import { Account } from "@/lib/schema"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { getAccount } from "../lib/api"
+import { getAccount } from "@/lib/api"
 import React from "react"
-import DataLoadState, { fromData, initial } from "../lib/DataLoadState"
+import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
 
 const SPLASH_DELAY = 3000
 

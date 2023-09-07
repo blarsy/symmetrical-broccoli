@@ -1,15 +1,15 @@
 import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
-import { beginOperation, fromData, fromError, initial } from "../../lib/DataLoadState"
-import { updateAccount } from "../../lib/api"
+import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import { updateAccount } from "@/lib/api"
 import ErrorText from "./ErrorText"
 import * as yup from 'yup'
-import { AppContext } from "../AppContextProvider"
-import { isValidPassword } from "../../lib/utils"
+import { AppContext } from "@/components/AppContextProvider"
+import { isValidPassword } from "@/lib/utils"
 import { MaterialIcons } from "@expo/vector-icons"
-import { t } from '../../i18n'
+import { t } from '@/i18n'
 import OrangeTextInput from "./OrangeTextInput"
-import { WhiteButton } from "../layout/lib"
+import { WhiteButton } from "@/components/layout/lib"
 import { View } from "react-native"
 import { Snackbar } from "react-native-paper"
 

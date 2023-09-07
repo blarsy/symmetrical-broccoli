@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
-import { t } from '../i18n'
+import { t } from '@/i18n'
 import { View } from "react-native"
-import { OrangeButton } from "./layout/lib"
+import { OrangeButton } from "@/components/layout/lib"
 
 export default function EditResource () {
     useEffect(() => {

@@ -38,6 +38,12 @@ export interface AccountLinkRequest {
     target: Account
 }
 
+export interface Network {
+    linkRequests: Account[], 
+    linkedAccounts: Account[], 
+    receivedLinkRequests: Account[]
+}
+
 export const fromRawAccount = (raw: any): Account => ({
     id: raw.Id, name: raw.nom, balance: raw.balance, email: raw.email, hash: raw.hash,
     resources: raw.ressources ? raw.ressources.map((rawRes:any) => fromRawResource(rawRes)): [],

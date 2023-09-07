@@ -1,8 +1,8 @@
 import { StyleProp, Text, View, ViewStyle } from "react-native"
 import { primaryColor } from "./constants"
 import React, { useContext } from "react"
-import { AppContext } from "../AppContextProvider"
-import { diagnostic } from "../../lib/settings"
+import { AppContext } from "@/components/AppContextProvider"
+import { diagnostic } from "@/lib/settings"
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 
 interface Props {

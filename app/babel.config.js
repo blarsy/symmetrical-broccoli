@@ -9,7 +9,15 @@ module.exports = function(api) {
           moduleName: 'react-native-dotenv',
           verbose: false,
         },
-      ],
+      ],[
+        'module-resolver',
+        {
+          root: ['.'],
+          alias: {
+            '@': './',
+          },
+        },
+      ]
     ],
   };
 };

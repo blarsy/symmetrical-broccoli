@@ -1,10 +1,10 @@
 import { TextInput, TextInputProps } from "react-native-paper"
-import { primaryColor } from "../layout/constants"
+import { primaryColor } from "@/components/layout/constants"
 import React from "react"
 
 const OrangeTextInput = (props: TextInputProps) => <TextInput 
     placeholderTextColor="#ddd" mode="flat" textColor="#fff" underlineColor="#fff"
-    activeUnderlineColor="#fff" selectionColor="transparent"q
+    activeUnderlineColor="#fff" selectionColor="transparent"
     theme={{ colors: { onSurfaceVariant: '#ddd'} }}
     contentStyle={{
         color: '#fff',

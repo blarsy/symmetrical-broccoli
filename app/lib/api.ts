@@ -1,4 +1,4 @@
-import { Account } from './schema'
+import { Account, Network } from './schema'
 import { apiUrl } from './settings'
 let loggedOutHandler: () => void
 
@@ -29,13 +29,13 @@ export const getAccount = async (token: string): Promise<Account> => {
     }
 }
 
-export const getNetwork = async (token: string): Promise<Account[]> => {
+export const getNetwork = async (token: string): Promise<Network> => {
     const res = await apiCall(`${apiUrl}/user/network`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
         const network = (await res.json())
-        return network.linkedAccounts
+        return network
     } else {
         throw new Error(res.statusText)
     }

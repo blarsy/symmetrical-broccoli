@@ -1,11 +1,11 @@
 import { useContext, useEffect } from "react"
-import { fromData, fromError } from "../lib/DataLoadState"
+import { fromData, fromError } from "@/lib/DataLoadState"
 import Login from "./Login"
 import Main from "./Main"
-import { AppContext } from "./AppContextProvider"
-import { registerLoggedOutHandler } from "../lib/api"
+import { AppContext } from "@/components/AppContextProvider"
+import { registerLoggedOutHandler } from "@/lib/api"
 import React from "react"
-import i18n from '../i18n'
+import i18n from '@/i18n'
 import Splash from "./Splash"
 
 interface Props {

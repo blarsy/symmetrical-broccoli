@@ -41,7 +41,14 @@ const resources = {
       "noData": "No data",
       "myResourcesAccordionTitle": "My resources",
       "profileSettingsAccordionTitle": "Settings",
-      "networkAccordionTitle": "My network"
+      "networkAccordionTitle": "My network",
+      "back": "Back",
+      "myNetwork_title": "Friends",
+      "requestsReceived_title": "Friendship requests received",
+      "requestsSent_title": "Friendship requests sent",
+      "friends_buttonLabel": "Friends",
+      "requestsReceived_buttonLabel": "Inbox",
+      "requestsSent_buttonLabel": "Outbox"
     }
   },
   fr: {
@@ -80,7 +87,14 @@ const resources = {
       "noData": "Pas de donnée",
       "myResourcesAccordionTitle": "Ressources",
       "profileSettingsAccordionTitle": "Admin",
-      "networkAccordionTitle": "Réseau"
+      "networkAccordionTitle": "Réseau",
+      "back": "Retour",
+      "myNetwork_title": "Amis",
+      "requestsReceived_title": "Demandes d'amitié reçues",
+      "requestsSent_title": "Demandes d'amitié envoyées",
+      "friends_buttonLabel": "Amis",
+      "requestsReceived_buttonLabel": "Invit. reçues",
+      "requestsSent_buttonLabel": "Invit. envoyées"
     }
   }
 }

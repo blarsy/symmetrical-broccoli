@@ -1,16 +1,16 @@
 import { Formik, ErrorMessage } from "formik"
 import { t } from "i18next"
 import { StyleProp, View, ViewStyle } from "react-native"
-import { beginOperation, fromData, fromError, initial } from "../../lib/DataLoadState"
-import { login } from "../../lib/api"
+import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import { login } from "@/lib/api"
 import { OrangeBackedErrorText } from "./ErrorText"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
-import { AppContext } from "../AppContextProvider"
+import { AppContext } from "@/components/AppContextProvider"
 import OrangeTextInput from "./OrangeTextInput"
 import { Button, Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
-import { WhiteButton } from "../layout/lib"
+import { WhiteButton } from "@/components/layout/lib"
 
 interface Props {
     toggleRegistering: () => void,

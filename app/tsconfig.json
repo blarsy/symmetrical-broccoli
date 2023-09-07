@@ -7,6 +7,10 @@
   "compilerOptions": {
     "jsx": "react",
     "types": ["node"],
-    "lib": ["ES2017"]
+    "lib": ["ES2017"],
+    "baseUrl": ".",                                      
+    "paths": {
+      "@/*": ["./*"],
+    },
   }
 }

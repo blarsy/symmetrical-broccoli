@@ -4,14 +4,14 @@ import { Text } from "react-native"
 
 interface Props<T> {
     data?: T[],
-    displayItem: (item: T) => JSX.Element
+    displayItem: (item: T, index: number) => JSX.Element
 }
 
 function ListOf<T>({data, displayItem}: Props<T>) {
     if(data && data.length > 0) {
-        return data.map(item => displayItem(item))
+        return data.map((item, idx) => displayItem(item, idx))
     } else {
-        return <Text>{t('noData')}</Text>
+        return <Text style={{ textAlign: 'center', textTransform: 'uppercase' }}>{t('noData')}</Text>
     }
 }
 

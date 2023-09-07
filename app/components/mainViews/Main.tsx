@@ -3,8 +3,8 @@ import React from 'react'
 import { Text, View } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MaterialIcons from "@expo/vector-icons/MaterialIcons"
-import { t } from '../i18n'
-import { primaryColor } from './layout/constants'
+import { t } from '@/i18n'
+import { primaryColor } from '@/components/layout/constants'
 import Profile from './Profile'
 import DealBoard from './DealBoard'
 

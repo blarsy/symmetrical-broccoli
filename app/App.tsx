@@ -1,6 +1,6 @@
 import React from 'react'
-import AppContextProvider from './components/AppContextProvider'
-import { Start } from './components/Start'
+import AppContextProvider from '@/components/AppContextProvider'
+import { Start } from '@/components/mainViews/Start'
 import { AppRegistry } from 'react-native'
 import { PaperProvider, Snackbar } from 'react-native-paper'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'

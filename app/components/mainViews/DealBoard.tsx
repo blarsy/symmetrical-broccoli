@@ -1,19 +1,19 @@
 import React, { useState } from "react"
-import { Appbar, BottomNavigation, IconButton } from "react-native-paper"
+import { Appbar, BottomNavigation } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
-import { lightPrimaryColor, primaryColor } from "./layout/constants"
+import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'
 import Chat from './Chat'
-import EditResource from './EditResource'
+import EditResource from '@/components/EditResource'
 import History from './History'
-import { t } from "../i18n"
+import { t } from "@/i18n"
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
 
 const routes = [
     { key: 'search', title: t('search_label'), focusedIcon: ({ uri: require('/assets/LOUPE.svg') } as IconSource) },
-    { key: 'history', title: t('history_label'), focusedIcon: ({ uri: require('/assets/PENCIL.svg') } as IconSource) },
-    { key: 'resource', title: t('resource_label'), focusedIcon: ({ uri: require('/assets/HISTORY.svg') } as IconSource)  },
+    { key: 'history', title: t('history_label'), focusedIcon: ({ uri: require('/assets/HISTORY.svg') } as IconSource) },
+    { key: 'resource', title: t('resource_label'), focusedIcon: ({ uri: require('/assets/PENCIL.svg') } as IconSource)  },
     { key: 'chat', title: t('chat_label'), focusedIcon: ({ uri: require('/assets/CHAT.svg') } as IconSource)  },
 ]
 

@@ -1,8 +1,6 @@
 import React from 'react'
 import { useState, type PropsWithChildren } from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { IconButton } from 'react-native-paper'
-import Icon from 'react-native-paper/lib/typescript/components/Icon'
 
 const styles = StyleSheet.create({
     container: {
@@ -53,11 +51,11 @@ function AccordionItem({ children, title }: AccordionItemPros): JSX.Element {
   
     return (
         <View style={styles.accordContainer}>
-            <TouchableOpacity style={styles.accordHeader} onPress={ toggleItem }>
+            <TouchableOpacity style={{...styles.accordHeader, ...{ borderBottomColor: expanded ? '#000' : '#fff' }}} onPress={ toggleItem }>
               <Text style={styles.accordTitle}>{ title }</Text>
-              {expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 20, height: 20, tintColor: '#000', 
+              {expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
                 transform: [{ rotate: '270deg' }] }}/>}
-              {!expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 20, height: 20, tintColor: '#fff', 
+              {!expanded && <Image source={require('/assets/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#fff', 
                 transform: [{ rotate: '90deg' }] }}/>}
             </TouchableOpacity>
             { expanded && body }

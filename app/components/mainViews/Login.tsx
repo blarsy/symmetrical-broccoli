@@ -2,9 +2,9 @@ import { useState } from "react"
 import { View } from "react-native"
 import React from "react"
 import { t } from 'i18next'
-import LoginForm from "./form/LoginForm"
-import RegisterForm from "./form/RegisterForm"
-import PrimaryColoredContainer from "./layout/PrimaryColoredContainer"
+import LoginForm from "@/components/form/LoginForm"
+import RegisterForm from "@/components/form/RegisterForm"
+import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { Text } from "react-native-paper"
 
 export default function Login () {
