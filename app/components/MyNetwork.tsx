@@ -25,9 +25,9 @@ interface SubViewProps {
 const SubViewAccordion = ({ id, titleI18n, children, imgSrc }: SubViewProps) => <List.Accordion id={id} title={<Text style={{ textTransform: 'uppercase' }}>{t(titleI18n)}</Text>} 
     titleStyle={{ fontFamily: 'DK-magical-brush', fontSize: 20, borderBottomWidth: 1 }}  titleNumberOfLines={2}
     right={({ isExpanded}) => isExpanded ?
-        <Image source={require('/assets/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
+        <Image source={require('/assets/img/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
             transform: [{ rotate: '270deg' }] }}/> :
-        <Image source={require('/assets/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
+        <Image source={require('/assets/img/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
             transform: [{ rotate: '90deg' }] }}/>}
     left={({color, style}) => <Image source={imgSrc} style={{ ...style, width: 30, height: 30, tintColor: '#000'}} /> }>
         <View style={{ flex: 1, padding: 10 }}>{children}</View>
@@ -56,13 +56,13 @@ const NetworkMainView = ({ route, navigation }: { route: any, navigation: Naviga
         return <ActivityIndicator style={{ marginTop: 10 }} />
     } else {
         return <List.AccordionGroup>
-            <SubViewAccordion id={1} titleI18n="myNetwork_title" imgSrc={require('/assets/HEART.svg')}>
+            <SubViewAccordion id={1} titleI18n="myNetwork_title" imgSrc={require('/assets/img/HEART.svg')}>
                 <Connections state={network} onAddRequested={() => navigation.navigate('addFriend')} onChange={loadNetwork}/>
             </SubViewAccordion>
-            <SubViewAccordion id={2} titleI18n="requestsReceived_title" imgSrc={require('/assets/RECU.svg')}>
+            <SubViewAccordion id={2} titleI18n="requestsReceived_title" imgSrc={require('/assets/img/RECU.svg')}>
                 <RequestsReceived state={network} onChange={loadNetwork}/>
             </SubViewAccordion>
-            <SubViewAccordion id={3} titleI18n="requestsSent_title" imgSrc={require('/assets/ENVOYE.svg')}>
+            <SubViewAccordion id={3} titleI18n="requestsSent_title" imgSrc={require('/assets/img/ENVOYE.svg')}>
                 <RequestsSent state={network} onChange={loadNetwork}/>
             </SubViewAccordion>
         </List.AccordionGroup>

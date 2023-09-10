@@ -25,7 +25,7 @@ const RequestReceived = ({ item, isLastRow, onChange, onError }: ReqProps) => {
     return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
         <Text style={{ flex: 1 }}>{item.name}</Text>
         { opProcessing && <ActivityIndicator /> }
-        <IconButton icon={{ uri: require('/assets/VALID.svg')}} size={20} onPress={async () => {
+        <IconButton icon={{ uri: require('/assets/img/VALID.svg')}} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await acceptInvitation(item.id, appContext.state.token.data!)
@@ -36,7 +36,7 @@ const RequestReceived = ({ item, isLastRow, onChange, onError }: ReqProps) => {
                 setOpProcessing(false)
             }
         }} />
-        <IconButton icon={{ uri: require('/assets/CROSS.svg')}} size={20} onPress={async () => {
+        <IconButton icon={{ uri: require('/assets/img/CROSS.svg')}} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await declineInvitation(item.id, appContext.state.token.data!)

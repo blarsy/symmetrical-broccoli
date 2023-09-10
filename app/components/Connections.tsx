@@ -27,7 +27,7 @@ const Connection = ({ item, isLastRow, onChange, onError }: ConnectionProps) => 
     return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
         <Text style={{ flex: 1 }}>{item.name}</Text>
         { opProcessing && <ActivityIndicator /> }
-        <IconButton style={{ width: 24, height: 24 }} iconColor="#000" icon={{ uri: require('/assets/CROSS.svg')}} size={20} onPress={async () => {
+        <IconButton style={{ width: 24, height: 24 }} iconColor="#000" icon={{ uri: require('/assets/img/CROSS.svg')}} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await removeFriend(item.id, appContext.state.token.data!)
