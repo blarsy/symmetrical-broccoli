@@ -1,6 +1,6 @@
 import { createToken, getAccount, queryAccount } from "../apiutil"
 import bcrypt from 'bcrypt'
-import { getOne, link, list, create as nocoCreate, unlink, update } from '../noco'
+import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'
 import { isValidPassword } from "@/utils"
@@ -118,4 +118,11 @@ export const updateAccount = async (token: string, password: string, newPassword
 
     const updated = update('comptes', sourceAccount.id, updatedAccount)
     return fromRawAccount(updated)
+}
+
+export const removeFriend = async (token: string, target: string): Promise<Account> => {
+    const sourceAccount = await getAccount(token, ['Id', 'comptes_liés'])
+    await unlink('comptes', sourceAccount.id, 'comptes_liés', target as string)
+    await unlink('comptes', Number(target), 'comptes_liés', sourceAccount.id.toString())
+    return fromRawAccount(await getAccount(token, ['Id', 'comptes_liés']))
 }

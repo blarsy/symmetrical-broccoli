@@ -1,13 +1,7 @@
 import { getJwt } from "@/server/apiutil"
 import { answerInvite, invite, uninvite } from "@/server/dal/user"
-import { list } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { NextApiRequest, NextApiResponse } from "next"
-
-// const getRequest = async (requester: string, targetAccount: number) => {
-//     const myRequests = await list('demandes_liaison_comptes', `nested[demandeur][where]=(Id,eq,${requester})`, ['Id', 'demandeur', 'cible'])
-//     return myRequests.find((request: any) => request.cible.length > 0 && request.cible[0].Id === targetAccount)
-// }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -19,20 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             respondWithSuccess(res)
         } catch(e: any) {
-            respondWithFailure(req, res, e)
-        }
-    } else if (req.method === 'DELETE') {
-        try {         
-            const { target } = req.query
-            if(target) {
-                const jwt = await getJwt(getToken(req))
-                await uninvite(jwt.email, target as string)
-    
-                respondWithSuccess(res)
-            } else {
-                respondWithFailure(req, res, new Error('Missing parameter'), 400)
-            }
-        } catch (e: any) {
             respondWithFailure(req, res, e)
         }
     } else if (req.method === 'PATCH') {

@@ -48,7 +48,15 @@ const resources = {
       "requestsSent_title": "Friendship requests sent",
       "friends_buttonLabel": "Friends",
       "requestsReceived_buttonLabel": "Inbox",
-      "requestsSent_buttonLabel": "Outbox"
+      "requestsSent_buttonLabel": "Outbox",
+      "network_label": "My network",
+      "add_buttonLabel": "Add",
+      "Atleast3chars": "At least 3 characters",
+      "nameOrEmail_label": "Name or email",
+      "newFriend_viewTitle": "Send an invitation",
+      "invitationAccepted_Message": "'{{name}}' is now a connection",
+      "invitationDeclined_Message": "Invitation from {{name}} declined",
+      "invitationCancelled_Message": "Invitation sent to {{name}} cancelled"
     }
   },
   fr: {
@@ -94,7 +102,15 @@ const resources = {
       "requestsSent_title": "Demandes d'amitié envoyées",
       "friends_buttonLabel": "Amis",
       "requestsReceived_buttonLabel": "Invit. reçues",
-      "requestsSent_buttonLabel": "Invit. envoyées"
+      "requestsSent_buttonLabel": "Invit. envoyées",
+      "network_label": "Mon réseau",
+      "add_buttonLabel": "Ajouter",
+      "Atleast3chars": "Au moins 3 caractères",
+      "nameOrEmail_label": "Nom ou email",
+      "newFriend_viewTitle": "Envoyer une invitation",
+      "invitationAccepted_Message": "Vous êtes maintenant connecté à '{{name}}'",
+      "invitationDeclined_Message": "L'invitation de {{name}} a été refusée",
+      "invitationCancelled_Message": "L'invitation envoyée à {{name}} a été annulée"
     }
   }
 }

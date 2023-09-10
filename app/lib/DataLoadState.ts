@@ -1,7 +1,12 @@
+export interface StateError {
+    message?: string, 
+    detail?: string
+}
+
 class DataLoadState<T> {
     data?: T
     loading: boolean
-    error?: { message?: string, detail?: string}
+    error?: StateError
     constructor(data: T|undefined, loading: boolean, error?: { message?: string, detail?: string}) {
         this.data = data
         this.loading = loading

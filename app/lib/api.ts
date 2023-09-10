@@ -53,8 +53,51 @@ export const updateAccount = async (token: string, password: string, newPassword
     }
 }
 
+export const searchAccount = async (input: string, token: string): Promise<Account[]> => {
+    const res = await (apiCall(`${apiUrl}/account?search=${encodeURI(input)}`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    }}))
+    if(res.status === 200) {
+        return res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const sendInvitation = async (targetAccountId: number, token: string) => {
+    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'POST', body: JSON.stringify({target: targetAccountId}), mode: 'cors', headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+    }}))
+}
+
+export const acceptInvitation = async (targetAccountId: number, token: string) => {
+    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 1}), mode: 'cors', headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+    }}))
+}
+
+export const declineInvitation = async (targetAccountId: number, token: string) => {
+    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 0}), mode: 'cors', headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+    }}))
+}
+
+export const cancelInvitation = async (targetAccountId: number, token: string) => {
+    await (apiCall(`${apiUrl}/user/linkrequest/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
+        'Authorization': token
+    }}))
+}
+
+export const removeFriend = async (targetAccountId: number, token: string) => {
+    await (apiCall(`${apiUrl}/user/friend/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
+        'Authorization': token
+    }}))
+}
+
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
-    console.log('API request : ', input, init)
     const res = await  fetch(input, init)
     if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
         if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')

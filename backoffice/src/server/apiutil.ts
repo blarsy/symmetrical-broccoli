@@ -7,6 +7,7 @@ const secret = process.env.JWT_SECRET as string
 
 export const getJwt = async (token: string): Promise<JwtPayload> => {
     return new Promise((resolve, reject) => {
+        console.log('token', token, 'secret', secret)
         verify(token, secret, (err, payload) => {
             if(err) reject(err)
             else resolve(payload as JwtPayload)

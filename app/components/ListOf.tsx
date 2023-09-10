@@ -11,7 +11,7 @@ function ListOf<T>({data, displayItem}: Props<T>) {
     if(data && data.length > 0) {
         return data.map((item, idx) => displayItem(item, idx))
     } else {
-        return <Text style={{ textAlign: 'center', textTransform: 'uppercase' }}>{t('noData')}</Text>
+        return <Text style={{ textAlign: 'center', textTransform: 'uppercase', margin:10 }}>{t('noData')}</Text>
     }
 }
 

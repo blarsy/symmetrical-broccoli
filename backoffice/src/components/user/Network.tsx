@@ -42,7 +42,19 @@ const Network = () => {
             linkedAccountRequestsState={linkedAccountRequestsState} onLinksChanged={async () => await load()}/> }
         { currentTab === 1 && <Box>
            <LoadingList loadState={linkedAccountsState} displayItem={item => {
-                return <Typography variant="body1">{item.name} ({item.email})</Typography>
+                return <Box display="flex" flexDirection="row" justifyContent="space-between">
+                    <Typography variant="body1">{item.name} ({item.email})</Typography>
+                    <IconButton onClick={async () => {
+                        try {
+                            setRequestProcessingState(beginOperation())
+                            await axios.delete(`/api/user/friend/${item.id}`, { headers: { Authorization: localStorage.getItem('token') }})
+                            setRequestProcessingState(fromData(null))
+                            await load()
+                        } catch(e: any) {
+                            setRequestProcessingState(fromError(e, 'Erreur pendant l\'exécution de l\'opération'))
+                        }  
+                    }}><DeleteIcon/></IconButton>
+                </Box>
             }} onErrorClosed={() => { setLinkedAccountsState(fromData([])) }} />
         </Box> }
         { currentTab === 2 && <Box>
