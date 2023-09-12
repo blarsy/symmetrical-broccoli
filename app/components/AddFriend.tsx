@@ -27,7 +27,7 @@ const AddFriend = ({ route, navigation }: { route: any, navigation: NavigationHe
     }
 
     return <View style={{ flex: 1, padding: 10 }}>
-        <TextInput label={t('nameOrEmail_label')} placeholder={t('Atleast3chars')}
+        <TextInput label={t('nameOrEmail_label')} placeholder={t('Atleast3chars')} value={searchTerm}
             onChangeText={async e => {
                 setSearchTerm(e)
                 searchWithTerm(e)
@@ -43,7 +43,7 @@ const AddFriend = ({ route, navigation }: { route: any, navigation: NavigationHe
                     //search again, should show the same results, but without the account we just invited
                     await searchWithTerm(searchTerm)
                     setAddFriendOperationStatus(fromData(null))
-                    navigation.navigate('networkMain', { timestamp: new Date() })
+                    navigation.navigate('networkMain', { timestamp: new Date().valueOf() })
                 } catch(e) {
                     setAddFriendOperationStatus(fromError(e, t('requestError')))
                 }

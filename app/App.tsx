@@ -9,9 +9,10 @@ import { Font } from 'react-native-paper/lib/typescript/types'
 
 function App() {
   const [fontsLoaded, fontError] = useFonts({
-    'DK-magical-brush': require('./assets/fonts/DK Magical Brush.otf'),
-    'Futura-std-book': require('./assets/fonts/Futura Std Book.otf'),
-    'Futura-std-heavy': require('./assets/fonts/Futura Std Heavy.otf'),
+    'DK-magical-brush': require('./assets/fonts/dk-magical-brush.otf'),
+    'Futura-std-book': require('./assets/fonts/futura-std-book.otf'),
+    'Futura-std-heavy': require('./assets/fonts/futura-std-heavy.otf'),
+    'FontAwesome': require('./assets/fonts/FontAwesome.ttf')
   })
   const defaultFont: Font  = {
     fontFamily: 'Futura-std-book'

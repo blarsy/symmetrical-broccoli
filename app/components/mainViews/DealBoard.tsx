@@ -9,14 +9,14 @@ import EditResource from '@/components/EditResource'
 import MyNetwork from "@/components/MyNetwork"
 import History from './History'
 import { t } from "@/i18n"
-import { IconSource } from "react-native-paper/lib/typescript/components/Icon"
+import Images from '@/Images'
 
 const routes = [
-    { key: 'search', title: t('search_label'), focusedIcon: ({ uri: require('/assets/img/LOUPE.svg') } as IconSource) },
-    { key: 'resource', title: t('resource_label'), focusedIcon: ({ uri: require('/assets/img/PENCIL.svg') } as IconSource)  },
-    { key: 'chat', title: t('chat_label'), focusedIcon: ({ uri: require('/assets/img/CHAT.svg') } as IconSource)  },
+    { key: 'search', title: t('search_label'), focusedIcon: Images.Search },
+    { key: 'resource', title: t('resource_label'), focusedIcon: Images.Modify },
+    { key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
     { key: 'myNetwork', title: t('network_label'), focusedIcon: 'account-multiple-check-outline' },
-    { key: 'history', title: t('history_label'), focusedIcon: ({ uri: require('/assets/img/HISTORY.svg') } as IconSource) },
+    { key: 'history', title: t('history_label'), focusedIcon: Images.History },
 ]
 
 export let navigateMainStack: (viewName: string) => void
@@ -32,7 +32,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
     return <View style={{ flex: 1 }}>
         <Appbar.Header style={{ backgroundColor: primaryColor} }>
             <Appbar.Content title={routes[tabIndex].title} titleStyle={{ fontSize: 24, fontFamily: 'DK-magical-brush', fontWeight: '400', textTransform: 'uppercase', textAlign: 'center' }} />
-            <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={{ uri: require('/assets/img/PROFIL.svg') } as IconSource} size={30} onPress={() => { navigation.navigate('profile')}} />
+            <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
         </Appbar.Header>
         <BottomNavigation onIndexChange={setTabIndex} barStyle={{ backgroundColor: lightPrimaryColor }} 
             renderScene={BottomNavigation.SceneMap({

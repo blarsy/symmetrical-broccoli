@@ -9,29 +9,34 @@ import Connections from "./Connections"
 import RequestsReceived from "./RequestsReceived"
 import RequestsSent from "./RequestsSent"
 import {List } from "react-native-paper"
-import { Image, View } from "react-native"
+import { Touchable, View } from "react-native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AddFriend from "./AddFriend"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor } from "./layout/constants"
+import Images from "@/Images"
+import { SvgProps } from "react-native-svg"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 interface SubViewProps {
-    id: number,
     titleI18n: string,
     children: JSX.Element,
-    imgSrc: any
+    Img: React.FC<SvgProps>
 }
 
-const SubViewAccordion = ({ id, titleI18n, children, imgSrc }: SubViewProps) => <List.Accordion id={id} title={<Text style={{ textTransform: 'uppercase' }}>{t(titleI18n)}</Text>} 
-    titleStyle={{ fontFamily: 'DK-magical-brush', fontSize: 20, borderBottomWidth: 1 }}  titleNumberOfLines={2}
-    right={({ isExpanded}) => isExpanded ?
-        <Image source={require('/assets/img/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
-            transform: [{ rotate: '270deg' }] }}/> :
-        <Image source={require('/assets/img/FLECHE.svg')} style={{ width: 25, height: 25, tintColor: '#000', 
-            transform: [{ rotate: '90deg' }] }}/>}
-    left={({color, style}) => <Image source={imgSrc} style={{ ...style, width: 30, height: 30, tintColor: '#000'}} /> }>
-        <View style={{ flex: 1, padding: 10 }}>{children}</View>
-</List.Accordion>
+const SubView = ({ titleI18n, children, Img }: SubViewProps) => {
+    const [isExpanded, setIsExpanded] = useState(false)
+    return <View style={{ flexDirection: "column" }}>
+        <TouchableOpacity style={{ borderBottomWidth: 1, flexDirection: 'row', justifyContent: 'space-between', padding: 10, alignItems: 'center', gap: 10 }} onPress={() => setIsExpanded(!isExpanded)}>
+            <Img width={30} height={30} color="#000" />
+            <Text style={{ fontFamily: 'DK-magical-brush', fontSize: 20, textTransform: 'uppercase', flex: 1 }}>{t(titleI18n)}</Text>
+            {isExpanded ?
+                <View style={{ transform: [{ rotate: '270deg' }] }}><Images.Arrow width={25} height={25} color="#000" /></View> :
+                <View style={{ transform: [{ rotate: '90deg' }] }}><Images.Arrow width={25} height={25} color="#000" /></View>}
+        </TouchableOpacity>
+        { isExpanded && children }
+    </View>
+}
 
 const NetworkMainView = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
     const appContext = useContext(AppContext)
@@ -55,17 +60,17 @@ const NetworkMainView = ({ route, navigation }: { route: any, navigation: Naviga
     } else if(network.loading){
         return <ActivityIndicator style={{ marginTop: 10 }} />
     } else {
-        return <List.AccordionGroup>
-            <SubViewAccordion id={1} titleI18n="myNetwork_title" imgSrc={require('/assets/img/HEART.svg')}>
+        return <View style={{ flexDirection: 'column' }}>
+            <SubView titleI18n="myNetwork_title" Img={Images.Heart}>
                 <Connections state={network} onAddRequested={() => navigation.navigate('addFriend')} onChange={loadNetwork}/>
-            </SubViewAccordion>
-            <SubViewAccordion id={2} titleI18n="requestsReceived_title" imgSrc={require('/assets/img/RECU.svg')}>
+            </SubView>
+            <SubView titleI18n="requestsReceived_title" Img={Images.Received}>
                 <RequestsReceived state={network} onChange={loadNetwork}/>
-            </SubViewAccordion>
-            <SubViewAccordion id={3} titleI18n="requestsSent_title" imgSrc={require('/assets/img/ENVOYE.svg')}>
+            </SubView>
+            <SubView titleI18n="requestsSent_title" Img={Images.Sent}>
                 <RequestsSent state={network} onChange={loadNetwork}/>
-            </SubViewAccordion>
-        </List.AccordionGroup>
+            </SubView>
+        </View>
     }
 }
 
@@ -86,7 +91,7 @@ const MyNetwork = () => {
         <IconButton icon="arrow-left" onPress={() => props.navigation.goBack()} />
         <Text style={{ fontSize: 20, fontFamily: 'DK-magical-brush', textTransform: 'uppercase' }}>{t(getViewTitleI18n(props.route.name))}</Text>
     </View> : <></> }}}>
-        <StackNav.Screen name="networkMain" component={NetworkMainView} initialParams={{ timestamp: new Date() }} key="networkMain" />
+        <StackNav.Screen name="networkMain" component={NetworkMainView} initialParams={{ timestamp: new Date().valueOf() }} key="networkMain" />
         <StackNav.Screen name="addFriend" component={AddFriend} key="addFriend" />
     </StackNav.Navigator>
 }

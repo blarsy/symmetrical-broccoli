@@ -39,8 +39,8 @@ const ResourceImages = ({ images, setImages, onImageSelected, onRequestImageDele
         }} />
         { images && 
             <Box margin="1rem">
-                { images.map(image => <Chip key={image.name} label={`${image.name}`} onDelete={() => 
-                    setImages([...(images.filter(file => file !== image))]) } />
+                { Images.map(image => <Chip key={image.name} label={`${image.name}`} onDelete={() => 
+                    setImages([...(Images.filter(file => file !== image))]) } />
                 )}
             </Box>
         }

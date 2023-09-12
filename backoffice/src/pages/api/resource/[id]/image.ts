@@ -55,13 +55,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['images'])
             resource.images = JSON.parse(resource.images)
     
-            const imageToDelete = resource.images.find((image: Image) => image.path === path)
+            const imageToDelete = resource.Images.find((image: Image) => image.path === path)
             if(!imageToDelete) {
                 respondWithFailure(req, res, new Error('Image not found.'), 404)
                 return
             }
     
-            const updatedResource = await update('ressources', resourceId, { images: resource.images.filter((image: any) => image.path !== path) })
+            const updatedResource = await update('ressources', resourceId, { images: resource.Images.filter((image: any) => image.path !== path) })
             respondWithSuccess(res, fromRawResource(updatedResource))
         } catch(e: any) {
             respondWithFailure(req, res, e)

@@ -7,6 +7,7 @@ import DataLoadState from "@/lib/DataLoadState"
 import { AppContext } from "./AppContextProvider"
 import { t } from "@/i18n"
 import { removeFriend } from "@/lib/api"
+import Images from "@/Images"
 
 interface Props {
     state: DataLoadState<Network>,
@@ -25,9 +26,9 @@ const Connection = ({ item, isLastRow, onChange, onError }: ConnectionProps) => 
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
     return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
-        <Text style={{ flex: 1 }}>{item.name}</Text>
+        <Text style={{ flex: 1, fontSize: 16, paddingLeft: 10 }}>{item.name}</Text>
         { opProcessing && <ActivityIndicator /> }
-        <IconButton style={{ width: 24, height: 24 }} iconColor="#000" icon={{ uri: require('/assets/img/CROSS.svg')}} size={20} onPress={async () => {
+        <IconButton style={{ width: 24, height: 24 }} iconColor="#000" icon={Images.Cross} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await removeFriend(item.id, appContext.state.token.data!)

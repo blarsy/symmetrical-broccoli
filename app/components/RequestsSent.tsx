@@ -7,6 +7,7 @@ import LoadedList from "./LoadedList"
 import { AppContext } from "./AppContextProvider"
 import { cancelInvitation } from "@/lib/api"
 import { t } from "@/i18n"
+import Images from "@/Images"
 
 interface Props {
     state: DataLoadState<Network>,
@@ -24,9 +25,9 @@ const RequestSent = ({ item, isLastRow, onChange, onError }: ReqProps) => {
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
     return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
-        <Text style={{ flex: 1 }}>{item.name}</Text>
+        <Text style={{ flex: 1, marginLeft: 10, fontSize: 16 }}>{item.name}</Text>
         { opProcessing && <ActivityIndicator /> }
-        <IconButton iconColor="#000" icon={{ uri: require('/assets/img/CROSS.svg')}} size={20} onPress={async () => {
+        <IconButton iconColor="#000" icon={Images.Cross} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await cancelInvitation(item.id, appContext.state.token.data!)

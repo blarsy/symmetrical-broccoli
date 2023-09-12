@@ -7,6 +7,7 @@ import DataLoadState from "@/lib/DataLoadState"
 import { acceptInvitation, declineInvitation } from "@/lib/api"
 import { AppContext } from "./AppContextProvider"
 import { t } from "@/i18n"
+import Images from "@/Images"
 
 interface Props {
     state: DataLoadState<Network>,
@@ -23,9 +24,9 @@ const RequestReceived = ({ item, isLastRow, onChange, onError }: ReqProps) => {
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
     return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
-        <Text style={{ flex: 1 }}>{item.name}</Text>
+        <Text style={{ flex: 1, marginLeft: 10, fontSize: 16 }}>{item.name}</Text>
         { opProcessing && <ActivityIndicator /> }
-        <IconButton icon={{ uri: require('/assets/img/VALID.svg')}} size={20} onPress={async () => {
+        <IconButton icon={Images.Valid} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await acceptInvitation(item.id, appContext.state.token.data!)
@@ -36,7 +37,7 @@ const RequestReceived = ({ item, isLastRow, onChange, onError }: ReqProps) => {
                 setOpProcessing(false)
             }
         }} />
-        <IconButton icon={{ uri: require('/assets/img/CROSS.svg')}} size={20} onPress={async () => {
+        <IconButton icon={Images.Cross} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await declineInvitation(item.id, appContext.state.token.data!)

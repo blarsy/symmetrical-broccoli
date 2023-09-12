@@ -26,7 +26,7 @@ const Suggestions = () => {
         <Typography variant="h2">Suggestions</Typography>
         <LoadingList loadState={suggestedResourcesState} onErrorClosed={() => setSuggestedResourcesState(initial<Resource[]>(false))}
             displayItem={(resource: Resource) => (<Box display="flex" flexDirection="row" gap="1rem" alignItems="center">
-                { resource.images && resource.images.length > 0 ? 
+                { resource.images && resource.Images.length > 0 ? 
                     <Image width="100" height="100" src={`${imagePublicBaseUrl}/${resource.images[0].path}`} alt={resource.title} /> :
                     <Image width="100" height="100" src="/placeholder.png" alt="pas d'image" />
                 }
