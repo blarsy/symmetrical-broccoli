@@ -28,3 +28,4 @@ app/android/app/build/
 app/android/.*
 app/android/app/*.keystore
 *.aab
+backoffice/mails/
