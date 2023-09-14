@@ -26,8 +26,8 @@ const Create = () => {
                                     expiration: values.expiration ? values.expiration.toDate(): undefined,
                                     conditions: values.conditions },
                                     { headers: { Authorization: localStorage.getItem('token') }})
-                                if(Images.length > 0){
-                                    await axios.postForm(`/api/resource/${res.data.id}/image`, { files: Images.map(img => img.blob) } , { headers: {
+                                if(images.length > 0){
+                                    await axios.postForm(`/api/resource/${res.data.id}/image`, { files: images.map(img => img.blob) } , { headers: {
                                         Authorization: localStorage.getItem('token') as string,
                                         "Content-Type": "multipart/form-data"
                                     }})

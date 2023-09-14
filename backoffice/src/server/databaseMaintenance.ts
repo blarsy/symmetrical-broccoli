@@ -2,7 +2,7 @@ import { NormalColumnRequestType, Api, LinkToAnotherColumnReqType } from "nocodb
 import { logData } from "./logger"
 import { answerInvite, create, invite } from "./dal/user"
 import { create as createResource} from './dal/resource'
-import { list } from "./noco"
+import { getOne, list, update } from "./noco"
 
 const systemTableName = 'systeme'
 const accountsTableName = 'comptes'
@@ -68,6 +68,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
         type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
     } as LinkToAnotherColumnReqType)
     await migrateToV1_0_0(apiInNewProject, projectId, orgs, projectName)
+    await migrateToV1_0_1(apiInNewProject, projectId)
 }
 
 const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string): Promise<void> => {
@@ -82,6 +83,15 @@ const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: strin
         childId: accountsTableId, parentId: accountsTableId, title: 'comptes_invites',
         type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
     } as LinkToAnotherColumnReqType)
+}
+
+const migrateToV1_0_1 = async (api: Api<unknown>, projectId: string) => {
+    const accountsTableId = await getTableId(api, projectId, accountsTableName)
+
+    await api.dbTableColumn.create(accountsTableId, { column_name: 'code_restauration', title: 'code_restauration', uidt: 'SingleLineText' })
+    await api.dbTableColumn.create(accountsTableId, { column_name: 'expiration_code_restauration', title: 'expiration_code_restauration', uidt: 'DateTime' })
+
+    await update(systemTableName, 1, { version: '1.0.1' })
 }
  
 const insertTestData  = async () => {
@@ -118,12 +128,18 @@ const insertTestData  = async () => {
 const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, orgs: string): Promise<string> => {
     const projectId = await getProjectId(api, projectName)
     const tables = await api.dbTable.list(projectId)
-    if(tables.list.some((table) => table.title === systemTableName)) {
-        // nothing for the moment, future migrations will be called from here
-        return 'Db up to date'
-    } else {
+    if(!tables.list.some((table) => table.title === systemTableName)) {
         await migrateToV1_0_0(api, projectId, orgs, projectName)
-        return 'Migrated to 1.0.0'
+        await migrateToV1_0_1(api, projectId)
+        return 'Migrated to 1.0.1'
+    } else {
+        const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
+        if(systemRow.version === '1.0.0') {
+            await migrateToV1_0_1(api, projectId)
+            return 'Migrated to 1.0.1'
+        } else {
+            return 'Db already up to date'
+        }
     }
 }
 
@@ -141,7 +157,6 @@ export const ensureDataStoreUptodate = async (api: Api<unknown>, projectName: st
       try {
         logData(`Project ${projectName} detected, checking for a migration ...`, {})
         const result = await ensureMigrationApplied(api, projectName, orgs)
-        await insertTestData()
         logData('Startup complete.', {})
         return result
       } catch(e: any) {

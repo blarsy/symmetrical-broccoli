@@ -1,4 +1,4 @@
-import { TextField, Box } from "@mui/material"
+import { TextField, Box, Link } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { Formik } from "formik"
 import * as yup from 'yup'
@@ -55,6 +55,7 @@ const Login = ({ onSuccess }: Props) => {
                         startIcon={<LoginIcon />}
                         type="submit"
                         variant="contained">Se connecter</LoadingButton>
+                    <Link style={{ textAlign: 'center' }} href="/recover">Mot de passe oublié ?</Link>
                     {errorInfo.message && <Feedback severity="error" message={errorInfo.message} 
                         detail={errorInfo.detail} 
                         onClose={() => setErrorInfo({ message: '', detail: '' })}/>}

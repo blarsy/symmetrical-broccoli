@@ -764,6 +764,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sendgrid/client@npm:^7.7.0":
+  version: 7.7.0
+  resolution: "@sendgrid/client@npm:7.7.0"
+  dependencies:
+    "@sendgrid/helpers": ^7.7.0
+    axios: ^0.26.0
+  checksum: 81299ff65b67de3df8c20f545aa7c3416519865079a2d21ce1ee80c76da568799679eb680fca51ef0df0ad34628e695e1991ea9cd8809baa9173ce5cda17fa50
+  languageName: node
+  linkType: hard
+
+"@sendgrid/helpers@npm:^7.7.0":
+  version: 7.7.0
+  resolution: "@sendgrid/helpers@npm:7.7.0"
+  dependencies:
+    deepmerge: ^4.2.2
+  checksum: 20387aae1bff06b9febc39f82cd184dd6e59d0e1ae2e74565d88802a6c6a5e4e571924335bfc8b1493f5f09e832f526f71d81e813295b2060379cb6e53786429
+  languageName: node
+  linkType: hard
+
+"@sendgrid/mail@npm:^7.7.0":
+  version: 7.7.0
+  resolution: "@sendgrid/mail@npm:7.7.0"
+  dependencies:
+    "@sendgrid/client": ^7.7.0
+    "@sendgrid/helpers": ^7.7.0
+  checksum: 8bd446c367983e70b5d1f7a9a5796b2db3dd9304a3d6adf36fb3ee87ff0021e69223222e9ddfa62a40749ed9b136d0e6e4567e9dc4ad66b4ae38a404b07f24e1
+  languageName: node
+  linkType: hard
+
 "@swc/helpers@npm:0.5.1":
   version: 0.5.1
   resolution: "@swc/helpers@npm:0.5.1"
@@ -1216,6 +1245,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^0.26.0":
+  version: 0.26.1
+  resolution: "axios@npm:0.26.1"
+  dependencies:
+    follow-redirects: ^1.14.8
+  checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
+  languageName: node
+  linkType: hard
+
 "axios@npm:^1.4.0":
   version: 1.4.0
   resolution: "axios@npm:1.4.0"
@@ -1259,6 +1297,7 @@ __metadata:
     "@mui/material": ^5.13.3
     "@mui/system": ^5.8.0
     "@mui/x-date-pickers": ^6.7.0
+    "@sendgrid/mail": ^7.7.0
     "@types/bcrypt": ^5.0.0
     "@types/formidable": ^3.4.0
     "@types/jsonwebtoken": ^9.0.2
@@ -1272,6 +1311,7 @@ __metadata:
     eslint-config-next: 13.4.4
     formidable: ^3.5.0
     formik: ^2.4.1
+    handlebars: ^4.7.8
     i18next: ^23.4.3
     jsonwebtoken: ^9.0.0
     next: 13.4.4
@@ -1669,6 +1709,13 @@ __metadata:
   version: 2.2.1
   resolution: "deepmerge@npm:2.2.1"
   checksum: 284b71065079e66096229f735a9a0222463c9ca9ee9dda7d5e9a0545bf254906dbc7377e3499ca3b2212073672b1a430d80587993b43b87d8de17edc6af649a8
+  languageName: node
+  linkType: hard
+
+"deepmerge@npm:^4.2.2":
+  version: 4.3.1
+  resolution: "deepmerge@npm:4.3.1"
+  checksum: 2024c6a980a1b7128084170c4cf56b0fd58a63f2da1660dcfe977415f27b17dbe5888668b59d0b063753f3220719d5e400b7f113609489c90160bb9a5518d052
   languageName: node
   linkType: hard
 
@@ -2378,7 +2425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.15.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
@@ -2694,6 +2741,24 @@ __metadata:
   version: 1.4.0
   resolution: "graphemer@npm:1.4.0"
   checksum: bab8f0be9b568857c7bec9fda95a89f87b783546d02951c40c33f84d05bb7da3fd10f863a9beb901463669b6583173a8c8cc6d6b306ea2b9b9d5d3d943c3a673
+  languageName: node
+  linkType: hard
+
+"handlebars@npm:^4.7.8":
+  version: 4.7.8
+  resolution: "handlebars@npm:4.7.8"
+  dependencies:
+    minimist: ^1.2.5
+    neo-async: ^2.6.2
+    source-map: ^0.6.1
+    uglify-js: ^3.1.4
+    wordwrap: ^1.0.0
+  dependenciesMeta:
+    uglify-js:
+      optional: true
+  bin:
+    handlebars: bin/handlebars
+  checksum: 00e68bb5c183fd7b8b63322e6234b5ac8fbb960d712cb3f25587d559c2951d9642df83c04a1172c918c41bcfc81bfbd7a7718bbce93b893e0135fc99edea93ff
   languageName: node
   linkType: hard
 
@@ -3556,7 +3621,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:^1.2.0, minimist@npm:^1.2.6":
+"minimist@npm:^1.2.0, minimist@npm:^1.2.5, minimist@npm:^1.2.6":
   version: 1.2.8
   resolution: "minimist@npm:1.2.8"
   checksum: 75a6d645fb122dad29c06a7597bddea977258957ed88d7a6df59b5cd3fe4a527e253e9bbf2e783e4b73657f9098b96a5fe96ab8a113655d4109108577ecf85b0
@@ -3690,6 +3755,13 @@ __metadata:
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
   checksum: b8ffeb1e262eff7968fc90a2b6767b04cfd9842582a9d0ece0af7049537266e7b2506dfb1d107a32f06dd849ab2aea834d5830f7f4d0e5cb7d36e1ae55d021d9
+  languageName: node
+  linkType: hard
+
+"neo-async@npm:^2.6.2":
+  version: 2.6.2
+  resolution: "neo-async@npm:2.6.2"
+  checksum: deac9f8d00eda7b2e5cd1b2549e26e10a0faa70adaa6fdadca701cc55f49ee9018e427f424bac0c790b7c7e2d3068db97f3093f1093975f2acb8f8818b936ed9
   languageName: node
   linkType: hard
 
@@ -4603,6 +4675,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"source-map@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "source-map@npm:0.6.1"
+  checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
+  languageName: node
+  linkType: hard
+
 "ssri@npm:^10.0.0":
   version: 10.0.4
   resolution: "ssri@npm:10.0.4"
@@ -5003,6 +5082,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uglify-js@npm:^3.1.4":
+  version: 3.17.4
+  resolution: "uglify-js@npm:3.17.4"
+  bin:
+    uglifyjs: bin/uglifyjs
+  checksum: 7b3897df38b6fc7d7d9f4dcd658599d81aa2b1fb0d074829dd4e5290f7318dbca1f4af2f45acb833b95b1fe0ed4698662ab61b87e94328eb4c0a0d3435baf924
+  languageName: node
+  linkType: hard
+
 "unbox-primitive@npm:^1.0.2":
   version: 1.0.2
   resolution: "unbox-primitive@npm:1.0.2"
@@ -5173,6 +5261,13 @@ __metadata:
   version: 1.2.3
   resolution: "word-wrap@npm:1.2.3"
   checksum: 30b48f91fcf12106ed3186ae4fa86a6a1842416df425be7b60485de14bec665a54a68e4b5156647dec3a70f25e84d270ca8bc8cd23182ed095f5c7206a938c1f
+  languageName: node
+  linkType: hard
+
+"wordwrap@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "wordwrap@npm:1.0.0"
+  checksum: 2a44b2788165d0a3de71fd517d4880a8e20ea3a82c080ce46e294f0b68b69a2e49cff5f99c600e275c698a90d12c5ea32aff06c311f0db2eb3f1201f3e7b2a04
   languageName: node
   linkType: hard
 

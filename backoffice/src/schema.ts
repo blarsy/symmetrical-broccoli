@@ -7,7 +7,9 @@ export interface Account {
     resources?: Resource[],
     linkedAccounts: Account[],
     invitedAccounts: Account[],
-    invitedByAccounts: Account[]
+    invitedByAccounts: Account[],
+    recoveryCode: string,
+    expirationRecoveryCode: Date
 }
 
 export interface Image {
@@ -43,7 +45,9 @@ export const fromRawAccount = (raw: any): Account => ({
     resources: raw.ressources ? raw.ressources.map((rawRes:any) => fromRawResource(rawRes)): [],
     linkedAccounts: raw.comptes_liés ? raw.comptes_liés.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
     invitedAccounts: raw.comptes_invites ? raw.comptes_invites.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
-    invitedByAccounts: raw['comptes List1'] ? raw['comptes List1'].map((rawAccount: any) => fromRawAccount(rawAccount)) : []
+    invitedByAccounts: raw['comptes List1'] ? raw['comptes List1'].map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+    recoveryCode: raw.code_restauration,
+    expirationRecoveryCode: raw.expiration_code_restauration
 })
 
 export const fromRawResource = (raw: any): Resource => ({

@@ -4,8 +4,11 @@ import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'
 import { isValidPassword } from "@/utils"
+import { sendAccountRecoveryMail, sendMail } from "../mailing"
 
 const INITIAL_BALANCE = 5
+const ACCOUNT_RECOVERY_DELAY_MINUTES = Number(process.env.ACCOUNT_RECOVERY_DELAY_MINUTES!)
+const NOREPLY_EMAIL = process.env.NOREPLY_EMAIL!
 
 export const authenticate = async(email: string, password: string) => {
     const account = await queryAccount(`(email,eq,${email})`, ['Id', 'nom', 'email', 'balance', 'hash'])
@@ -89,6 +92,42 @@ export const getInvitableAccounts = async (search: string, token: string): Promi
     return filteredResult
 }
 
+const createRecoveryCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let result = ''
+    for(let i = 0; i < 24; i ++) {
+        result += chars[Math.floor(Math.random() * 36)]
+    }
+    return result
+}
+
+export const requestRecovery = async (email: string) => {
+    if(!yup.string().email().validate(email)) throw new Error('invalid email')
+
+    const sourceAccount = await queryAccount(`(email,eq,${email})`, ['Id'])
+
+    const recoveryCode = createRecoveryCode()
+
+    await sendAccountRecoveryMail(email, recoveryCode)
+
+    await update('comptes', sourceAccount.id, {
+        code_restauration: recoveryCode,
+        expiration_code_restauration: new Date(new Date().valueOf() + ACCOUNT_RECOVERY_DELAY_MINUTES * 60 * 1000)
+    })
+}
+
+export const recover = async (recoveryCode: string, newPassword: string) => {
+    if(!isValidPassword(newPassword)) throw new Error('invalid new password')
+
+    const sourceAccount = await queryAccount(`(code_restauration,eq,${recoveryCode})`, ['Id', 'hash'])
+
+    await update('comptes', sourceAccount.id, {
+        code_restauration: '',
+        expiration_code_restauration: null,
+        hash: await hashFromPassword(newPassword)
+    })
+}
+
 export const updateAccount = async (token: string, password: string, newPassword: string, name: string, email: string): Promise<Account> => {
     if(!token) throw new Error('missing token')
     if(!yup.string().email().validate(email)) throw new Error('invalid email')
@@ -116,7 +155,11 @@ export const updateAccount = async (token: string, password: string, newPassword
         updatedAccount.name = name
     }
 
-    const updated = update('comptes', sourceAccount.id, updatedAccount)
+    const updated = update('comptes', sourceAccount.id, {
+        hash: updatedAccount.hash,
+        email: updatedAccount.email,
+        nom: updatedAccount.name
+    })
     return fromRawAccount(updated)
 }
 

@@ -18,17 +18,102 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## How to generate a free SSL certificate from Let's encrypt - through its Certbot utility, and apply it to a docker-hosted NGinx container
 
-To learn more about Next.js, take a look at the following resources:
+**Assuming:**
+* the IP address of the remote server with Docker installed is 45.91.169.85
+* the url we are securing with https is admin.homeostasis.pro
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+First ensure your web server does not systematically redirect everything to SSL, as Certbot will need the Letsencrypt servers to query for challenge files on HTTP. So, comment out the https redirection line in /docker/prod/nginx.conf, so that it looks like:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+`server {`
 
-## Deploy on Vercel
+`    listen 80;`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`    location /.well-known/ {`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`        root /var/local;`
+
+`    }`
+
+`    #return 301 https://$host$request_uri;`
+
+`}`
+
+make sure you uploaded your SSH key to the target server first (should be done only once in the server's lifetime)
+
+`ssh-copy-id -i ~/.ssh/id_rsa.pub root@45.91.169.85`
+
+connect to the server
+
+`ssh root@45.91.169.85`
+
+Generate the certificates
+
+`certbot certonly --webroot --domains admin.homeostasis.pro`
+
+You'll have to provide the path where to create the challenge files required for Letsencrypt to verify you actually control the public IP address you request the certificates for. Thus, when prompted:
+
+`Input the webroot for admin.homeostasis.pro: (Enter 'c' to cancel):`
+
+Type
+
+`/etc/letsencrypt`
+
+Make sure the certificate files are accessible to the web proxy docker container:
+
+`cd /etc/letsencrypt`
+
+`chmod -R 705 archive`
+
+`chmod -R 705 live`
+
+Should be good to go ...
+
+## How to RENEW a free SSL certificate from Let's encrypt - through its Certbot utility, and apply it to a docker-hosted NGinx container
+
+First ensure your web server does not systematically redirect everything to SSL, as Certbot will need the Letsencrypt servers to query for challenge files on HTTP. So, comment out the https redirection line in /docker/prod/nginx.conf, so that it looks like:
+
+`server {`
+
+`    listen 80;`
+
+`    location /.well-known/ {`
+
+`        root /var/local;`
+
+`    }`
+
+`    #return 301 https://$host$request_uri;`
+
+`}`
+
+Run the deployment script
+
+`sh deploy.sh`
+
+connect to the server
+
+`ssh root@45.91.169.85`
+
+`certbot renew`
+
+when renewal is successful, restore the nginx.config file:
+
+`server {`
+
+`    listen 80;`
+
+`    location /.well-known/ {`
+
+`        root /var/local;`
+
+`    }`
+
+`    return 301 https://$host$request_uri;`
+
+`}`
+
+Run the deployment script again
+
+`sh deploy.sh`
