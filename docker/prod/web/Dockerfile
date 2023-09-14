@@ -16,6 +16,7 @@ COPY --chown=nextjs:nodejs /public ./public
 COPY --chown=nextjs:nodejs ./web/standalone ./
 COPY --chown=nextjs:nodejs ./web/static ./.next/static
 COPY --chown=nextjs:nodejs ./web/next.config.js ./
+COPY --chown=nextjs:nodejs ./web/mailtemplates ./mailtemplates/
 
 USER nextjs
 

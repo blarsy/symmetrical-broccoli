@@ -11,8 +11,9 @@ scp -rp ./docker/prod/.env root@45.91.168.78:/home/symbro/docker
 scp -rp ./backoffice/.env.production root@45.91.168.78:/home/symbro
 # Zip web build files
 rm ./web.zip
+cp -r ./backoffice/src/server/mailing/templates ./backoffice/.next/mailtemplates
 cd backoffice/.next
-zip -r -q --symlinks ../../web.zip ./static ./standalone ../next.config.js
+zip -q -r --symlinks ../../web.zip ./static ./standalone ./mailtemplates ../next.config.js
 cd ..
 cd ..
 

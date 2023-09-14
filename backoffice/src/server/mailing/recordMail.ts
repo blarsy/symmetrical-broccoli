@@ -18,7 +18,7 @@ export const recordMail = async (msg: Message) => {
     console.log(`${mailPath}${uuid}`)
     promises.push(writeFile(`${mailPath}${uuid}.txt`, msg.text))
     promises.push(writeFile(`${mailPath}${uuid}.html`, msg.html))
-    promises.push(appendFile(`${mailPath}mails.txt`, JSON.stringify({ date: new Date(), to: msg.to, subject: msg.subject })+ '\n')) 
+    promises.push(appendFile(`${mailPath}mails.txt`, JSON.stringify({ date: new Date(), from: msg.from, to: msg.to, subject: msg.subject })+ '\n')) 
 
     await Promise.all(promises)
 }

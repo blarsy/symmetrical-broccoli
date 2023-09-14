@@ -6,7 +6,7 @@ import { recordMail } from './recordMail'
 const config = {
     mailApiKey: process.env.SENDGRID_API_KEY!,
     noreplyEmail: process.env.NOREPLY_EMAIL!,
-    mailTemplatesLocation: './src/server/mailing/templates/',
+    mailTemplatesLocation: process.env.MAIL_TEMPLATES_LOCATION!,
     websiteUrl: process.env.TOPELA_API_URL!,
     productName: 'Tope là',
     production: process.env.NODE_ENV!.toLowerCase() === 'production'
@@ -55,7 +55,7 @@ const preparePartials = async () => {
 export const sendAccountRecoveryMail = async (email: string, code: string) => {
     const heading = 'Récupération de mot de passe'
     const text = `Voici un lien pour effectuer la récupération de votre mot de passe sur ${config.productName}: `
-    const link = `${config.websiteUrl}/user/recovery/${code}`
+    const link = `${config.websiteUrl}/recover/${code}`
 
     await preparePartials()
     const source = await readFile(`${config.mailTemplatesLocation}adminInvite.html`)

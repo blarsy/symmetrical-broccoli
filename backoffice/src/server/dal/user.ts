@@ -8,7 +8,6 @@ import { sendAccountRecoveryMail, sendMail } from "../mailing"
 
 const INITIAL_BALANCE = 5
 const ACCOUNT_RECOVERY_DELAY_MINUTES = Number(process.env.ACCOUNT_RECOVERY_DELAY_MINUTES!)
-const NOREPLY_EMAIL = process.env.NOREPLY_EMAIL!
 
 export const authenticate = async(email: string, password: string) => {
     const account = await queryAccount(`(email,eq,${email})`, ['Id', 'nom', 'email', 'balance', 'hash'])
