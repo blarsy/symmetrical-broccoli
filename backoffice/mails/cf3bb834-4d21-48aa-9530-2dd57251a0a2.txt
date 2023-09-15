@@ -1,1 +1,0 @@
-Voici un lien pour effectuer la récupération de votre mot de passe sur Tope là: http://localhost:3000/user/recovery/NRFLE07VSXRQ8363ERI7KPQ4

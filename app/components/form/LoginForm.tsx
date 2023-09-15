@@ -14,10 +14,11 @@ import { WhiteButton } from "@/components/layout/lib"
 
 interface Props {
     toggleRegistering: () => void,
+    toggleRecovering: () => void,
     style: StyleProp<ViewStyle>
 }
 
-const LoginForm = ({ toggleRegistering, style }: Props) => {
+const LoginForm = ({ toggleRegistering, toggleRecovering, style }: Props) => {
     const appContext = useContext(AppContext)
     const [loginState, setLoginstate] = useState(initial<null>(false))
 
@@ -52,6 +53,10 @@ const LoginForm = ({ toggleRegistering, style }: Props) => {
                 <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
                     onPress={toggleRegistering} labelStyle={{ fontSize: 16 }}>
                     {t('notsubscribedyet_label')}
+                </Button>                
+                <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
+                    onPress={toggleRecovering} labelStyle={{ fontSize: 16 }}>
+                    {t('forgotPassword_label')}
                 </Button>
                 <Portal>
                     <Snackbar role="alert" visible={!!loginState.error && !!loginState.error.message} onDismiss={() => setLoginstate(initial<null>(false))}>

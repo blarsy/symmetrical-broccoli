@@ -97,6 +97,12 @@ export const removeFriend = async (targetAccountId: number, token: string) => {
     }}))
 }
 
+export const requestRecovery = async (email: string) => {
+    return await apiCall(`${apiUrl}/user/recovery`, { method: 'PUT', body: JSON.stringify({ email }), mode: 'cors', headers: {
+        'Content-Type': 'application/json'
+    }})
+}
+
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     const res = await  fetch(input, init)
     if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {

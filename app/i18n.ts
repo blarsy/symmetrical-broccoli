@@ -56,7 +56,9 @@ const resources = {
       "newFriend_viewTitle": "Send an invitation",
       "invitationAccepted_Message": "'{{name}}' is now a connection",
       "invitationDeclined_Message": "Invitation from {{name}} declined",
-      "invitationCancelled_Message": "Invitation sent to {{name}} cancelled"
+      "invitationCancelled_Message": "Invitation sent to {{name}} cancelled",
+      "forgotPassword_label": "Forgot password ?",
+      "recoveryRequested_message": "A mail has been sent to your address. Please follow the instructions it provides to restore access to your account."
     }
   },
   fr: {
@@ -110,7 +112,9 @@ const resources = {
       "newFriend_viewTitle": "Envoyer une invitation",
       "invitationAccepted_Message": "Vous êtes maintenant connecté à '{{name}}'",
       "invitationDeclined_Message": "L'invitation de {{name}} a été refusée",
-      "invitationCancelled_Message": "L'invitation envoyée à {{name}} a été annulée"
+      "invitationCancelled_Message": "L'invitation envoyée à {{name}} a été annulée",
+      "forgotPassword_label": "Mot de passe oublié ?",
+      "recoveryRequested_message": "Un email a été envoyé à votre adresse. Veuillez suivre les instructions qui s'y trouvent pour rétablir l'accès à votre compte."
     }
   }
 }
