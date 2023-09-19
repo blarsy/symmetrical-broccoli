@@ -5,18 +5,17 @@ import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadStat
 import { register } from "@/lib/api"
 import { OrangeBackedErrorText } from "./ErrorText"
 import * as yup from 'yup'
-import { StyleProp, View, ViewStyle } from "react-native"
+import { View } from "react-native"
 import { AppContext } from "@/components/AppContextProvider"
 import OrangeTextInput from "./OrangeTextInput"
 import { Portal, Snackbar } from "react-native-paper"
 import { WhiteButton } from "@/components/layout/lib"
 
 interface Props {
-    toggleRegistering: () => void,
-    style: StyleProp<ViewStyle>
+    toggleRegistering: () => void
 }
 
-const RegisterForm = ({ toggleRegistering, style }: Props) => {
+const RegisterForm = ({ toggleRegistering }: Props) => {
     const appContext = useContext(AppContext)
     const [registerState, setRegisterState] = useState(initial<null>(false))
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
@@ -36,7 +35,7 @@ const RegisterForm = ({ toggleRegistering, style }: Props) => {
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View style={style}>
+        <View>
             <OrangeTextInput label={t('name_label')} textContentType="givenName" value={values.name}
                 onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={OrangeBackedErrorText} name="name" />
@@ -49,14 +48,14 @@ const RegisterForm = ({ toggleRegistering, style }: Props) => {
             <OrangeTextInput label={t('repeatpassword_label')} textContentType="password" secureTextEntry value={values.repeatPassword}
                 onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
             <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
-            <View style={{ flex: 1, flexDirection: 'row', gap: 10, justifyContent: 'center', marginTop: 20 }}>
-            <WhiteButton style={{ flex: 1, flexShrink: 0, flexBasis: '40%' }} onPress={e => { handleSubmit() }} loading={registerState.loading}>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+                <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={registerState.loading}>
                     {t('ok_caption')}
                 </WhiteButton>
                 <Portal>
                     <Snackbar visible={!!registerState.error && !!registerState.error.message} onDismiss={() => setRegisterState(initial<null>(false))}>{registerState.error && registerState.error.message}</Snackbar>
                 </Portal>
-                <WhiteButton style={{ flex: 1, flexShrink: 0, flexBasis: '40%' }} onPress={() => {
+                <WhiteButton style={{ flex: 1 }} onPress={() => {
                     toggleRegistering()
                 }}>
                     {t('cancel_caption')}

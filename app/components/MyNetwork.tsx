@@ -8,15 +8,13 @@ import { ActivityIndicator, IconButton, Snackbar, Text } from "react-native-pape
 import Connections from "./Connections"
 import RequestsReceived from "./RequestsReceived"
 import RequestsSent from "./RequestsSent"
-import {List } from "react-native-paper"
-import { Touchable, View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import AddFriend from "./AddFriend"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor } from "./layout/constants"
 import Images from "@/Images"
 import { SvgProps } from "react-native-svg"
-import { TouchableOpacity } from "react-native-gesture-handler"
 
 interface SubViewProps {
     titleI18n: string,

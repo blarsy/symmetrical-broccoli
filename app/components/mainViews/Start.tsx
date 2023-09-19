@@ -1,3 +1,4 @@
+
 import { useContext, useEffect } from "react"
 import { fromData, fromError } from "@/lib/DataLoadState"
 import Login from "./Login"
@@ -8,19 +9,17 @@ import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
 import { Font } from 'react-native-paper/lib/typescript/types'
-import { useFonts, isLoaded } from 'expo-font'
+import { useFonts } from 'expo-font'
 import { PaperProvider, Snackbar } from 'react-native-paper'
 
-export const Start = () => {
+export default () => {
     const { t } = i18n
     const appContext = useContext(AppContext)
 
     const [fontsLoaded, fontError] = useFonts({
         'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
         'Futura-std-book': require('@/assets/fonts/futura-std-book.otf'),
-        'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf'),
-        'FontAwesome': require('@/assets/fonts/FontAwesome.ttf'),
-        'material': require('@/assets/fonts/MaterialCommunityIcons.ttf')
+        'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
       })
     
 
@@ -41,7 +40,6 @@ export const Start = () => {
         return <Splash />
     }
     if(fontsLoaded) {
-        console.log(`isLoaded('Futura-std-book')`, isLoaded('Futura-std-book'))
         const defaultFont: Font  = {
             fontFamily: 'Futura-std-book'
         }

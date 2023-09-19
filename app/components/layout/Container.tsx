@@ -1,9 +1,8 @@
-import { StyleProp, Text, View, ViewStyle } from "react-native"
+import { StyleProp, Text, TouchableOpacity, View, ViewStyle } from "react-native"
 import { primaryColor } from "./constants"
 import React, { useContext } from "react"
 import { AppContext } from "@/components/AppContextProvider"
 import { diagnostic } from "@/lib/settings"
-import Swipeable from 'react-native-gesture-handler/Swipeable'
 
 interface Props {
     children: JSX.Element,
@@ -18,11 +17,11 @@ const Container = ({ children, style }:Props) => {
         </View>
         { appContext.state.message && diagnostic === '1' && 
             <View style={{ backgroundColor: '#ddd', flexGrow: 0, flexShrink: 1, flexBasis: '20%', overflow: 'scroll' }}>
-                <Swipeable onSwipeableClose={(direction) => {
-                        if(direction === 'left') appContext.actions.setMessage('')
+                <TouchableOpacity onPress={() => {
+                        appContext.actions.setMessage('')
                     }}>
                     <Text>{appContext.state.message}</Text>
-                </Swipeable>
+                </TouchableOpacity>
             </View>}
     </View>
 }

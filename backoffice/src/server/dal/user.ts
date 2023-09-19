@@ -103,7 +103,7 @@ const createRecoveryCode = () => {
 export const requestRecovery = async (email: string) => {
     if(!yup.string().email().validate(email)) throw new Error('invalid email')
 
-    const sourceAccount = await queryAccount(`(email,eq,${email})`, ['Id'])
+    const sourceAccount = await queryAccount(`(email,eq,${email.toLowerCase()})`, ['Id'])
 
     const recoveryCode = createRecoveryCode()
 

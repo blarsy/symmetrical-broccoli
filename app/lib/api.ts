@@ -104,15 +104,20 @@ export const requestRecovery = async (email: string) => {
 }
 
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
-    const res = await  fetch(input, init)
-    if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
-        if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')
-        loggedOutHandler()
+    try {
+        const res = await  fetch(input, init)
+        
+        if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
+            if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')
+            loggedOutHandler()
+            return res
+        }
+        if(res.status >= 400) {
+            console.error('Error response returned.', res)
+            throw new Error(`Code ${res.status}, ${res.statusText}, ${await res.text()}\nRequest: ${input}, ${init && JSON.stringify(init)}`)
+        }
         return res
+    } catch (e) {
+        throw new Error(`Fetching ${input} ${init && `failed with ${JSON.stringify(init)}`}., ${e}`)
     }
-    if(res.status >= 400) {
-        console.error('Error response returned.', res)
-        throw new Error(`Code ${res.status}, ${res.statusText}, ${await res.text()}\nRequest: ${input}, ${init && JSON.stringify(init)}`)
-    }
-    return res
 }
