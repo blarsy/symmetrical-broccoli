@@ -24,10 +24,13 @@ export default function Login () {
     const [registering, setRegistering] = useState(false)
     const [recovering, setRecovering] = useState(false)
     if(!registering) {
+        if(recovering) {
+            return <ConnectContainer titleI18n="recovery_page_title">
+                <RecoveryForm toggleRecovering={() => setRecovering(false)} />
+            </ConnectContainer>
+        }
         return <ConnectContainer titleI18n="login_page_title">
-            {recovering ? <RecoveryForm toggleRecovering={() => setRecovering(false)} />:
-                <LoginForm toggleRegistering={() => setRegistering(true) } toggleRecovering={() => setRecovering(true)} />
-            }
+            <LoginForm toggleRegistering={() => setRegistering(true) } toggleRecovering={() => setRecovering(true)} />
         </ConnectContainer>
     } else {
         return <ConnectContainer titleI18n="register_page_title">

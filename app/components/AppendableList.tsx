@@ -13,7 +13,7 @@ interface Props<T, I> {
 }
 
 function AppendableList<T, I> ({ state, dataFromState, displayItem, onAddRequested }:Props<T, I>) {
-    return <View style={{ flex: 1, flexDirection: 'column' }}>
+    return <View style={{ flexDirection: 'column' }}>
         <Button mode="text" labelStyle={{ fontSize: 16, textTransform: 'uppercase' }} icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</Button>
         <LoadedList loading={state.loading} error={state.error} data={dataFromState(state)} 
             displayItem={displayItem}/>

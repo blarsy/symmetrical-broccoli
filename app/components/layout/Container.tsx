@@ -12,7 +12,7 @@ interface Props {
 const Container = ({ children, style }:Props) => {
     const appContext = useContext(AppContext)
     return <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={{...{ flex: 1, backgroundColor: primaryColor, alignItems: 'center', justifyContent: 'center' }, ...(style as Object) }}>
+        <View style={{ flex: 1, backgroundColor: primaryColor, alignItems: 'center', justifyContent: 'center' , ...(style as Object) }}>
             {children}
         </View>
         { appContext.state.message && diagnostic === '1' && 

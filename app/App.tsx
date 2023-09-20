@@ -1,17 +1,16 @@
 import React from 'react'
 import AppContextProvider from '@/components/AppContextProvider'
 import Start from '@/components/mainViews/Start'
-import { AppRegistry } from 'react-native'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { AppRegistry, StatusBar, View } from 'react-native'
+import { primaryColor } from './components/layout/constants'
 
 function App() {
-  return (
-    <AppContextProvider>
-      <SafeAreaProvider style={{ flex: 1 }}>
+  return <AppContextProvider>
+      <>
+        <StatusBar backgroundColor={primaryColor}/>
         <Start/>
-      </SafeAreaProvider>
-    </AppContextProvider>
-  )
+      </>
+  </AppContextProvider>
 }
 
 AppRegistry.registerComponent("topela", () => App)

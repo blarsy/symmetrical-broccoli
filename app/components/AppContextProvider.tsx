@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getAccount } from "@/lib/api"
 import React from "react"
 import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { Snackbar } from "react-native-paper"
 
 const SPLASH_DELAY = 3000
 
@@ -20,6 +22,7 @@ interface AppActions {
     accountUpdated: (account: Account) => Promise<void>
     setTokenState: (newState: DataLoadState<string>) => void
     setMessage: (message: any) => void
+    notify: (message: any) => void
 }
 
 interface AppContext {
@@ -32,7 +35,7 @@ interface Props {
 }
 
 export const AppContext = createContext<AppContext>({
-    state: { token: initial<string>(true), message: '' }, 
+    state: { token: initial<string>(true) }, 
     actions: {
         loginComplete: (_, account) => Promise.resolve(account),
         tryRestoreToken: () => Promise.resolve(),
@@ -40,6 +43,7 @@ export const AppContext = createContext<AppContext>({
         logout: () => Promise.resolve(),
         setTokenState: () => {},
         setMessage: () => {},
+        notify: () => {}
     }
 })
 
@@ -47,6 +51,7 @@ const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState({
         token: initial<string>(true), account: undefined
     } as AppState)
+    const [lastNotification, setLastNofication] = useState('')
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
@@ -93,11 +98,17 @@ const AppContextProvider = ({ children }: Props) => {
             if(messageObj instanceof Error) message = (messageObj as Error).stack
             else message = messageObj as string
             setAppState({ ...appState, ...{ message }})
-        }
+        },
+        notify: setLastNofication
     }
 
     return <AppContext.Provider value={{ state: appState, actions}}>
-        {children}
+        <SafeAreaProvider style={{ flex: 1 }}>
+            {children}
+            <Snackbar visible={!!lastNotification} duration={4000} onDismiss={() => setLastNofication('')}>
+                {lastNotification}
+            </Snackbar>
+        </SafeAreaProvider>
     </AppContext.Provider>
 }
 

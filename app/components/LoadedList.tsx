@@ -13,7 +13,7 @@ interface Props<T> {
 }
 
 function LoadedList<T>({ loading, error, data, displayItem }:Props<T>) {
-    return <View style={{ flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
+    return <View style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
     { loading && <ActivityIndicator /> }
     { !loading && !error && <ListOf data={data} displayItem={displayItem} /> }
     <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>

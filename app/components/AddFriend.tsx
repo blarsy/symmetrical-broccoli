@@ -1,18 +1,44 @@
-import { t } from "@/i18n";
-import { searchAccount, sendInvitation } from "@/lib/api";
-import React, { useContext, useState } from "react";
-import { View } from "react-native";
-import { ActivityIndicator, IconButton, Snackbar, Text, TextInput } from "react-native-paper";
-import { AppContext } from "./AppContextProvider";
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState";
-import { Account } from "@/lib/schema";
-import LoadedList from "./LoadedList";
-import { NavigationHelpers, ParamListBase } from "@react-navigation/native";
+import { t } from "@/i18n"
+import { searchAccount, sendInvitation } from "@/lib/api"
+import React, { useContext, useState } from "react"
+import { View } from "react-native"
+import { ActivityIndicator, IconButton, List, Portal, Snackbar, Text, TextInput } from "react-native-paper"
+import { AppContext } from "./AppContextProvider"
+import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import { Account } from "@/lib/schema"
+import LoadedList from "./LoadedList"
 
-const AddFriend = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
+interface Props {
+    onChange: () => Promise<void>
+}
+
+interface AccountListItemProps {
+    item: Account,
+    onChange: (msg: string) => Promise<void>
+}
+
+const AccountListItem = ({ item, onChange }: AccountListItemProps) => {
+    const appContext = useContext(AppContext)
+    const [addFriendOperationStatus, setAddFriendOperationStatus] = useState(false)
+    return <List.Item title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
+        { addFriendOperationStatus && <ActivityIndicator /> }
+        <IconButton mode="outlined" icon="account-plus" onPress={async () => {
+            setAddFriendOperationStatus(true)
+            try {
+                await sendInvitation(item.id, appContext.state.token.data!)
+                onChange(t('invitationSent_Message', { name: item.name }))
+            } catch(e) {
+                onChange(t('requestError'))
+            } finally {
+                setAddFriendOperationStatus(false)
+            }
+        }} />
+    </View>} />
+}
+
+const AddFriend = ({ onChange }: Props) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [foundAccounts, setFoundAccounts] = useState(initial<Account[]>(false))
-    const [addFriendOperationStatus, setAddFriendOperationStatus] = useState(initial<null>(false))
     const appContext = useContext(AppContext)
 
     const searchWithTerm = async (term: string) => {
@@ -33,25 +59,10 @@ const AddFriend = ({ route, navigation }: { route: any, navigation: NavigationHe
                 searchWithTerm(e)
             }} right={<TextInput.Icon icon="account-search" />} />
         <LoadedList loading={foundAccounts.loading} error={foundAccounts.error} data={foundAccounts.data}
-            displayItem={(item, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: idx < foundAccounts.data!.length - 1 ? 1 : 0, borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed' }}>
-            <Text style={{ flex: 1 }}>{item.name}</Text>
-            { addFriendOperationStatus.loading && <ActivityIndicator /> }
-            <IconButton mode="outlined" icon="account-plus" onPress={async () => {
-                setAddFriendOperationStatus(beginOperation())
-                try {
-                    await sendInvitation(item.id, appContext.state.token.data!)
-                    //search again, should show the same results, but without the account we just invited
-                    await searchWithTerm(searchTerm)
-                    setAddFriendOperationStatus(fromData(null))
-                    navigation.navigate('networkMain', { timestamp: new Date().valueOf() })
-                } catch(e) {
-                    setAddFriendOperationStatus(fromError(e, t('requestError')))
-                }
-            }} />
-        </View>} />
-        <Snackbar visible={!!addFriendOperationStatus.error} onDismiss={() => setAddFriendOperationStatus(initial<null>(false))}>
-            {t('requestError')}
-        </Snackbar>
+        displayItem={(item, idx) => <AccountListItem key={idx} item={item} onChange={msg => {
+            appContext.actions.notify(msg)
+            return onChange()
+        }} />} />
     </View>
 }
 

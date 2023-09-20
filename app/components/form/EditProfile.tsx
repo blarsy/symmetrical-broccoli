@@ -6,12 +6,11 @@ import ErrorText from "./ErrorText"
 import * as yup from 'yup'
 import { AppContext } from "@/components/AppContextProvider"
 import { isValidPassword } from "@/lib/utils"
-import { MaterialIcons } from "@expo/vector-icons"
 import { t } from '@/i18n'
 import OrangeTextInput from "./OrangeTextInput"
 import { WhiteButton } from "@/components/layout/lib"
 import { View } from "react-native"
-import { Snackbar } from "react-native-paper"
+import { Button, IconButton, Snackbar } from "react-native-paper"
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)
@@ -60,11 +59,11 @@ export default function EditProfile () {
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, padding: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: "center" }}>
                 <OrangeTextInput style={{ flex: 1 }} label={t('name_label')} textContentType="name" value={values.name}
                     onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
-                <MaterialIcons.Button color="#000" backgroundColor="transparent" name="logout" onPress={e => appContext.actions.logout()} />
+                <IconButton icon="logout" size={30} iconColor="#000" background="transparent" onPress={() => appContext.actions.logout()} />
             </View>
             <ErrorMessage component={ErrorText} name="name" />
             <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
@@ -79,7 +78,7 @@ export default function EditProfile () {
             <OrangeTextInput label={t('repeatnewpassword_label')} textContentType="password" secureTextEntry value={values.passwordRepeat}
                 onChangeText={handleChange('passwordRepeat')} onBlur={handleBlur('passwordRepeat')} />
             <ErrorMessage component={ErrorText} name="passwordRepeat" />
-            <WhiteButton onPress={e => handleSubmit()} loading={updateProfileState.loading}>
+            <WhiteButton style={{ marginTop: 20 }} onPress={e => handleSubmit()} loading={updateProfileState.loading}>
                 {t('save_label')}
             </WhiteButton>
             <Snackbar visible={!!updateProfileState.error && !!updateProfileState.error.message} onDismiss={() => setUpdateProfileState(initial<null>(false))}>

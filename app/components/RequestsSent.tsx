@@ -1,8 +1,8 @@
 import { Account, Network } from "@/lib/schema"
 import React, { useContext, useState } from "react"
-import { ActivityIndicator, IconButton, Portal, Snackbar, Text } from "react-native-paper"
+import { ActivityIndicator, IconButton, List } from "react-native-paper"
 import { View } from "react-native"
-import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import DataLoadState from "@/lib/DataLoadState"
 import LoadedList from "./LoadedList"
 import { AppContext } from "./AppContextProvider"
 import { cancelInvitation } from "@/lib/api"
@@ -16,44 +16,31 @@ interface Props {
 
 interface ReqProps {
     item: Account,
-    isLastRow: boolean,
-    onChange: (successMsg: string) => Promise<void>
-    onError: (msg: string) => void
+    onChange: () => Promise<void>
 }
 
-const RequestSent = ({ item, isLastRow, onChange, onError }: ReqProps) => {
+const RequestSent = ({ item, onChange }: ReqProps) => {
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
-    return <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderRadius: 0.01, borderStyle: 'dashed', borderBottomWidth: isLastRow ? 0 : 1 }}>
-        <Text style={{ flex: 1, marginLeft: 10, fontSize: 16 }}>{item.name}</Text>
+    return <List.Item title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
         { opProcessing && <ActivityIndicator /> }
         <IconButton iconColor="#000" icon={Images.Cross} size={20} onPress={async () => {
             try {
                 setOpProcessing(true)
                 await cancelInvitation(item.id, appContext.state.token.data!)
-                onChange(t('invitationCancelled_Message', { name: item.name }))
+                appContext.actions.notify(t('invitationCancelled_Message', { name: item.name }))
+                onChange()
             } catch(e) {
-                onError(t('requestError'))
+                appContext.actions.notify(t('requestError'))
             } finally {
                 setOpProcessing(false)
             }
         }} />
-    </View>
+    </View>} />
 }
 
-const RequestsSent = ({ state, onChange }: Props) => {
-    const [message, setMessage] = useState('')
-    return <>
-        <LoadedList data={state.data!.linkRequests}
-            loading={state.loading} error={state.error}
-            displayItem={(item, idx) => <RequestSent key={idx} item={item} isLastRow={idx === state.data!.linkRequests.length - 1} onChange={msg => {
-                setMessage(msg)
-                return onChange()
-            }} onError={msg => setMessage(msg)}/>} />
-        <Portal>
-            <Snackbar visible={!!message} onDismiss={() => setMessage('')}>{message}</Snackbar>
-        </Portal>
-    </>
-}
+const RequestsSent = ({ state, onChange }: Props) => <LoadedList data={state.data!.linkRequests}
+    loading={state.loading} error={state.error}
+    displayItem={(item, idx) => <RequestSent key={idx} item={item} onChange={onChange} /> } />
 
 export default RequestsSent
