@@ -1,6 +1,5 @@
 "use client"
 import { fromData, fromError, initial } from "@/DataLoadState"
-import AppContextProvider from "@/components/AppContextProvider"
 import ClientWrapper from "@/components/ClientWrapper"
 import Feedback from "@/components/Feedback"
 import LoggedInLayout from "@/components/LoggedInLayout"
@@ -53,13 +52,11 @@ const ResourcePage = ({ params }: { params: { id: string } }) => {
             }}/>
     }
 
-    return <AppContextProvider>
-        <ClientWrapper>
-            <LoggedInLayout title="Modifier une ressource">
-                { content }
-            </LoggedInLayout>
-        </ClientWrapper>
-    </AppContextProvider>
+    return <ClientWrapper>
+        <LoggedInLayout title="Modifier une ressource">
+            { content }
+        </LoggedInLayout>
+    </ClientWrapper>
 
 }
 

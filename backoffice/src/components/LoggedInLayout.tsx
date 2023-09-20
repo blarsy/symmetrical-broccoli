@@ -1,19 +1,25 @@
-import { Typography, Container, Box, CircularProgress, IconButton, Link } from "@mui/material"
+import { Typography, Container, Box, CircularProgress, IconButton, AppBar, Stack, Button } from "@mui/material"
 import { AppContext } from "./AppContextProvider"
-import { Fragment, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { fromData, fromError, initial } from "@/DataLoadState"
 import { useRouter } from "next/navigation"
 import Feedback from "./Feedback"
-import HomeIcon from '@mui/icons-material/Home'
 import LogoutIcon from '@mui/icons-material/Logout'
 import NextLink from "next/link"
 import { Account } from "@/schema"
+import Image from 'next/image'
 
 interface Props {
     title?: string,
     children: JSX.Element | '' | undefined
 }
+
+const pages = [
+    { name: 'Tableau de bord', path: '/home' },
+    { name: 'Resources', path: '/home/resource/create' },
+    { name: 'Réseau', path: '/' },
+]
 
 const LoggedInLayout = ({ title, children }: Props) => {
     const appContext = useContext(AppContext)
@@ -50,21 +56,24 @@ const LoggedInLayout = ({ title, children }: Props) => {
         content = <Feedback message="La connexion a échoué. Vous allez pouvoir vous reconnecter dans quelques instants." 
             detail={account.error.detail} severity="error"/>
     } else {
-        content = <Fragment>
-            <Box height="1.5rem" display="flex" justifyContent="space-between">
-                <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
-                <Box display="flex" flexDirection="row" gap="0.5rem">
-                    <IconButton onClick={() => {
-                        localStorage.removeItem('token')
-                        router.push('/')
-                    }}><LogoutIcon/></IconButton>
-                    <Link href="/home" component={NextLink}><HomeIcon/></Link>
-                </Box>
-                <Typography variant="overline">Balance: {appContext.data.account.balance}€</Typography>
-            </Box>
+        content = <>
+            <AppBar position="static">
+                <Stack direction="row" alignItems="center" justifyContent="space-between" padding="0 1rem">
+                    <Image src="/logo.jpeg" alt="logo Tope-là" width={120} height={100}/>
+                    <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
+                    <Box display="flex" flexDirection="row" gap="0.5rem">
+                        { pages.map(page => <Button LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }
+                        <IconButton onClick={() => {
+                            localStorage.removeItem('token')
+                            router.push('/')
+                        }}><LogoutIcon/></IconButton>
+                    </Box>
+                    <Typography variant="overline">Balance: {appContext.data.account.balance}€</Typography>
+                </Stack>
+            </AppBar>
             { title && <Typography variant="h1" textAlign="center">{ title }</Typography> }
             { children }
-        </Fragment>
+        </>
     }
 
     return <Container sx={{ height: '100vh' }}>

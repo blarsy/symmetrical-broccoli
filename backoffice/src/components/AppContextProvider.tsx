@@ -30,7 +30,6 @@ export const AppContext = createContext<AppContext>(blankAppContext)
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(blankAppContext.data)
-    //const router = useRouter()
 
     const loggedIn = (account: Account): void => {
       setAppState({ ...appState, ...{ account } })
