@@ -23,7 +23,7 @@ const resources = {
       "connection_label": "Connection",
       "search_label": "Search",
       "history_label": "History",
-      "resource_label": "Ressource",
+      "resource_label": "Ressources",
       "chat_label": "Chat",
       "profile_label": "Profile",
       "name_too_long": "Please use a shorter name",
@@ -58,7 +58,11 @@ const resources = {
       "invitationCancelled_Message": "Invitation sent to {{name}} cancelled",
       "friendRemoved_Message": "'{{name}}' is no more a connection",
       "forgotPassword_label": "Forgot password ?",
-      "recoveryRequested_message": "A mail has been sent to your address. Please follow the instructions it provides to restore access to your account."
+      "recoveryRequested_message": "A mail has been sent to your address. Please follow the instructions it provides to restore access to your account.",
+      "newResource_viewTitle": "Create resource",
+      "viewResource_viewTitle": "View resource",
+      "editResource_viewTitle": "Edit resource",
+
     }
   },
   fr: {
@@ -79,7 +83,7 @@ const resources = {
       "connection_label": "Connexion",
       "search_label": "Recherche",
       "history_label": "Historique",
-      "resource_label": "Resource",
+      "resource_label": "Resources",
       "chat_label": "Chat",
       "profile_label": "Profil",
       "name_too_long": "Veuillez utiliser un nom plus court",
@@ -114,7 +118,10 @@ const resources = {
       "invitationCancelled_Message": "L'invitation envoyée à {{name}} a été annulée",
       "friendRemoved_Message": "Vous n'êtes plus connecté à '{{name}}'",
       "forgotPassword_label": "Mot de passe oublié ?",
-      "recoveryRequested_message": "Un email a été envoyé à votre adresse. Veuillez suivre les instructions qui s'y trouvent pour rétablir l'accès à votre compte."
+      "recoveryRequested_message": "Un email a été envoyé à votre adresse. Veuillez suivre les instructions qui s'y trouvent pour rétablir l'accès à votre compte.",
+      "newResource_viewTitle": "Créer ressource",
+      "viewResource_viewTitle": "Visualiser ressource",
+      "editResource_viewTitle": "Modifier ressource",
     }
   }
 }

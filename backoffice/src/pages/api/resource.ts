@@ -2,14 +2,17 @@ import { getAccount, getJwt, queryAccount } from "@/server/apiutil"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { create } from "@/server/dal/resource"
+import { getChildItems } from "@/server/noco"
+import { fromRawResource } from "@/schema"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
         try {
             const jwt = await getJwt(getToken(req))
             const account = await queryAccount(`(email,eq,${jwt.email})`, ['Id', 'ressources'])
+            const resources = await getChildItems('comptes', account.id, 'ressources')
             
-            respondWithSuccess(res, account.resources)
+            respondWithSuccess(res, resources.map(res => fromRawResource(res)))
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }

@@ -13,7 +13,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "http://localhost:3000/api",
-        "EXPO_PUBLIC_DIAGNOSTIC": "1"
+        "EXPO_PUBLIC_DIAGNOSTIC": "1",
+        "EXPO_PUBLIC_IMG_URL": "https://localhost:8080/"
       }
     },
     "preview": {
@@ -22,7 +23,8 @@
     "production": {
       "env": {
         "EXPO_PUBLIC_API_URL": "https://www.tope-la.com/api",
-        "EXPO_PUBLIC_DIAGNOSTIC": "1"
+        "EXPO_PUBLIC_DIAGNOSTIC": "1",
+        "EXPO_PUBLIC_IMG_URL": "https://admin.tope-la.com/"
       }
     }
   },

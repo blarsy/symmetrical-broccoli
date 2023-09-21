@@ -103,6 +103,17 @@ export const requestRecovery = async (email: string) => {
     }})
 }
 
+export const getResources = async (token: string) => {
+    const res = await apiCall(`${apiUrl}/resource`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    }})
+    if(res.status === 200) {
+        return res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     try {
         const res = await  fetch(input, init)

@@ -17,8 +17,8 @@ interface Props {
 
 const pages = [
     { name: 'Tableau de bord', path: '/home' },
-    { name: 'Resources', path: '/home/resource/create' },
-    { name: 'Réseau', path: '/' },
+    { name: 'Resources', path: '/home/resource' },
+    { name: 'Réseau', path: '/home/network' },
 ]
 
 const LoggedInLayout = ({ title, children }: Props) => {
@@ -59,7 +59,7 @@ const LoggedInLayout = ({ title, children }: Props) => {
         content = <>
             <AppBar position="static">
                 <Stack direction="row" alignItems="center" justifyContent="space-between" padding="0 1rem">
-                    <Image src="/logo.jpeg" alt="logo Tope-là" width={120} height={100}/>
+                    <Image src="/logo.jpeg" alt="logo Tope-là" width={100} height={85}/>
                     <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
                     <Box display="flex" flexDirection="row" gap="0.5rem">
                         { pages.map(page => <Button LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }

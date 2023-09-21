@@ -45,7 +45,6 @@ const getViewTitleI18n = (name: string): string => {
 const MyNetwork = () => {
     const appContext = useContext(AppContext)
     const [network, setNetwork] = useState(initial<Network>(true))
-    const [lastChange, setLastChange] = useState('')
 
     const loadNetwork = async () => {
         try {
@@ -54,11 +53,6 @@ const MyNetwork = () => {
         } catch(e) {
             setNetwork(fromError(e, t('requestError')))
         }
-    }
-
-    const notifyChangeAndRefresh = (changeDescription: string) => {
-        setLastChange(changeDescription)
-        return loadNetwork()
     }
 
     useEffect(() => {
@@ -71,12 +65,11 @@ const MyNetwork = () => {
         return <ActivityIndicator style={{ marginTop: 10 }} />
     } else {
         return <StackNav.Navigator 
-            screenOptions={{ header: props => {
-                return props.route.name != 'networkMain' && <Appbar.Header style={{ backgroundColor: lightPrimaryColor }}>
+            screenOptions={{ header: props => props.route.name != 'networkMain' && <Appbar.Header style={{ backgroundColor: lightPrimaryColor }}>
                     <Appbar.BackAction onPress={() => props.navigation.goBack()} />
                     { props.route.params && (props.route.params as { icon: React.ReactNode | undefined }).icon }
                     <Appbar.Content titleStyle={{ fontSize: 20, fontFamily: 'DK-magical-brush', textTransform: 'uppercase' }} title={t(getViewTitleI18n(props.route.name))} />
-                </Appbar.Header> }}}>
+                </Appbar.Header> }}>
             <StackNav.Screen name="networkMain" component={NetworkMainView} key="networkMain" />
             <StackNav.Screen initialParams={{ icon: <Images.Heart style={{ margin: 10 }} width={30} height={30} /> }} name="connections" component={(({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => 
                 <Connections state={network} onChange={loadNetwork}
