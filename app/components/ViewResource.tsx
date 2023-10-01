@@ -1,7 +1,9 @@
 import { RouteProps } from "@/lib/utils"
 import React from "react"
-import { Text } from "react-native-paper"
+import { Card, Text } from "react-native-paper"
 
-const ViewResource = ({ route, navigation }:RouteProps) => <Text>View resource</Text>
+const ViewResource = ({ route, navigation }:RouteProps) => <Card>
+    
+</Card>
 
 export default ViewResource

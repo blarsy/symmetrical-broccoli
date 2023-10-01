@@ -1,12 +1,10 @@
 import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
+import { lightPrimaryColor, primaryColor } from "./utils"
 
 const titleFont = localFont({ src: './app/dk-magical-brush.otf' })
 const generalFont = localFont({ src: './app/futura-std-book.otf' })
 const altGeneralFont = localFont({ src: './app/futura-std-heavy.otf' })
-
-const primaryColor = '#ff4401'
-const lightPrimaryColor = '#fef0e3'
 
 export default createTheme({
   palette: {
