@@ -1,27 +1,12 @@
 "use client"
-import ClientLayout from "@/components/ClientLayout"
-import Login from "@/components/user/Login"
-import { Box, Link } from "@mui/material"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { Container, Typography } from "@mui/material"
+import Qr from "react-qr-code"
 
-export default function Home() {
-  const router = useRouter()
+const baseUrl = process.env.TOPELA_API_URL
 
-  useEffect(() => {
-    if(localStorage.getItem('token')){
-      router.push('/home')
-    }
-  }, [])
+const Page = () => <Container>
+    <Typography variant="h1">Titre</Typography>
+    <Qr value={`${baseUrl}/api/link/1`} />
+</Container>
 
-  return (
-    <ClientLayout title="Connexion">
-      <Box display="flex" flexDirection="column" alignItems="center">
-        <Login onSuccess={() => {
-          router.push('/home')
-        }}/>
-        <Link href="/register">Pas encore inscrit ?</Link>
-      </Box>
-    </ClientLayout>
-  )
-}
+export default Page

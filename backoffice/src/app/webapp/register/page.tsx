@@ -10,7 +10,7 @@ export default function Home() {
     <ClientWrapper>
       <ClientLayout>
         <Register onSuccess={() => {
-          router.push('/')
+          router.push('/webapp/')
         }}/>
       </ClientLayout>
     </ClientWrapper>

@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { id } = req.query
             const resourceId = Number(id)
             const account = await getAccount(getToken(req))
-            const { title, description, expiration, conditions } = req.body
+            const { title, description, expiration, conditions } = JSON.parse(req.body)
     
             if(!account.resources || !account.resources.some(res => res.id === resourceId)) {
                 respondWithFailure(req, res, 'Resource not found', 404)
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
             const currentData = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'expiration', 'images', 'conditions'])
             const currentConditions = await getChildItems('conditions', resourceId, `ressources` )
-    
+
             const conditionsToAdd = conditionsToRaw(conditions.filter((condition: any) => !condition.id))
             const conditionsToDelete = currentConditions.filter((condition: any) => !conditions.some((newCondition: any) => newCondition.id === condition.Id))
             const conditionsToUpdate = conditionsToRaw(conditions.filter((condition: any) => 

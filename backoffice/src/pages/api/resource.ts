@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const jwt = await getJwt(getToken(req))
             const account = await queryAccount(`(email,eq,${jwt.email})`, ['Id', 'ressources'])
             const resources = await getChildItems('comptes', account.id, 'ressources')
+            await Promise.all(resources.map(async (resource) => resource.conditions = await getChildItems('ressources', resource.Id, 'conditions')))
             
             respondWithSuccess(res, resources.map(res => fromRawResource(res)))
         } catch(e: any) {

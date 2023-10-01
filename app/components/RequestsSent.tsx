@@ -8,15 +8,11 @@ import { AppContext } from "./AppContextProvider"
 import { cancelInvitation } from "@/lib/api"
 import { t } from "@/i18n"
 import Images from "@/Images"
-
-interface Props {
-    state: DataLoadState<Network>,
-    onChange: () => Promise<void>
-}
+import { RouteProps } from "@/lib/utils"
 
 interface ReqProps {
     item: Account,
-    onChange: () => Promise<void>
+    onChange: () => void
 }
 
 const RequestSent = ({ item, onChange }: ReqProps) => {
@@ -39,8 +35,14 @@ const RequestSent = ({ item, onChange }: ReqProps) => {
     </View>} />
 }
 
-const RequestsSent = ({ state, onChange }: Props) => <LoadedList data={state.data!.linkRequests}
-    loading={state.loading} error={state.error}
-    displayItem={(item, idx) => <RequestSent key={idx} item={item} onChange={onChange} /> } />
+const RequestsSent = ({ route, navigation }: RouteProps) => <LoadedList data={(route.params.network as DataLoadState<Network>).data!.linkRequests}
+    loading={route.params.network.loading} error={route.params.network.error}
+    displayItem={(item, idx) => <RequestSent key={idx} item={item} onChange={() => {
+        navigation.navigate({
+            name: 'networkMain',
+            params: { hasChanged: true },
+            merge: true
+        })
+    }} /> } />
 
 export default RequestsSent

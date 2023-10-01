@@ -1,6 +1,6 @@
 import { Account, Network } from "@/lib/schema"
 import React, { useContext, useState } from "react"
-import { ActivityIndicator, IconButton, List, Portal, Snackbar, Text } from "react-native-paper"
+import { ActivityIndicator, IconButton, List } from "react-native-paper"
 import { View } from "react-native"
 import LoadedList from "./LoadedList"
 import DataLoadState from "@/lib/DataLoadState"
@@ -8,14 +8,11 @@ import { acceptInvitation, declineInvitation } from "@/lib/api"
 import { AppContext } from "./AppContextProvider"
 import { t } from "@/i18n"
 import Images from "@/Images"
+import { RouteProps } from "@/lib/utils"
 
-interface Props {
-    state: DataLoadState<Network>,
-    onChange: () => Promise<void>
-}
 interface ReqProps {
     item: Account,
-    onChange: () => Promise<void>
+    onChange: () => void
 }
 
 const RequestReceived = ({ item, onChange }: ReqProps) => {
@@ -50,8 +47,12 @@ const RequestReceived = ({ item, onChange }: ReqProps) => {
     </View>} />
 }
 
-const RequestsReceived = ({ state, onChange }: Props) => <LoadedList data={state.data!.receivedLinkRequests}
-    loading={state.loading} error={state.error}
-    displayItem={(item, idx) => <RequestReceived key={idx} item={item} onChange={onChange} />} />
+const RequestsReceived = ({ route, navigation }: RouteProps) => <LoadedList data={(route.params.network as DataLoadState<Network>).data!.receivedLinkRequests}
+    loading={route.params.network.loading} error={route.params.network.error}
+    displayItem={(item, idx) => <RequestReceived key={idx} item={item} onChange={() => navigation.navigate({
+        name: 'networkMain',
+        params: { hasChanged: true },
+        merge: true
+    })} />} />
 
 export default RequestsReceived

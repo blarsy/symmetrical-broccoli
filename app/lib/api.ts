@@ -1,4 +1,4 @@
-import { Account, Network } from './schema'
+import { Account, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 let loggedOutHandler: () => void
 
@@ -7,19 +7,19 @@ export const registerLoggedOutHandler = (handler: () => void) => {
 }
 
 export const login = async (email: string, password: string) => {
-    return apiCall(`${apiUrl}/auth`, { method: 'POST', body: JSON.stringify({email, password}), mode: 'cors', headers: {
+    return apiCall(`${apiUrl}auth`, { method: 'POST', body: JSON.stringify({email, password}), mode: 'cors', headers: {
         'Content-Type': 'application/json'
     }})
 }
 
 export const register = async (email: string, password: string, name: string) => {
-    return apiCall(`${apiUrl}/user`, { method: 'POST', body: JSON.stringify({ name, email, password }), mode: 'cors', headers: {
+    return apiCall(`${apiUrl}user`, { method: 'POST', body: JSON.stringify({ name, email, password }), mode: 'cors', headers: {
         'Content-Type': 'application/json'
     }})
 }
 
 export const getAccount = async (token: string): Promise<Account> => {
-    const res = await apiCall(`${apiUrl}/user`, { method: 'GET', mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}user`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
@@ -30,7 +30,7 @@ export const getAccount = async (token: string): Promise<Account> => {
 }
 
 export const getNetwork = async (token: string): Promise<Network> => {
-    const res = await apiCall(`${apiUrl}/user/network`, { method: 'GET', mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}user/network`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
@@ -42,7 +42,7 @@ export const getNetwork = async (token: string): Promise<Network> => {
 }
 
 export const updateAccount = async (token: string, password: string, newPassword: string, name: string, email: string): Promise<Account> => {
-    const res = await apiCall(`${apiUrl}/user`, { method: 'PATCH', body: JSON.stringify({email, password, newPassword, name}), mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}user`, { method: 'PATCH', body: JSON.stringify({email, password, newPassword, name}), mode: 'cors', headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
     }})
@@ -54,7 +54,7 @@ export const updateAccount = async (token: string, password: string, newPassword
 }
 
 export const searchAccount = async (input: string, token: string): Promise<Account[]> => {
-    const res = await (apiCall(`${apiUrl}/account?search=${encodeURI(input)}`, { method: 'GET', mode: 'cors', headers: {
+    const res = await (apiCall(`${apiUrl}account?search=${encodeURI(input)}`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }}))
     if(res.status === 200) {
@@ -65,46 +65,68 @@ export const searchAccount = async (input: string, token: string): Promise<Accou
 }
 
 export const sendInvitation = async (targetAccountId: number, token: string) => {
-    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'POST', body: JSON.stringify({target: targetAccountId}), mode: 'cors', headers: {
+    await (apiCall(`${apiUrl}user/linkrequest`, { method: 'POST', body: JSON.stringify({target: targetAccountId}), mode: 'cors', headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
     }}))
 }
 
 export const acceptInvitation = async (targetAccountId: number, token: string) => {
-    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 1}), mode: 'cors', headers: {
+    await (apiCall(`${apiUrl}user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 1}), mode: 'cors', headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
     }}))
 }
 
 export const declineInvitation = async (targetAccountId: number, token: string) => {
-    await (apiCall(`${apiUrl}/user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 0}), mode: 'cors', headers: {
+    await (apiCall(`${apiUrl}user/linkrequest`, { method: 'PATCH', body: JSON.stringify({target: targetAccountId, accept: 0}), mode: 'cors', headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
     }}))
 }
 
 export const cancelInvitation = async (targetAccountId: number, token: string) => {
-    await (apiCall(`${apiUrl}/user/linkrequest/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
+    await (apiCall(`${apiUrl}user/linkrequest/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
         'Authorization': token
     }}))
 }
 
 export const removeFriend = async (targetAccountId: number, token: string) => {
-    await (apiCall(`${apiUrl}/user/friend/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
+    await (apiCall(`${apiUrl}user/friend/${targetAccountId}`, { method: 'DELETE', mode: 'cors', headers: {
         'Authorization': token
     }}))
 }
 
 export const requestRecovery = async (email: string) => {
-    return await apiCall(`${apiUrl}/user/recovery`, { method: 'PUT', body: JSON.stringify({ email }), mode: 'cors', headers: {
+    return await apiCall(`${apiUrl}user/recovery`, { method: 'PUT', body: JSON.stringify({ email }), mode: 'cors', headers: {
         'Content-Type': 'application/json'
     }})
 }
 
 export const getResources = async (token: string) => {
-    const res = await apiCall(`${apiUrl}/resource`, { method: 'GET', mode: 'cors', headers: {
+    const res = await apiCall(`${apiUrl}resource`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    }})
+    if(res.status === 200) {
+        return res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const createResource = async (token: string, resource: Resource): Promise<Resource> => {
+    const res = await apiCall(`${apiUrl}resource`, { method: 'POST', body: JSON.stringify(resource), mode: 'cors', headers: {
+        'Authorization': token
+    }})
+    if(res.status === 200) {
+        return res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const updateResource = async (token: string, resource: Resource): Promise<Resource> => {
+    const res = await apiCall(`${apiUrl}resource/${resource.id}`, { method: 'POST', body: JSON.stringify(resource), mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {

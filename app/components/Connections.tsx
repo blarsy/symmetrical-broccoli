@@ -8,16 +8,11 @@ import { AppContext } from "./AppContextProvider"
 import { t } from "@/i18n"
 import { removeFriend } from "@/lib/api"
 import Images from "@/Images"
-
-interface Props {
-    state: DataLoadState<Network>,
-    onAddRequested: () => void,
-    onChange: () => Promise<void>
-}
+import { RouteProps } from "@/lib/utils"
 
 interface ConnectionProps {
     item: Account,
-    onChange: () => Promise<void>
+    onChange: () => void
 }
 
 const Connection = ({ item, onChange }: ConnectionProps) => {
@@ -40,8 +35,12 @@ const Connection = ({ item, onChange }: ConnectionProps) => {
     </View>} />
 }
 
-const Connections = ({ state, onAddRequested, onChange }: Props) => <AppendableList
-    dataFromState={state => state.data!.linkedAccounts} state={state}
-    displayItem={(item, idx) => <Connection key={idx} item={item} onChange={onChange} />} onAddRequested={onAddRequested} />
+const Connections = ({ route, navigation }: RouteProps) => <AppendableList
+    dataFromState={state => state.data!.linkedAccounts} state={route.params.network as DataLoadState<Network>}
+    displayItem={(item, idx) => <Connection key={idx} item={item} onChange={() => navigation.navigate({
+        name: 'networkMain',
+        params: { hasChanged: true },
+        merge: true
+    })} />} onAddRequested={() => navigation.navigate('addFriend')} />
 
 export default Connections

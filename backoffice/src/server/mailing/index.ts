@@ -8,6 +8,7 @@ const config = {
     noreplyEmail: process.env.NOREPLY_EMAIL!,
     mailTemplatesLocation: process.env.MAIL_TEMPLATES_LOCATION!,
     websiteUrl: process.env.TOPELA_API_URL!,
+    webAppUrl: process.env.TOPELA_WEBAPP_URL!,
     productName: 'Tope là',
     production: process.env.NODE_ENV!.toLowerCase() === 'production'
 }
@@ -55,7 +56,7 @@ const preparePartials = async () => {
 export const sendAccountRecoveryMail = async (email: string, code: string) => {
     const heading = 'Récupération de mot de passe'
     const text = `Voici un lien pour effectuer la récupération de votre mot de passe sur ${config.productName}: `
-    const link = `${config.websiteUrl}/recover/${code}`
+    const link = `${config.webAppUrl}/recover/${code}`
 
     await preparePartials()
     const source = await readFile(`${config.mailTemplatesLocation}adminInvite.html`)

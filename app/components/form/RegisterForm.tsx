@@ -3,13 +3,11 @@ import { t } from "i18next"
 import React, { useContext, useState } from "react"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { register } from "@/lib/api"
-import { OrangeBackedErrorText } from "./ErrorText"
 import * as yup from 'yup'
 import { View } from "react-native"
 import { AppContext } from "@/components/AppContextProvider"
-import OrangeTextInput from "./OrangeTextInput"
 import { Portal, Snackbar } from "react-native-paper"
-import { WhiteButton } from "@/components/layout/lib"
+import { OrangeBackedErrorText, OrangeTextInput, WhiteButton } from "@/components/layout/lib"
 
 interface Props {
     toggleRegistering: () => void

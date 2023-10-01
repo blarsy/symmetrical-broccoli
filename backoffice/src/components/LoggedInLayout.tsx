@@ -16,9 +16,9 @@ interface Props {
 }
 
 const pages = [
-    { name: 'Tableau de bord', path: '/home' },
-    { name: 'Resources', path: '/home/resource' },
-    { name: 'Réseau', path: '/home/network' },
+    { name: 'Tableau de bord', path: '/webapp/home' },
+    { name: 'Resources', path: '/webapp/home/resource' },
+    { name: 'Réseau', path: '/webapp/home/network' },
 ]
 
 const LoggedInLayout = ({ title, children }: Props) => {
@@ -28,7 +28,7 @@ const LoggedInLayout = ({ title, children }: Props) => {
     useEffect(() => {
         const load = async () => {
             if(!localStorage.getItem('token')){
-                router.push('/')
+                router.push('/webapp/')
                 return
             }
             if(localStorage.getItem('token') && !appContext.data.account.name) {
@@ -39,12 +39,12 @@ const LoggedInLayout = ({ title, children }: Props) => {
                 } catch (e: any) {
                     setAccount(fromError(e, 'Echec lors du chargement du compte.'))
                     localStorage.removeItem('token')
-                    router.push('/')
+                    router.push('/webapp/')
                 }
             }
         }
         load()
-    }, [])
+    }, [router, appContext])
 
     let content: JSX.Element
 
@@ -62,10 +62,10 @@ const LoggedInLayout = ({ title, children }: Props) => {
                     <Image src="/logo.jpeg" alt="logo Tope-là" width={100} height={85}/>
                     <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
                     <Box display="flex" flexDirection="row" gap="0.5rem">
-                        { pages.map(page => <Button LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }
+                        { pages.map(page => <Button key={page.name} LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }
                         <IconButton onClick={() => {
                             localStorage.removeItem('token')
-                            router.push('/')
+                            router.push('/webapp/')
                         }}><LogoutIcon/></IconButton>
                     </Box>
                     <Typography variant="overline">Balance: {appContext.data.account.balance}€</Typography>

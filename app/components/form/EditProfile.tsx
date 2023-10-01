@@ -2,15 +2,13 @@ import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { updateAccount } from "@/lib/api"
-import ErrorText from "./ErrorText"
 import * as yup from 'yup'
 import { AppContext } from "@/components/AppContextProvider"
 import { isValidPassword } from "@/lib/utils"
 import { t } from '@/i18n'
-import OrangeTextInput from "./OrangeTextInput"
-import { WhiteButton } from "@/components/layout/lib"
+import { WhiteButton, OrangeTextInput, ErrorText } from "@/components/layout/lib"
 import { View } from "react-native"
-import { Button, IconButton, Snackbar } from "react-native-paper"
+import { IconButton, Snackbar } from "react-native-paper"
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)

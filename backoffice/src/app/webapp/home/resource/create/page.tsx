@@ -30,7 +30,7 @@ const Create = () => {
                                     "Content-Type": "multipart/form-data"
                                 }})
                             }
-                            router.push(`/home/resource/${res.data.id}`)
+                            router.push(`/webapp/home/resource/${res.data.id}`)
                             return res
                         } catch (e: any) {
                             setBasicFeedback(fromError(e, 'Erreur pendant la sauvegarde'))

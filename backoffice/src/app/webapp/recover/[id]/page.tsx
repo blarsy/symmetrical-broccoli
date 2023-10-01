@@ -9,7 +9,7 @@ export default function Recovery({ params }: { params: { id: string } }) {
     return (
         <ClientWrapper>
             <ClientLayout>
-                <Recover onDone={() => router.push('/')} recoveryId={params.id} />
+                <Recover onDone={() => router.push('/webapp/')} recoveryId={params.id} />
             </ClientLayout>
         </ClientWrapper>
     )

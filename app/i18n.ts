@@ -62,7 +62,17 @@ const resources = {
       "newResource_viewTitle": "Create resource",
       "viewResource_viewTitle": "View resource",
       "editResource_viewTitle": "Edit resource",
-
+      "date_mustBeFuture": "This date must be in the future",
+      "title_label": "Title",
+      "description_label": "Description",
+      "noDate": "No date selected",
+      "dateFormat": "MM/DD/YYYY",
+      "expiration_label": "Expiration",
+      "addPictures_Button": "Add pictures",
+      "editCondition_title": "Edit condition",
+      "condition_title_label": "Title",
+      "condition_description_label": "Description",
+      "addCondition_title": "Create condition"
     }
   },
   fr: {
@@ -83,7 +93,7 @@ const resources = {
       "connection_label": "Connexion",
       "search_label": "Recherche",
       "history_label": "Historique",
-      "resource_label": "Resources",
+      "resource_label": "Ressources",
       "chat_label": "Chat",
       "profile_label": "Profil",
       "name_too_long": "Veuillez utiliser un nom plus court",
@@ -122,6 +132,17 @@ const resources = {
       "newResource_viewTitle": "Créer ressource",
       "viewResource_viewTitle": "Visualiser ressource",
       "editResource_viewTitle": "Modifier ressource",
+      "date_mustBeFuture": "Cette date doit être dans le futur",
+      "title_label": "Titre",
+      "description_label": "Description",
+      "noDate": "Aucune date sélectionnée",
+      "dateFormat": "DD/MM/YYYY",
+      "expiration_label": "Expiration",
+      "addPictures_Button": "Ajouter des photos",
+      "editCondition_title": "Modifier condition",
+      "condition_title_label": "Titre",
+      "condition_description_label": "Description",
+      "addCondition_title": "Créer condition"
     }
   }
 }

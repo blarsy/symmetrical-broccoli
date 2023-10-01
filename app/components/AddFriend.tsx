@@ -2,19 +2,16 @@ import { t } from "@/i18n"
 import { searchAccount, sendInvitation } from "@/lib/api"
 import React, { useContext, useState } from "react"
 import { View } from "react-native"
-import { ActivityIndicator, IconButton, List, Portal, Snackbar, Text, TextInput } from "react-native-paper"
+import { ActivityIndicator, IconButton, List, TextInput } from "react-native-paper"
 import { AppContext } from "./AppContextProvider"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Account } from "@/lib/schema"
 import LoadedList from "./LoadedList"
-
-interface Props {
-    onChange: () => Promise<void>
-}
+import { RouteProps } from "@/lib/utils"
 
 interface AccountListItemProps {
     item: Account,
-    onChange: (msg: string) => Promise<void>
+    onChange: (msg: string) => void
 }
 
 const AccountListItem = ({ item, onChange }: AccountListItemProps) => {
@@ -36,7 +33,7 @@ const AccountListItem = ({ item, onChange }: AccountListItemProps) => {
     </View>} />
 }
 
-const AddFriend = ({ onChange }: Props) => {
+const AddFriend = ({ route, navigation }: RouteProps) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [foundAccounts, setFoundAccounts] = useState(initial<Account[]>(false))
     const appContext = useContext(AppContext)
@@ -61,7 +58,11 @@ const AddFriend = ({ onChange }: Props) => {
         <LoadedList loading={foundAccounts.loading} error={foundAccounts.error} data={foundAccounts.data}
         displayItem={(item, idx) => <AccountListItem key={idx} item={item} onChange={msg => {
             appContext.actions.notify(msg)
-            return onChange()
+            navigation.navigate({
+                name: 'networkMain',
+                params: { hasChanged: true },
+                merge: true
+            })
         }} />} />
     </View>
 }
