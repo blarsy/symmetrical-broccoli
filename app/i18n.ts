@@ -67,12 +67,14 @@ const resources = {
       "description_label": "Description",
       "noDate": "No date selected",
       "dateFormat": "MM/DD/YYYY",
+      "dateTimeFormat": "MM/DD/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Add pictures",
       "editCondition_title": "Edit condition",
       "condition_title_label": "Title",
       "condition_description_label": "Description",
-      "addCondition_title": "Create condition"
+      "addCondition_title": "Create condition",
+      "conditions_label": "Conditions"
     }
   },
   fr: {
@@ -137,12 +139,14 @@ const resources = {
       "description_label": "Description",
       "noDate": "Aucune date sélectionnée",
       "dateFormat": "DD/MM/YYYY",
+      "dateTimeFormat": "DD/MM/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Ajouter des photos",
       "editCondition_title": "Modifier condition",
       "condition_title_label": "Titre",
       "condition_description_label": "Description",
-      "addCondition_title": "Créer condition"
+      "addCondition_title": "Créer condition",
+      "conditions_label": "Conditions"
     }
   }
 }

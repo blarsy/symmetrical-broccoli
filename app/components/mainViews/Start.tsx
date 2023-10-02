@@ -10,7 +10,7 @@ import i18n from '@/i18n'
 import Splash from "./Splash"
 import { Font } from 'react-native-paper/lib/typescript/types'
 import { useFonts } from 'expo-font'
-import { PaperProvider, Snackbar } from 'react-native-paper'
+import { PaperProvider, Snackbar, configureFonts } from 'react-native-paper'
 
 export default () => {
     const { t } = i18n
@@ -40,15 +40,24 @@ export default () => {
         return <Splash />
     }
     if(fontsLoaded) {
-        const defaultFont: Font  = {
-            fontFamily: 'Futura-std-book'
-        }
         return <PaperProvider theme={{
-            fonts: {
-              regular: defaultFont, titleLarge: defaultFont, titleMedium: defaultFont, titleSmall: defaultFont,
-              bodyLarge: defaultFont, bodyMedium: defaultFont, bodySmall: defaultFont, default: defaultFont,
-              labelLarge: defaultFont, labelMedium: defaultFont, labelSmall: defaultFont
-            }
+            fonts: configureFonts({ config: { 
+                bodyLarge: { fontFamily: 'Futura-std-book'},
+                bodyMedium: { fontFamily: 'Futura-std-book'},
+                bodySmall: { fontFamily: 'Futura-std-book'},
+                displayLarge: { fontFamily: 'Futura-std-book'},
+                displayMedium: { fontFamily: 'Futura-std-book'},
+                displaySmall: { fontFamily: 'Futura-std-book'},
+                headlineLarge: { fontFamily: 'Futura-std-book'},
+                headlineMedium: { fontFamily: 'Futura-std-book'},
+                headlineSmall: { fontFamily: 'Futura-std-book'},
+                labelLarge: { fontFamily: 'Futura-std-book'},
+                labelMedium: { fontFamily: 'Futura-std-book'},
+                labelSmall: { fontFamily: 'Futura-std-book'},
+                titleLarge: { fontFamily: 'DK-magical-brush' },
+                titleMedium: { fontFamily: 'DK-magical-brush' },
+                titleSmall: { fontFamily: 'DK-magical-brush' }
+            } })
           }}>
             { appContext.state.token.data ? 
                 <Main /> :
