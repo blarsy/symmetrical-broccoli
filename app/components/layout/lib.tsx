@@ -62,9 +62,9 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [timeOpen, setTimeOpen] = useState(false)
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
+    return <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
         <Text style={{ color: props.textColor, fontSize: 16, marginLeft: 16 }}>{props.label}</Text>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
             <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ fontSize: 16, margin: 10, marginLeft: 20, color: props.textColor }}>
                 {props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}
             </Button>

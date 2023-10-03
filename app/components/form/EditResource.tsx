@@ -8,7 +8,7 @@ import * as yup from 'yup'
 import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
-import { View } from "react-native"
+import { ScrollView, View } from "react-native"
 import { Portal, Snackbar } from "react-native-paper"
 
 
@@ -45,7 +45,7 @@ export default ({ route, navigation }:RouteProps) => {
         }
     }}>
     {formikState => {
-        return <View style={{ padding: 10 }}>
+        return <ScrollView style={{ margin: 10 }}>
             <EditResourceFields formikState={formikState} onConditionAddRequested={() => {
                 navigation.navigate('addCondition', { condition: { title: '', description: ''}} )
             }} onConditionEditRequested={condition => {
@@ -57,7 +57,7 @@ export default ({ route, navigation }:RouteProps) => {
                     {saveResourceState.error && saveResourceState.error.message}
                 </Snackbar>
             </Portal>
-        </View>
+        </ScrollView>
     }}
     </Formik>
 }

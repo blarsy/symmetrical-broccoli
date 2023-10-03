@@ -1,11 +1,12 @@
 import { RouteProps } from "@/lib/utils"
-import React, { useState } from "react"
+import React from "react"
 import { Card, Text } from "react-native-paper"
 import { imgUrl } from "@/lib/settings"
 import { Resource } from "@/lib/schema"
 import { t } from "@/i18n"
-import { View } from "react-native"
+import { Dimensions, Image, ScrollView, View } from "react-native"
 import dayjs from "dayjs"
+import SwiperFlatList from "react-native-swiper-flatlist"
 
 interface ResourceViewFieldProps {
     title: string,
@@ -20,10 +21,21 @@ const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFiel
     {children}
 </View>
 
+const getSwiperData = (resource: Resource) => {
+    if(resource.images && resource.images.length > 0) {
+        return resource.images.map((img, idx) => ({
+            source: `${imgUrl}${img.path}`,
+            alt: img.title,
+            idx
+        }))
+    } else {
+        return [{ source: '/placeholder.png', alt: 'placeholder'}]
+    }
+}
+
 const ViewResource = ({ route, navigation }:RouteProps) => {
     const resource = route.params.resource as Resource
-    const [currentImgIdx, setCurrentImgIdx] = useState(0)
-    const imgPath = resource.images.length === 0 ? '/placeholder.png': `${imgUrl}${resource.images[currentImgIdx].path}`
+    
     let expirationText: string
     if(resource.expiration) {
         const dateObj = dayjs(resource.expiration)
@@ -31,37 +43,42 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     } else {
         expirationText = ''
     }
+    const windowDimension = Dimensions.get('window')
+    const imgSize = Math.min(windowDimension.height, windowDimension.width)
 
-    return <Card>
-        <Card.Cover source={{ uri: imgPath }} />
-        <Card.Content style={{ gap: 10 }}>
-            <ResourceViewField title={t('title_label')}>
-                <Text style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
+    return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+            <SwiperFlatList data={getSwiperData(resource)} 
+                renderItem= {({ item }) => <View>
+                    <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} style={{ width: imgSize, height: imgSize }}/>
+            </View>} />
+        </View>
+        <ResourceViewField title={t('title_label')}>
+            <Text style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
+        </ResourceViewField>
+        <ResourceViewField title={t('description_label')} titleOnOwnLine>
+            <Text>{resource.description}</Text>
+        </ResourceViewField>
+        { expirationText && <View>
+            <ResourceViewField title={t('expiration_label')}>
+                <Text>{expirationText}</Text>
             </ResourceViewField>
-            <ResourceViewField title={t('description_label')} titleOnOwnLine>
-                <Text>{resource.description}</Text>
+        </View>}
+        { resource.conditions && resource.conditions.length > 0 && <View>
+            <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
+                <View style={{ flexDirection: 'column' }}>
+                    { resource.conditions.map((condition, idx) => <View key={idx} style={{ paddingBottom: 5, borderTopWidth: 1, borderTopColor: '#aaa' }}>
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                            <Text variant="bodySmall">{t('title_label')}</Text>
+                            <Text>{condition.title}</Text>
+                        </View>
+                        <Text variant="bodySmall">{t('description_label')}</Text>
+                        <Text>{condition.description}</Text>
+                    </View>)}
+                </View>
             </ResourceViewField>
-            { expirationText && <View>
-                <ResourceViewField title={t('expiration_label')}>
-                    <Text>{expirationText}</Text>
-                </ResourceViewField>
-            </View>}
-            { resource.conditions && resource.conditions.length > 0 && <View>
-                <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
-                    <View style={{ flexDirection: 'column' }}>
-                        { resource.conditions.map(condition => <View style={{ paddingBottom: 5, borderTopWidth: 1, borderTopColor: '#aaa' }}>
-                            <View style={{ flexDirection: 'row', gap: 10 }}>
-                                <Text variant="bodySmall">{t('title_label')}</Text>
-                                <Text>{condition.title}</Text>
-                            </View>
-                            <Text variant="bodySmall">{t('description_label')}</Text>
-                            <Text>{condition.description}</Text>
-                        </View>)}
-                    </View>
-                </ResourceViewField>
-            </View> }
-        </Card.Content>
-    </Card>
+        </View> }
+    </ScrollView>
 }
 
 export default ViewResource
