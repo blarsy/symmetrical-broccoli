@@ -2,9 +2,14 @@ import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
 import { lightPrimaryColor, primaryColor } from "./utils"
 
-const titleFont = localFont({ src: './app/dk-magical-brush.otf' })
-const generalFont = localFont({ src: './app/futura-std-book.otf' })
-const altGeneralFont = localFont({ src: './app/futura-std-heavy.otf' })
+const title = localFont({ src: './app/dk-magical-brush.otf' })
+const general = localFont({ src: './app/futura-std-book.otf' })
+const altGeneral = localFont({ src: './app/futura-std-heavy.otf' })
+export const fonts = {
+  title,
+  general,
+  altGeneral
+}
 
 export default createTheme({
   palette: {
@@ -16,24 +21,24 @@ export default createTheme({
     }
   },
   typography: {
-    body1: { fontFamily: generalFont.style.fontFamily } ,
-    body2: { fontFamily: generalFont.style.fontFamily },
-    h1: { fontFamily: titleFont.style.fontFamily,
+    body1: { fontFamily: fonts.general.style.fontFamily } ,
+    body2: { fontFamily: fonts.general.style.fontFamily },
+    h1: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '2.5rem', padding: '1.5rem 0' },
-    h2: { fontFamily: titleFont.style.fontFamily,
+    h2: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '2rem', padding: '1.2rem 0' },
-    h3: { fontFamily: titleFont.style.fontFamily,
+    h3: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '1.7rem', padding: '1rem 0' },
-    h4: { fontFamily: titleFont.style.fontFamily,
+    h4: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '1.4rem', padding: '0.5rem 0' },
-    h5: { fontFamily: titleFont.style.fontFamily,
+    h5: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '1.2rem', padding: '0.3rem 0' },
-    h6: { fontFamily: titleFont.style.fontFamily,
+    h6: { fontFamily: fonts.title.style.fontFamily,
       fontSize: '1.1rem', padding: '0.2rem 0' },
-    overline: { fontFamily: altGeneralFont.style.fontFamily },
-    caption: { fontFamily: altGeneralFont.style.fontFamily },
-    subtitle1: { fontFamily: titleFont.style.fontFamily },
-    subtitle2: { fontFamily: titleFont.style.fontFamily },
-    button: { fontFamily: altGeneralFont.style.fontFamily },
-  }
+    overline: { fontFamily: fonts.altGeneral.style.fontFamily },
+    caption: { fontFamily: fonts.altGeneral.style.fontFamily },
+    subtitle1: { fontFamily: fonts.title.style.fontFamily },
+    subtitle2: { fontFamily: fonts.title.style.fontFamily },
+    button: { fontFamily: fonts.altGeneral.style.fontFamily },
+  },
 })
