@@ -16,14 +16,14 @@ const contents = [{
 
 const Step1 = () => <Stack maxWidth={1100} gap="50px" display="flex" justifyContent="center" sx={theme => ({
     flexDirection: 'row',
-    flex: '1 0 50%',
     [theme.breakpoints.down('md')]: {
         flexDirection: 'column',
         padding: '2rem 0',
         alignItems: 'center'
     }
 })}>
-    <Box flex="1" sx={{ maxHeight: '347px' }}>
+    <Box sx={{ maxHeight: '347px',
+        flex: '1 0 50%' }}>
         <Motto width="100%" height="100%"/>
     </Box>
     <Stack justifyContent="center">

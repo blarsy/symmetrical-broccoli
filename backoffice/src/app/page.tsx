@@ -26,14 +26,14 @@ const PresentationCarousel = () => {
     const swiperRef = useRef<SwiperType>()
 
     return <Stack flex="1" flexDirection="row" alignItems="center" sx={{
-        backgroundColor: '#fff',
-        [theme.breakpoints.up('lg')]: {
+        backgroundColor: '#fcf5ef',
+        [theme.breakpoints.up('md')]: {
             backgroundColor: 'transparent',
             backgroundImage: `url('/FOND.svg')`,
             backgroundRepeat: 'no-repeat',
             backgroundOrigin: "border-box",
             backgroundPosition: 'top',
-            backgroundSize: '120%'
+            backgroundSize: '110%'
         }
     }}>
         <IconButton style={{ transform: 'scaleX(-1)', fill: primaryColor }} onClick={() => {
@@ -94,13 +94,13 @@ const Page = () => {
                         sx={{ transform: 'rotate(-3.7deg)' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
                     <Typography textAlign="center" sx={{ 
                         fontSize: 21, 
-                        padding: '5rem',
+                        padding: '3rem',
                         backgroundImage: `url('/FOND.svg')`,
                         backgroundRepeat: 'no-repeat',
                         backgroundAttachment: 'local',
                         backgroundSize: '100%',
                         [theme.breakpoints.down('md')]: {
-                            padding: '2rem'
+                            padding: '2.5rem 1.5rem'
                         }
                     }}>La solidarit&#233;, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au don ou l&#8217;&#233;change.</Typography>
                     <Typography textAlign="center" color="#fff" fontSize={21}>Y a rien d&apos;autre &agrave; dire<br/>Oui, on vous l&apos;avais bien dit que c&apos;&eacute;tait archi-simple.</Typography>
