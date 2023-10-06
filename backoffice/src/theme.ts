@@ -41,4 +41,13 @@ export default createTheme({
     subtitle2: { fontFamily: fonts.title.style.fontFamily },
     button: { fontFamily: fonts.altGeneral.style.fontFamily },
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1650,
+    },
+  },
 })

@@ -14,9 +14,17 @@ const contents = [{
     text: `Le tope, c'est notre manière de dire "youpi, on a trouvé bonheur". Allez, tope-là !`
 }]
 
-const Step1 = () => <Stack flexDirection="row" maxWidth={1100} gap="100px" display="flex" justifyContent="center">
-    <Box flex="1">
-        <Motto height={347} width={428} />
+const Step1 = () => <Stack maxWidth={1100} gap="50px" display="flex" justifyContent="center" sx={theme => ({
+    flexDirection: 'row',
+    flex: '1 0 50%',
+    [theme.breakpoints.down('md')]: {
+        flexDirection: 'column',
+        padding: '2rem 0',
+        alignItems: 'center'
+    }
+})}>
+    <Box flex="1" sx={{ maxHeight: '347px' }}>
+        <Motto width="100%" height="100%"/>
     </Box>
     <Stack justifyContent="center">
         {contents.map((content, idx) => {
