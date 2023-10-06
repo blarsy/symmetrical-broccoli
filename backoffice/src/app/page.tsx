@@ -93,7 +93,6 @@ const Page = () => {
                     <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
                         sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
                     <Typography textAlign="center" sx={{ 
-                        fontSize: 21, 
                         padding: '3rem',
                         backgroundImage: `url('/FOND.svg')`,
                         backgroundRepeat: 'no-repeat',
