@@ -90,8 +90,8 @@ const Page = () => {
                         flex: '0 1 90%'
                     }
                 })} alignItems="center">
-                    <Typography color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
-                        sx={{ transform: 'rotate(-3.7deg)' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
+                    <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
+                        sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
                     <Typography textAlign="center" sx={{ 
                         fontSize: 21, 
                         padding: '3rem',
@@ -102,16 +102,16 @@ const Page = () => {
                         [theme.breakpoints.down('md')]: {
                             padding: '2.5rem 1.5rem'
                         }
-                    }}>La solidarit&#233;, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au don ou l&#8217;&#233;change.</Typography>
-                    <Typography textAlign="center" color="#fff" fontSize={21}>Y a rien d&apos;autre &agrave; dire<br/>Oui, on vous l&apos;avais bien dit que c&apos;&eacute;tait archi-simple.</Typography>
+                    }}>La <b>solidarit&#233;</b>, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
+                    <Typography textAlign="center" color="#fff" fontSize={21}>Y a rien d&apos;autre &agrave; dire</Typography>
                 </Stack>
                 <Box sx={theme => ({
                     [theme.breakpoints.down('lg')]: {
                         display: 'none',
                     },
-                    height: 430
+                    height: 410
                 })} flex="0 1 25%">
-                    <img src={smartphone.src} width="100%" style={{ maxWidth: '470px' }} alt="smartphone"/>
+                    <img src={smartphone.src} width="100%" style={{ maxWidth: '430px' }} alt="smartphone"/>
                 </Box>
             </Stack>
             <PresentationCarousel />

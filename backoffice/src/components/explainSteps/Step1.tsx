@@ -3,18 +3,7 @@ import Motto from '@/app/img/TROCLA.svg'
 import { primaryColor } from "@/utils"
 import { fonts } from "@/theme"
 
-const contents = [{
-    title: 'Troc',
-    text: `Tu as du matériel dont tu n'as plus besoin ? Tu peux le proposer au troc sur l'application. Cela permet à d'autres associations de l'emprunter ou de l'utiliser temporairement, tout en vous permettant de récupérer des ressources dont tu as besoin.`
-},{
-    title: 'Donne',
-    text: `Si tu es prêt à faire don de ressources sans attendre quoi que ce soit en retour (parce que tu es une personne méga sympa), utilise la fonction "Donne" pour partager ta générosité. C'est une manière simple et efficace d'aider d'autres associations dans le besoin.`
-},{
-    title: 'Tope',
-    text: `Le tope, c'est notre manière de dire "youpi, on a trouvé bonheur". Allez, tope-là !`
-}]
-
-const Step1 = () => <Stack maxWidth={1100} gap="50px" display="flex" justifyContent="center" sx={theme => ({
+const Step1 = () => <Stack maxWidth={1100} display="flex" justifyContent="center" sx={theme => ({
     flexDirection: 'row',
     [theme.breakpoints.down('md')]: {
         flexDirection: 'column',
@@ -27,12 +16,18 @@ const Step1 = () => <Stack maxWidth={1100} gap="50px" display="flex" justifyCont
         <Motto width="100%" height="100%"/>
     </Box>
     <Stack justifyContent="center">
-        {contents.map((content, idx) => {
-            return <Box key={idx}>
-                <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>{content.title}</Typography>
-                <Typography component="span">{content.text}</Typography>
-            </Box>
-        })}
+        <Box>
+            <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Troc</Typography>
+            <Typography component="span">Tu as du mat&eacute;riel dont tu n&apos;as plus besoin ? Tu peux le proposer au troc sur l&apos;application. Cela permet &agrave; d&apos;autres associations de <b>l&apos;emprunter ou de l&apos;utiliser</b> temporairement, tout en vous permettant de r&eacute;cup&eacute;rer des ressources dont tu as besoin.</Typography>
+        </Box>
+        <Box>
+            <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Donne</Typography>
+            <Typography component="span">Si tu es pr&ecirc;t &agrave; faire don de ressources sans attendre quoi que ce soit en retour (parce que tu es une personne m&eacute;ga sympa), utilise la fonction &quot;Donne&quot; pour <b>partager</b> ta g&eacute;n&eacute;rosit&eacute;. C&apos;est une mani&egrave;re simple et efficace d&apos;aider d&apos;autres associations dans le besoin.</Typography>
+        </Box>
+        <Box>
+            <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Tope</Typography>
+            <Typography component="span">Le tope, c&apos;est notre mani&egrave;re de dire &quot;youpi, on a trouv&eacute; bonheur&quot;. <b>Allez, tope-l&agrave; !</b></Typography>
+        </Box>
     </Stack>
 </Stack>
 
