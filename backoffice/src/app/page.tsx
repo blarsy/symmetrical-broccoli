@@ -8,6 +8,7 @@ import InstaLogo from './img/INSTAGRAM.svg'
 import Logo from './img/LOGO-TOPE LA.svg'
 import smartphone from './img/IPHONE.png'
 import ComingSoon from './img/BIENTOT DISPO.svg'
+import LetsConnect from './img/CONNECTONS NOUS.svg'
 import { useRef } from "react"
 import Step1 from "@/components/explainSteps/Step1"
 import Arrow from './img/fleche.svg'
@@ -102,7 +103,7 @@ const Page = () => {
                             padding: '2.5rem 1.5rem'
                         }
                     }}>La <b>solidarit&#233;</b>, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
-                    <Typography textAlign="center" color="#fff" fontSize={21}>Y a rien d&apos;autre &agrave; dire</Typography>
+                    <Link href="https://forms.gle/VhgXtnRToprjWYeU8" style={{ alignSelf: 'center', height: '100px' }}><LetsConnect /></Link>
                 </Stack>
                 <Box sx={theme => ({
                     [theme.breakpoints.down('lg')]: {
