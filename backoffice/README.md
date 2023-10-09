@@ -50,11 +50,11 @@ connect to the server
 
 Generate the certificates
 
-`certbot certonly --webroot --domains admin.homeostasis.pro`
+`certbot certonly --webroot -d www.homeostasis.pro -d homeostasis.pro`
 
 You'll have to provide the path where to create the challenge files required for Letsencrypt to verify you actually control the public IP address you request the certificates for. Thus, when prompted:
 
-`Input the webroot for admin.homeostasis.pro: (Enter 'c' to cancel):`
+`Input the webroot for www.homeostasis.pro: (Enter 'c' to cancel):`
 
 Type
 
