@@ -9,7 +9,7 @@ import Logo from './img/LOGO-TOPE LA.svg'
 import smartphone from './img/IPHONE.png'
 import ComingSoon from './img/BIENTOT DISPO.svg'
 import LetsConnect from './img/CONNECTONS NOUS.svg'
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import Step1 from "@/components/explainSteps/Step1"
 import Arrow from './img/fleche.svg'
 import Step2 from "@/components/explainSteps/Step2"
@@ -21,10 +21,18 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import { Swiper as SwiperType } from "swiper"
+import { Autoplay } from 'swiper/modules'
 import Link from "next/link"
 
 const PresentationCarousel = () => {
     const swiperRef = useRef<SwiperType>()
+    const [swiperSlideState, setSwiperSlideState] = useState({ begin: true, end: false })
+
+    const refreshSwiperSlideState = () => {
+        if(swiperRef && swiperRef.current && (swiperRef.current.isBeginning != swiperSlideState.begin || swiperRef.current.isEnd != swiperSlideState.end)){
+            setSwiperSlideState({ begin: swiperRef.current.isBeginning, end: swiperRef.current.isEnd })
+        }
+    }
 
     return <Stack flex="1" flexDirection="row" alignItems="center" sx={{
         backgroundColor: '#fcf5ef',
@@ -37,13 +45,18 @@ const PresentationCarousel = () => {
             backgroundSize: '110%'
         }
     }}>
-        <IconButton style={{ transform: 'scaleX(-1)', fill: primaryColor }} onClick={() => {
+        
+        <IconButton style={{ transform: 'scaleX(-1)', fill: primaryColor, visibility: !swiperSlideState.begin ? 'visible': 'hidden' }} onClick={() => {
             swiperRef.current?.slidePrev()
         }}>
             <Arrow width={42} height={42} alt="fleche droite"/>
         </IconButton>
-        <Swiper onBeforeInit={(swiper) => {
-                swiperRef.current = swiper;
+        <Swiper modules={[ Autoplay ]} onBeforeInit={(swiper) => {
+                swiperRef.current = swiper
+            }} onTransitionEnd={t => {
+                refreshSwiperSlideState()
+            }} autoplay={{
+                delay: 5000
             }} >
             <SwiperSlide style={{ display: 'flex',flexDirection: 'column', alignItems: 'center', alignSelf: 'center' }}>
                 <Step1 />
@@ -64,7 +77,7 @@ const PresentationCarousel = () => {
                 <Step6 />
             </SwiperSlide>
         </Swiper>
-        <IconButton style={{ fill: primaryColor }} onClick={() => {
+        <IconButton style={{ fill: primaryColor, visibility: !swiperSlideState.end ? 'visible': 'hidden' }} onClick={() => {
             swiperRef.current?.slideNext()
         }}>
             <Arrow style={{ color: primaryColor }} width={42} height={42} alt="fleche droite"/>
@@ -103,7 +116,7 @@ const Page = () => {
                             padding: '2.5rem 1.5rem'
                         }
                     }}>La <b>solidarit&#233;</b>, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
-                    <Link href="https://forms.gle/VhgXtnRToprjWYeU8" style={{ alignSelf: 'center', height: '100px' }}><LetsConnect /></Link>
+                    <Link href="https://forms.gle/VhgXtnRToprjWYeU8" style={{ alignSelf: 'center', height: '100px' }}><LetsConnect height="100%" /></Link>
                 </Stack>
                 <Box sx={theme => ({
                     [theme.breakpoints.down('lg')]: {
