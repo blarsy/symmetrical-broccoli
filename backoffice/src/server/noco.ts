@@ -101,7 +101,7 @@ export const unlink = async (tableName: string, sourceItemId: number, columnName
   }
 }
 
-export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, filePaths: string[]): Promise<object> => {
+export const uploadResourceImage = async (attachmentPath: string, account: Account, resourceId: number, filePaths: string[]): Promise<any> => {
   const formData = new FormData()
   const logicalPath = `noco/${projectName}/${attachmentPath}`
   if(!account.resources || !account.resources.find(resource => resource.id === resourceId)) throw new Error(`Resource with id ${resourceId} not found.`)

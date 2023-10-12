@@ -4328,6 +4328,7 @@ __metadata:
     dayjs: ^1.11.10
     eas-cli: ^5.2.0
     expo: ^49.0.13
+    expo-image-picker: ~14.3.2
     expo-localization: ~14.3.0
     expo-splash-screen: ~0.20.5
     expo-status-bar: ~1.6.0
@@ -6785,6 +6786,26 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 3eff92ba5c62de5f37cfdfd86a5daf1d448e4f3e82a9ff401b4c4da1c4e5a7241da26edf32fb049763147e442d74ae8b4575b7e5a4ae0d935750c6d3f70f4355
+  languageName: node
+  linkType: hard
+
+"expo-image-loader@npm:~4.3.0":
+  version: 4.3.0
+  resolution: "expo-image-loader@npm:4.3.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 0440ac80a7b2331cdfd0db88aac0ba2fe61689e6347e2c6bedba6bf3220b95410c724ac9004252486870b582fc36d47d4bff008bba7052dcee2830256950974f
+  languageName: node
+  linkType: hard
+
+"expo-image-picker@npm:~14.3.2":
+  version: 14.3.2
+  resolution: "expo-image-picker@npm:14.3.2"
+  dependencies:
+    expo-image-loader: ~4.3.0
+  peerDependencies:
+    expo: "*"
+  checksum: 301a5e11cdd436717051fdd8b0f943210d281ca94d1417bb2e1b29a8fa02d3bc6f9321c4cac49376b6f3b76e78cecb23e42bc32131fce3d78006a44d64bfba56
   languageName: node
   linkType: hard
 

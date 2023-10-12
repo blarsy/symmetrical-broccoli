@@ -4,7 +4,6 @@ import { Button } from "react-native-paper"
 import { t } from "@/i18n"
 import DataLoadState from "@/lib/DataLoadState"
 import LoadedList from "./LoadedList"
-import { array } from "yup"
 
 interface Props<T, I> {
     state: DataLoadState<T> | I[]
@@ -14,7 +13,7 @@ interface Props<T, I> {
 }
 
 function AppendableList<T, I> ({ state, dataFromState, displayItem, onAddRequested }:Props<T, I>) {
-    return <View style={{ flexDirection: 'column', padding: 10 }}>
+    return <View style={{ flexDirection: 'column', margin: 10, flex:1 }}>
         <Button mode="outlined" labelStyle={{ fontSize: 16, textTransform: 'uppercase', color: '#000' }} icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</Button>
         { state instanceof DataLoadState ? <LoadedList loading={state.loading} error={state.error} data={dataFromState!(state)} 
             displayItem={displayItem}/> :

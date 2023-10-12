@@ -1,4 +1,4 @@
-import { Account, Network, Resource } from './schema'
+import { Account, Image, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 let loggedOutHandler: () => void
 
@@ -103,23 +103,34 @@ export const requestRecovery = async (email: string) => {
     }})
 }
 
-export const getResources = async (token: string) => {
+export const getResources = async (token: string): Promise<Resource[]> => {
     const res = await apiCall(`${apiUrl}resource`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
-        return res.json()
+        return ((await res.json()) as Resource[]).map(res => resourceFromApi(res))
     } else {
         throw new Error(res.statusText)
     }
 }
 
+const resourceFromApi = (rawResource: Resource) => {
+    if(typeof rawResource.images === 'string') {
+        rawResource.images = JSON.parse(rawResource.images)
+    }
+    if(typeof(rawResource.expiration) === 'string')
+    rawResource.expiration = new Date(rawResource.expiration as unknown as string)
+    return rawResource
+}
+
 export const createResource = async (token: string, resource: Resource): Promise<Resource> => {
-    const res = await apiCall(`${apiUrl}resource`, { method: 'POST', body: JSON.stringify(resource), mode: 'cors', headers: {
+    const strippedResource = {...resource}
+    strippedResource.images = []
+    const res = await apiCall(`${apiUrl}resource`, { method: 'POST', body: JSON.stringify(strippedResource), mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
-        return res.json()
+        return resourceFromApi(await res.json())
     } else {
         throw new Error(res.statusText)
     }
@@ -130,7 +141,32 @@ export const updateResource = async (token: string, resource: Resource): Promise
         'Authorization': token
     }})
     if(res.status === 200) {
-        return res.json()
+        return resourceFromApi(await res.json())
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const uploadImagesOnResource = async (token: string, resourceId: number, imgBlobs: Blob[]): Promise<Resource> => {
+    const formData = new FormData()
+    imgBlobs.forEach(blob => formData.append('files[]', blob))
+    
+    const res = await apiCall(`${apiUrl}resource/${resourceId}/image`, { method: 'POST', body: formData, mode: 'cors', headers: {
+        'Authorization': token
+    }})
+    if(res.status === 200) {
+        return resourceFromApi(await res.json())
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const removeImageFromResource = async (token: string, resourceId: number, path: string): Promise<Resource> => {
+    const res = await apiCall(`${apiUrl}resource/${resourceId}/image`, { method: 'PATCH', body: JSON.stringify({ path }), mode: 'cors', headers: {
+        'Authorization': token
+    }})
+    if(res.status === 200) {
+        return resourceFromApi(await res.json())
     } else {
         throw new Error(res.statusText)
     }

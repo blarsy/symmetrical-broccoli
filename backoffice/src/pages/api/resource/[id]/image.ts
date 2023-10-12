@@ -1,4 +1,4 @@
-import { getAccount } from "@/server/apiutil"
+import { getAccount, getResource } from "@/server/apiutil"
 import { getOne, update, uploadResourceImage } from "@/server/noco"
 import { Image, fromRawResource } from "@/schema"
 import { respondWithSuccess, respondWithFailure, getToken } from "@/server/respond"
@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
             const resource = await uploadResourceImage('ressources/images', account, resourceId, filePaths)
             
-            respondWithSuccess(res, fromRawResource(resource))
+            respondWithSuccess(res, await getResource(resource.Id))
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             //check if resource belongs to the logged in account
             const { id } = req.query
             const resourceId = Number(id)
-
+            
             if(!account.resources || !account.resources.find((res) => res.id == resourceId)) {
                 respondWithFailure(req, res, new Error('Resource not found'), 404)
                 return
@@ -55,14 +55,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['images'])
             resource.images = JSON.parse(resource.images)
     
-            const imageToDelete = resource.Images.find((image: Image) => image.path === path)
+            const imageToDelete = resource.images.find((image: Image) => image.path === path)
             if(!imageToDelete) {
                 respondWithFailure(req, res, new Error('Image not found.'), 404)
                 return
             }
-    
-            const updatedResource = await update('ressources', resourceId, { images: resource.Images.filter((image: any) => image.path !== path) })
-            respondWithSuccess(res, fromRawResource(updatedResource))
+
+            const updatedResource = await update('ressources', resourceId, { images: resource.images.filter((image: any) => image.path !== path) })
+            respondWithSuccess(res, await getResource(updatedResource.Id))
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }

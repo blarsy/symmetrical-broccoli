@@ -1,6 +1,6 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken"
-import { getOne } from "./noco"
-import { Account, fromRawAccount } from "../schema"
+import { getChildItems, getOne } from "./noco"
+import { Account, Resource, fromRawAccount, fromRawResource } from "../schema"
 import { RequestParams } from "nocodb-sdk"
 
 const secret = process.env.JWT_SECRET as string
@@ -34,4 +34,11 @@ export const createToken = async (secret: string, data: any): Promise<string> =>
         resolve(token!)
       })
     })
-  }
+}
+
+export const getResource = async(resourceId: number): Promise<Resource> => {
+    const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration'])
+    const conditions = await getChildItems('conditions', resource.Id, 'ressources')
+    resource.conditions = conditions
+    return fromRawResource(resource)
+}

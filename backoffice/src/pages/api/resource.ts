@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const { title, description, expiration, conditions } = req.body
+            const { title, description, expiration, conditions } = JSON.parse(req.body)
             const account = await getAccount(getToken(req))
             const resource = await create(account.id, title, description, expiration, conditions)
     

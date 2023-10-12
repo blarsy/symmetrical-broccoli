@@ -1,14 +1,13 @@
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
-import { createResource, updateResource } from "@/lib/api"
 import { Formik } from "formik"
 import { t } from "i18next"
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { AppContext } from "../AppContextProvider"
 import * as yup from 'yup'
 import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
-import { ScrollView, View } from "react-native"
+import { ScrollView } from "react-native"
 import { Portal, Snackbar } from "react-native-paper"
 
 
@@ -17,6 +16,12 @@ export default ({ route, navigation }:RouteProps) => {
     const editResourceContext = useContext(EditResourceContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false))
 
+    useEffect(() => {
+        if(route.params && route.params.isNew){
+            editResourceContext.actions.reset()
+        }
+    }, [])
+
     return <Formik enableReinitialize initialValues={editResourceContext.state.resource} validationSchema={yup.object().shape({
         title: yup.string().max(50).required(t('field_required')),
         description: yup.string(),
@@ -24,12 +29,7 @@ export default ({ route, navigation }:RouteProps) => {
      })} onSubmit={async (values) => {
         setSaveResourcestate(beginOperation())
         try {
-            if(editResourceContext.state.resource.id) {
-                await updateResource(appContext.state.token.data!, values)
-            } else {
-                await createResource(appContext.state.token.data!, values)
-            }
-            
+            await editResourceContext.actions.save(appContext.state.token.data!, values)
             setSaveResourcestate(fromData(null))
 
             navigation.navigate({
@@ -50,7 +50,7 @@ export default ({ route, navigation }:RouteProps) => {
                 navigation.navigate('addCondition', { condition: { title: '', description: ''}} )
             }} onConditionEditRequested={condition => {
                 navigation.navigate('editCondition', { condition } )
-            }} processing={saveResourceState.loading}/>
+            }} processing={saveResourceState.loading} />
             <Portal>
                 <Snackbar role="alert" visible={!!saveResourceState.error && !!saveResourceState.error.message} 
                     onDismiss={() => setSaveResourcestate(initial<null>(false))}>

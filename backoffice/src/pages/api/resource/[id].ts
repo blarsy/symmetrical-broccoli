@@ -1,7 +1,7 @@
-import { getAccount } from "@/server/apiutil"
+import { getAccount, getResource } from "@/server/apiutil"
 import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, update } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
-import { conditionsToRaw, fromRawResource } from "@/schema"
+import { conditionsToRaw } from "@/schema"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -15,11 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 respondWithFailure(req, res, new Error('Resource not found'), 404)
                 return
             }
-            const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration'])
-            const conditions = await getChildItems('conditions', resource.Id, 'ressources')
-            resource.conditions = conditions
+            const resource = await getResource(resourceId)
 
-            respondWithSuccess(res, fromRawResource(resource))
+            respondWithSuccess(res, resource)
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }
@@ -57,10 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
             
             const resource = await update('ressources', resourceId, input)
-            const upToDateConditions = await getChildItems('conditions', resourceId, 'ressources')
-            resource.conditions = upToDateConditions
-    
-            respondWithSuccess(res, fromRawResource(resource))
+
+            respondWithSuccess(res, await getResource(resource.Id))
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }

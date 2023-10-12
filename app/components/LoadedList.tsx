@@ -1,5 +1,5 @@
 import React from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, ScrollView, View } from "react-native"
 import ListOf from "./ListOf"
 import { Snackbar } from "react-native-paper"
 import { t } from "@/i18n"
@@ -13,11 +13,11 @@ interface Props<T> {
 }
 
 function LoadedList<T>({ loading, error, data, displayItem }:Props<T>) {
-    return <View style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
+    return <ScrollView style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
     { loading && <ActivityIndicator /> }
     { !loading && !error && <ListOf data={data} displayItem={displayItem} /> }
     <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>
-</View>
+</ScrollView>
 }
 
 export default LoadedList

@@ -178,7 +178,7 @@ const makeInitialCrop = (imgRef: RefObject<HTMLImageElement>): Crop => {
     }
 }
 
-export const CropImage = ({ fileBase64, imgRef, onCropComplete }: CropProps) => {
+const CropImage = ({ fileBase64, imgRef, onCropComplete }: CropProps) => {
     const [crop, setCrop] = useState(makeInitialCrop(imgRef))
     return <Box display="flex" flexDirection="column" justifyItems="center">
         <Container sx={{ display: 'flex', flexDirection: 'column', justifyItems: 'stretch' }} maxWidth={'sm'}>

@@ -1,8 +1,8 @@
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { Appbar, BottomNavigation } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
-import { Text, View } from "react-native"
+import { ScrollView, Text, View } from "react-native"
 import Search from './Search'
 import Chat from './Chat'
 import MyNetwork from "@/components/MyNetwork"
@@ -20,6 +20,7 @@ import RequestsSent from "../RequestsSent"
 import EditCondition from "../form/EditCondition"
 import ViewResource from "../ViewResource"
 import EditResourceContextProvider from "../EditResourceContextProvider"
+import { SvgProps } from "react-native-svg"
 
 const StackNav = createNativeStackNavigator()
 
@@ -72,20 +73,22 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                 <StackNav.Screen name="dealMain" key="dealMain">
                     {(props: RouteProps) => <BottomNavigation onIndexChange={setTabIndex}
                         barStyle={{ backgroundColor: lightPrimaryColor }} 
-                        renderScene={BottomNavigation.SceneMap({
-                                        search: Search,
-                                        history: History,
-                                        resource: () => Resources(props),
-                                        chat: Chat,
-                                        myNetwork: () => MyNetwork(props),
-                                    })}
+                        renderScene={
+                            BottomNavigation.SceneMap({
+                                search: Search,
+                                history: History,
+                                resource: () => <Resources {...props} />,
+                                chat: Chat,
+                                myNetwork: () => <ScrollView><MyNetwork {...props} /></ScrollView>,
+                            })
+                        }
                         activeColor={primaryColor}
                         navigationState={{ index: tabIndex, routes: bottomRoutes }} />}
                 </StackNav.Screen>
                 <StackNav.Screen name="resourcesMain" key="resourcesMain"
                     component={Resources} />
                 <StackNav.Screen name="newResource" key="newResource"
-                    component={EditResource} />
+                    component={EditResource} initialParams={{isNew: true}}/>
                 <StackNav.Screen name="viewResource" key="viewResource"
                     component={ViewResource} />
                 <StackNav.Screen name="editResource" key="editResource"
