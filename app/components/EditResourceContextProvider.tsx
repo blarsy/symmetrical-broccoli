@@ -6,7 +6,7 @@ import { createResource, removeImageFromResource, updateResource, uploadImagesOn
 interface EditResourceState {
     resource: Resource
     changeCallback: () => void
-    imagesToAdd: { path: string, blob: Blob}[]
+    imagesToAdd: NewOrExistingImage[]
 }
 
 export interface NewOrExistingImage extends Image{
@@ -51,8 +51,6 @@ export const EditResourceContext = createContext<EditResourceContext>({
     }
 })
 
-
-
 const EditResourceContextProvider = ({ children }: Props) => {
     const [editResourceState, setEditResourceState] = useState({ resource: { id: 0, conditions: [], description: '', title: '', images: [] } as Resource, changeCallback: () => {} } as EditResourceState)
     
@@ -92,10 +90,10 @@ const EditResourceContextProvider = ({ children }: Props) => {
         addImage: async (token: string, resourceId: number, img: NewOrExistingImage) => {
             if(img.blob){
                 if(editResourceState.resource.id){
-                    const resource = await uploadImagesOnResource(token, resourceId, [img.blob])
+                    const resource = await uploadImagesOnResource(token, resourceId, [img])
                     setResource(resource)
                 } else {
-                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, { path: img.path, blob: img.blob! } ], resource: { ...editResourceState.resource, ...{ images: [ ...editResourceState.resource.images, img] } } }})
+                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], resource: { ...editResourceState.resource, ...{ images: [ ...editResourceState.resource.images, img] } } }})
                     editResourceState.changeCallback()
                 }
             } else {
@@ -118,7 +116,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             } else {
                 const newResource = await createResource(token, resource)
                 if(editResourceState.imagesToAdd.length > 0) {
-                    const newResourceWithImage = await uploadImagesOnResource(token, newResource.id, editResourceState.imagesToAdd.map(img => img.blob))
+                    const newResourceWithImage = await uploadImagesOnResource(token, newResource.id, editResourceState.imagesToAdd)
                     setEditResourceState({ imagesToAdd: [], changeCallback: editResourceState.changeCallback, resource: newResourceWithImage })
                     editResourceState.changeCallback()
                 }

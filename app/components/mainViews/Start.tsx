@@ -8,7 +8,6 @@ import { registerLoggedOutHandler } from "@/lib/api"
 import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
-import { Font } from 'react-native-paper/lib/typescript/types'
 import { useFonts } from 'expo-font'
 import { PaperProvider, Snackbar, configureFonts } from 'react-native-paper'
 

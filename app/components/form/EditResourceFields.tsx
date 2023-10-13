@@ -31,7 +31,15 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
 
     return <>
         <PicturesField images={values.images} 
-            onImageSelected={img => editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)}
+            onImageSelected={img => {
+                try {
+                    // appContext.actions.setMessage(`blob size: ${img.blob?.size}, path : ${img.path}`)
+                    editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)
+                } catch(e) {
+                    appContext.actions.setMessage((e as Error).stack!)
+                    appContext.actions.notify(e)
+                }
+            }}
             onImageDeleteRequested={img => editResourceContext.actions.deleteImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)} />
         <TransparentTextInput label={t('title_label')} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />

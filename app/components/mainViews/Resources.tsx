@@ -49,7 +49,7 @@ const Resources = ({ route, navigation }: RouteProps) => {
         displayItem={(resource, idx) => <List.Item onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
             description={resource.description} style={{ margin: 0, padding: 0 }}
             left={() => getResourceImage(resource, 70)}
-            right={() => <IconButton mode="outlined" icon="pencil" onPress={e => {
+            right={() => <IconButton mode="outlined" size={40} icon="pencil" onPress={e => {
                 e.stopPropagation()
                 editResourceContext.actions.setResource(resource)
                 navigation.navigate('editResource')

@@ -27,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const form = formidable()
             const [_, files] = await form.parse(req)
 
+            console.log(files)
             const filePaths = (files['files[]'] as File[]).map(file => file.filepath)
     
             const resource = await uploadResourceImage('ressources/images', account, resourceId, filePaths)

@@ -1,5 +1,7 @@
+import { NewOrExistingImage } from '@/components/EditResourceContextProvider'
 import { Account, Image, Network, Resource } from './schema'
 import { apiUrl } from './settings'
+import { Platform } from 'react-native'
 let loggedOutHandler: () => void
 
 export const registerLoggedOutHandler = (handler: () => void) => {
@@ -147,9 +149,9 @@ export const updateResource = async (token: string, resource: Resource): Promise
     }
 }
 
-export const uploadImagesOnResource = async (token: string, resourceId: number, imgBlobs: Blob[]): Promise<Resource> => {
+export const uploadImagesOnResource = async (token: string, resourceId: number, imgs: NewOrExistingImage[]): Promise<Resource> => {
     const formData = new FormData()
-    imgBlobs.forEach(blob => formData.append('files[]', blob))
+    imgs.forEach(img => formData.append('files[]', Platform.OS === "web" ? img.blob! : {uri: img.path, name: img.title, type: 'image/jpeg'}))
     
     const res = await apiCall(`${apiUrl}resource/${resourceId}/image`, { method: 'POST', body: formData, mode: 'cors', headers: {
         'Authorization': token
@@ -174,7 +176,7 @@ export const removeImageFromResource = async (token: string, resourceId: number,
 
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     try {
-        const res = await  fetch(input, init)
+        const res = await fetch(input, init)
         
         if(res.status === 401 && ((await res.text()) === 'TOKEN_EXPIRED')) {
             if(!loggedOutHandler) throw new Error('Please call "registerLoggedOutHandler" first.')

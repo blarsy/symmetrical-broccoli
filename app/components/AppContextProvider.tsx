@@ -6,13 +6,14 @@ import React from "react"
 import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Snackbar } from "react-native-paper"
+import dayjs from "dayjs"
 
 const SPLASH_DELAY = 3000
 
 interface AppState {
     token: DataLoadState<string>,
     account?: Account,
-    message?: string
+    messages: string[]
 }
 
 interface AppActions {
@@ -21,6 +22,7 @@ interface AppActions {
     tryRestoreToken: () => Promise<void>
     accountUpdated: (account: Account) => Promise<void>
     setTokenState: (newState: DataLoadState<string>) => void
+    resetMessages: () => void
     setMessage: (message: any) => void
     notify: (message: any) => void
 }
@@ -35,13 +37,14 @@ interface Props {
 }
 
 export const AppContext = createContext<AppContext>({
-    state: { token: initial<string>(true) }, 
+    state: { token: initial<string>(true), messages: [] }, 
     actions: {
         loginComplete: (_, account) => Promise.resolve(account),
         tryRestoreToken: () => Promise.resolve(),
         accountUpdated: () => Promise.resolve(),
         logout: () => Promise.resolve(),
         setTokenState: () => {},
+        resetMessages: () => {},
         setMessage: () => {},
         notify: () => {}
     }
@@ -49,7 +52,7 @@ export const AppContext = createContext<AppContext>({
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState({
-        token: initial<string>(true), account: undefined
+        token: initial<string>(true), account: undefined, messages: []
     } as AppState)
     const [lastNotification, setLastNofication] = useState('')
 
@@ -94,10 +97,13 @@ const AppContextProvider = ({ children }: Props) => {
             setAppState({ ...appState, ...{ token: newState, message: newState.error && newState.error.detail} })
         },
         setMessage: (messageObj: any) => {
-            let message: string | undefined
-            if(messageObj instanceof Error) message = (messageObj as Error).stack
+            let message: string
+            if(messageObj instanceof Error) message = (messageObj as Error).stack!
             else message = messageObj as string
-            setAppState({ ...appState, ...{ message }})
+            setAppState({ ...appState, ...{ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH/mm/ss')}: ${message}\n`] }})
+        },
+        resetMessages: () => {
+            setAppState({ ...appState, ...{ messages: [] }})
         },
         notify: setLastNofication
     }
