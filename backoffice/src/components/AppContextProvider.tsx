@@ -32,6 +32,7 @@ const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(blankAppContext.data)
 
     const loggedIn = (account: Account): void => {
+      console.log(account)
       setAppState({ ...appState, ...{ account } })
     }
 

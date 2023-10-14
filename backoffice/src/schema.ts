@@ -31,7 +31,8 @@ export interface Resource {
     conditions: Condition[],
     title: string,
     description: string,
-    expiration?: Date
+    expiration?: Date,
+    account?: Account
 }
 
 export interface AccountLinkRequest {
@@ -56,7 +57,8 @@ export const fromRawResource = (raw: any): Resource => ({
     description: raw.description,
     expiration: raw.expiration,
     images: raw.images,
-    conditions: raw.conditions ? conditionsFromRaw(raw.conditions): []
+    conditions: raw.conditions ? conditionsFromRaw(raw.conditions): [],
+    account: raw.comptes ? fromRawAccount(raw.comptes) : undefined
 })
 
 export const conditionsFromRaw = (raws: any[]): Condition[] => {

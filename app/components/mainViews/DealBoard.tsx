@@ -53,7 +53,7 @@ const bottomRoutes = [
     { key: 'search', title: t('search_label'), focusedIcon: Images.Search },
     { key: 'resource', title: t('resource_label'), focusedIcon: Images.Modify },
     { key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
-    { key: 'myNetwork', title: t('network_label'), focusedIcon: 'account-multiple-check-outline' },
+    //{ key: 'myNetwork', title: t('network_label'), focusedIcon: 'account-multiple-check-outline' },
     { key: 'history', title: t('history_label'), focusedIcon: Images.History },
 ]
 

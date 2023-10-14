@@ -9,7 +9,6 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import NextLink from "next/link"
 import { Account } from "@/schema"
 import Image from 'next/image'
-import ClientWrapper from "./ClientWrapper"
 
 interface Props {
     title?: string,
@@ -19,7 +18,7 @@ interface Props {
 const pages = [
     { name: 'Tableau de bord', path: '/webapp/home' },
     { name: 'Resources', path: '/webapp/home/resource' },
-    { name: 'Réseau', path: '/webapp/home/network' },
+    // { name: 'Réseau', path: '/webapp/home/network' },
 ]
 
 const LoggedInLayout = ({ title, children }: Props) => {
@@ -47,41 +46,33 @@ const LoggedInLayout = ({ title, children }: Props) => {
         load()
     }, [router, appContext])
 
-    let content: JSX.Element
-
     if(account.loading) {
-        content = <Box display="flex" flexDirection="column" alignItems="center" padding="2rem">
+        return <Box display="flex" flexDirection="column" alignItems="center" padding="2rem">
             <CircularProgress />
         </Box>
     } else if (account.error){
-        content = <Feedback message="La connexion a échoué. Vous allez pouvoir vous reconnecter dans quelques instants." 
+        return <Feedback message="La connexion a échoué. Vous allez pouvoir vous reconnecter dans quelques instants." 
             detail={account.error.detail} severity="error"/>
     } else {
-        content = <ClientWrapper>
-            <>
-                <AppBar position="static">
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" padding="0 1rem">
-                        <Image src="/logo.jpeg" alt="logo Tope-là" width={100} height={85}/>
-                        <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
-                        <Box display="flex" flexDirection="row" gap="0.5rem">
-                            { pages.map(page => <Button key={page.name} LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }
-                            <IconButton onClick={() => {
-                                localStorage.removeItem('token')
-                                router.push('/webapp/')
-                            }}><LogoutIcon/></IconButton>
-                        </Box>
-                        <Typography variant="overline">Balance: {appContext.data.account.balance}€</Typography>
-                    </Stack>
-                </AppBar>
-                { title && <Typography variant="h1" textAlign="center">{ title }</Typography> }
-                { children }
-            </>
-        </ClientWrapper>
+        return <>
+            <AppBar position="static">
+                <Stack direction="row" alignItems="center" justifyContent="space-between" padding="0 1rem">
+                    <Image src="/logo.jpeg" alt="logo Tope-là" width={100} height={85}/>
+                    <Typography variant="body2">Bonjour {appContext.data.account.name}</Typography>
+                    <Box display="flex" flexDirection="row" gap="0.5rem">
+                        { pages.map(page => <Button key={page.name} LinkComponent={NextLink} color="secondary" href={page.path} variant="text">{page.name}</Button>) }
+                        <IconButton onClick={() => {
+                            localStorage.removeItem('token')
+                            router.push('/webapp/')
+                        }}><LogoutIcon/></IconButton>
+                    </Box>
+                    <Typography variant="overline">Balance: {appContext.data.account.balance}€</Typography>
+                </Stack>
+            </AppBar>
+            { title && <Typography variant="h1" textAlign="center">{ title }</Typography> }
+            { children }
+        </>
     }
-
-    return <Container sx={{ height: '100vh' }}>
-        {content}
-    </Container>
 }
 
 export default LoggedInLayout

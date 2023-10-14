@@ -5,6 +5,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
 import AppContextProvider from './AppContextProvider'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import dayjs from 'dayjs'
+
+dayjs.extend(relativeTime)
 
 interface Props {
     children: JSX.Element

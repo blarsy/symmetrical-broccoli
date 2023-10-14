@@ -18,6 +18,7 @@ export const queryAccount = async (query: string, fields?: string[], otherParams
     const account = await getOne('comptes', query, fields || ['Id', 'nom', 'email', 'balance', 'ressources'], otherParams)
 
     if(!account) throw new Error(`No account found with query ${query}.`)
+    //console.log('account', account, 'formatted', fromRawAccount(account))
     return fromRawAccount(account)
 }
 

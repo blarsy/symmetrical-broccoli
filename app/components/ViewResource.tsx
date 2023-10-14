@@ -1,6 +1,6 @@
 import { RouteProps } from "@/lib/utils"
 import React from "react"
-import { Card, Text } from "react-native-paper"
+import { Text } from "react-native-paper"
 import { imgUrl } from "@/lib/settings"
 import { Resource } from "@/lib/schema"
 import { t } from "@/i18n"

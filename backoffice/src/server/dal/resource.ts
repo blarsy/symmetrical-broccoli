@@ -17,7 +17,7 @@ export const create = async (accountId: number, title: string, description: stri
 }
 
 export const getSuggestions = async (token: string): Promise<Resource[]> => {
-    const account = await getAccount(token, ['Id', 'comptes_liés', 'images'])
-    const resourceRaw = await list('ressources', `(comptes,anyof,${account.linkedAccounts.map(linked => linked.name).join(',')})`)
+    const account = await getAccount(token, ['Id', 'comptes_liés', 'images', 'nom'])
+    const resourceRaw = await list('ressources', `(comptes,neq,${account.name})~and(expiration,gt,today)`, ['Id', 'titre', 'description', 'expiration', 'comptes', 'images', 'conditions'], undefined, ['expiration','titre'])
     return resourceRaw.map(raw => fromRawResource(raw))
 }
