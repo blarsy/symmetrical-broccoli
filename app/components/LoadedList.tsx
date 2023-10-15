@@ -16,7 +16,10 @@ function LoadedList<T>({ loading, error, data, displayItem }:Props<T>) {
     return <ScrollView style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
     { loading && <ActivityIndicator /> }
     { !loading && !error && <ListOf data={data} displayItem={displayItem} /> }
-    <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>
+    {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
+    <View style={{ height: 60 }}>
+        <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>
+    </View>
 </ScrollView>
 }
 

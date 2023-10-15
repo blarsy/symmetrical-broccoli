@@ -19,14 +19,15 @@ interface Props {
 const assetToString = (asset: ImagePickerAsset) => `name: ${asset.fileName}, size: ${asset.fileSize}, height : ${asset.height}, width : ${asset.width}`
 
 const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Props) => {
-    const appContext = useContext(AppContext)
     return <View style={{ flex: 1, alignItems: 'stretch', flexDirection: 'column' }}>
-        <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-            { images.map((image, idx) => <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
-                <Image style={{ height: 100, width: 100 }} source={{ uri: image.blob ? image.path : `${imgUrl}${image.path}` }} />
-                <IconButton size={20} icon="close-thick" iconColor="red" onPress={() => onImageDeleteRequested(image)}/>
-            </View>)}
-        </View>
+        { images && images.length > 0 &&
+            <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+                { images.map((image, idx) => <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
+                    <Image style={{ height: 100, width: 100 }} source={{ uri: image.blob ? image.path : `${imgUrl}${image.path}` }} />
+                    <IconButton size={20} icon="close-thick" iconColor="red" onPress={() => onImageDeleteRequested(image)}/>
+                </View>)}
+            </View>
+        }
         <TouchableOpacity onPress={async () => {
                 let result = await launchImageLibraryAsync({
                     mediaTypes: MediaTypeOptions.Images,

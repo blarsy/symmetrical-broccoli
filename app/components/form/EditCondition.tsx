@@ -19,13 +19,13 @@ const EditCondition = ({ route, navigation }:RouteProps) => {
             navigation.goBack()
         }}>
         {({ handleChange, handleBlur, handleSubmit, values }) => <View>
-            <TransparentTextInput id="title" 
+            <TransparentTextInput id="title"
                 label={t('condition_title_label')} value={values.title} 
-                onChange={handleChange} onBlur={handleBlur} />
+                onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
             <ErrorMessage component={ErrorText} name="title" />
-            <TransparentTextInput id="description" 
+            <TransparentTextInput id="description"
                 label={t('condition_description_label')} value={values.description} 
-                onChange={handleChange} onBlur={handleBlur} />
+                onChangeText={handleChange('description')} onBlur={handleBlur('description')} />
             <ErrorMessage component={ErrorText} name="description" />
             <OrangeButton style={{ marginTop: 20 }} onPress={() => handleSubmit()} icon={props => <Icons {...props} name="pencil-square" />}>{t('save_label')}</OrangeButton>
         </View>}

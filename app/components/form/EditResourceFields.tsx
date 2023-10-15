@@ -33,7 +33,6 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         <PicturesField images={values.images} 
             onImageSelected={img => {
                 try {
-                    // appContext.actions.setMessage(`blob size: ${img.blob?.size}, path : ${img.path}`)
                     editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)

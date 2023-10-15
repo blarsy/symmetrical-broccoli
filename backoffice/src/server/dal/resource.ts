@@ -16,8 +16,9 @@ export const create = async (accountId: number, title: string, description: stri
     return resource
 }
 
-export const getSuggestions = async (token: string): Promise<Resource[]> => {
+export const getSuggestions = async (token: string, searchText: string): Promise<Resource[]> => {
     const account = await getAccount(token, ['Id', 'comptes_liés', 'images', 'nom'])
-    const resourceRaw = await list('ressources', `(comptes,neq,${account.name})~and(expiration,gt,today)`, ['Id', 'titre', 'description', 'expiration', 'comptes', 'images', 'conditions'], undefined, ['expiration','titre'])
+    const filter = `(comptes,neq,${account.name})~and(expiration,gt,today)${searchText && `~and((titre,like,%${searchText}%)~or(description,like,%${searchText}%))`}`
+    const resourceRaw = await list('ressources', filter, ['Id', 'titre', 'description', 'expiration', 'comptes', 'images', 'conditions'], undefined, ['expiration','titre'])
     return resourceRaw.map(raw => fromRawResource(raw))
 }

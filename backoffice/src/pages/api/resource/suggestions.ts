@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
         try {
-            const resources = await getSuggestions(getToken(req))
+            const resources = await getSuggestions(getToken(req), req.query.search as string)
             respondWithSuccess(res, resources)
         } catch(e: any) {
             respondWithFailure(req, res, e)

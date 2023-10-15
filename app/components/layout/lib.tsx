@@ -34,19 +34,20 @@ export const OrangeTextInput = (props: TextInputProps) => <TextInput
         marginTop: 10,
     }, props.style)}/>
 
-export const TransparentTextInput = (props: TextInputProps) => <TextInput 
-    {...props}
-    placeholderTextColor="#222" mode="flat" textColor="#000" underlineColor="#222"
-    activeUnderlineColor="#222" selectionColor="transparent"
-    theme={{ colors: { onSurfaceVariant: '#222'} }}
-    contentStyle={{
-        color: '#000',
-        fontSize: 16
-    }} style={Object.assign({
-        backgroundColor: 'transparent',
-        marginTop: 10,
-    }, props.style)}/>
-
+export const TransparentTextInput = (props: TextInputProps) => {
+    return <TextInput 
+        {...props}
+        placeholderTextColor="#222" mode="flat" textColor="#000" underlineColor="#222"
+        activeUnderlineColor="#222" selectionColor="transparent"
+        theme={{ colors: { onSurfaceVariant: '#222'} }}
+        contentStyle={{
+            color: '#000',
+            fontSize: 16
+        }} style={Object.assign({
+            backgroundColor: 'transparent',
+            marginTop: 10,
+        }, props.style)}/>
+}
 
 const lang = getLocales()[0].languageCode
 

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react"
+import React, { useState } from "react"
 import { Appbar, BottomNavigation } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
@@ -20,7 +20,6 @@ import RequestsSent from "../RequestsSent"
 import EditCondition from "../form/EditCondition"
 import ViewResource from "../ViewResource"
 import EditResourceContextProvider from "../EditResourceContextProvider"
-import { SvgProps } from "react-native-svg"
 
 const StackNav = createNativeStackNavigator()
 
@@ -75,7 +74,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                         barStyle={{ backgroundColor: lightPrimaryColor }} 
                         renderScene={
                             BottomNavigation.SceneMap({
-                                search: Search,
+                                search: () => <Search {...props} />,
                                 history: History,
                                 resource: () => <Resources {...props} />,
                                 chat: Chat,
