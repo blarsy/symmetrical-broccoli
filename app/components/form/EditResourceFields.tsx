@@ -33,13 +33,13 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         <PicturesField images={values.images} 
             onImageSelected={img => {
                 try {
-                    editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)
+                    editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
                     appContext.actions.notify(e)
                 }
             }}
-            onImageDeleteRequested={img => editResourceContext.actions.deleteImage(appContext.state.token!.data!, editResourceContext.state.resource.id, img)} />
+            onImageDeleteRequested={img => editResourceContext.actions.deleteImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)} />
         <TransparentTextInput label={t('title_label')} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
         <ErrorMessage component={ErrorText} name="title" />
@@ -61,7 +61,7 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         </Surface>
         <OrangeButton style={{ marginTop: 20 }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
             loading={processing}>
-            {(editResourceContext.state.resource.id) ? t('save_label') : t('create_label')}
+            {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')}
         </OrangeButton>
     </>
 }

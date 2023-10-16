@@ -1,12 +1,15 @@
 import { createContext, useState } from "react"
 import { Condition, Image, Resource } from "@/lib/schema"
 import React from "react"
-import { createResource, removeImageFromResource, updateResource, uploadImagesOnResource } from "@/lib/api"
+import { createResource, getResources, removeImageFromResource, updateResource, uploadImagesOnResource } from "@/lib/api"
+import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import { t } from "@/i18n"
 
 interface EditResourceState {
-    resource: Resource
+    editedResource: Resource
     changeCallback: () => void
     imagesToAdd: NewOrExistingImage[]
+    resources: DataLoadState<Resource[]>
 }
 
 export interface NewOrExistingImage extends Image{
@@ -14,7 +17,8 @@ export interface NewOrExistingImage extends Image{
 }
 
 interface EditResourceActions {
-    setResource: (resource: Resource) => void,
+    load: (token: string) => void
+    setResource: (resource: Resource) => void
     setCondition: (condition: Condition) => void
     deleteCondition: (condition: Condition) => void
     setChangeCallback: (cb: () => void) => void
@@ -35,11 +39,13 @@ interface Props {
 
 export const EditResourceContext = createContext<EditResourceContext>({
     state: { 
-        resource: { id: 0, conditions: [], description: '', title: '', images: [] }, 
+        editedResource: { id: 0, conditions: [], description: '', title: '', images: [] }, 
         changeCallback: () => {},
-        imagesToAdd: []
+        imagesToAdd: [],
+        resources: initial(true)
     } as EditResourceState, 
     actions: {
+        load: () => {},
         setResource: () => {},
         setCondition: () => {},
         deleteCondition: () => {},
@@ -52,32 +58,46 @@ export const EditResourceContext = createContext<EditResourceContext>({
 })
 
 const EditResourceContextProvider = ({ children }: Props) => {
-    const [editResourceState, setEditResourceState] = useState({ resource: { id: 0, conditions: [], description: '', title: '', images: [] } as Resource, changeCallback: () => {} } as EditResourceState)
+    const [editResourceState, setEditResourceState] = useState({ editedResource: { id: 0, conditions: [], description: '', title: '', images: [] } as Resource, changeCallback: () => {} } as EditResourceState)
     
     const setResource = (resource: Resource) => {
         if(typeof(resource.expiration) === 'string')
             resource.expiration = new Date(resource.expiration as unknown as string)
         
-        const newResourceState = {...editResourceState, ...{ resource }}
+        const newResourceState = {...editResourceState, ...{ editedResource: resource }}
         setEditResourceState( newResourceState )
         editResourceState.changeCallback()
     }
+
+    const loadResources = async (token: string) => {
+        setEditResourceState( {...editResourceState, resources: beginOperation() })
+        try {
+            const resources = await getResources(token)
+            setEditResourceState( {...editResourceState, resources: fromData(resources) })
+        } catch(e) {
+            setEditResourceState( {...editResourceState, resources: fromError(e, t('requestError')) })
+        }
+    }
+
     const actions: EditResourceActions = {
         setResource,
+        load: (token: string) => {
+            loadResources(token)
+        },
         setCondition: condition => {
-            const targetCondition = condition.id ? editResourceState.resource.conditions.find(cond => cond.id === condition.id ) : undefined
+            const targetCondition = condition.id ? editResourceState.editedResource.conditions.find(cond => cond.id === condition.id ) : undefined
             if(targetCondition) {
                 targetCondition.description = condition.description
                 targetCondition.title = condition.title
                 setEditResourceState({ ...editResourceState })
             } else {
-                setEditResourceState({ ...editResourceState, ...{ resource: { ...editResourceState.resource, ...{ conditions: [ ...editResourceState.resource.conditions, condition ] } } } })
-                editResourceState.resource.conditions.push(condition)
+                setEditResourceState({ ...editResourceState, ...{ editedResource: { ...editResourceState.editedResource, ...{ conditions: [ ...editResourceState.editedResource.conditions, condition ] } } } })
+                editResourceState.editedResource.conditions.push(condition)
             }
             editResourceState.changeCallback()
         },
         deleteCondition: condition => {
-            const resource = editResourceState.resource
+            const resource = editResourceState.editedResource
             if(condition.id) {
                 resource.conditions = resource.conditions.filter(cond => condition.id != cond.id)
             } else {
@@ -89,11 +109,11 @@ const EditResourceContextProvider = ({ children }: Props) => {
         setChangeCallback: changeCallback => setEditResourceState({ ...editResourceState, ...{ changeCallback } }),
         addImage: async (token: string, resourceId: number, img: NewOrExistingImage) => {
             if(img.blob){
-                if(editResourceState.resource.id){
+                if(editResourceState.editedResource.id){
                     const resource = await uploadImagesOnResource(token, resourceId, [img])
                     setResource(resource)
                 } else {
-                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], resource: { ...editResourceState.resource, ...{ images: [ ...editResourceState.resource.images, img] } } }})
+                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...editResourceState.editedResource, ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
                     editResourceState.changeCallback()
                 }
             } else {
@@ -101,7 +121,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
         },
         deleteImage: async (token: string, resourceId: number, img: NewOrExistingImage) => {
-            if(editResourceState.resource.id){
+            if(editResourceState.editedResource.id){
                 const resource = await removeImageFromResource(token, resourceId, img.path)
                 setResource(resource)
             } else {
@@ -110,20 +130,21 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
         },
         save: async (token: string, resource: Resource) => {
-            if(editResourceState.resource.id) {
+            if(editResourceState.editedResource.id) {
                 const newResource = await updateResource(token, resource)
                 setResource(newResource)
             } else {
                 const newResource = await createResource(token, resource)
                 if(editResourceState.imagesToAdd.length > 0) {
                     const newResourceWithImage = await uploadImagesOnResource(token, newResource.id, editResourceState.imagesToAdd)
-                    setEditResourceState({ imagesToAdd: [], changeCallback: editResourceState.changeCallback, resource: newResourceWithImage })
+                    setEditResourceState({ imagesToAdd: [], changeCallback: editResourceState.changeCallback, editedResource: newResourceWithImage, resources: editResourceState.resources })
                     editResourceState.changeCallback()
                 }
             }
+            loadResources(token)
         },
         reset: () => {
-            const newResourceState = {...editResourceState, ...{ resource: { id: 0, title: '', description: '', images: [], conditions: [] }, imagesToAdd: [] }}
+            const newResourceState = {...editResourceState, ...{ editedResource: { id: 0, title: '', description: '', images: [], conditions: [] }, imagesToAdd: [] }}
             setEditResourceState( newResourceState )
         }
     }

@@ -22,7 +22,7 @@ export default ({ route, navigation }:RouteProps) => {
         }
     }, [])
 
-    return <Formik enableReinitialize initialValues={editResourceContext.state.resource} validationSchema={yup.object().shape({
+    return <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
         title: yup.string().max(50).required(t('field_required')),
         description: yup.string(),
         expiration: yup.date().required(t('field_required'))
@@ -32,13 +32,7 @@ export default ({ route, navigation }:RouteProps) => {
             await editResourceContext.actions.save(appContext.state.token.data!, values)
             setSaveResourcestate(fromData(null))
 
-            navigation.navigate({
-                name: 'resourcesMain',
-                params: {
-                    hasChanged: true
-                },
-                merge: true
-            })
+            navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
             appContext.actions.setMessage(e)

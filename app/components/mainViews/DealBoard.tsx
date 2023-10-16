@@ -84,8 +84,6 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                         activeColor={primaryColor}
                         navigationState={{ index: tabIndex, routes: bottomRoutes }} />}
                 </StackNav.Screen>
-                <StackNav.Screen name="resourcesMain" key="resourcesMain"
-                    component={Resources} />
                 <StackNav.Screen name="newResource" key="newResource"
                     component={EditResource} initialParams={{isNew: true}}/>
                 <StackNav.Screen name="viewResource" key="viewResource"
