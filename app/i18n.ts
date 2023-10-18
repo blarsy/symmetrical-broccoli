@@ -74,7 +74,8 @@ const resources = {
       "condition_title_label": "Title",
       "condition_description_label": "Description",
       "addCondition_title": "Create condition",
-      "conditions_label": "Conditions"
+      "conditions_label": "Conditions",
+      "resourceCategories_label": "Categories"
     }
   },
   fr: {
@@ -146,7 +147,8 @@ const resources = {
       "condition_title_label": "Titre",
       "condition_description_label": "Description",
       "addCondition_title": "Créer condition",
-      "conditions_label": "Conditions"
+      "conditions_label": "Conditions",
+      "resourceCategories_label": "Catégories"
     }
   }
 }

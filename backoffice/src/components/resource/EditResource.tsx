@@ -7,12 +7,13 @@ import * as yup from 'yup'
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../Feedback"
 import dayjs, { Dayjs } from "dayjs"
-import { Condition, Image, Resource } from "@/schema"
+import { Category, Condition, Image, Resource } from "@/schema"
 import ResourceImages from "./ResourceImages"
 import { fromData, fromError, initial } from "@/DataLoadState"
 import { ResourceImage } from "./ResourceImage"
 import CreateIcon from '@mui/icons-material/Create'
 import DeleteIcon from '@mui/icons-material/Delete'
+import CategoriesSelect from "./CategoriesSelect"
 
 interface Props {
     data: Resource,
@@ -30,7 +31,8 @@ interface Props {
 
 interface FormValues {
     title: string, description: string, 
-    expiration: dayjs.Dayjs, images: Image[], conditions: Condition[]
+    expiration: dayjs.Dayjs, images: Image[], conditions: Condition[],
+    categories: Category[]
 }
 
 const isTouched = (touched: FormikTouched<FormValues>, idx: number, propName: string):boolean => {
@@ -48,7 +50,8 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
     
     const minExpiration = dayjs(new Date(Date.now() + 60 * 60 * 1000))
     return <Formik initialValues={{ title: data.title, description: data.description, 
-        expiration: dayjs(data.expiration), images: data.images, conditions: data.conditions} as FormValues}
+        expiration: dayjs(data.expiration), images: data.images, conditions: data.conditions,
+        categories: data.categories} as FormValues}
         onSubmit={async (values, { setSubmitting }) => {
             try {
                 await onSubmit(values, images)
@@ -106,21 +109,23 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
                     <ResourceImages justifySelf="stretch" images={images} setImages={setImages} 
                         existingImages={data.images} onImageSelected={onImageSelected} 
                         onRequestImageDelete={onRequestImageDelete || (async () => {})}/>
+                    <CategoriesSelect onChange={(categories: Category[]) => setFieldValue('categories', categories)} value={values.categories} />
                     <Typography variant="body1">Conditions</Typography>
                     <Box>
                         <FieldArray name="conditions" 
                             render={arrayHelpers => <Box display="flex" flexDirection="column" gap="0.5rem">
-                                {values.conditions.map((condition, idx) => <Box key={idx} display="flex" flexDirection="row">
-                                    <TextField sx={{ flex: '1 0 30%' }} id="title" size="small" name={`conditions[${idx}].title`} multiline
-                                        label="Titre" type="text" variant="standard" value={condition.title} 
-                                        onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'title')} 
-                                        helperText={errorMessage(touched, idx, errors, 'title')}/>
-                                    <TextField sx={{ flex: '1 0 70%' }} id="description" size="small" name={`conditions[${idx}].description`} multiline
-                                        label="Description" type="text" variant="standard" value={condition.description} 
-                                        onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'description')} 
-                                        helperText={errorMessage(touched, idx, errors, 'description')}/>
-                                    <IconButton onClick={() => arrayHelpers.remove(idx)}><DeleteIcon /></IconButton>
-                                </Box>)}
+                                {values.conditions.map((condition: Condition, idx) => <Box key={idx} display="flex" flexDirection="row">
+                                        <TextField sx={{ flex: '1 0 30%' }} id="title" size="small" name={`conditions[${idx}].title`} multiline
+                                            label="Titre" type="text" variant="standard" value={condition.title} 
+                                            onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'title')} 
+                                            helperText={errorMessage(touched, idx, errors, 'title')}/>
+                                        <TextField sx={{ flex: '1 0 70%' }} id="description" size="small" name={`conditions[${idx}].description`} multiline
+                                            label="Description" type="text" variant="standard" value={condition.description} 
+                                            onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'description')} 
+                                            helperText={errorMessage(touched, idx, errors, 'description')}/>
+                                        <IconButton onClick={() => arrayHelpers.remove(idx)}><DeleteIcon /></IconButton>
+                                    </Box>
+                                )}
                                 <Button sx={{ alignSelf: 'flex-start' }} variant="outlined" startIcon={<CreateIcon />} onClick={() => arrayHelpers.push({})}>Ajouter</Button>
                             </Box>} />
                     </Box>

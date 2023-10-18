@@ -1,11 +1,10 @@
 import { fromData, fromError, initial } from "@/DataLoadState"
 import { Resource } from "@/schema"
-import { Box, Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import LoadingList from "../LoadingList"
-import Image from "next/image"
-import dayjs from "dayjs"
+import ResourceCard from "./ResourceCard"
 
 const imagePublicBaseUrl = process.env.NEXT_PUBLIC_IMG_URL
 
@@ -26,19 +25,7 @@ const Suggestions = () => {
     return <Box display="display" flexDirection="column">
         <Typography variant="h2">Suggestions</Typography>
         <LoadingList loadState={suggestedResourcesState} onErrorClosed={() => setSuggestedResourcesState(initial<Resource[]>(false))}
-            displayItem={(resource: Resource) => (<Box display="flex" flexDirection="row" gap="1rem" alignItems="center">
-                { resource.images && resource.images.length > 0 ? 
-                    <Image width="100" height="100" src={`${imagePublicBaseUrl}/${resource.images[0].path}`} alt={resource.title} /> :
-                    <Image width="100" height="100" src="/placeholder.png" alt="pas d'image" />
-                }
-                <Tooltip title={resource.description}>
-                    <Stack>
-                        <Typography variant="body1">Proposé par {resource.account!.name}</Typography>
-                        <Typography variant="overline">{resource.title}</Typography>
-                        <Typography variant="body1">Expire {dayjs(resource.expiration).fromNow()} ({dayjs(resource.expiration).format('DD/MM/YYYY HH:mm')})</Typography>
-                    </ Stack>
-                </Tooltip>
-            </Box>)} />
+            displayItem={(resource: Resource) => (<ResourceCard resource={resource} onClick={() => {}} />)} />
     </Box>
 }
 

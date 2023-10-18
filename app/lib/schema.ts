@@ -23,6 +23,11 @@ export interface Condition {
     id?: number
 }
 
+export interface Category {
+    id: number,
+    name: string
+}
+
 export interface Resource {
     id: number,
     images: Image[],
@@ -30,7 +35,8 @@ export interface Resource {
     title: string,
     description: string,
     expiration?: Date,
-    account?: Account
+    account?: Account,
+    categories: Category[]
 }
 
 export interface AccountLinkRequest {
@@ -60,7 +66,8 @@ export const fromRawResource = (raw: any): Resource => ({
     expiration: raw.expiration,
     images: raw.images,
     conditions: raw.conditions ? conditionsFromRaw(raw.conditions): [],
-    account: raw.comptes ? fromRawAccount(raw.comptes): undefined
+    account: raw.comptes ? fromRawAccount(raw.comptes): undefined,
+    categories: raw.categories ? resourceCategoriesFromRaw(raw.categories): []
 })
 
 export const conditionsFromRaw = (raws: any[]): Condition[] => {
@@ -68,6 +75,13 @@ export const conditionsFromRaw = (raws: any[]): Condition[] => {
         id: raw.Id as number,
         title: raw.titre as string,
         description: raw.description as string
+    }))
+}
+
+export const resourceCategoriesFromRaw = (raws: any[]): Category[] => {
+    return raws.map((raw: any) => ({
+        id: raw.Id as number,
+        name: raw.nom as string
     }))
 }
 

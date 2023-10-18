@@ -18,7 +18,6 @@ export const queryAccount = async (query: string, fields?: string[], otherParams
     const account = await getOne('comptes', query, fields || ['Id', 'nom', 'email', 'balance', 'ressources'], otherParams)
 
     if(!account) throw new Error(`No account found with query ${query}.`)
-    //console.log('account', account, 'formatted', fromRawAccount(account))
     return fromRawAccount(account)
 }
 
@@ -38,7 +37,7 @@ export const createToken = async (secret: string, data: any): Promise<string> =>
 }
 
 export const getResource = async(resourceId: number): Promise<Resource> => {
-    const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration'])
+    const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration', 'categories'])
     const conditions = await getChildItems('conditions', resource.Id, 'ressources')
     resource.conditions = conditions
     return fromRawResource(resource)

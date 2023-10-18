@@ -1,5 +1,5 @@
 import { NewOrExistingImage } from '@/components/EditResourceContextProvider'
-import { Account, Image, Network, Resource } from './schema'
+import { Account, Category, Image, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 import { Platform } from 'react-native'
 let loggedOutHandler: () => void
@@ -116,6 +116,15 @@ export const getResources = async (token: string): Promise<Resource[]> => {
     }
 }
 
+export const getResourceCategories = async () => {
+    const res = await apiCall(`${apiUrl}resource/categories`, { method: 'GET', mode: 'cors' })
+    if(res.status === 200) {
+        return (await res.json()) as Category[]
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
 const resourceFromApi = (rawResource: Resource) => {
     if(typeof rawResource.images === 'string') {
         rawResource.images = JSON.parse(rawResource.images)
@@ -140,7 +149,8 @@ export const createResource = async (token: string, resource: Resource): Promise
 
 export const updateResource = async (token: string, resource: Resource): Promise<Resource> => {
     const res = await apiCall(`${apiUrl}resource/${resource.id}`, { method: 'POST', body: JSON.stringify(resource), mode: 'cors', headers: {
-        'Authorization': token
+        'Authorization': token,
+        'Content-Type': 'application/json'
     }})
     if(res.status === 200) {
         return resourceFromApi(await res.json())

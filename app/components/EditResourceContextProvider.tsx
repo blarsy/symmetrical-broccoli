@@ -39,7 +39,7 @@ interface Props {
 
 export const EditResourceContext = createContext<EditResourceContext>({
     state: { 
-        editedResource: { id: 0, conditions: [], description: '', title: '', images: [] }, 
+        editedResource: { id: 0, conditions: [], description: '', title: '', images: [], categories: [] }, 
         changeCallback: () => {},
         imagesToAdd: [],
         resources: initial(true)
@@ -58,7 +58,7 @@ export const EditResourceContext = createContext<EditResourceContext>({
 })
 
 const EditResourceContextProvider = ({ children }: Props) => {
-    const [editResourceState, setEditResourceState] = useState({ editedResource: { id: 0, conditions: [], description: '', title: '', images: [] } as Resource, changeCallback: () => {} } as EditResourceState)
+    const [editResourceState, setEditResourceState] = useState({ editedResource: { id: 0, conditions: [], description: '', title: '', images: [], categories: [] } as Resource, changeCallback: () => {} } as EditResourceState)
     
     const setResource = (resource: Resource) => {
         if(typeof(resource.expiration) === 'string')
@@ -144,7 +144,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             loadResources(token)
         },
         reset: () => {
-            const newResourceState = {...editResourceState, ...{ editedResource: { id: 0, title: '', description: '', images: [], conditions: [] }, imagesToAdd: [] }}
+            const newResourceState = {...editResourceState, ...{ editedResource: { id: 0, title: '', description: '', images: [], conditions: [], categories: [] }, imagesToAdd: [] }}
             setEditResourceState( newResourceState )
         }
     }

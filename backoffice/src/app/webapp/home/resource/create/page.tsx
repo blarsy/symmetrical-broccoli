@@ -17,7 +17,7 @@ const Create = () => {
             <Box>
                 <EditResource data={{ id: 0, title: '', description: '', 
                     expiration: new Date(Date.now().valueOf() + 2 * 24 * 60 * 60 * 1000),
-                    images: [], conditions: [] }} onSubmit={async (values, images) => {
+                    images: [], conditions: [], categories: [] }} onSubmit={async (values, images) => {
                         try {
                             const res = await axios.post('/api/resource', { 
                                 title: values.title, description: values.description, 

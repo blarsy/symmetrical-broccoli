@@ -1,7 +1,7 @@
 import { getAccount, getResource } from "@/server/apiutil"
-import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, update } from "@/server/noco"
+import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, unlink, update } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
-import { conditionsToRaw } from "@/schema"
+import { Category, conditionsToRaw } from "@/schema"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -26,34 +26,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const { id } = req.query
             const resourceId = Number(id)
             const account = await getAccount(getToken(req))
-            const { title, description, expiration, conditions } = JSON.parse(req.body)
+
+            const { title, description, expiration, conditions, categories } = req.body
     
             if(!account.resources || !account.resources.some(res => res.id === resourceId)) {
                 respondWithFailure(req, res, 'Resource not found', 404)
                 return
             }
-            const currentData = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'expiration', 'images', 'conditions'])
-            const currentConditions = await getChildItems('conditions', resourceId, `ressources` )
+            const promisesToAwait: Promise<any>[] = []
+            const currentDataPromise = getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'expiration', 'images', 'conditions', 'categories'])
+            const currentConditionsPromise = getChildItems('conditions', resourceId, `ressources` )
 
             const conditionsToAdd = conditionsToRaw(conditions.filter((condition: any) => !condition.id))
+            if(conditionsToAdd.length > 0){
+                promisesToAwait.push(bulkCreate('conditions', conditionsToAdd).then((addedConditions: any[]) => Promise.all(addedConditions.map((condition: any) => link('ressources', resourceId, 'conditions', condition.id)))))
+            }
+            
+            const currentConditions = await currentConditionsPromise
             const conditionsToDelete = currentConditions.filter((condition: any) => !conditions.some((newCondition: any) => newCondition.id === condition.Id))
             const conditionsToUpdate = conditionsToRaw(conditions.filter((condition: any) => 
                 currentConditions.some((existingCondition: any) => 
                     existingCondition.Id === condition.id && (existingCondition.titre !== condition.title || existingCondition.description !== condition.description))))
-    
-     
-            const addedConditions = conditionsToAdd.length > 0 ? await bulkCreate('conditions', conditionsToAdd) : []
-            if(conditionsToDelete.length > 0) {
-                await bulkDelete('conditions', conditionsToDelete.map(condition => ({ id: condition.Id })))
-            }
-            await bulkUpdate('conditions', conditionsToUpdate)
-    
-            const input = { Id: resourceId, titre: title , description, expiration, images: currentData.images }
-    
-            if(addedConditions) {
-                await Promise.all(addedConditions.map((condition: any) => link('ressources', resourceId, 'conditions', condition.id)))
-            }
             
+            if(conditionsToDelete.length > 0) {
+                promisesToAwait.push(bulkDelete('conditions', conditionsToDelete.map(condition => ({ id: condition.Id }))))
+            }
+            promisesToAwait.push(bulkUpdate('conditions', conditionsToUpdate))
+    
+            const currentData = await currentDataPromise
+            promisesToAwait.push(Promise.all(categories.filter((cat: Category) => !currentData.categories.some((existingCat: any) => existingCat.Id === cat.id ))
+                .map((cat: Category) => link('ressources', resourceId, 'categories', cat.id.toString()))))
+            promisesToAwait.push(Promise.all(currentData.categories.filter((existingCat: any) => !categories.some((cat: Category) => cat.id === existingCat.Id))
+                .map((cat: any) => unlink('ressources', resourceId, 'categories', cat.Id.toString()))))
+            
+            const input = { Id: resourceId, titre: title , description, expiration, images: currentData.images }
+
+            await promisesToAwait
             const resource = await update('ressources', resourceId, input)
 
             respondWithSuccess(res, await getResource(resource.Id))

@@ -4,6 +4,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import LoadingList from "../LoadingList"
 import { Resource } from "@/schema"
+import ResourceCard from "./ResourceCard"
 
 interface Props {
     onEditRequested: (res: Resource) => void
@@ -24,10 +25,7 @@ const ResourcesList = ({ onEditRequested }: Props) => {
     }, [])
 
     return <LoadingList<Resource> loadState={resources} onErrorClosed={() => setResources(initial<Resource[]>())}
-        displayItem={(item: Resource) => <Card onClick={() => onEditRequested(item)} key={item.id}
-            sx={{ display: 'flex', flexDirection: 'row', padding: '0.5rem', cursor: 'pointer' }}>
-            <Typography variant="body1">{item.title}</Typography>
-        </Card>} />
+        displayItem={(item: Resource) => <ResourceCard resource={item} onClick={() => onEditRequested(item)} />} />
 }
 
 export default ResourcesList

@@ -1,6 +1,6 @@
 import { RouteProps } from "@/lib/utils"
 import React from "react"
-import { Text } from "react-native-paper"
+import { Chip, Text } from "react-native-paper"
 import { imgUrl } from "@/lib/settings"
 import { Resource } from "@/lib/schema"
 import { t } from "@/i18n"
@@ -64,6 +64,11 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <Text>{expirationText}</Text>
             </ResourceViewField>
         </View>}
+        { resource.categories && resource.categories.length > 0 && 
+            <View style={{ flexDirection: "row", gap: 10, flexWrap: 'wrap' }}>
+                { resource.categories.map((cat, idx) => <Chip icon="label" key={idx}>{cat.name}</Chip>) }
+            </View>
+        }
         { resource.conditions && resource.conditions.length > 0 && <View>
             <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
                 <View style={{ flexDirection: 'column' }}>

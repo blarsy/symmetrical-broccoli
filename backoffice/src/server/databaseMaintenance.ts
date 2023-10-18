@@ -6,6 +6,8 @@ import { getOne, list, update } from "./noco"
 
 const systemTableName = 'systeme'
 const accountsTableName = 'comptes'
+const resourceCategoriesTableName = 'categories'
+const resourceTableName = 'ressources'
 
 const testPwd1 = process.env.TEST_PWD_1 as string
 const testPwd2 = process.env.TEST_PWD_2 as string
@@ -41,7 +43,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
         ...systemCols
 
     ] })
-    const resourcesTable = await apiInNewProject.dbTable.create(projectId, { table_name: 'ressources', title: 'ressources', columns: [
+    const resourcesTable = await apiInNewProject.dbTable.create(projectId, { table_name: resourceTableName, title: resourceTableName, columns: [
         { column_name: 'titre', title: 'titre', uidt: 'SingleLineText', pv: true },
         { column_name: 'description', title: 'description', uidt: 'LongText'},
         { column_name: 'expiration', title: 'expiration', uidt: 'DateTime'},
@@ -60,7 +62,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
         ...systemCols
     ]  })
     await apiInNewProject.dbTableColumn.create(accountsTable.id!, {
-        childId: resourcesTable.id!, parentId: accountsTable.id!, title: 'ressources',
+        childId: resourcesTable.id!, parentId: accountsTable.id!, title: resourceTableName,
         type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
     } as LinkToAnotherColumnReqType)
     await apiInNewProject.dbTableColumn.create(accountsTable.id!, {
@@ -69,6 +71,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
     } as LinkToAnotherColumnReqType)
     await migrateToV1_0_0(apiInNewProject, projectId, orgs, projectName)
     await migrateToV1_0_1(apiInNewProject, projectId)
+    await migrateToV1_0_2(apiInNewProject, projectId, orgs, projectName)
 }
 
 const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string): Promise<void> => {
@@ -93,6 +96,55 @@ const migrateToV1_0_1 = async (api: Api<unknown>, projectId: string) => {
 
     await update(systemTableName, 1, { version: '1.0.1' })
 }
+
+const migrateToV1_0_2 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string) => {
+    const categoriesTbl = await api.dbTable.create(projectId, { table_name: resourceCategoriesTableName, title: resourceCategoriesTableName, columns: [
+        ...systemCols,
+        { column_name: 'nom', title: 'nom', uidt: 'SingleLineText', pv: true }
+    ] })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Meubles' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Vaisselle & ustensiles de cuisine' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Décoration de la maison' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Entretien de la maison' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Petit électroménager' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Gros électroménager' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Machines & équipements' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Mobilier de jardin' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Petit outillage & accessoires' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Plantes & jardin' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Vêtements' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Accessoires de mode' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Chaussures' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Produits & accessoires d\'hygiène' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Maquillage' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Informatique' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'TV, Hi-Fi, téléphonie' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Câbles, coques & accessoires' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Livres, films & musique' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Jeux & jouets' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Jeux vidéo' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Matériels & équipements sportifs' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Autres accessoires de sport' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Papeterie & fourniture de bureau' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Loisirs créatifs' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Vêtements bébé' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Jouets pour bébé' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Équipement de puériculture' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Petits accessoires & consommables' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Nourriture pour animaux' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Accessoires pour animaux' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Objets' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Nourriture' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Autre' })
+
+    const tables = await api.dbTable.list(projectId)
+
+    const ressourcesTblId = tables.list.find(table => table.title === resourceTableName)!.id!
+    await api.dbTableColumn.create(ressourcesTblId, {
+        childId: categoriesTbl.id!, parentId: ressourcesTblId, title: resourceCategoriesTableName,
+        type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+}
  
 const insertTestData  = async () => {
     if(process.env.NODE_ENV === 'development') {
@@ -102,12 +154,12 @@ const insertTestData  = async () => {
             create('Collectif Garage', 'info@garage.be', 'password')
         ])
         await Promise.all([
-            createResource(accounts[0].id, 'Matelas 2 personnes', 'Double emploi', new Date(new Date().valueOf() + (10 * 24 * 60 * 60 * 1000)), []),
+            createResource(accounts[0].id, 'Matelas 2 personnes', 'Double emploi', new Date(new Date().valueOf() + (10 * 24 * 60 * 60 * 1000)), [], []),
             createResource(accounts[0].id, 'Pigments peinture argile', 'Restes de mes travaux. Jaune, bleu, vert.', new Date(new Date().valueOf() + (8 * 24 * 60 * 60 * 1000)), [
                 { title: 'Retrait sur place', description: 'Pas de livraison' },
                 { title: 'Prix fixe', description: 'Pas de négociations, on ne répondra pas aux offres plus basses que le prix demandé.'}
-            ]),
-            createResource(accounts[1].id, 'Bois de chauffe', 'Une stère de bois mélangé bouleau, peuplier et érable.', new Date(new Date().valueOf() + (5 * 24 * 60 * 60 * 1000)), []),
+            ], []),
+            createResource(accounts[1].id, 'Bois de chauffe', 'Une stère de bois mélangé bouleau, peuplier et érable.', new Date(new Date().valueOf() + (5 * 24 * 60 * 60 * 1000)), [], []),
             invite(accounts[0].email, accounts[1].id.toString())
         ])
         return Promise.all([
@@ -131,12 +183,16 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
     if(!tables.list.some((table) => table.title === systemTableName)) {
         await migrateToV1_0_0(api, projectId, orgs, projectName)
         await migrateToV1_0_1(api, projectId)
-        return 'Migrated to 1.0.1'
+        await migrateToV1_0_2(api, projectId, orgs, projectName)
+        return 'Migrated to 1.0.2'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
         if(systemRow.version === '1.0.0') {
             await migrateToV1_0_1(api, projectId)
             return 'Migrated to 1.0.1'
+        } else if(systemRow.version === '1.0.1') {
+            await migrateToV1_0_2(api, projectId, orgs, projectName)
+            return 'Migrated to 1.0.2'
         } else {
             return 'Db already up to date'
         }

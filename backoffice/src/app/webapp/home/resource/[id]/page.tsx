@@ -8,12 +8,13 @@ import { CircularProgress } from "@mui/material"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import EditIcon from '@mui/icons-material/Edit'
+import ClientLayout from "@/components/ClientLayout"
 
 const ensureImagesInJSON = (resourceData: any):Resource => {
     if(typeof resourceData.images === 'string'){
         resourceData.images = JSON.parse(resourceData.images)
     }
-    return fromRawResource(resourceData)
+    return resourceData
 }
 
 const ResourcePage = ({ params }: { params: { id: string } }) => {
@@ -57,10 +58,11 @@ const ResourcePage = ({ params }: { params: { id: string } }) => {
             }}/>
     }
 
-    return <LoggedInLayout title="Modifier une ressource">
-        { content }
-    </LoggedInLayout>
-
+    return <ClientLayout>
+        <LoggedInLayout title="Modifier une ressource">
+            { content }
+        </LoggedInLayout>
+    </ClientLayout>
 }
 
 export default ResourcePage

@@ -6,10 +6,11 @@ import { List, IconButton, Text, Surface } from "react-native-paper"
 import AppendableList from "../AppendableList"
 import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton } from "../layout/lib"
 import PicturesField from "./PicturesField"
-import { Condition, Resource } from "@/lib/schema"
+import { Category, Condition, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { AppContext } from "../AppContextProvider"
+import CategoriesSelect from "./CategoriesSelect"
 
 const limitWithEllipsis = (text: string, amountChars: number) => text.length > amountChars ?`${text.substring(0, amountChars)}...` : text
 
@@ -48,6 +49,9 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         <ErrorMessage component={ErrorText} name="description" />
         <DateTimePickerField textColor="#000" value={values.expiration} onChange={d =>  setFieldValue('expiration', d)} label={t('expiration_label')} />
         <ErrorMessage component={ErrorText} name="expiration" />
+        <CategoriesSelect value={values.categories} onChange={(categories: Category[]) => {
+            setFieldValue('categories', categories)
+        }} />
         <Surface style={{ marginTop: 8 }}>
             <Text style={{ fontSize: 16, marginLeft: 16, marginTop: 16 }}>{t('conditions_label')}</Text>
             <AppendableList state={values.conditions} onAddRequested={onConditionAddRequested} 

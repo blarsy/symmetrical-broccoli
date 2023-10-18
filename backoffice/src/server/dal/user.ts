@@ -4,7 +4,7 @@ import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'
 import { isValidPassword } from "@/utils"
-import { sendAccountRecoveryMail, sendMail } from "../mailing"
+import { sendAccountRecoveryMail } from "../mailing"
 
 const INITIAL_BALANCE = 5
 const ACCOUNT_RECOVERY_DELAY_MINUTES = Number(process.env.ACCOUNT_RECOVERY_DELAY_MINUTES!)
