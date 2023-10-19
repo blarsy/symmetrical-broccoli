@@ -32,12 +32,12 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
 
     return <>
         <PicturesField images={values.images} 
-            onImageSelected={img => {
+            onImageSelected={async img => {
                 try {
-                    editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
+                    await editResourceContext.actions.addImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
-                    appContext.actions.notify(e)
+                    appContext.actions.notify(t('requestError'))
                 }
             }}
             onImageDeleteRequested={img => editResourceContext.actions.deleteImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)} />
