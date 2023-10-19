@@ -65,9 +65,11 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             </ResourceViewField>
         </View>}
         { resource.categories && resource.categories.length > 0 && 
-            <View style={{ flexDirection: "row", gap: 10, flexWrap: 'wrap' }}>
-                { resource.categories.map((cat, idx) => <Chip icon="label" key={idx}>{cat.name}</Chip>) }
-            </View>
+            <ResourceViewField title={t('resourceCategories_label')} titleOnOwnLine>
+                <View style={{ flexDirection: "row", gap: 10, flexWrap: 'wrap' }}>
+                    { resource.categories.map((cat, idx) => <Chip icon="label" key={idx}>{cat.name}</Chip>) }
+                </View>
+            </ResourceViewField>
         }
         { resource.conditions && resource.conditions.length > 0 && <View>
             <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
