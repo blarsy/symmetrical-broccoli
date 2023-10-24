@@ -62,7 +62,7 @@ export const fromRawResource = (raw: any): Resource => ({
     title: raw.titre,
     description: raw.description,
     expiration: raw.expiration,
-    images: raw.images,
+    images: typeof raw.images === 'string' ? JSON.parse(raw.images) : raw.images,
     conditions: raw.conditions ? conditionsFromRaw(raw.conditions): [],
     account: raw.comptes ? fromRawAccount(raw.comptes) : undefined,
     categories: raw.categories ? resourceCategoriesFromRaw(raw.categories) : []

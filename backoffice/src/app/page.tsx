@@ -1,7 +1,7 @@
 "use client"
 import { primaryColor } from "@/utils"
-import { Box, IconButton, Stack, Typography } from "@mui/material"
-import theme, { fonts } from '@/theme'
+import { Box, IconButton, Stack, Theme, Typography } from "@mui/material"
+import createTheme, { fonts } from '@/theme'
 import { ThemeProvider } from "@emotion/react"
 import FbLogo from './img/FACEBOOK.svg'
 import InstaLogo from './img/INSTAGRAM.svg'
@@ -23,8 +23,9 @@ import 'swiper/css/navigation'
 import { Swiper as SwiperType } from "swiper"
 import { Autoplay } from 'swiper/modules'
 import Link from "next/link"
+import useMediaQuery from '@mui/material/useMediaQuery'
 
-const PresentationCarousel = () => {
+const PresentationCarousel = ({ theme }: { theme: Theme }) => {
     const swiperRef = useRef<SwiperType>()
     const [swiperSlideState, setSwiperSlideState] = useState({ begin: true, end: false })
 
@@ -86,6 +87,9 @@ const PresentationCarousel = () => {
 }
 
 const Page = () => {
+    const dark = useMediaQuery('(prefers-color-scheme: dark)')
+    const theme = createTheme(dark)
+    
     return <ThemeProvider theme={theme}>
         <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Stack flexDirection="row" justifyContent="flex-end" padding="1rem 1rem 0 0" gap="1rem">
@@ -106,7 +110,7 @@ const Page = () => {
                 })} alignItems="center">
                     <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
                         sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
-                    <Typography textAlign="center" sx={{ 
+                    <Typography textAlign="center" color="#000" sx={{ 
                         padding: '3rem',
                         backgroundImage: `url('/FOND.svg')`,
                         backgroundRepeat: 'no-repeat',
@@ -127,12 +131,14 @@ const Page = () => {
                     <img src={smartphone.src} width="100%" style={{ maxWidth: '430px' }} alt="smartphone"/>
                 </Box>
             </Stack>
-            <PresentationCarousel />
+            <PresentationCarousel theme={theme} />
             <Stack alignItems="center" style={{ maxHeight: '274px' }}>
                 <ComingSoon alt="Bientôt disponible"/>
             </Stack>
         </Stack>
     </ThemeProvider>
 }
+
+    
 
 export default Page

@@ -1,8 +1,6 @@
 import { Category } from "@/schema"
-import theme from "@/theme"
 import { FormControl, InputLabel, Select, OutlinedInput, Chip, MenuItem } from "@mui/material"
 import { Box } from "@mui/system"
-import LoadingList from "../LoadingList"
 import { useEffect, useState } from "react"
 import { fromData, fromError, initial } from "@/DataLoadState"
 import axios from "axios"

@@ -25,7 +25,9 @@ const ResourcesList = ({ onEditRequested }: Props) => {
     }, [])
 
     return <LoadingList<Resource> loadState={resources} onErrorClosed={() => setResources(initial<Resource[]>())}
-        displayItem={(item: Resource) => <ResourceCard resource={item} onClick={() => onEditRequested(item)} />} />
+        displayItem={(item: Resource) => 
+            <ResourceCard resource={item} onClick={() => onEditRequested(item)} />}
+         />
 }
 
 export default ResourcesList

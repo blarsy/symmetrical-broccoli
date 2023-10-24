@@ -118,12 +118,10 @@ export const uploadResourceImage = async (attachmentPath: string, account: Accou
     })
 
     await Promise.all(promises)
-    console.log(formData)
 
     const uploadRes = await axios.post(`${nocoUrl}/api/v1/db/storage/upload?path=${logicalPath}`, 
       formData, { headers: { 'xc-token': nocoApiKey } })
 
-    console.log('uploadRes', uploadRes)
     if(uploadRes.data.length && uploadRes.data.length > 0) {
       const images = [
         ...(resource.images ? resource.images : []),
@@ -142,7 +140,6 @@ export const uploadResourceImage = async (attachmentPath: string, account: Accou
       throw new Error('No file uploaded.')
     }
   } catch(e: any) {
-    console.log(e)
     logData(`Error trying to upload file to ${logicalPath}`, e, true)
     throw e
   }

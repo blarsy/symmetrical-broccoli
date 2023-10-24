@@ -12,8 +12,8 @@ interface Props {
 
 const ResourceCard = ({ resource, onClick }: Props) => <Card component={Box} display="flex" flexDirection="row" gap="1rem" alignItems="center" onClick={onClick}>
     { resource.images && resource.images.length > 0 ? 
-        <Image width="100" height="100" src={`${imagePublicBaseUrl}/${resource.images[0].path}`} alt={resource.title} /> :
-        <Image width="100" height="100" src="/placeholder.png" alt="pas d'image" />
+            <Image width="100" height="100" src={`${imagePublicBaseUrl}/${resource.images[0].path}`} alt={resource.title} /> :
+            <Image width="100" height="100" src="/placeholder.png" alt="pas d'image" />
     }
     <Tooltip title={resource.description}>
         <Stack>

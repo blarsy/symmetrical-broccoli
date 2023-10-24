@@ -11,7 +11,6 @@ import { AppContext } from "../AppContextProvider"
 interface Props {
     onSuccess: () => void
 }
-
 const Login = ({ onSuccess }: Props) => {
     const appContext = useContext(AppContext)
     const [errorInfo, setErrorInfo] = useState({ message: '', detail: '' })
@@ -40,12 +39,12 @@ const Login = ({ onSuccess }: Props) => {
             handleSubmit,
             isSubmitting,
             getFieldProps
-        }) => (
+        }) =>
         <form onSubmit={handleSubmit}>
             <Box display="flex" padding="1rem" justifyContent="center">
                 <Box display="flex" flexDirection="column" maxWidth="25em" gap="0.5rem">
-                    <TextField size="small" id="email" variant="standard" type="text" {...getFieldProps('email')} 
-                        label="email" error={!!errors.email} helperText={touched.email && errors.email}/>
+                    <TextField autoComplete="username" size="small" id="email" variant="standard" type="text" {...getFieldProps('email')} 
+                        label="Email" error={!!errors.email} helperText={touched.email && errors.email}/>
                     <TextField id="password" size="small" name="password" autoComplete="current-password" 
                         label="Mot de passe" type="password" variant="standard" value={values.password} 
                         onChange={handleChange} error={touched.password && !!errors.password} 
@@ -62,7 +61,7 @@ const Login = ({ onSuccess }: Props) => {
                 </Box>
             </Box>
         </form>
-        )}
+        }
     </Formik>
 }
 

@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material"
+import { createTheme, PaletteMode, PaletteOptions } from "@mui/material"
 import localFont from "next/font/local"
 import { lightPrimaryColor, primaryColor } from "./utils"
 
@@ -11,8 +11,9 @@ export const fonts = {
   altGeneral
 }
 
-export default createTheme({
+export default (dark: boolean) => createTheme({
   palette: {
+    mode: dark ? 'dark': 'light',
     primary: {
       main: primaryColor,
     },
@@ -21,20 +22,32 @@ export default createTheme({
     }
   },
   typography: {
-    body1: { fontFamily: fonts.general.style.fontFamily } ,
+    body1: { fontFamily: fonts.general.style.fontFamily },
     body2: { fontFamily: fonts.general.style.fontFamily },
-    h1: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '2.5rem', padding: '1.5rem 0' },
-    h2: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '2rem', padding: '1.2rem 0' },
-    h3: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '1.7rem', padding: '1rem 0' },
-    h4: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '1.4rem', padding: '0.5rem 0' },
-    h5: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '1.2rem', padding: '0.3rem 0' },
-    h6: { fontFamily: fonts.title.style.fontFamily,
-      fontSize: '1.1rem', padding: '0.2rem 0' },
+    h1: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '2.5rem', padding: '1.5rem 0'
+    },
+    h2: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '2rem', padding: '1.2rem 0'
+    },
+    h3: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '1.7rem', padding: '1rem 0'
+    },
+    h4: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '1.4rem', padding: '0.5rem 0'
+    },
+    h5: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '1.2rem', padding: '0.3rem 0'
+    },
+    h6: {
+      fontFamily: fonts.title.style.fontFamily,
+      fontSize: '1.1rem', padding: '0.2rem 0'
+    },
     overline: { fontFamily: fonts.altGeneral.style.fontFamily },
     caption: { fontFamily: fonts.altGeneral.style.fontFamily },
     subtitle1: { fontFamily: fonts.title.style.fontFamily },
