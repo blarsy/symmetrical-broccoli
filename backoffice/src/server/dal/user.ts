@@ -1,5 +1,5 @@
 import { createToken, getAccount, queryAccount } from "../apiutil"
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'

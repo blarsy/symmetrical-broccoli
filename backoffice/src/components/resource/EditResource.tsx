@@ -23,7 +23,8 @@ interface Props {
         title: string
         description: string
         expiration: dayjs.Dayjs,
-        conditions: Condition[]
+        conditions: Condition[],
+        categories: Category[]
     }, images: ResourceImage[]) => Promise<any>,
     onImageSelected?: (file: ResourceImage ) => void,
     onRequestImageDelete?: (image: Image) => Promise<void>
@@ -68,6 +69,10 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
                 .test('expirationIsEnoughInTheFuture', 'Cette offre doit durer au moins une heure', val => {
                     return !!val && !!(data.id || val > minExpiration.toDate())
                 }),
+            categories: yup.array(yup.object({
+                id: yup.number().required(),
+                name: yup.string()
+            })),
             conditions: yup.array(yup.object({
                 title: yup.string().max(30, 'Ce titre est trop long.').required('Ce champ est requis.'),
                 description: yup.string().max(8000, 'Cette valeur est trop longue.').required('Ce champ est requis.')
@@ -109,7 +114,9 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
                     <ResourceImages justifySelf="stretch" images={images} setImages={setImages} 
                         existingImages={data.images} onImageSelected={onImageSelected} 
                         onRequestImageDelete={onRequestImageDelete || (async () => {})}/>
-                    <CategoriesSelect onChange={(categories: Category[]) => setFieldValue('categories', categories)} value={values.categories} />
+                    <CategoriesSelect onChange={(categories: Category[]) => {
+                        setFieldValue('categories', categories)
+                    }} value={values.categories} />
                     <Typography variant="body1">Conditions</Typography>
                     <Box>
                         <FieldArray name="conditions" 

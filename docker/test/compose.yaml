@@ -1,0 +1,40 @@
+version: '2.1'
+services:
+  sb_web_test:
+    build:
+      context: './..'
+      dockerfile: './docker/web/Dockerfile'
+    ports:
+      - "3001:3000"
+  sb_nocodb_test:
+    depends_on: 
+      sb_db_test: 
+        condition: service_healthy
+    env_file:
+      - .env
+    image: "nocodb/nocodb:0.109.3"
+    ports: 
+      - "8081:8080"
+    restart: always
+    volumes: 
+      - "nc_data_test:/usr/app/data"
+  sb_db_test:
+    env_file:
+      - .env
+    healthcheck: 
+      interval: 10s
+      retries: 10
+      test: "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
+      timeout: 2s
+    image: postgres
+    ports: 
+      - "5433:5432"
+    restart: always
+    volumes: 
+      - "db_data_test:/var/lib/postgresql/data"
+volumes: 
+  db_data_test: {}
+  nc_data_test: {}
+networks:
+  proxynet:
+    name: sb_network

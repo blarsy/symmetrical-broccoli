@@ -19,9 +19,11 @@ web-build/
 
 .env.development
 .env.production
+.env.test
 /docker/prod/.env
 *.log
 web.zip
+web_test.zip
 web/
 
 .yarn

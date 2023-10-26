@@ -23,9 +23,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            const { title, description, expiration, conditions, categories } = JSON.parse(req.body)
+            
+            const { title, description, expiration, conditions, categories } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
             const account = await getAccount(getToken(req))
-            const resource = await create(account.id, title, description, expiration, conditions, categories)
+            const resource = await create(account.id, title, description, expiration, conditions || [], categories || [])
     
             respondWithSuccess(res, resource)
         } catch(e: any) {

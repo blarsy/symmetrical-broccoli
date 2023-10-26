@@ -22,7 +22,7 @@ const Create = () => {
                             const res = await axios.post('/api/resource', { 
                                 title: values.title, description: values.description, 
                                 expiration: values.expiration ? values.expiration.toDate(): undefined,
-                                conditions: values.conditions },
+                                conditions: values.conditions, categories: values.categories },
                                 { headers: { Authorization: localStorage.getItem('token') }})
                             if(images.length > 0){
                                 await axios.postForm(`/api/resource/${res.data.id}/image`, { files: images.map(img => img.blob) } , { headers: {

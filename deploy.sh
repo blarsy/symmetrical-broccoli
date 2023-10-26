@@ -1,3 +1,9 @@
+cd backoffice
+
+yarn build || exit 1
+
+cd ..
+
 # make sure you upload your SSH key to the target server first:
 # ssh-copy-id -i ~/.ssh/id_rsa.pub YOUR_USER_NAME@IP_ADDRESS_OF_THE_SERVER
 # ssh-copy-id -i ~/.ssh/id_rsa.pub root@45.91.168.78

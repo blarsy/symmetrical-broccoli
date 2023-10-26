@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:test": "env-cmd -f .env.test next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -18,12 +19,13 @@
     "@mui/system": "^5.8.0",
     "@mui/x-date-pickers": "^6.7.0",
     "@sendgrid/mail": "^7.7.0",
+    "@types/bcryptjs": "^2.4.5",
     "@types/formidable": "^3.4.0",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.4",
     "axios": "^1.4.0",
-    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.8",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
@@ -48,6 +50,7 @@
     "@svgr/webpack": "^8.1.0",
     "@types/bcrypt": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/react-swipeable-views": "^0.13.3"
+    "@types/react-swipeable-views": "^0.13.3",
+    "env-cmd": "^10.1.0"
   }
 }
