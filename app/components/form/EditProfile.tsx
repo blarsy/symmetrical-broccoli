@@ -9,6 +9,7 @@ import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, ErrorText } from "@/components/layout/lib"
 import { View } from "react-native"
 import { IconButton, Snackbar } from "react-native-paper"
+import { isMdWidth } from "@/lib/settings"
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)
@@ -76,7 +77,7 @@ export default function EditProfile () {
             <OrangeTextInput label={t('repeatnewpassword_label')} textContentType="password" secureTextEntry value={values.passwordRepeat}
                 onChangeText={handleChange('passwordRepeat')} onBlur={handleBlur('passwordRepeat')} />
             <ErrorMessage component={ErrorText} name="passwordRepeat" />
-            <WhiteButton style={{ marginTop: 20 }} onPress={e => handleSubmit()} loading={updateProfileState.loading}>
+            <WhiteButton style={{ marginTop: 20, width: isMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => handleSubmit()} loading={updateProfileState.loading}>
                 {t('save_label')}
             </WhiteButton>
             <Snackbar visible={!!updateProfileState.error && !!updateProfileState.error.message} onDismiss={() => setUpdateProfileState(initial<null>(false))}>

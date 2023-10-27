@@ -9,6 +9,7 @@ import { AppContext } from "@/components/AppContextProvider"
 import { Button, Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, WhiteButton } from "@/components/layout/lib"
+import { isMdWidth } from "@/lib/settings"
 
 interface Props {
     toggleRegistering: () => void,
@@ -42,7 +43,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
             <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={OrangeBackedErrorText} name="password" />
-            <WhiteButton style={{ marginTop: 20 }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
+            <WhiteButton style={{ marginTop: 20, width: isMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
                 loading={loginState.loading}>
                 {t('connection_label')}
             </WhiteButton>

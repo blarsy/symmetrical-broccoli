@@ -11,6 +11,7 @@ import { Image, View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import { imgUrl } from "@/lib/settings"
 import { useDebounce } from "usehooks-ts"
+import MainResourceImage from "../MainResourceImage"
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
@@ -34,14 +35,6 @@ export default function Search ({ route, navigation }: RouteProps) {
             setResources(fromError(e, t('requestError')))
         }
     }
-
-    const getResourceImage = (res: Resource, size: number) => {
-        if(res.images && res.images.length > 0) {
-            const imgData = res.images[0]
-            return <Image source={{ uri: `${imgUrl}${imgData.path}` }} alt={imgData.title} style={{ width: size, height: size }} />
-        }
-        return <Image source={require('@/assets/img/placeholder.png')} style={{ width: size, height: size }} />
-    }
     const debouncedSearchText = useDebounce(searchText, 1000)
 
     useEffect(() => {
@@ -53,7 +46,7 @@ export default function Search ({ route, navigation }: RouteProps) {
         <LoadedList loading={resources.loading} error={resources.error} data={resources.data}
             displayItem={(resource, idx) => <List.Item onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
             description={resource.description} style={{ margin: 0, padding: 0 }}
-            left={() => getResourceImage(resource, 70)}
+            left={() => <MainResourceImage resource={resource} />}
         />}/>
     </View>
 

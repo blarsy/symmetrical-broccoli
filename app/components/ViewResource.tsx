@@ -44,10 +44,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
         expirationText = ''
     }
     const windowDimension = Dimensions.get('window')
-    const imgSize = Math.min(windowDimension.height, windowDimension.width)
+    const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
 
     return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images.length === 1 ? 'center': 'auto' }}>
             <SwiperFlatList data={getSwiperData(resource)} 
                 renderItem= {({ item }) => <View>
                     <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} style={{ width: imgSize, height: imgSize }}/>
