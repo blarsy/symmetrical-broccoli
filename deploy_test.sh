@@ -18,6 +18,7 @@ scp -rp ./backoffice/.env.test root@45.91.168.78:/home/symbro_test/.env
 # Zip web build files
 rm ./web_test.zip
 cp -r ./backoffice/src/server/mailing/templates ./backoffice/.next/mailtemplates
+cp -rf ./backoffice/.env.test ./backoffice/.next/standalone/.env.production
 cd backoffice/.next
 zip -q -r --symlinks ../../web_test.zip ./static ./standalone ./mailtemplates ../next.config.js
 cd ..
