@@ -23,7 +23,7 @@ interface Props {
 
 const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEditRequested, processing}: Props) => {
     const appContext = useContext(AppContext)
-    const { handleChange, handleBlur, values, setFieldValue, resetForm, handleSubmit } = formikState
+    const { handleChange, handleBlur, values, setFieldValue, setTouched, resetForm, handleSubmit } = formikState
     const editResourceContext = useContext(EditResourceContext)
 
     useEffect(() => {
@@ -47,7 +47,10 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         <TransparentTextInput label={t('description_label')} value={values.description}
             onChangeText={handleChange('description')} onBlur={handleBlur('description')} />
         <ErrorMessage component={ErrorText} name="description" />
-        <DateTimePickerField textColor="#000" value={values.expiration} onChange={d =>  setFieldValue('expiration', d)} label={t('expiration_label')} />
+        <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
+            setFieldValue('expiration', d)
+            setTouched({ expiration: true })
+        }} label={t('expiration_label')} />
         <ErrorMessage component={ErrorText} name="expiration" />
         <CategoriesSelect value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
