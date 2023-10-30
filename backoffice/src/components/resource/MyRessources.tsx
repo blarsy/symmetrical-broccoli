@@ -9,7 +9,8 @@ const MyResources = () => {
         <Link variant="button" component={NextLink} href="/webapp/home/resource/create">Créer</Link>
         <ResourcesList onEditRequested={res => {
             router.push(`/webapp/home/resource/${res.id}`)
-        }}/>
+        }} />
+
     </Box>
 }
 

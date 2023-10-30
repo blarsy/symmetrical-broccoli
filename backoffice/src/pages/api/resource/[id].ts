@@ -1,5 +1,5 @@
 import { getAccount, getResource } from "@/server/apiutil"
-import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, unlink, update } from "@/server/noco"
+import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, remove, unlink, update } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { Category, conditionsToRaw } from "@/schema"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -66,6 +66,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             respondWithSuccess(res, await getResource(resource.Id))
         } catch(e: any) {
+            respondWithFailure(req, res, e)
+        }
+    } else if (req.method === 'DELETE') {
+        try {
+            const { id } = req.query
+            const resourceId = Number(id)
+            const account = await getAccount(getToken(req))
+    
+            if(!account.resources || !account.resources.some(res => res.id === resourceId)) {
+                respondWithFailure(req, res, 'Resource not found', 404)
+                return
+            }
+
+            await remove('ressources', id as string)
+
+            respondWithSuccess(res)
+        } catch (e: any) {
             respondWithFailure(req, res, e)
         }
     } else {

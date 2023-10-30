@@ -75,7 +75,9 @@ const resources = {
       "condition_description_label": "Description",
       "addCondition_title": "Create condition",
       "conditions_label": "Conditions",
-      "resourceCategories_label": "Categories"
+      "resourceCategories_label": "Categories",
+      "Confirmation_DialogTitle": "Confirmation",
+      "Confirm_Resource_Delete_Question": "Are you sure you want to delete this resource ?"
     }
   },
   fr: {
@@ -148,7 +150,9 @@ const resources = {
       "condition_description_label": "Description",
       "addCondition_title": "Créer condition",
       "conditions_label": "Conditions",
-      "resourceCategories_label": "Catégories"
+      "resourceCategories_label": "Catégories",
+      "Confirmation_DialogTitle": "Confirmation",
+      "Confirm_Resource_Delete_Question": "Etes-vous sûr.e de vouloir supprimer cette ressource ?"
     }
   }
 }
