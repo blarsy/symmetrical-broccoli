@@ -9,6 +9,7 @@ import { AppContext } from "./AppContextProvider"
 import { t } from "@/i18n"
 import Images from "@/Images"
 import { RouteProps } from "@/lib/utils"
+import ResponsiveListItem from "./ResponsiveListItem"
 
 interface ReqProps {
     item: Account,
@@ -18,7 +19,7 @@ interface ReqProps {
 const RequestReceived = ({ item, onChange }: ReqProps) => {
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
-    return <List.Item title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
+    return <ResponsiveListItem title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
         { opProcessing && <ActivityIndicator /> }
         <IconButton icon={Images.Valid} size={20} onPress={async () => {
             try {

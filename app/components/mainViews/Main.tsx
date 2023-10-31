@@ -29,7 +29,7 @@ export default function Main () {
             <View style={{ flex: 1,alignItems: 'stretch', alignSelf: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
                 <StackNav.Navigator screenOptions={{ header: (props) => props.route.name != 'main' && <Appbar.Header style={{ backgroundColor: primaryColor }}>
                         <Appbar.BackAction onPress={() => props.navigation.goBack()} />
-                        <Appbar.Content titleStyle={{ fontSize: 24, fontFamily: 'DK-magical-brush', textTransform: 'uppercase', fontWeight: '400', textAlign: 'center' }} title={t(getViewTitleI18n(props.route.name))} />
+                        <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', textAlign: 'center' }} title={t(getViewTitleI18n(props.route.name))} />
                     </Appbar.Header> }}>
                     <StackNav.Screen name="main" component={DealBoard} key="main" />
                     <StackNav.Screen name="profile" component={Profile} key="profile"  />

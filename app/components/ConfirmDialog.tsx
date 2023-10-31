@@ -14,7 +14,7 @@ const ConfirmDialog = ({ visible, onResponse, title, question }: Props) => {
     const [processing, setProcessing] = useState(initial<null>(false))
     return <Portal>
         <Dialog visible={visible}>
-            <Dialog.Title>{title}</Dialog.Title>
+            <Dialog.Title><Text variant="titleLarge">{title}</Text></Dialog.Title>
             <Dialog.Content>
                 <Text variant="bodyMedium">{question}</Text>
                 { processing.loading && <ActivityIndicator /> }

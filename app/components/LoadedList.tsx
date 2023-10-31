@@ -17,9 +17,9 @@ function LoadedList<T>({ loading, error, data, displayItem }:Props<T>) {
     { loading && <ActivityIndicator /> }
     { !loading && !error && <ListOf data={data} displayItem={displayItem} /> }
     {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
-    <View style={{ height: 60 }}>
+    { error && <View style={{ height: 60 }}>
         <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>
-    </View>
+    </View> }
 </ScrollView>
 }
 

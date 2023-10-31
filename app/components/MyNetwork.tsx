@@ -8,6 +8,7 @@ import { ActivityIndicator, List, Snackbar } from "react-native-paper"
 import { View } from "react-native"
 import Images from "@/Images"
 import { RouteProps } from "@/lib/utils"
+import ResponsiveListItem from "./ResponsiveListItem"
 
 const MyNetwork = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
@@ -32,11 +33,11 @@ const MyNetwork = ({ route, navigation }: RouteProps) => {
         return <ActivityIndicator style={{ marginTop: 10 }} />
     } else {
         return <View style={{ flexDirection: 'column' }}>
-            <List.Item title={t('myNetwork_title')} left={() => <Images.Heart style={{ margin: 10 }} width={30} height={30} />} 
+            <ResponsiveListItem title={t('myNetwork_title')} left={() => <Images.Heart style={{ margin: 10 }} width={30} height={30} />} 
                 right={() => <List.Icon icon="chevron-right" />} onPress={() => navigation.navigate('connections', { network })} />
-            <List.Item title={t('requestsReceived_title')} left={() => <Images.Received style={{ margin: 10 }} width={30} height={30} />} 
+            <ResponsiveListItem title={t('requestsReceived_title')} left={() => <Images.Received style={{ margin: 10 }} width={30} height={30} />} 
                 right={() => <List.Icon icon="chevron-right" />}  onPress={() => navigation.navigate('requestsReceived', { network })} />
-            <List.Item title={t('requestsSent_title')} left={() => <Images.Sent style={{ margin: 10 }} width={30} height={30} />} 
+            <ResponsiveListItem title={t('requestsSent_title')} left={() => <Images.Sent style={{ margin: 10 }} width={30} height={30} />} 
                 right={() => <List.Icon icon="chevron-right" />}  onPress={() => navigation.navigate('requestsSent', { network })} />
         </View>    
     }

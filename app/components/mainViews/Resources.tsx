@@ -3,14 +3,15 @@ import AppendableList from "../AppendableList"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
-import { Dialog, IconButton, List, Portal } from "react-native-paper"
+import { IconButton, List, useTheme } from "react-native-paper"
 import { deleteResource, getResources } from "@/lib/api"
 import { t } from "@/i18n"
-import { Text, View } from "react-native"
+import { View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import MainResourceImage from "../MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
+import ResponsiveListItem from "../ResponsiveListItem"
 
 const Resources = ({ route, navigation }: RouteProps) => {
     const [resources, setResources] = useState(initial<Resource[]>(true))
@@ -38,10 +39,12 @@ const Resources = ({ route, navigation }: RouteProps) => {
         loadResources()
     }, [])
 
+    const theme = useTheme()
+
     return <>
         <AppendableList state={resources} dataFromState={state => state.data!}
             onAddRequested={() => navigation.navigate('newResource')} 
-            displayItem={(resource, idx) => <List.Item onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
+            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
                 description={resource.description} style={{ margin: 0, padding: 0 }}
                 left={() => <MainResourceImage resource={resource} />}
                 right={() => <View style={{ flexDirection: 'row' }}>

@@ -8,6 +8,7 @@ import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadStat
 import { Account } from "@/lib/schema"
 import LoadedList from "./LoadedList"
 import { RouteProps } from "@/lib/utils"
+import ResponsiveListItem from "./ResponsiveListItem"
 
 interface AccountListItemProps {
     item: Account,
@@ -17,7 +18,7 @@ interface AccountListItemProps {
 const AccountListItem = ({ item, onChange }: AccountListItemProps) => {
     const appContext = useContext(AppContext)
     const [addFriendOperationStatus, setAddFriendOperationStatus] = useState(false)
-    return <List.Item title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
+    return <ResponsiveListItem title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
         { addFriendOperationStatus && <ActivityIndicator /> }
         <IconButton mode="outlined" icon="account-plus" onPress={async () => {
             setAddFriendOperationStatus(true)

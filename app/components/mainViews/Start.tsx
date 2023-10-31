@@ -10,6 +10,11 @@ import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { PaperProvider, Snackbar, configureFonts } from 'react-native-paper'
+import { isMdWidth } from "@/lib/settings"
+
+let fontSizeLarge = 20
+let fontSizeMedium = 16
+let fontSizeSmall = 14
 
 export default () => {
     const { t } = i18n
@@ -23,6 +28,9 @@ export default () => {
     
 
     useEffect(() => {
+        fontSizeLarge =  isMdWidth() ? 24 : 20
+        fontSizeMedium = isMdWidth() ? 20 : 16
+        fontSizeSmall = isMdWidth() ? 18 : 14
         const load = async () => {
             try {
                 registerLoggedOutHandler(() => {
@@ -41,21 +49,21 @@ export default () => {
     if(fontsLoaded) {
         return <PaperProvider theme={{
             fonts: configureFonts({ config: { 
-                bodyLarge: { fontFamily: 'Futura-std-book'},
-                bodyMedium: { fontFamily: 'Futura-std-book'},
-                bodySmall: { fontFamily: 'Futura-std-book'},
-                displayLarge: { fontFamily: 'Futura-std-book'},
-                displayMedium: { fontFamily: 'Futura-std-book'},
-                displaySmall: { fontFamily: 'Futura-std-book'},
-                headlineLarge: { fontFamily: 'Futura-std-book'},
-                headlineMedium: { fontFamily: 'Futura-std-book'},
-                headlineSmall: { fontFamily: 'Futura-std-book'},
-                labelLarge: { fontFamily: 'Futura-std-book'},
-                labelMedium: { fontFamily: 'Futura-std-book'},
-                labelSmall: { fontFamily: 'Futura-std-book'},
-                titleLarge: { fontFamily: 'DK-magical-brush' },
-                titleMedium: { fontFamily: 'DK-magical-brush' },
-                titleSmall: { fontFamily: 'DK-magical-brush' }
+                bodyLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
+                bodyMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
+                bodySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
+                displayLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
+                displayMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
+                displaySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
+                headlineLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
+                headlineMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
+                headlineSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
+                labelLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
+                labelMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
+                labelSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
+                titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge },
+                titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium },
+                titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall }
             } })
           }}>
             { appContext.state.token.data ? 

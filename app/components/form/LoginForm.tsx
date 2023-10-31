@@ -48,11 +48,11 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
                 {t('connection_label')}
             </WhiteButton>
             <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
-                onPress={toggleRegistering} labelStyle={{ fontSize: 16 }}>
+                onPress={toggleRegistering}>
                 {t('notsubscribedyet_label')}
             </Button>                
-            <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
-                onPress={toggleRecovering} labelStyle={{ fontSize: 16 }}>
+            <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="lock" />} 
+                onPress={toggleRecovering}>
                 {t('forgotPassword_label')}
             </Button>
             <Portal>

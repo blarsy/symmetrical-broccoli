@@ -11,6 +11,7 @@ import { EditResourceContext } from "../EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { AppContext } from "../AppContextProvider"
 import CategoriesSelect from "./CategoriesSelect"
+import ResponsiveListItem from "../ResponsiveListItem"
 
 const limitWithEllipsis = (text: string, amountChars: number) => text.length > amountChars ?`${text.substring(0, amountChars)}...` : text
 
@@ -56,9 +57,9 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
             setFieldValue('categories', categories)
         }} />
         <Surface style={{ marginTop: 8 }}>
-            <Text style={{ fontSize: 16, marginLeft: 16, marginTop: 16 }}>{t('conditions_label')}</Text>
+            <Text variant="bodyMedium" style={{ marginLeft: 16, marginTop: 16 }}>{t('conditions_label')}</Text>
             <AppendableList state={values.conditions} onAddRequested={onConditionAddRequested} 
-                displayItem={(item, idx) => <List.Item key={idx} title={item.title}
+                displayItem={(item, idx) => <ResponsiveListItem key={idx} title={item.title}
                     description={limitWithEllipsis(item.description, 30)}
                     onPress={() => onConditionEditRequested(item)} 
                     right={() => <IconButton icon={Images.Cross} onPress={e => {

@@ -1,6 +1,6 @@
 import { Category, Condition, Resource, categoriesToRaw, conditionsToRaw, fromRawResource, resourceCategoriesFromRaw } from "@/schema"
 import { bulkCreate, link, list, create as nocoCreate } from '@/server/noco'
-import { getAccount } from "../apiutil"
+import { getAccount, getResource } from "../apiutil"
 
 export const create = async (accountId: number, title: string, description: string, expiration: Date, conditions: Condition[], categories: Category[]): Promise<Resource> => {
     const resourceRaw = await nocoCreate('ressources', { titre: title , description, expiration })
@@ -28,6 +28,7 @@ export const getCategories = async (): Promise<Category[]> => {
 export const getSuggestions = async (token: string, searchText: string): Promise<Resource[]> => {
     const account = await getAccount(token, ['Id', 'comptes_liés', 'images', 'nom'])
     const filter = `(comptes,neq,${account.name})~and(expiration,gt,today)${searchText && `~and((titre,like,%${searchText}%)~or(description,like,%${searchText}%))`}`
-    const resourceRaw = await list('ressources', filter, ['Id', 'titre', 'description', 'expiration', 'comptes', 'images', 'conditions', 'categories'], undefined, ['expiration','titre'])
-    return resourceRaw.map(raw => fromRawResource(raw))
+    
+    const resourceRaw = await list('ressources', filter, ['Id'], undefined, ['expiration','titre'])
+    return Promise.all(resourceRaw.map(raw => getResource(raw.Id)))
 }

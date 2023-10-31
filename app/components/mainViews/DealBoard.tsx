@@ -62,12 +62,12 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
     return <EditResourceContextProvider>
         <View style={{ flex: 1 }}>
             <Appbar.Header style={{ backgroundColor: primaryColor} }>
-                <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontSize: 24, fontFamily: 'DK-magical-brush', fontWeight: '400', textTransform: 'uppercase', textAlign: 'center' }} />
+                <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center' }} />
                 <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
             </Appbar.Header>
             <StackNav.Navigator screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header style={{ backgroundColor: lightPrimaryColor }}>
                 <Appbar.BackAction onPress={() => props.navigation.goBack()} />
-                <Appbar.Content titleStyle={{ fontSize: 20, fontFamily: 'DK-magical-brush', textTransform: 'uppercase' }} title={t(getViewTitleI18n(props.route.name))} />
+                <Appbar.Content titleStyle={{ textTransform: 'uppercase' }} title={t(getViewTitleI18n(props.route.name))} />
             </Appbar.Header> }}>
                 <StackNav.Screen name="dealMain" key="dealMain">
                     {(props: RouteProps) => <BottomNavigation onIndexChange={setTabIndex}

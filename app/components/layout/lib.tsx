@@ -7,17 +7,16 @@ import { ColorValue, View } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 
-export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff" 
-    labelStyle={{ fontSize: 20 }} {...props} />
+export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff" {...props} />
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
-    labelStyle={{ fontSize: 20 }} {...props} />
+    {...props} />
     
 export function ErrorText(props: TextProps<never>) {
-    return <Text style={{ color: 'red' }}>{props.children}</Text>
+    return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>
 }
 
-export const OrangeBackedErrorText = (props: TextProps<never>) => <Text style={{
+export const OrangeBackedErrorText = (props: TextProps<never>) => <Text variant="bodyMedium" style={{
     backgroundColor: 'orange', color: '#fff'
 }}>{props.children}</Text>
 
@@ -27,8 +26,7 @@ export const OrangeTextInput = (props: TextInputProps) => <TextInput
     activeUnderlineColor="#fff" selectionColor="transparent"
     theme={{ colors: { onSurfaceVariant: '#ddd'} }}
     contentStyle={{
-        color: '#fff',
-        fontSize: 16
+        color: '#fff'
     }} style={Object.assign({
         backgroundColor: primaryColor,
         marginTop: 10,
@@ -41,8 +39,7 @@ export const TransparentTextInput = (props: TextInputProps) => {
         activeUnderlineColor="#222" selectionColor="transparent"
         theme={{ colors: { onSurfaceVariant: '#222'} }}
         contentStyle={{
-            color: '#000',
-            fontSize: 16
+            color: '#000'
         }} style={Object.assign({
             backgroundColor: 'transparent',
             marginTop: 10,
@@ -64,12 +61,12 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
     return <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
-        <Text style={{ color: props.textColor, fontSize: 16, marginLeft: 16 }}>{props.label}</Text>
+        <Text variant="bodyMedium" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
         <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
-            <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ fontSize: 16, margin: 10, marginLeft: 20, color: props.textColor }}>
+            <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
                 {props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}
             </Button>
-            { props.value && <Button icon="clock" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setTimeOpen(true)} labelStyle={{ fontSize: 16, margin: 10, marginLeft: 20, color: props.textColor }}>
+            { props.value && <Button icon="clock" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setTimeOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
                 {props.value ? `${props.value.getHours().toString().padStart(2, '0')}:${props.value.getMinutes().toString().padStart(2, '0')}` : ''}
             </Button>}
         </View>

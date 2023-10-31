@@ -1,6 +1,6 @@
 import { Account, Network } from "@/lib/schema"
 import React, { useContext, useState } from "react"
-import { ActivityIndicator, IconButton, List, Portal, Snackbar, Text } from "react-native-paper"
+import { ActivityIndicator, IconButton, List } from "react-native-paper"
 import { View } from "react-native"
 import AppendableList from "./AppendableList"
 import DataLoadState from "@/lib/DataLoadState"
@@ -9,6 +9,7 @@ import { t } from "@/i18n"
 import { removeFriend } from "@/lib/api"
 import Images from "@/Images"
 import { RouteProps } from "@/lib/utils"
+import ResponsiveListItem from "./ResponsiveListItem"
 
 interface ConnectionProps {
     item: Account,
@@ -18,7 +19,7 @@ interface ConnectionProps {
 const Connection = ({ item, onChange }: ConnectionProps) => {
     const appContext = useContext(AppContext)
     const [opProcessing, setOpProcessing] = useState(false)
-    return <List.Item title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
+    return <ResponsiveListItem title={item.name} description={item.email} right={() => <View style={{ flexDirection: 'row' }}>
         { opProcessing && <ActivityIndicator /> }
         <IconButton style={{ width: 24, height: 24 }} iconColor="#000" icon={Images.Cross} size={20} onPress={async () => {
             try {

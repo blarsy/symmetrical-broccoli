@@ -49,7 +49,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
         }}>
             <View style={{ flex: 1, backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 15 }}>
                 <Images.Photos style={{ height: 100, width: '100%', marginBottom: 15 }} fill="#fff" />
-                <Text style={{ color: primaryColor, fontSize: 16, fontFamily: 'dk-magical-brush' }}>
+                <Text variant="titleMedium" style={{ color: primaryColor }}>
                     <Icons name="plus" style={{ padding: 5 }} />
                     {t('addPictures_Button')}
                 </Text>

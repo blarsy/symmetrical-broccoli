@@ -12,6 +12,7 @@ import { RouteProps } from "@/lib/utils"
 import { imgUrl } from "@/lib/settings"
 import { useDebounce } from "usehooks-ts"
 import MainResourceImage from "../MainResourceImage"
+import ResponsiveListItem from "../ResponsiveListItem"
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
@@ -44,7 +45,7 @@ export default function Search ({ route, navigation }: RouteProps) {
     return <View style={{ flexDirection: 'column', margin: 10, flex:1 }}>
         <SearchBox onChange={setSearchText} value={searchText} />
         <LoadedList loading={resources.loading} error={resources.error} data={resources.data}
-            displayItem={(resource, idx) => <List.Item onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
+            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
             description={resource.description} style={{ margin: 0, padding: 0 }}
             left={() => <MainResourceImage resource={resource} />}
         />}/>

@@ -47,21 +47,21 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
 
     return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
-        <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images.length === 1 ? 'center': 'auto' }}>
+        <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images && resource.images.length === 1 ? 'center': 'auto', marginBottom: 10 }}>
             <SwiperFlatList data={getSwiperData(resource)} 
                 renderItem= {({ item }) => <View>
                     <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} style={{ width: imgSize, height: imgSize }}/>
             </View>} />
         </View>
         <ResourceViewField title={t('title_label')}>
-            <Text style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
+            <Text variant="bodyLarge" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
         </ResourceViewField>
         <ResourceViewField title={t('description_label')} titleOnOwnLine>
-            <Text>{resource.description}</Text>
+            <Text variant="bodyMedium">{resource.description}</Text>
         </ResourceViewField>
         { expirationText && <View>
             <ResourceViewField title={t('expiration_label')}>
-                <Text>{expirationText}</Text>
+                <Text variant="bodyMedium">{expirationText}</Text>
             </ResourceViewField>
         </View>}
         { resource.categories && resource.categories.length > 0 && 
@@ -73,14 +73,16 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
         }
         { resource.conditions && resource.conditions.length > 0 && <View>
             <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
-                <View style={{ flexDirection: 'column' }}>
+                <View style={{ flexDirection: 'column', alignSelf: 'stretch' }}>
                     { resource.conditions.map((condition, idx) => <View key={idx} style={{ paddingBottom: 5, borderTopWidth: 1, borderTopColor: '#aaa' }}>
                         <View style={{ flexDirection: 'row', gap: 10 }}>
-                            <Text variant="bodySmall">{t('title_label')}</Text>
-                            <Text>{condition.title}</Text>
+                            <Text variant="titleSmall" style={{ flexBasis: '30%', flexShrink: 0, flexGrow: 1 }}>{t('title_label')}</Text>
+                            <Text variant="bodySmall" style={{ flexBasis: '70%', flexShrink: 0, flexGrow: 1 }}>{condition.title}</Text>
                         </View>
-                        <Text variant="bodySmall">{t('description_label')}</Text>
-                        <Text>{condition.description}</Text>
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                            <Text variant="titleSmall" style={{ flexBasis: '30%', flexShrink: 0, flexGrow: 1 }}>{t('description_label')}</Text>
+                            <Text variant="bodySmall" style={{ flexBasis: '70%', flexShrink: 0, flexGrow: 1 }}>{condition.description}</Text>
+                        </View>
                     </View>)}
                 </View>
             </ResourceViewField>
