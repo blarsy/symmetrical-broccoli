@@ -6,17 +6,14 @@ import Icons from "@expo/vector-icons/FontAwesome"
 import { t } from "@/i18n"
 import Images from "@/Images"
 import { imgUrl } from "@/lib/settings"
-import { ImagePickerAsset, launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
+import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
 import { NewOrExistingImage } from "../EditResourceContextProvider"
-import { AppContext } from "../AppContextProvider"
 
 interface Props {
     images: NewOrExistingImage[]
     onImageSelected: (img: NewOrExistingImage) => void
     onImageDeleteRequested: (img: NewOrExistingImage) => Promise<void>
 }
-
-const assetToString = (asset: ImagePickerAsset) => `name: ${asset.fileName}, size: ${asset.fileSize}, height : ${asset.height}, width : ${asset.width}`
 
 const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Props) => {
     return <View style={{ flex: 1, alignItems: 'stretch', flexDirection: 'column' }}>
@@ -29,13 +26,14 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
             </View>
         }
         <TouchableOpacity onPress={async () => {
+                await requestMediaLibraryPermissionsAsync(true)
                 let result = await launchImageLibraryAsync({
                     mediaTypes: MediaTypeOptions.Images,
                     allowsEditing: true,
                     aspect: [1, 1],
                     quality: 1,
                 })
-                // appContext.actions.setMessage((result.assets && result.assets?.length > 0) ? assetToString(result.assets[0]): 'no asset')
+                
                 if(!result.canceled && result.assets.length > 0) {
                     const imgRes = await fetch(result.assets[0].uri)
                     const imgBlob = await imgRes.blob()

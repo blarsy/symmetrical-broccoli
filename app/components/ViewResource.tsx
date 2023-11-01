@@ -1,17 +1,24 @@
 import { RouteProps } from "@/lib/utils"
-import React from "react"
-import { Chip, Text } from "react-native-paper"
+import React, { useState } from "react"
+import { Chip, Modal, Portal, Text } from "react-native-paper"
 import { imgUrl } from "@/lib/settings"
 import { Resource } from "@/lib/schema"
 import { t } from "@/i18n"
-import { Dimensions, Image, ScrollView, View } from "react-native"
+import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-native"
 import dayjs from "dayjs"
 import SwiperFlatList from "react-native-swiper-flatlist"
+import PanZoomImage from "./PanZoomImage"
 
 interface ResourceViewFieldProps {
     title: string,
     children: JSX.Element,
     titleOnOwnLine?: boolean
+}
+
+interface ImgMetadata { 
+    source: string
+    alt: string
+    idx: number
 }
 
 const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFieldProps) => <View style={{ 
@@ -21,7 +28,7 @@ const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFiel
     {children}
 </View>
 
-const getSwiperData = (resource: Resource) => {
+const getSwiperData = (resource: Resource): ImgMetadata[] => {
     if(resource.images && resource.images.length > 0) {
         return resource.images.map((img, idx) => ({
             source: `${imgUrl}${img.path}`,
@@ -29,12 +36,13 @@ const getSwiperData = (resource: Resource) => {
             idx
         }))
     } else {
-        return [{ source: '/placeholder.png', alt: 'placeholder'}]
+        return [{ source: '/placeholder.png', alt: 'placeholder', idx: 0}]
     }
 }
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
     const resource = route.params.resource as Resource
+    const [ focusedImage, setFocusedImage] = useState('')
     
     let expirationText: string
     if(resource.expiration) {
@@ -45,13 +53,16 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     }
     const windowDimension = Dimensions.get('window')
     const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
-
+    
     return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
         <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images && resource.images.length === 1 ? 'center': 'auto', marginBottom: 10 }}>
             <SwiperFlatList data={getSwiperData(resource)} 
-                renderItem= {({ item }) => <View>
-                    <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} style={{ width: imgSize, height: imgSize }}/>
-            </View>} />
+                renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => {
+                    setFocusedImage(item.source)
+                }}>
+                    <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} 
+                        style={{ width: imgSize, height: imgSize }} />
+            </TouchableOpacity>} />
         </View>
         <ResourceViewField title={t('title_label')}>
             <Text variant="bodyLarge" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
@@ -87,6 +98,11 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </View>
             </ResourceViewField>
         </View> }
+        <Portal>
+            <Modal dismissable onDismiss={() => setFocusedImage('')} visible={ !!focusedImage }>
+                { focusedImage && <PanZoomImage uri={focusedImage} /> }
+            </Modal>
+        </Portal>
     </ScrollView>
 }
 

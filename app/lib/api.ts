@@ -1,5 +1,5 @@
 import { NewOrExistingImage } from '@/components/EditResourceContextProvider'
-import { Account, Category, Image, Network, Resource } from './schema'
+import { Account, Category, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 import { Platform } from 'react-native'
 let loggedOutHandler: () => void

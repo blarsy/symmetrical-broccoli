@@ -1,6 +1,6 @@
 import React from "react"
-import { Text } from "react-native"
+import { Text, View } from "react-native"
 
 export default function Chat () {
-    return <Text>CHAT</Text>
+    return <View><Text>Chat</Text></View>
 }
