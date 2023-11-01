@@ -43,7 +43,7 @@ const PresentationCarousel = ({ theme }: { theme: Theme }) => {
             backgroundRepeat: 'no-repeat',
             backgroundOrigin: "border-box",
             backgroundPosition: 'top',
-            backgroundSize: '110%'
+            backgroundSize: '110% 100%'
         }
     }}>
         
@@ -58,7 +58,7 @@ const PresentationCarousel = ({ theme }: { theme: Theme }) => {
                 refreshSwiperSlideState()
             }} autoplay={{
                 delay: 5000
-            }} >
+            }} style={{ flex: 1, overflow: 'hidden' }}>
             <SwiperSlide style={{ display: 'flex',flexDirection: 'column', alignItems: 'center', alignSelf: 'center' }}>
                 <Step1 />
             </SwiperSlide>
@@ -115,7 +115,7 @@ const Page = () => {
                         backgroundImage: `url('/FOND.svg')`,
                         backgroundRepeat: 'no-repeat',
                         backgroundAttachment: 'local',
-                        backgroundSize: '100%',
+                        backgroundSize: '100% 100%',
                         [theme.breakpoints.down('md')]: {
                             padding: '2.5rem 1.5rem'
                         }
