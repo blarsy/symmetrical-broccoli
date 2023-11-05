@@ -37,10 +37,22 @@ services:
       retries: 10
       test: "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
       timeout: 2s
-    image: postgres
+    image: postgres@sha256:31c9342603866f29206a06b77c8fed48b3c3f70d710a4be4e8216b134f92d0df
     restart: always
     volumes: 
       - "db_data:/var/lib/postgresql/data"
+  state:
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always
+  scheduler:
+    depends_on:
+      - sb_db
+      - state
+    build:
+      dockerfile: './scheduler/Dockerfile'
+    restart: always
 volumes: 
   db_data: {}
   nc_data: {}

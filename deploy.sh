@@ -1,3 +1,11 @@
+cd scheduler
+yarn build
+cd ..
+mkdir -p ./docker/prod/scheduler/src/
+cp -r scheduler/* ./docker/prod/scheduler/src/
+rm -rf ./docker/prod/scheduler/src/node_modules
+cp scheduler/.env.production ./docker/prod/scheduler/src/.env
+
 cd backoffice
 
 yarn build || exit 1

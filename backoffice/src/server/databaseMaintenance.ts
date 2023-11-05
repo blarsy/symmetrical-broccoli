@@ -12,6 +12,7 @@ const resourceTableName = 'ressources'
 const testPwd1 = process.env.TEST_PWD_1 as string
 const testPwd2 = process.env.TEST_PWD_2 as string
 const testPwd3 = process.env.TEST_PWD_3 as string
+const testPwd4 = process.env.TEST_PWD_4 as string
 
 const systemCols: NormalColumnRequestType[] = [
     {"column_name":"id","title":"Id","dt":"int4","dtx":"integer","rqd":true,"pk":true,"un":false,"ai":true,"cdf":null,"np":11,"ns":0,"dtxp":"11","dtxs":"","uidt":"ID"},
@@ -147,7 +148,16 @@ const migrateToV1_0_2 = async (api: Api<unknown>, projectId: string, orgs: strin
 
     await update(systemTableName, 1, { version: '1.0.2' })
 }
- 
+
+const migrateToV1_0_3 = async () => {
+    const testAccounts = await list('comptes', `(email,eq,tester@apple.com)`, ['Id'])
+    if(testAccounts.length === 0) {
+        await create('Apple tester', 'tester@apple.com', testPwd4)
+    }
+
+    await update(systemTableName, 1, { version: '1.0.3' })
+}
+
 const insertTestData  = async () => {
     if(process.env.NODE_ENV === 'development') {
         const accounts = await Promise.all([
@@ -168,7 +178,7 @@ const insertTestData  = async () => {
             answerInvite(accounts[1].email, accounts[0].id.toString(), true)
         ])
     } else {
-        const testAccounts = await list('comptes', `(email,eq,test1@gmail.com`, ['Id'])
+        const testAccounts = await list('comptes', `(email,eq,test1@gmail.com)`, ['Id'])
         if(testAccounts.length === 0) {
             await Promise.all([
                 create('Google test1', 'test1@gmail.com', testPwd1),
@@ -186,7 +196,8 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         await migrateToV1_0_0(api, projectId, orgs, projectName)
         await migrateToV1_0_1(api, projectId)
         await migrateToV1_0_2(api, projectId, orgs, projectName)
-        return 'Migrated to 1.0.2'
+        await migrateToV1_0_3()
+        return 'Migrated to 1.0.3'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
         if(systemRow.version === '1.0.0') {
@@ -195,6 +206,9 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         } else if(systemRow.version === '1.0.1') {
             await migrateToV1_0_2(api, projectId, orgs, projectName)
             return 'Migrated to 1.0.2'
+        } else if(systemRow.version === '1.0.2') {
+            await migrateToV1_0_3()
+            return 'Migrated to 1.0.3'
         } else {
             return 'Db already up to date'
         }

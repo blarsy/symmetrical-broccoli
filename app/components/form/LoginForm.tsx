@@ -26,7 +26,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
     })} onSubmit={async (values) => {
         setLoginstate(beginOperation())
         try {
-            const res = await login(values.email, values.password)
+            const res = await login(values.email.trim(), values.password)
             const data = await res.json()
             appContext.actions.loginComplete(data.token, data.account)
             setLoginstate(fromData(null))

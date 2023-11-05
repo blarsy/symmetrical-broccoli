@@ -1,0 +1,25 @@
+{
+  "name": "scheduler",
+  "license": "MIT",
+  "packageManager": "yarn@3.6.0",
+  "type": "module",
+  "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "@types/node": "^20.8.10",
+    "bullmq": "^4.12.7",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.3.1",
+    "google-auth-library": "^9.2.0",
+    "googleapis": "^128.0.0",
+    "winston": "^3.11.0"
+  },
+  "scripts": {
+    "start": "NODE_PATH=./build node build/index.js",
+    "build": "yarn tsc",
+    "dev": "yarn tsc; NODE_PATH=./build node build/index.js"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "typescript": "^5.2.2"
+  }
+}
