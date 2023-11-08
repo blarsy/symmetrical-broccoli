@@ -1,7 +1,7 @@
 import { Category } from "@/schema"
 import { FormControl, InputLabel, Select, OutlinedInput, Chip, MenuItem } from "@mui/material"
 import { Box } from "@mui/system"
-import { useEffect, useState } from "react"
+import { SyntheticEvent, useEffect, useState } from "react"
 import { fromData, fromError, initial } from "@/DataLoadState"
 import axios from "axios"
 import LoadingZone from "../LoadingZone"
@@ -9,9 +9,10 @@ import LoadingZone from "../LoadingZone"
 interface Props {
     onChange: (categories: Category[]) => void
     value: Category[]
+    onClose?: ((event: SyntheticEvent<Element, Event>) => void)
 }
 
-const CategoriesSelect = ({ onChange, value }: Props) => {
+const CategoriesSelect = ({ onChange, value, onClose }: Props) => {
     const [categories, setCategories] = useState(initial<Category[]>(true))
     useEffect(() => {
         const load = async () => {
@@ -25,7 +26,7 @@ const CategoriesSelect = ({ onChange, value }: Props) => {
         load()
     }, [])
     return <LoadingZone loadState={categories} onErrorClosed={() => setCategories(initial<Category[]>(false))}>
-        <FormControl>
+        <FormControl variant="outlined">
             <InputLabel id="categories_label">Categorie</InputLabel>
             <Select
                 labelId="categories_label"
@@ -35,6 +36,7 @@ const CategoriesSelect = ({ onChange, value }: Props) => {
                 onChange={e => {
                     onChange((e.target.value as number[]).map(catId => categories.data!.find(cat => cat.id === catId)!))
                 }}
+                onClose={onClose}
                 input={<OutlinedInput id="select-multiple-categories" label="Categorie" />}
                 renderValue={(selected) => {
                     return <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

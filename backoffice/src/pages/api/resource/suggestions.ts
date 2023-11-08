@@ -5,7 +5,12 @@ import { NextApiRequest, NextApiResponse } from "next"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
         try {
-            const resources = await getSuggestions(getToken(req), req.query.search as string)
+            let categories: string[] = []
+            if(req.query.categories) {
+                categories = (req.query.categories as string).split(',')
+            }
+            
+            const resources = await getSuggestions(getToken(req), req.query.search as string, categories)
             respondWithSuccess(res, resources)
         } catch(e: any) {
             respondWithFailure(req, res, e)

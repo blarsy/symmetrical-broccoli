@@ -37,7 +37,7 @@ export const createToken = async (secret: string, data: any): Promise<string> =>
 }
 
 export const getResource = async(resourceId: number): Promise<Resource> => {
-    const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration', 'categories'])
+    const resource = await getOne('ressources', `(Id,eq,${resourceId})`, ['Id', 'titre', 'description', 'images', 'conditions', 'expiration', 'comptes', 'categories'])
     const conditions = await getChildItems('conditions', resource.Id, 'ressources')
     resource.conditions = conditions
     return fromRawResource(resource)

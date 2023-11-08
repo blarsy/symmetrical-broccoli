@@ -18,7 +18,7 @@ const CategoriesSelect = ({ value, onChange }: Props) => {
         const load = async () => {
             try {
                 const categories = await getResourceCategories()
-                setCategories(fromData(categories))
+                setCategories(fromData(categories.sort((a, b) => a.name.localeCompare(b.name))))
             } catch (e) {
                 setCategories(fromError(e, t('requestError')))
             }

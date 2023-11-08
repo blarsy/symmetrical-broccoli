@@ -195,8 +195,15 @@ export const removeImageFromResource = async (token: string, resourceId: number,
     }
 }
 
-export const suggestions = async(token: string, searchTerm: string): Promise<Resource[]> => {
-    const res = await apiCall(`${apiUrl}resource/suggestions?search=${encodeURI(searchTerm)}`, { method: 'GET', mode: 'cors', headers:{
+export const getSuggestions = async(token: string, searchTerm: string, categories: string[]): Promise<Resource[]> => {
+    const queryTokens = []
+    if(searchTerm) {
+        queryTokens.push(`search=${searchTerm}`)
+    }
+    if(categories) {
+        queryTokens.push(`categories=${categories.join(',')}`)
+    }
+    const res = await apiCall(`${apiUrl}resource/suggestions${queryTokens.length > 0 ? `?${queryTokens.join('&')}` : ''}`, { method: 'GET', mode: 'cors', headers:{
         'Authorization': token
     } })
     if(res.status === 200) {

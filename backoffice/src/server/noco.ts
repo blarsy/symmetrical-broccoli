@@ -33,10 +33,10 @@ export const remove = async (tableName: string, itemId: string): Promise<number>
   }
 }
 
-export const list = async (tableName: string, filter?: string, fields?: string[], otherParams?: RequestParams, sort?: string | string[]): Promise<any[]> => {
+export const list = async (tableName: string, filter?: string, fields?: string[], otherParams?: RequestParams, sort?: string | string[], limit?: number): Promise<any[]> => {
     try{
-      const res = await api.dbTableRow.list(orgs, projectName, tableName, { where: filter, fields, sort }, otherParams)
-      logData(`Querying ${tableName} with filter ${filter} ${otherParams && 'other params: ' + JSON.stringify(otherParams)}`, res)
+      const res = await api.dbTableRow.list(orgs, projectName, tableName, { where: filter, fields, sort, limit }, otherParams)
+      logData(`Querying ${tableName} with filter ${filter} ${otherParams ? 'other params: ' + JSON.stringify(otherParams):''}`, res)
       return res.list
     } catch(e: any) {
       logData(`Error when querying ${tableName} with filter ${filter}`, e, true)

@@ -158,6 +158,21 @@ const migrateToV1_0_3 = async () => {
     await update(systemTableName, 1, { version: '1.0.3' })
 }
 
+const migrateToV1_0_4 = async (api: Api<unknown>, projectId: string) => {
+    const tables = await api.dbTable.list(projectId)
+    const categoriesTblId = tables.list.find(table => table.title === resourceCategoriesTableName)!.id!
+    const resourceTbl = tables.list.find(table => table.title === resourceTableName)!
+    const ressourcesTblId = resourceTbl.id!
+    const resourceTblFull = await api.dbTable.read(ressourcesTblId)
+    
+    const categoryResourceColId = resourceTblFull.columns!.find(col => col.title === resourceCategoriesTableName )!.id!
+    await api.dbTableColumn.delete(categoryResourceColId)
+    await api.dbTableColumn.create(ressourcesTblId, {
+        childId: categoriesTblId, parentId: ressourcesTblId, title: resourceCategoriesTableName,
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+}
+
 const insertTestData  = async () => {
     if(process.env.NODE_ENV === 'development') {
         const accounts = await Promise.all([
@@ -197,6 +212,7 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         await migrateToV1_0_1(api, projectId)
         await migrateToV1_0_2(api, projectId, orgs, projectName)
         await migrateToV1_0_3()
+        await migrateToV1_0_4(api, projectId)
         return 'Migrated to 1.0.3'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
@@ -209,6 +225,9 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         } else if(systemRow.version === '1.0.2') {
             await migrateToV1_0_3()
             return 'Migrated to 1.0.3'
+        } else if(systemRow.version === '1.0.3') {
+            await migrateToV1_0_4(api, projectId)
+            return 'Migrated to 1.0.4'
         } else {
             return 'Db already up to date'
         }

@@ -17,6 +17,7 @@ export default {
         const backupFilePath = `./${backupFilename}`
 
         await new Promise((res, rej) => {
+            //This comment does not serve any semantic purpose
             exec(`/usr/bin/pg_dump 'postgresql://${settings.dbUser}:${settings.dbPassword}@${settings.dbHost}:${settings.dbPort}/${settings.dbName}' -f ${backupFilePath}`, (err, outStream, errStream) => {
                 if(err) {
                     rej(errStream)

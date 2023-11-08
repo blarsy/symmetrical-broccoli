@@ -21,13 +21,26 @@ export const create = async (accountId: number, title: string, description: stri
 }
 
 export const getCategories = async (): Promise<Category[]> => {
-    const categoriesRaw = await list('categories')
+    const categoriesRaw = await list('categories', undefined, undefined, undefined, 'nom', 10000)
     return resourceCategoriesFromRaw(categoriesRaw)
 }
 
-export const getSuggestions = async (token: string, searchText: string): Promise<Resource[]> => {
-    const account = await getAccount(token, ['Id', 'comptes_liés', 'images', 'nom'])
-    const filter = `(comptes,neq,${account.name})~and(expiration,gt,today)${searchText && `~and((titre,like,%${searchText}%)~or(description,like,%${searchText}%))`}`
+export const getSuggestions = async (token: string, searchText: string, categories?: string[]): Promise<Resource[]> => {
+    const account = await getAccount(token, ['Id', 'nom'])
+    let filter = `(comptes,neq,${account.name})~and(expiration,gt,today)${searchText ? `~and((titre,like,%${searchText}%)~or(description,like,%${searchText}%))` : ''}`
+    
+    let resourcesOfCategory: number[] = []
+    if(categories && categories.length > 0) {
+        const categoriesAndResources = await list('categories', `(Id,in,${categories.join(',')})`, ['ressources List'], undefined, undefined, 10000000) as {['ressources List']: { Id: number }[]}[]
+        resourcesOfCategory = categoriesAndResources.filter(cr => !!cr['ressources List']).map(cr => cr['ressources List'].map(r => r.Id)).flat()
+        console.log(resourcesOfCategory)
+        
+        if(resourcesOfCategory.length > 0) {
+            filter += `~and(Id,in,${resourcesOfCategory.join(',')})`
+        } else {
+            filter = '(Id,eq,-1)'
+        }
+    }
     
     const resourceRaw = await list('ressources', filter, ['Id'], undefined, ['expiration','titre'])
     return Promise.all(resourceRaw.map(raw => getResource(raw.Id)))
