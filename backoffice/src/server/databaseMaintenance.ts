@@ -171,6 +171,7 @@ const migrateToV1_0_4 = async (api: Api<unknown>, projectId: string) => {
         childId: categoriesTblId, parentId: ressourcesTblId, title: resourceCategoriesTableName,
         type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
     } as LinkToAnotherColumnReqType)
+    await update(systemTableName, 1, { version: '1.0.4' })
 }
 
 const insertTestData  = async () => {
