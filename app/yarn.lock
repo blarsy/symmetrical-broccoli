@@ -4201,6 +4201,7 @@ __metadata:
     eas-cli: ^5.2.0
     expo: ^49.0.13
     expo-dev-client: ~2.4.11
+    expo-image-manipulator: ~11.3.0
     expo-image-picker: 14.6.0
     expo-localization: ~14.3.0
     expo-splash-screen: ~0.20.5
@@ -6706,12 +6707,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-image-loader@npm:~4.3.0":
+  version: 4.3.0
+  resolution: "expo-image-loader@npm:4.3.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 0440ac80a7b2331cdfd0db88aac0ba2fe61689e6347e2c6bedba6bf3220b95410c724ac9004252486870b582fc36d47d4bff008bba7052dcee2830256950974f
+  languageName: node
+  linkType: hard
+
 "expo-image-loader@npm:~4.5.0":
   version: 4.5.0
   resolution: "expo-image-loader@npm:4.5.0"
   peerDependencies:
     expo: "*"
   checksum: 017667e71f30a1285f178266af2729736badf0b6d36a4f525fc4838848c6b0788abb2bcd3cdda19264719c8108a91910af25994b670a04534ef3102d857f4730
+  languageName: node
+  linkType: hard
+
+"expo-image-manipulator@npm:~11.3.0":
+  version: 11.3.0
+  resolution: "expo-image-manipulator@npm:11.3.0"
+  dependencies:
+    expo-image-loader: ~4.3.0
+  peerDependencies:
+    expo: "*"
+  checksum: 7f3009e2f31973057d2008a4fa5738c79d8e21a3e203aa1fba4ff815cc78e96402ea337c799c4e2ad930f7148153a1a685ba952825c0ffab2df7b98b210d4fa2
   languageName: node
   linkType: hard
 

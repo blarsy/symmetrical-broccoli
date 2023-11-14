@@ -33,7 +33,6 @@ export const getSuggestions = async (token: string, searchText: string, categori
     if(categories && categories.length > 0) {
         const categoriesAndResources = await list('categories', `(Id,in,${categories.join(',')})`, ['ressources List'], undefined, undefined, 10000000) as {['ressources List']: { Id: number }[]}[]
         resourcesOfCategory = categoriesAndResources.filter(cr => !!cr['ressources List']).map(cr => cr['ressources List'].map(r => r.Id)).flat()
-        console.log(resourcesOfCategory)
         
         if(resourcesOfCategory.length > 0) {
             filter += `~and(Id,in,${resourcesOfCategory.join(',')})`

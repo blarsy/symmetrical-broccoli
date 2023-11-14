@@ -36,7 +36,6 @@ const hashFromPassword = async (password: string): Promise<string> => {
 export const create = async (name: string, email: string, password: string): Promise<Account> => {
     const duplicates = await list('comptes', `(email,eq,${email})~or(nom,like,${name})`, ['Id', 'nom', 'email'])
     if(duplicates.length > 0) {
-        console.log(duplicates)
         if(duplicates[0].email === email) {
             throw new Error('Already registered with this email address.', { cause: DUPLICATE_EMAIL })
         } else {
@@ -166,7 +165,6 @@ export const updateAccount = async (token: string, password: string, newPassword
         email: updatedAccount.email,
         nom: updatedAccount.name
     })
-    console.log(updated)
     return fromRawAccount(updated)
 }
 
