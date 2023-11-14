@@ -6,9 +6,15 @@ const allowedOrigins = JSON.parse(allowedOriginsStr) as string[]
 export function middleware(req: NextRequest) {
     const res= NextResponse.next()
 
+    if (req.headers.get('origin')) {
+        const soleOriginToAllow = allowedOrigins.find(ao => ao.toLowerCase().startsWith(req.headers.get('origin')!.toLowerCase()))
+        res.headers.append('Access-Control-Allow-Origin', soleOriginToAllow || allowedOrigins[0])
+    } else {
+        res.headers.append('Access-Control-Allow-Origin', allowedOrigins[0])
+    }
+    
     // add the CORS headers to the response
     res.headers.append('Access-Control-Allow-Credentials', "true")
-    res.headers.append('Access-Control-Allow-Origin', allowedOrigins.join(','))
     res.headers.append('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT')
     res.headers.append(
         'Access-Control-Allow-Headers', 

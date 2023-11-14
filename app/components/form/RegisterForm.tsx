@@ -29,12 +29,13 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
             appContext.actions.loginComplete(data.token, data.account)
             setRegisterState(fromData(null))
         } catch(e: any) {
+
             setRegisterState(fromError(e, t('registration_error')))
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View>
-            <OrangeTextInput label={t('name_label')} textContentType="givenName" value={values.name}
+            <OrangeTextInput label={t('organization_name_label')} textContentType="givenName" value={values.name}
                 onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={OrangeBackedErrorText} name="name" />
             <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}

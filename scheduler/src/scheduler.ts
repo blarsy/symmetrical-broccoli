@@ -43,7 +43,6 @@ export default async () => {
             logData(`Failure sending notification mail`, e, true)
         }
       }
-    
     })
     worker.on('active', (job => logData('Job starting', `Job ${job.name}`)))
     

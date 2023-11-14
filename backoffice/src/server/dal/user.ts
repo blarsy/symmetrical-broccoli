@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { link, list, create as nocoCreate, unlink, update } from '../noco'
 import { Account, fromRawAccount } from "@/schema"
 import * as yup from 'yup'
-import { isValidPassword } from "@/utils"
+import { DUPLICATE_EMAIL, DUPLICATE_NAME, isValidPassword } from "@/utils"
 import { sendAccountRecoveryMail } from "../mailing"
 
 const INITIAL_BALANCE = 5
@@ -34,8 +34,15 @@ const hashFromPassword = async (password: string): Promise<string> => {
 }
 
 export const create = async (name: string, email: string, password: string): Promise<Account> => {
-    const duplicates = await list('comptes', `(email,eq,${email})`, ['Id'])
-    if(duplicates.length > 0) throw new Error('Already registered with this email address.')
+    const duplicates = await list('comptes', `(email,eq,${email})~or(nom,like,${name})`, ['Id', 'nom', 'email'])
+    if(duplicates.length > 0) {
+        console.log(duplicates)
+        if(duplicates[0].email === email) {
+            throw new Error('Already registered with this email address.', { cause: DUPLICATE_EMAIL })
+        } else {
+            throw new Error('Already registered with this name', { cause: DUPLICATE_NAME })
+        }
+    }
     const hash = await hashFromPassword(password)
 
     const accountRaw = await nocoCreate('comptes', { email, nom: name, hash, balance: INITIAL_BALANCE  })
@@ -154,11 +161,12 @@ export const updateAccount = async (token: string, password: string, newPassword
         updatedAccount.name = name
     }
 
-    const updated = update('comptes', sourceAccount.id, {
+    const updated = await update('comptes', sourceAccount.id, {
         hash: updatedAccount.hash,
         email: updatedAccount.email,
         nom: updatedAccount.name
     })
+    console.log(updated)
     return fromRawAccount(updated)
 }
 

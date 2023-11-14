@@ -55,7 +55,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
     
     return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
-        <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images && resource.images.length === 1 ? 'center': 'auto', marginBottom: 10 }}>
+        { resource.images && resource.images.length >0 && <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images && resource.images.length === 1 ? 'center': 'auto', marginBottom: 10 }}>
             <SwiperFlatList data={getSwiperData(resource)} 
                 renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => {
                     setFocusedImage(item.source)
@@ -63,7 +63,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                     <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} 
                         style={{ width: imgSize, height: imgSize }} />
             </TouchableOpacity>} />
-        </View>
+        </View> }
         <ResourceViewField title={t('title_label')}>
             <Text variant="bodyLarge" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
         </ResourceViewField>

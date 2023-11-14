@@ -5,7 +5,8 @@ import * as yup from 'yup'
 import RegisterIcon from '@mui/icons-material/HowToReg'
 import Feedback from "@/components/Feedback"
 import { useState } from "react"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
+import { DUPLICATE_EMAIL } from "@/utils"
 
 interface Props {
     onSuccess: () => void
@@ -15,13 +16,23 @@ const Register = ({ onSuccess }: Props) => {
     const [errorInfo, setErrorInfo] = useState({ message: '', detail: '' })
 
     return <Formik initialValues={{ email: '', password: '', name: '' }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting }) => {
             try {
                 setSubmitting(true)
-                axios.post('/api/user', { email: values.email, name: values.name, password: values.password})
+                await axios.post('/api/user', { email: values.email, name: values.name, password: values.password})
                 onSuccess()
             } catch(e: any) {
-                setErrorInfo({ message: (e as string), detail: '' })
+                const err = (e as AxiosError)
+                if(!err) {
+                    setErrorInfo({ message: (e as string), detail: '' })
+                } else {
+                    console.log(err.response?.data)
+                    if(err.response?.data === DUPLICATE_EMAIL) {
+                        setErrorInfo({ message: 'Cette adresse email est déjà utilisée. Vous pouvez restaurer l\'accès à ce compte.', detail: '' })
+                    } else {
+                        setErrorInfo({ message: 'Ce nom d\'association est déjà utilisé.', detail: '' })
+                    }
+                }
             } finally {
                 setSubmitting(false)
             }
@@ -43,7 +54,7 @@ const Register = ({ onSuccess }: Props) => {
             <Box display="flex" padding="1rem" justifyContent="center">
                 <Box display="flex" flexDirection="column" maxWidth="25em" gap="0.5rem">
                     <TextField size="small" id="name" type="text" {...getFieldProps('name')} variant="standard"
-                        error={!!errors.name} label="Nom" helperText={touched.name && errors.name}/>
+                        error={!!errors.name} label="Nom de l'association" helperText={touched.name && errors.name}/>
                     <TextField size="small" id="email" type="text" {...getFieldProps('email')} variant="standard"
                         label="Email" error={!!errors.email} helperText={touched.email && errors.email}/>
                     <TextField id="password" name="password" autoComplete="current-password" 

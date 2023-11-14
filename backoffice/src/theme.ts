@@ -1,4 +1,4 @@
-import { createTheme, PaletteMode, PaletteOptions } from "@mui/material"
+import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
 import { lightPrimaryColor, primaryColor } from "./utils"
 

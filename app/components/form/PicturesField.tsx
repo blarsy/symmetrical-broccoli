@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Image, TouchableOpacity, View } from "react-native"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { IconButton, Text } from "react-native-paper"
@@ -37,11 +37,12 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 if(!result.canceled && result.assets.length > 0) {
                     const imgRes = await fetch(result.assets[0].uri)
                     const imgBlob = await imgRes.blob()
+                    console.log(result)
                     onImageSelected({ 
                         path: result.assets[0].uri, 
                         blob: imgBlob, 
                         size: result.assets[0].fileSize!, 
-                        mimetype: 'image/jpeg',//result.assets[0].type,
+                        mimetype: result.assets[0].mimeType!,
                         title: result.assets[0].fileName || '' })
                 }
         }}>

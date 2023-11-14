@@ -60,7 +60,7 @@ export default function EditProfile () {
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View style={{ flex: 1, padding: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <OrangeTextInput style={{ flex: 1 }} label={t('name_label')} textContentType="name" value={values.name}
+                <OrangeTextInput style={{ flex: 1 }} label={t('organization_name_label')} textContentType="name" value={values.name}
                     onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
                 <IconButton icon="logout" size={30} iconColor="#000" background="transparent" onPress={() => appContext.actions.logout()} />
             </View>

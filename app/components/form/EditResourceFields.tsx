@@ -43,18 +43,26 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
             }}
             onImageDeleteRequested={img => editResourceContext.actions.deleteImage(appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)} />
         <TransparentTextInput label={t('title_label')} value={values.title}
-            onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
+            onChangeText={val => {
+                handleChange('title')
+                editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ title: val }  })
+            }} onBlur={handleBlur('title')} />
         <ErrorMessage component={ErrorText} name="title" />
         <TransparentTextInput label={t('description_label')} value={values.description}
-            onChangeText={handleChange('description')} onBlur={handleBlur('description')} />
+            onChangeText={val => {
+                handleChange('description')
+                editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ description: val }  })
+            }} onBlur={handleBlur('description')} />
         <ErrorMessage component={ErrorText} name="description" />
         <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
             setFieldValue('expiration', d)
             setTouched({ expiration: true })
+            editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ expiration: d }  })
         }} label={t('expiration_label')} />
         <ErrorMessage component={ErrorText} name="expiration" />
         <CategoriesSelect value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
+            editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ categories }  })
         }} />
         <Surface style={{ marginTop: 8 }}>
             <Text variant="bodyMedium" style={{ marginLeft: 16, marginTop: 16 }}>{t('conditions_label')}</Text>

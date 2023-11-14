@@ -100,7 +100,7 @@ const AppContextProvider = ({ children }: Props) => {
             let message: string
             if(messageObj instanceof Error) message = (messageObj as Error).stack!
             else message = messageObj as string
-            setAppState({ ...appState, ...{ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH/mm/ss')}: ${message}\n`] }})
+            setAppState({ ...appState, ...{ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}: ${message}\n`] }})
         },
         resetMessages: () => {
             setAppState({ ...appState, ...{ messages: [] }})

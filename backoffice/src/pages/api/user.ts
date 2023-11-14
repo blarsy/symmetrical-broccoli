@@ -2,6 +2,7 @@ import { getToken, respondWithFailure, respondWithSuccess } from '@/server/respo
 import { getJwt, queryAccount } from '@/server/apiutil'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { authenticate, create, updateAccount } from '@/server/dal/user'
+import { DUPLICATE_EMAIL, DUPLICATE_NAME } from '@/utils'
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,7 +22,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const auth = await authenticate(lcaseEmail, password)
       respondWithSuccess(res, auth)
     } catch(e: any) {
-      respondWithFailure(req, res, e)
+      const error = e as Error
+      
+      if(error.cause === DUPLICATE_EMAIL) {
+        respondWithFailure(req, res, DUPLICATE_EMAIL, 409)
+      } else if(error.cause === DUPLICATE_NAME) {
+        respondWithFailure(req, res, DUPLICATE_NAME, 409)
+      } else {
+        respondWithFailure(req, res, e)
+      }
     }
   } else if(req.method === 'PATCH') {
     try {

@@ -172,7 +172,7 @@ export const deleteResource = async (token: string, resourceId: number): Promise
 
 export const uploadImagesOnResource = async (token: string, resourceId: number, imgs: NewOrExistingImage[]): Promise<Resource> => {
     const formData = new FormData()
-    imgs.forEach(img => formData.append('files[]', Platform.OS === "web" ? img.blob! : {uri: img.path, name: img.title, type: 'image/jpeg'}))
+    imgs.forEach(img => formData.append('files[]', Platform.OS === "web" ? img.blob! : {uri: img.path, name: img.title, type: img.mimetype || 'image/jpeg'}))
     
     const res = await apiCall(`${apiUrl}resource/${resourceId}/image`, { method: 'POST', body: formData, mode: 'cors', headers: {
         'Authorization': token

@@ -125,7 +125,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                 const resource = await removeImageFromResource(token, resourceId, img.path)
                 setResource(resource)
             } else {
-                setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd.filter(curImg => curImg.path != img.path)! ] }})
+                setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd.filter(curImg => curImg.path != img.path)! ] }, editedResource: { ...editResourceState.editedResource, ...{ images: editResourceState.editedResource.images.filter(curImg => img.path != curImg.path) } } })
                 editResourceState.changeCallback()
             }
         },
