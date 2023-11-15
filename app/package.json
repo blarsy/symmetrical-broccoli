@@ -22,7 +22,7 @@
     "expo": "^49.0.13",
     "expo-dev-client": "~2.4.11",
     "expo-image-manipulator": "~11.3.0",
-    "expo-image-picker": "14.6.0",
+    "expo-image-picker": "~14.3.2",
     "expo-localization": "~14.3.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",

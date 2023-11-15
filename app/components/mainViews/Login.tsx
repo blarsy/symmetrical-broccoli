@@ -15,9 +15,9 @@ interface ConnectProps {
 }
 
 const ConnectContainer = ({ children, titleI18n }: ConnectProps) => <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: "stretch", margin: 10, 
-        alignSelf: "stretch", gap: 30, maxWidth: isMdWidth() ? mdScreenWidth : 'auto' }}>
-        <Text variant="titleLarge" style={{ color: '#000', fontWeight: "bold", fontSize: 38, textTransform: "uppercase", textAlign: 'center' }}>{t(titleI18n)}</Text>
+    <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', margin: 10, 
+        alignSelf: 'stretch', gap: 30, maxWidth: isMdWidth() ? mdScreenWidth : 'auto' }}>
+        <Text variant="titleLarge" style={{ color: '#000', fontWeight: "bold", fontSize: 38, textTransform: "uppercase", textAlign: 'center', lineHeight: 38 }}>{t(titleI18n)}</Text>
         { children }
     </View>
 </PrimaryColoredContainer>

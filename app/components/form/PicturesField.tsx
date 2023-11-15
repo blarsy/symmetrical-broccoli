@@ -48,7 +48,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                         path: img.uri, 
                         blob: imgBlob, 
                         size: imgBlob.size, 
-                        mimetype: result.assets[0].mimeType!,
+                        mimetype: '',
                         title: result.assets[0].fileName || '' })
                 }
             } catch(e) {
