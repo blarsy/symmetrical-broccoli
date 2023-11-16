@@ -65,7 +65,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                 <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center' }} />
                 <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
             </Appbar.Header>
-            <StackNav.Navigator screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header style={{ backgroundColor: lightPrimaryColor }}>
+            <StackNav.Navigator screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor }}>
                 <Appbar.BackAction onPress={() => props.navigation.goBack()} />
                 <Appbar.Content titleStyle={{ textTransform: 'uppercase' }} title={t(getViewTitleI18n(props.route.name))} />
             </Appbar.Header> }}>

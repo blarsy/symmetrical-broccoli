@@ -223,7 +223,6 @@ const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response
             return res
         }
         if(res.status >= 400) {
-            console.error('Error response returned.', res)
             throw new Error(`Code ${res.status}, ${res.statusText}, ${await res.text()}\nRequest: ${input}, ${init && JSON.stringify(init)}`)
         }
         return res

@@ -26,7 +26,6 @@ const Register = ({ onSuccess }: Props) => {
                 if(!err) {
                     setErrorInfo({ message: (e as string), detail: '' })
                 } else {
-                    console.log(err.response?.data)
                     if(err.response?.data === DUPLICATE_EMAIL) {
                         setErrorInfo({ message: 'Cette adresse email est déjà utilisée. Vous pouvez restaurer l\'accès à ce compte.', detail: '' })
                     } else {
