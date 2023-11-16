@@ -49,21 +49,21 @@ export default () => {
     if(fontsLoaded) {
         return <PaperProvider theme={{
             fonts: configureFonts({ config: { 
-                bodyLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
-                bodyMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
-                bodySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
-                displayLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
-                displayMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
-                displaySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
-                headlineLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
-                headlineMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
-                headlineSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
-                labelLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge},
-                labelMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium},
-                labelSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall},
-                titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge },
-                titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium },
-                titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall }
+                bodyLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+                bodyMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+                bodySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                displayLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                displayMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                displaySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                headlineLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                headlineMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                headlineSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                labelLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                labelMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                labelSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+                titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+                titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
             } })
           }}>
             { appContext.state.token.data ? 
