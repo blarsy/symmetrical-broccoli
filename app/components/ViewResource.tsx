@@ -64,6 +64,9 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                         style={{ width: imgSize, height: imgSize }} />
             </TouchableOpacity>} />
         </View> }
+        <ResourceViewField title={t('brought_by_label')}>
+            <Text variant="bodyLarge">{resource.account?.name}</Text>
+        </ResourceViewField>
         <ResourceViewField title={t('title_label')}>
             <Text variant="bodyLarge" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
         </ResourceViewField>

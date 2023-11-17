@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, Resource } from "@/lib/schema"
-import { TextInput } from "react-native-paper"
+import { Text, TextInput } from "react-native-paper"
 import { getSuggestions } from "@/lib/api"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
@@ -13,6 +13,7 @@ import { useDebounce } from "usehooks-ts"
 import MainResourceImage from "../MainResourceImage"
 import ResponsiveListItem from "../ResponsiveListItem"
 import CategoriesSelect from "../form/CategoriesSelect"
+import { primaryColor } from "../layout/constants"
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
@@ -48,7 +49,7 @@ export default function Search ({ route, navigation }: RouteProps) {
             onChange={categories => setFilters({ search: filters.search, categories })} />
         <LoadedList loading={resources.loading} error={resources.error} data={resources.data}
             displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
-            description={resource.description} style={{ margin: 0, padding: 0 }}
+            description={<Text variant="bodySmall" style={{ color: primaryColor }}>{resource.account?.name}</Text>} style={{ margin: 0, padding: 0 }}
             left={() => <MainResourceImage resource={resource} />}
         />}/>
     </View>

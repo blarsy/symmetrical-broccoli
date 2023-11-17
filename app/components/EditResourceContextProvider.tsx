@@ -20,10 +20,10 @@ interface EditResourceActions {
     load: (token: string) => void
     setResource: (resource: Resource) => void
     setCondition: (condition: Condition) => void
-    deleteCondition: (condition: Condition) => void
+    deleteCondition: (resourceState: any, condition: Condition) => void
     setChangeCallback: (cb: () => void) => void
-    addImage: (token: string, resourceId: number, img: NewOrExistingImage) => Promise<void>
-    deleteImage: (token: string, resourceId: number, img: NewOrExistingImage) => Promise<void>
+    addImage: (resourceState: any, token: string, resourceId: number, img: NewOrExistingImage) => Promise<void>
+    deleteImage: (resourceState: any, token: string, resourceId: number, img: NewOrExistingImage) => Promise<void>
     save: (token: string, resource: Resource) => Promise<void>
     reset: () => void
 }
@@ -96,36 +96,36 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
             editResourceState.changeCallback()
         },
-        deleteCondition: condition => {
-            const resource = editResourceState.editedResource
+        deleteCondition: (resourceState: any, condition: Condition) => {
+            const resource = { ...editResourceState.editedResource, ...resourceState }
             if(condition.id) {
-                resource.conditions = resource.conditions.filter(cond => condition.id != cond.id)
+                resource.conditions = resource.conditions.filter((cond: Condition) => condition.id != cond.id)
             } else {
-                resource.conditions = resource.conditions.filter(cond => condition.description != cond.description || condition.title != cond.title )
+                resource.conditions = resource.conditions.filter((cond: Condition) => condition.description != cond.description || condition.title != cond.title )
             }
             
             setResource(resource)
         },
         setChangeCallback: changeCallback => setEditResourceState({ ...editResourceState, ...{ changeCallback } }),
-        addImage: async (token: string, resourceId: number, img: NewOrExistingImage) => {
+        addImage: async (resourceState: any, token: string, resourceId: number, img: NewOrExistingImage) => {
             if(img.blob){
                 if(editResourceState.editedResource.id){
                     const resource = await uploadImagesOnResource(token, resourceId, [img])
-                    setResource(resource)
+                    setResource({ ...resourceState,  ...{ images: resource.images } })
                 } else {
-                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...editResourceState.editedResource, ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
+                    setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...editResourceState.editedResource, ...resourceState, ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
                     editResourceState.changeCallback()
                 }
             } else {
                 throw new Error('Need an image Blob')
             }
         },
-        deleteImage: async (token: string, resourceId: number, img: NewOrExistingImage) => {
+        deleteImage: async (resourceState: any, token: string, resourceId: number, img: NewOrExistingImage) => {
             if(editResourceState.editedResource.id){
                 const resource = await removeImageFromResource(token, resourceId, img.path)
-                setResource(resource)
+                setResource({ ...resourceState,  ...{ images: resource.images } })
             } else {
-                setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd.filter(curImg => curImg.path != img.path)! ] }, editedResource: { ...editResourceState.editedResource, ...{ images: editResourceState.editedResource.images.filter(curImg => img.path != curImg.path) } } })
+                setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd.filter(curImg => curImg.path != img.path)! ] }, editedResource: { ...editResourceState.editedResource, ...resourceState, ...{ images: editResourceState.editedResource.images.filter(curImg => img.path != curImg.path) } } })
                 editResourceState.changeCallback()
             }
         },
