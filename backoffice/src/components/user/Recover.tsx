@@ -1,4 +1,4 @@
-import { TextField, Box, Alert } from "@mui/material"
+import { TextField, Box, Stack, Alert, Typography } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import { Formik } from "formik"
 import * as yup from 'yup'
@@ -7,21 +7,31 @@ import Feedback from "@/components/Feedback"
 import { useState } from "react"
 import axios from "axios"
 import { isValidPassword } from "@/utils"
+import { initial } from "@/DataLoadState"
+import Link from "next/link"
 
 interface Props {
-    recoveryId: string,
-    onDone: () => void
+    recoveryId: string
 }
 
-const Recover = ({ recoveryId, onDone }: Props) => {
+const Recover = ({ recoveryId }: Props) => {
     const [errorInfo, setErrorInfo] = useState({ message: '', detail: '' })
+    const [success, setSuccess] = useState(false)
+
+    if(success) {
+        return <Stack alignItems="center" gap="2rem">
+            <Alert severity="success">Votre mot de passe a été changé</Alert>
+            <Typography variant="overline">Ouvrez l'app pour vous reconnecter</Typography>
+            <Link href="/webapp">Rester sur le site web</Link>
+        </Stack>
+    }
 
     return <Formik initialValues={{ password: '', repeatPassword: '' }}
         onSubmit={async (values, { setSubmitting }) => {
             try {
                 setSubmitting(true)
                 await axios.post('/api/user/recovery', { id: recoveryId, password: values.password })
-                onDone()
+                setSuccess(true)
             } catch(e: any) {
                 setErrorInfo({ message: e.toString(), detail: '' })
             } finally {

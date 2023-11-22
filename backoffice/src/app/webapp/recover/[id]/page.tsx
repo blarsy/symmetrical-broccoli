@@ -1,11 +1,9 @@
 "use client"
 import ClientLayout from "@/components/ClientLayout"
 import Recover from "@/components/user/Recover"
-import { useRouter } from "next/navigation"
 
-export default function Recovery({ params }: { params: { id: string } }) {
-    const router = useRouter()
+export default function Recovery({ params }: { params: { id: string, fromApp: boolean } }) {
     return <ClientLayout>
-        <Recover onDone={() => router.push('/webapp/')} recoveryId={params.id} />
+        <Recover recoveryId={params.id} />
     </ClientLayout>
 }
