@@ -1,5 +1,5 @@
 import { createContext, useState } from "react"
-import { Account } from "@/lib/schema"
+import { Account, Category } from "@/lib/schema"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getAccount } from "@/lib/api"
 import React from "react"
@@ -10,10 +10,16 @@ import dayjs from "dayjs"
 
 const SPLASH_DELAY = 3000
 
+export interface SearchFilter {
+    search: string;
+    categories: Category[];
+}
+
 interface AppState {
     token: DataLoadState<string>,
     account?: Account,
-    messages: string[]
+    messages: string[],
+    searchFilter: SearchFilter
 }
 
 interface AppActions {
@@ -25,6 +31,7 @@ interface AppActions {
     resetMessages: () => void
     setMessage: (message: any) => void
     notify: (message: any) => void
+    setSearchFilter: (newFilter: SearchFilter) => void
 }
 
 interface AppContext {
@@ -37,7 +44,7 @@ interface Props {
 }
 
 export const AppContext = createContext<AppContext>({
-    state: { token: initial<string>(true, ''), messages: [] }, 
+    state: { token: initial<string>(true, ''), messages: [], searchFilter: { categories: [], search: '' } }, 
     actions: {
         loginComplete: (_, account) => Promise.resolve(account),
         tryRestoreToken: () => Promise.resolve(),
@@ -46,13 +53,14 @@ export const AppContext = createContext<AppContext>({
         setTokenState: () => {},
         resetMessages: () => {},
         setMessage: () => {},
-        notify: () => {}
+        notify: () => {},
+        setSearchFilter: () => {}
     }
 })
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState({
-        token: initial<string>(true, ''), account: undefined, messages: []
+        token: initial<string>(true, ''), account: undefined, messages: [], searchFilter: { categories: [], search: '' }
     } as AppState)
     const [lastNotification, setLastNofication] = useState('')
 
@@ -105,7 +113,10 @@ const AppContextProvider = ({ children }: Props) => {
         resetMessages: () => {
             setAppState({ ...appState, ...{ messages: [] }})
         },
-        notify: setLastNofication
+        notify: setLastNofication,
+        setSearchFilter: (newFilter: SearchFilter) => {
+            setAppState({ ...appState, ...{ searchFilter: newFilter }})
+        }
     }
 
     return <AppContext.Provider value={{ state: appState, actions}}>
