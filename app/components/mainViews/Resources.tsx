@@ -14,7 +14,7 @@ import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
 
 const Resources = ({ route, navigation }: RouteProps) => {
-    const [resources, setResources] = useState(initial<Resource[]>(true))
+    const [resources, setResources] = useState(initial<Resource[]>(true, []))
     const [deletingResource, setDeletingResource] = useState(0)
     const appContext = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)

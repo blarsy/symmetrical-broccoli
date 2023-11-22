@@ -47,15 +47,34 @@ export interface AccountLinkRequest {
     target: Account
 }
 
-export const fromRawAccount = (raw: any): Account => ({
-    id: raw.Id, name: raw.nom, balance: raw.balance, email: raw.email, hash: raw.hash,
-    resources: raw.ressources ? raw.ressources.map((rawRes:any) => fromRawResource(rawRes)): [],
-    linkedAccounts: raw.comptes_liés ? raw.comptes_liés.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
-    invitedAccounts: raw.comptes_invites ? raw.comptes_invites.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
-    invitedByAccounts: raw['comptes List1'] ? raw['comptes List1'].map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
-    recoveryCode: raw.code_restauration,
-    expirationRecoveryCode: raw.expiration_code_restauration
-})
+export interface ConversationData {
+    withUser: Account,
+    conversation: {
+        id: number,
+        lastMessageExcerpt: string | undefined,
+        ressourceTitle: string,
+    }
+}
+
+export interface Message {
+    text: string,
+    id: number,
+    created: Date,
+    from: Account,
+    image?: Image
+}
+
+export const fromRawAccount = (raw: any): Account => {
+    return {
+        id: raw.Id, name: raw.nom, balance: raw.balance, email: raw.email, hash: raw.hash,
+        resources: raw.ressources ? raw.ressources.map((rawRes:any) => fromRawResource(rawRes)): [],
+        linkedAccounts: raw.comptes_liés ? raw.comptes_liés.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+        invitedAccounts: raw.comptes_invites ? raw.comptes_invites.map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+        invitedByAccounts: raw['comptes List1'] ? raw['comptes List1'].map((rawAccount: any) => fromRawAccount(rawAccount)) : [],
+        recoveryCode: raw.code_restauration,
+        expirationRecoveryCode: raw.expiration_code_restauration
+    }
+}
 
 export const fromRawResource = (raw: any): Resource => ({
     id: raw.Id,

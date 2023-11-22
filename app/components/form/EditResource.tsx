@@ -14,7 +14,7 @@ import { Portal, Snackbar } from "react-native-paper"
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
-    const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false))
+    const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
 
     useEffect(() => {
         if(route.params && route.params.isNew){
@@ -47,7 +47,7 @@ export default ({ route, navigation }:RouteProps) => {
             }} processing={saveResourceState.loading} />
             <Portal>
                 <Snackbar role="alert" visible={!!saveResourceState.error && !!saveResourceState.error.message} 
-                    onDismiss={() => setSaveResourcestate(initial<null>(false))}>
+                    onDismiss={() => setSaveResourcestate(initial<null>(false, null))}>
                     {saveResourceState.error && saveResourceState.error.message}
                 </Snackbar>
             </Portal>

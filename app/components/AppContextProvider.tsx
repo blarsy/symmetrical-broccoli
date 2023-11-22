@@ -37,7 +37,7 @@ interface Props {
 }
 
 export const AppContext = createContext<AppContext>({
-    state: { token: initial<string>(true), messages: [] }, 
+    state: { token: initial<string>(true, ''), messages: [] }, 
     actions: {
         loginComplete: (_, account) => Promise.resolve(account),
         tryRestoreToken: () => Promise.resolve(),
@@ -52,7 +52,7 @@ export const AppContext = createContext<AppContext>({
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState({
-        token: initial<string>(true), account: undefined, messages: []
+        token: initial<string>(true, ''), account: undefined, messages: []
     } as AppState)
     const [lastNotification, setLastNofication] = useState('')
 

@@ -27,7 +27,7 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
 
 export default function Search ({ route, navigation }: RouteProps) {
     const appContext = useContext(AppContext)
-    const [resources, setResources] = useState(initial<Resource[]>(true))
+    const [resources, setResources] = useState(initial<Resource[]>(true, []))
     const [filters, setFilters] = useState({ search: '', categories: [] as Category[] })
     const load = async(searchText: string, categories: Category[]) => {
         try{

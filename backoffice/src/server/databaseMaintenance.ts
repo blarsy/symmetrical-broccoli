@@ -7,6 +7,9 @@ import { getOne, list, update } from "./noco"
 const systemTableName = 'systeme'
 const accountsTableName = 'comptes'
 const resourceCategoriesTableName = 'categories'
+const messagesTableName = 'messages'
+const participantsTableName = 'participants'
+const conversationsTableName = 'conversations'
 const resourceTableName = 'ressources'
 
 const testPwd1 = process.env.TEST_PWD_1 as string
@@ -73,6 +76,9 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
     await migrateToV1_0_0(apiInNewProject, projectId, orgs, projectName)
     await migrateToV1_0_1(apiInNewProject, projectId)
     await migrateToV1_0_2(apiInNewProject, projectId, orgs, projectName)
+    await migrateToV1_0_3()
+    await migrateToV1_0_4(apiInNewProject, projectId)
+    await migrateToV1_0_5(apiInNewProject, projectId)
 }
 
 const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string): Promise<void> => {
@@ -174,6 +180,50 @@ const migrateToV1_0_4 = async (api: Api<unknown>, projectId: string) => {
     await update(systemTableName, 1, { version: '1.0.4' })
 }
 
+const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string) => {
+    const tables = await api.dbTable.list(projectId)
+    const resourceTbl = tables.list.find(table => table.title === resourceTableName)!
+    const accountTbl = tables.list.find(table => table.title === accountsTableName)!
+
+    const conversationsTbl = await api.dbTable.create(projectId, { table_name: conversationsTableName, title: conversationsTableName, columns: [
+        ...systemCols,
+        { column_name: 'demarre', title: 'demarre', uidt: 'DateTime', pv: true },
+    ] })
+    const participantsTbl = await api.dbTable.create(projectId, { table_name: participantsTableName, title: participantsTableName, columns: [
+        ...systemCols,
+        { column_name: 'rejoint', title: 'rejoint', uidt: 'DateTime', pv: true }
+    ] })
+    const messagesTbl = await api.dbTable.create(projectId, { table_name: messagesTableName, title: messagesTableName, columns: [
+        ...systemCols,
+        { column_name: 'texte', title: 'texte', uidt: 'SingleLineText', pv: true },
+        { column_name: 'recu', title: 'recu', uidt: 'Checkbox' },
+        { column_name: 'image', title: 'image', uidt: 'Attachment' },
+        { column_name: 'envoye', title: 'envoye', uidt: 'DateTime' },
+    ] })
+    await api.dbTableColumn.create(conversationsTbl.id!, {
+        childId: messagesTbl.id!, parentId: conversationsTbl.id!, title: 'dernier_message',
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+    await api.dbTableColumn.create(conversationsTbl.id!, {
+        childId: resourceTbl.id!, parentId: conversationsTbl.id!, title: 'ressource',
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+
+    await api.dbTableColumn.create(participantsTbl.id!, {
+        childId: conversationsTbl.id!, parentId: participantsTbl.id!, title: 'conversation',
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+    await api.dbTableColumn.create(participantsTbl.id!, {
+        childId: accountTbl.id!, parentId: participantsTbl.id!, title: 'compte',
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+
+    await api.dbTableColumn.create(messagesTbl.id!, {
+        childId: participantsTbl.id!, parentId: messagesTbl.id!, title: 'participant',
+        type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+}
+
 const insertTestData  = async () => {
     if(process.env.NODE_ENV === 'development') {
         const accounts = await Promise.all([
@@ -214,7 +264,8 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         await migrateToV1_0_2(api, projectId, orgs, projectName)
         await migrateToV1_0_3()
         await migrateToV1_0_4(api, projectId)
-        return 'Migrated to 1.0.3'
+        await migrateToV1_0_5(api, projectId)
+        return 'Migrated to 1.0.5'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
         if(systemRow.version === '1.0.0') {
@@ -229,6 +280,9 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         } else if(systemRow.version === '1.0.3') {
             await migrateToV1_0_4(api, projectId)
             return 'Migrated to 1.0.4'
+        } else if(systemRow.version === '1.0.4') {
+            await migrateToV1_0_5(api, projectId)
+            return 'Migrated to 1.0.5'
         } else {
             return 'Db already up to date'
         }

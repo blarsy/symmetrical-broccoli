@@ -1,5 +1,5 @@
 import { NewOrExistingImage } from '@/components/EditResourceContextProvider'
-import { Account, Category, Network, Resource } from './schema'
+import { Account, Category, ConversationData, Message, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 import { Platform } from 'react-native'
 let loggedOutHandler: () => void
@@ -208,6 +208,28 @@ export const getSuggestions = async(token: string, searchTerm: string, categorie
     } })
     if(res.status === 200) {
         return ((await res.json()) as Resource[]).map(res => resourceFromApi(res))
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const getMessages = async(token: string, conversationId: number): Promise<Message[]> => {
+    const res = await apiCall(`${apiUrl}messages/${conversationId}`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    } })
+    if(res.status === 200) {
+        return (await res.json()) as Message[]
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const getPastConversations = async(token: string): Promise<ConversationData[]> => {
+    const res = await apiCall(`${apiUrl}conversations`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    } })
+    if(res.status === 200) {
+        return (await res.json()) as ConversationData[]
     } else {
         throw new Error(res.statusText)
     }

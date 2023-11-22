@@ -48,7 +48,7 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
         <ErrorMessage component={ErrorText} name="title" />
         <TransparentTextInput label={t('description_label')} value={values.description}
-            onChangeText={handleChange('description')} onBlur={handleBlur('description')} />
+            onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
         <ErrorMessage component={ErrorText} name="description" />
         <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
             setFieldValue('expiration', d)

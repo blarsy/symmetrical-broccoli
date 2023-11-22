@@ -15,7 +15,7 @@ interface Props {
 
 const RegisterForm = ({ toggleRegistering }: Props) => {
     const appContext = useContext(AppContext)
-    const [registerState, setRegisterState] = useState(initial<null>(false))
+    const [registerState, setRegisterState] = useState(initial<null>(false, null))
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')),
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
@@ -52,7 +52,7 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
                     {t('ok_caption')}
                 </WhiteButton>
                 <Portal>
-                    <Snackbar visible={!!registerState.error && !!registerState.error.message} onDismiss={() => setRegisterState(initial<null>(false))}>{registerState.error && registerState.error.message}</Snackbar>
+                    <Snackbar visible={!!registerState.error && !!registerState.error.message} onDismiss={() => setRegisterState(initial<null>(false, null))}>{registerState.error && registerState.error.message}</Snackbar>
                 </Portal>
                 <WhiteButton style={{ flex: 1 }} onPress={() => {
                     toggleRegistering()

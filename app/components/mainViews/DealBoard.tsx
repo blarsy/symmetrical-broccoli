@@ -51,7 +51,7 @@ const getViewTitleI18n = (routeName: string) => {
 const bottomRoutes = [
     { key: 'search', title: t('search_label'), focusedIcon: Images.Search },
     { key: 'resource', title: t('resource_label'), focusedIcon: Images.Modify },
-    //{ key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
+    { key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
     // { key: 'history', title: t('history_label'), focusedIcon: Images.History },
 ]
 
@@ -76,7 +76,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                                 search: () => <Search {...props} />,
                                 history: History,
                                 resource: () => <Resources {...props} />,
-                                chat: Chat,
+                                chat: () => <Chat {...props} />,
                                 myNetwork: () => <ScrollView><MyNetwork {...props} /></ScrollView>,
                             })
                         }

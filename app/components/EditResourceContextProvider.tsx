@@ -42,7 +42,7 @@ export const EditResourceContext = createContext<EditResourceContext>({
         editedResource: { id: 0, conditions: [], description: '', title: '', images: [], categories: [] }, 
         changeCallback: () => {},
         imagesToAdd: [],
-        resources: initial(true)
+        resources: initial(true, [])
     } as EditResourceState, 
     actions: {
         load: () => {},

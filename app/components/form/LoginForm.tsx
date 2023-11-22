@@ -18,7 +18,7 @@ interface Props {
 
 const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
     const appContext = useContext(AppContext)
-    const [loginState, setLoginstate] = useState(initial<null>(false))
+    const [loginState, setLoginstate] = useState(initial<null>(false, null))
 
     return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
@@ -56,7 +56,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
                 {t('forgotPassword_label')}
             </Button>
             <Portal>
-                <Snackbar role="alert" visible={!!loginState.error && !!loginState.error.message} onDismiss={() => setLoginstate(initial<null>(false))}>
+                <Snackbar role="alert" visible={!!loginState.error && !!loginState.error.message} onDismiss={() => setLoginstate(initial<null>(false, null))}>
                     {loginState.error && loginState.error.message}
                 </Snackbar>
             </Portal>

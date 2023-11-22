@@ -16,7 +16,7 @@ interface Props {
 
 const RecoveryForm = ({ toggleRecovering }: Props) => {
     const appContext = useContext(AppContext)
-    const [requestRecoveryState, setRequestRecoveryState] = useState(initial<null>(false))
+    const [requestRecoveryState, setRequestRecoveryState] = useState(initial<null>(false, null))
     const [recoveryRequested, setRecoveryRequested] = useState(false)
 
     return <Formik initialValues={{ email: '' }} validationSchema={yup.object().shape({
@@ -48,7 +48,7 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
                 </WhiteButton>
             </View>
             <Portal>
-                <Snackbar role="alert" visible={!!requestRecoveryState.error && !!requestRecoveryState.error.message} onDismiss={() => setRequestRecoveryState(initial<null>(false))}>
+                <Snackbar role="alert" visible={!!requestRecoveryState.error && !!requestRecoveryState.error.message} onDismiss={() => setRequestRecoveryState(initial<null>(false, null))}>
                     {requestRecoveryState.error && requestRecoveryState.error.message}
                 </Snackbar>
                 <Snackbar role="note" visible={recoveryRequested} onDismiss={toggleRecovering}>{t('recoveryRequested_message')}</Snackbar>

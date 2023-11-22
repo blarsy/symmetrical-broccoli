@@ -13,7 +13,7 @@ import { isMdWidth } from "@/lib/settings"
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)
-    const [updateProfileState, setUpdateProfileState] = useState(initial<null>(false))
+    const [updateProfileState, setUpdateProfileState] = useState(initial<null>(false, null))
 
     let initialValues = { email: '', password: '', name: '', newPassword: '', passwordRepeat: ''}
     if(appContext.state.account) initialValues = { 
@@ -80,7 +80,7 @@ export default function EditProfile () {
             <WhiteButton style={{ marginTop: 20, width: isMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => handleSubmit()} loading={updateProfileState.loading}>
                 {t('save_label')}
             </WhiteButton>
-            <Snackbar visible={!!updateProfileState.error && !!updateProfileState.error.message} onDismiss={() => setUpdateProfileState(initial<null>(false))}>
+            <Snackbar visible={!!updateProfileState.error && !!updateProfileState.error.message} onDismiss={() => setUpdateProfileState(initial<null>(false, null))}>
                 {updateProfileState.error && updateProfileState.error.message}
             </Snackbar>
         </View>)}

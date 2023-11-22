@@ -36,7 +36,7 @@ const AccountListItem = ({ item, onChange }: AccountListItemProps) => {
 
 const AddFriend = ({ route, navigation }: RouteProps) => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [foundAccounts, setFoundAccounts] = useState(initial<Account[]>(false))
+    const [foundAccounts, setFoundAccounts] = useState(initial<Account[]>(false, []))
     const appContext = useContext(AppContext)
 
     const searchWithTerm = async (term: string) => {

@@ -28,6 +28,14 @@ export interface Category {
     name: string
 }
 
+export interface Message {
+    text: string,
+    id: number,
+    created: Date,
+    from: Account,
+    image?: Image
+}
+
 export interface Resource {
     id: number,
     images: Image[],
@@ -37,6 +45,15 @@ export interface Resource {
     expiration?: Date,
     account?: Account,
     categories: Category[]
+}
+
+export interface ConversationData {
+    withUser: Account,
+    conversation: {
+        id: number,
+        lastMessageExcerpt: string | undefined,
+        ressourceTitle: string,
+    }
 }
 
 export interface AccountLinkRequest {

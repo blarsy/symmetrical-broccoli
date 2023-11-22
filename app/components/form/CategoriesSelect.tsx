@@ -13,7 +13,7 @@ interface Props {
 }
 
 const CategoriesSelect = ({ value, onChange }: Props) => {
-    const [ categories, setCategories ] = useState(initial<Category[]>(true))
+    const [ categories, setCategories ] = useState(initial<Category[]>(true, []))
     useEffect(() => {
         const load = async () => {
             try {

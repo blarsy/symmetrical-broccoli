@@ -11,14 +11,14 @@ interface Props {
 }
 
 const ConfirmDialog = ({ visible, onResponse, title, question }: Props) => {
-    const [processing, setProcessing] = useState(initial<null>(false))
+    const [processing, setProcessing] = useState(initial<null>(false, null))
     return <Portal>
         <Dialog visible={visible}>
             <Dialog.Title><Text variant="titleLarge">{title}</Text></Dialog.Title>
             <Dialog.Content>
                 <Text variant="bodyMedium">{question}</Text>
                 { processing.loading && <ActivityIndicator /> }
-                <Snackbar visible={!!processing.error} onDismiss={() => setProcessing(initial(false))}>{processing.error && processing.error.message}</Snackbar>
+                <Snackbar visible={!!processing.error} onDismiss={() => setProcessing(initial(false, null))}>{processing.error && processing.error.message}</Snackbar>
             </Dialog.Content>
             <Dialog.Actions>
             <IconButton size={30} icon="check" onPress={async () => {

@@ -12,7 +12,7 @@ import ResponsiveListItem from "./ResponsiveListItem"
 
 const MyNetwork = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
-    const [network, setNetwork] = useState(initial<Network>(true))
+    const [network, setNetwork] = useState(initial<Network | undefined>(true, undefined))
 
     const loadNetwork = async () => {
         try {
@@ -28,7 +28,7 @@ const MyNetwork = ({ route, navigation }: RouteProps) => {
     }, [route.params && route.params.hasChanged])
     
     if( network.error && network.error.message ) {
-        return <Snackbar visible={!!network.error && !!network.error.message} onDismiss={() => setNetwork(initial<Network>(false))}>{network.error.message}</Snackbar>
+        return <Snackbar visible={!!network.error && !!network.error.message} onDismiss={() => setNetwork(initial(false, undefined))}>{network.error.message}</Snackbar>
     } else if(network.loading){
         return <ActivityIndicator style={{ marginTop: 10 }} />
     } else {
