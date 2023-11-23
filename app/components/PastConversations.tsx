@@ -33,7 +33,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
 
     return <View style={{ flex: 1 }}>
         <LoadedList loading={conversations.loading} data={conversations.data} error={conversations.error}
-            displayItem={(item, idx) => <ResponsiveListItem left={p => <Icon size={40} source="account" color={primaryColor} />} key={idx} onPress={() => onConversationSelected(item.conversation.id)} 
+            displayItem={(item, idx) => <ResponsiveListItem left={p => <Icon size={40} source="account" color={primaryColor} />} key={idx} onPress={() => onConversationSelected(item.conversation.resourceId)} 
                 title={() => <View style={{ flexDirection: 'column' }}>
                     <Text variant="headlineMedium" style={{ color: primaryColor }}>{ item.withUser.name }</Text>
                     <Text variant="bodyMedium">{item.conversation.ressourceTitle}</Text>

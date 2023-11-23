@@ -53,6 +53,7 @@ export interface ConversationData {
         id: number,
         lastMessageExcerpt: string | undefined,
         ressourceTitle: string,
+        resourceId: number
     }
 }
 

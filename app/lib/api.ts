@@ -2,6 +2,7 @@ import { NewOrExistingImage } from '@/components/EditResourceContextProvider'
 import { Account, Category, ConversationData, Message, Network, Resource } from './schema'
 import { apiUrl } from './settings'
 import { Platform } from 'react-native'
+import { IMessage } from 'react-native-gifted-chat'
 let loggedOutHandler: () => void
 
 export const registerLoggedOutHandler = (handler: () => void) => {
@@ -216,7 +217,19 @@ export const getSuggestions = async(token: string, searchTerm: string, categorie
 export const getMessages = async(token: string, conversationId: number): Promise<Message[]> => {
     const res = await apiCall(`${apiUrl}messages/${conversationId}`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
-    } })
+    }})
+    if(res.status === 200) {
+        return (await res.json()) as Message[]
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const sendChatMessages = async(token: string, resourceId: number, messages: IMessage[]): Promise<Message[]> => {
+    const res = await apiCall(`${apiUrl}messages/${resourceId}`, { method: 'POST', body: JSON.stringify({ messages: messages.map((msg: IMessage) => ({ text: msg.text, image: msg.image }))}), mode: 'cors', headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+    }})
     if(res.status === 200) {
         return (await res.json()) as Message[]
     } else {
@@ -233,6 +246,18 @@ export const getPastConversations = async(token: string): Promise<ConversationDa
     } else {
         throw new Error(res.statusText)
     }
+}
+
+export const createConversation = async (token: string, resourceId: number, messageText: string, messageImage: string) => {
+    const res = await apiCall(`${apiUrl}conversations/`, { method: 'POST', body: JSON.stringify({ resourceId, messageText, messageImage }), mode: 'cors', headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+    }})
+    if(res.status === 200) {
+        return resourceFromApi(await res.json())
+    } else {
+        throw new Error(res.statusText)
+    }  
 }
 
 const apiCall = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {

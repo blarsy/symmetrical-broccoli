@@ -8,8 +8,8 @@ interface Props {
 }
 
 const MainResourceImage = ({ resource }: Props) => {
-    const size = isMdWidth() ? 200 :
-        (hasMinWidth(450) ? 120 : 70)
+    const size = isMdWidth() ? 350 :
+        (hasMinWidth(450) ? 200 : 100)
     if(resource.images && resource.images.length > 0) {
         const imgData = resource.images[0]
         return <Image source={{ uri: `${imgUrl}${imgData.path}` }} alt={imgData.title} style={{ width: size, height: size }} />

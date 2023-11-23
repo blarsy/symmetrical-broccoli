@@ -23,7 +23,7 @@ export function beginOperation<M>(): DataLoadState<M> {
 }
 
 export function initial<M> (loading: boolean, value: M): DataLoadState<M> {
-    return new DataLoadState<M>(undefined, loading, undefined)
+    return new DataLoadState<M>(value, loading, undefined)
 }
 
 export function fromError<M> (err: any, message: string): DataLoadState<M> {

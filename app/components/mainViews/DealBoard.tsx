@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Appbar, BottomNavigation } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
-import { ScrollView, Text, View } from "react-native"
+import { ScrollView, View } from "react-native"
 import Search from './Search'
 import Chat from './Chat'
 import MyNetwork from "@/components/MyNetwork"
@@ -51,7 +51,7 @@ const getViewTitleI18n = (routeName: string) => {
 const bottomRoutes = [
     { key: 'search', title: t('search_label'), focusedIcon: Images.Search },
     { key: 'resource', title: t('resource_label'), focusedIcon: Images.Modify },
-    { key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
+    // { key: 'chat', title: t('chat_label'), focusedIcon: Images.Chat },
     // { key: 'history', title: t('history_label'), focusedIcon: Images.History },
 ]
 

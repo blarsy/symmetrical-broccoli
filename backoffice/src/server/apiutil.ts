@@ -4,6 +4,7 @@ import { Account, Resource, fromRawAccount, fromRawResource } from "../schema"
 import { RequestParams } from "nocodb-sdk"
 
 const secret = process.env.JWT_SECRET as string
+const jwtTokenLifetimeDays = Number(process.env.JWT_LIFETIME_DAYS)
 
 export const getJwt = async (token: string): Promise<JwtPayload> => {
     return new Promise((resolve, reject) => {
@@ -28,7 +29,7 @@ export const getAccount = async (token: string, fields?: string[]): Promise<Acco
 
 export const createToken = async (secret: string, data: any): Promise<string> => {
     return new Promise((resolve, reject) => {
-      data.exp = Date.now() / 1000 + (60 * 60 * 24 * 2)
+      data.exp = Date.now() / 1000 + (60 * 60 * 24 * jwtTokenLifetimeDays)
       sign(data, secret, (err: Error | null, token?: string) => {
         if(err) reject(err)
         resolve(token!)
