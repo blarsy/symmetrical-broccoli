@@ -11,6 +11,7 @@ const messagesTableName = 'messages'
 const participantsTableName = 'participants'
 const conversationsTableName = 'conversations'
 const resourceTableName = 'ressources'
+const conditionsTableName = 'conditions'
 
 const testPwd1 = process.env.TEST_PWD_1 as string
 const testPwd2 = process.env.TEST_PWD_2 as string
@@ -78,7 +79,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
     await migrateToV1_0_2(apiInNewProject, projectId, orgs, projectName)
     await migrateToV1_0_3()
     await migrateToV1_0_4(apiInNewProject, projectId)
-    await migrateToV1_0_5(apiInNewProject, projectId)
+    await migrateToV1_0_5(apiInNewProject, projectId, projectName, orgs)
 }
 
 const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string): Promise<void> => {
@@ -180,11 +181,13 @@ const migrateToV1_0_4 = async (api: Api<unknown>, projectId: string) => {
     await update(systemTableName, 1, { version: '1.0.4' })
 }
 
-const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string) => {
+const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string, projectName: string, orgs: string) => {
     const tables = await api.dbTable.list(projectId)
     const resourceTbl = tables.list.find(table => table.title === resourceTableName)!
     const accountTbl = tables.list.find(table => table.title === accountsTableName)!
+    const conditionsTbl = tables.list.find(table => table.title === conditionsTableName)!    
 
+    //Chat tables
     const conversationsTbl = await api.dbTable.create(projectId, { table_name: conversationsTableName, title: conversationsTableName, columns: [
         ...systemCols,
         { column_name: 'demarre', title: 'demarre', uidt: 'DateTime', pv: true },
@@ -222,6 +225,34 @@ const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string) => {
         childId: participantsTbl.id!, parentId: messagesTbl.id!, title: 'participant',
         type: 'mm', uidt: 'LinkToAnotherRecord', virtual: false
     } as LinkToAnotherColumnReqType)
+
+    await api.dbTableRow.bulkDeleteAll(orgs, projectId, resourceCategoriesTableName, new Object())
+
+    // Reduced category set
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Déco' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Transport' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Alimentation' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Jardin' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Sport & loisirs' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Santé & confort' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Matériaux construction & outillage' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Electronique & technologie' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Livre & éducation' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Divers' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Habillement' })
+
+    await Promise.all([
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'produit', column_name: 'produit', uidt: 'Checkbox' }),
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'service', column_name: 'service', uidt: 'Checkbox' }),
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'livraison', column_name: 'livraison', uidt: 'Checkbox' }),
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'aEmporter', column_name: 'aEmporter', uidt: 'Checkbox' }),
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'donOk', column_name: 'donOk', uidt: 'Checkbox' }),
+        api.dbTableColumn.create(resourceTbl.id!, { title: 'trocOk', column_name: 'trocOk', uidt: 'Checkbox' })
+    ])
+
+    await api.dbTable.delete(conditionsTbl.id!)
+
+    await update(systemTableName, 1, { version: '1.0.5' })
 }
 
 const insertTestData  = async () => {
@@ -232,12 +263,9 @@ const insertTestData  = async () => {
             create('Collectif Garage', 'info@garage.be', 'password')
         ])
         await Promise.all([
-            createResource(accounts[0].id, 'Matelas 2 personnes', 'Double emploi', new Date(new Date().valueOf() + (10 * 24 * 60 * 60 * 1000)), [], []),
-            createResource(accounts[0].id, 'Pigments peinture argile', 'Restes de mes travaux. Jaune, bleu, vert.', new Date(new Date().valueOf() + (8 * 24 * 60 * 60 * 1000)), [
-                { title: 'Retrait sur place', description: 'Pas de livraison' },
-                { title: 'Prix fixe', description: 'Pas de négociations, on ne répondra pas aux offres plus basses que le prix demandé.'}
-            ], []),
-            createResource(accounts[1].id, 'Bois de chauffe', 'Une stère de bois mélangé bouleau, peuplier et érable.', new Date(new Date().valueOf() + (5 * 24 * 60 * 60 * 1000)), [], []),
+            createResource(accounts[0].id, 'Matelas 2 personnes', 'Double emploi', new Date(new Date().valueOf() + (10 * 24 * 60 * 60 * 1000)), [], true, false, false, true, true, true),
+            createResource(accounts[0].id, 'Pigments peinture argile', 'Restes de mes travaux. Jaune, bleu, vert.', new Date(new Date().valueOf() + (8 * 24 * 60 * 60 * 1000)), [], false, true, false, true, true, false),
+            createResource(accounts[1].id, 'Bois de chauffe', 'Une stère de bois mélangé bouleau, peuplier et érable.', new Date(new Date().valueOf() + (5 * 24 * 60 * 60 * 1000)), [], true, false, false, true, false, true),
             invite(accounts[0].email, accounts[1].id.toString())
         ])
         return Promise.all([
@@ -264,7 +292,7 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         await migrateToV1_0_2(api, projectId, orgs, projectName)
         await migrateToV1_0_3()
         await migrateToV1_0_4(api, projectId)
-        await migrateToV1_0_5(api, projectId)
+        await migrateToV1_0_5(api, projectId, projectName, orgs)
         return 'Migrated to 1.0.5'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
@@ -281,7 +309,7 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
             await migrateToV1_0_4(api, projectId)
             return 'Migrated to 1.0.4'
         } else if(systemRow.version === '1.0.4') {
-            await migrateToV1_0_5(api, projectId)
+            await migrateToV1_0_5(api, projectId, projectName, orgs)
             return 'Migrated to 1.0.5'
         } else {
             return 'Db already up to date'

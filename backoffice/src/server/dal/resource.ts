@@ -1,21 +1,18 @@
-import { Category, Condition, Resource, categoriesToRaw, conditionsToRaw, fromRawResource, resourceCategoriesFromRaw } from "@/schema"
-import { bulkCreate, link, list, create as nocoCreate } from '@/server/noco'
+import { Category, Resource, fromRawResource, resourceCategoriesFromRaw } from "@/schema"
+import { link, list, create as nocoCreate } from '@/server/noco'
 import { getAccount, getResource } from "../apiutil"
 
-export const create = async (accountId: number, title: string, description: string, expiration: Date, conditions: Condition[], categories: Category[]): Promise<Resource> => {
-    const resourceRaw = await nocoCreate('ressources', { titre: title , description, expiration })
+export const create = async (accountId: number, title: string, description: string, expiration: Date, categories: Category[], 
+        isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
+        canBeGifted: boolean, canBeExchanged: boolean): Promise<Resource> => {
+    const resourceRaw = await nocoCreate('ressources', { titre: title , description, expiration, produit: isProduct, 
+        service: isService, livraison: canBeDelivered, aEmporter: canBeTakenAway, trocOk: canBeExchanged, donOk: canBeGifted })
     const resource = fromRawResource(resourceRaw)
 
     const linkAccountPromise = link('comptes', accountId, 'ressources', resource.id.toString())
-    const conditionsCreatePromise = bulkCreate('conditions', conditionsToRaw(conditions))
     const categoriesLinkPromise = Promise.all(categories.map((cat: Category) => link('ressources', resource.id, 'categories', cat.id.toString())))
 
-    const conditionsRes = await conditionsCreatePromise
-    const conditionsPromises = conditionsRes.map(async (condition: any) => {
-        return link('ressources', resource.id, 'conditions', condition.id)
-    })
-    await Promise.all([ categoriesLinkPromise, linkAccountPromise, ...conditionsPromises ])
-    resource.conditions = conditions
+    await Promise.all([ categoriesLinkPromise, linkAccountPromise ])
     resource.categories = categories
     return resource
 }
@@ -25,10 +22,41 @@ export const getCategories = async (): Promise<Category[]> => {
     return resourceCategoriesFromRaw(categoriesRaw)
 }
 
-export const getSuggestions = async (token: string, searchText: string, categories?: string[]): Promise<Resource[]> => {
+export const getSuggestions = async (token: string, searchText: string, isProduct: boolean, isService: boolean,
+    canBeDelivered: boolean, canBeTakenAway: boolean, canBeExchanged: boolean, canBeGifted: boolean, categories?: string[]): Promise<Resource[]> => {
     const account = await getAccount(token, ['Id', 'nom'])
-    let filter = `(comptes,neq,${account.name})~and(expiration,gt,today)${searchText ? `~and((titre,like,%${searchText}%)~or(description,like,%${searchText}%))` : ''}`
-    
+    const andFilters = []
+    andFilters.push(`(comptes,neq,${account.name})`)
+    andFilters.push(`(expiration,gt,today)`)
+    if(searchText) andFilters.push(`(titre,like,%${searchText}%)`)
+
+    if(isProduct || isService){
+        if(isProduct && isService) {
+            andFilters.push(`((produit,eq,true)~or(service,eq,true))`)
+        } else {
+            if(isProduct) andFilters.push(`(produit,eq,true)`)
+            else andFilters.push(`(service,eq,true)`)
+        }
+    }
+    if(canBeDelivered || canBeTakenAway){
+        if(canBeDelivered && canBeTakenAway) {
+            andFilters.push(`((livraison,eq,true)~or(aEmporter,eq,true))`)
+        } else {
+            if(canBeDelivered) andFilters.push(`(livraison,eq,true)`)
+            else andFilters.push(`(aEmporter,eq,true)`)
+        }
+    }
+    if(canBeGifted || canBeExchanged){
+        if(canBeGifted && canBeExchanged) {
+            andFilters.push(`((donOk,eq,true)~or(trocOk,eq,true))`)
+        } else {
+            if(canBeGifted) andFilters.push(`(donOk,eq,true)`)
+            else andFilters.push(`(trocOk,eq,true)`)
+        }
+    }
+
+    let filter = andFilters.join('~and')
+
     let resourcesOfCategory: number[] = []
     if(categories && categories.length > 0) {
         const categoriesAndResources = await list('categories', `(Id,in,${categories.join(',')})`, ['ressources List'], undefined, undefined, 10000000) as {['ressources List']: { Id: number }[]}[]

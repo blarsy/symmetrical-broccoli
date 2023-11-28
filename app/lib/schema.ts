@@ -17,12 +17,6 @@ export interface Image {
     mimetype: string
 }
 
-export interface Condition {
-    title: string,
-    description: string,
-    id?: number
-}
-
 export interface Category {
     id: number,
     name: string
@@ -39,12 +33,17 @@ export interface Message {
 export interface Resource {
     id: number,
     images: Image[],
-    conditions: Condition[],
     title: string,
     description: string,
     expiration?: Date,
     account?: Account,
-    categories: Category[]
+    categories: Category[],
+    isService: boolean,
+    isProduct: boolean,
+    canBeTakenAway: boolean,
+    canBeDelivered: boolean,
+    canBeGifted: boolean,
+    canBeExchanged: boolean
 }
 
 export interface ConversationData {
@@ -83,31 +82,20 @@ export const fromRawResource = (raw: any): Resource => ({
     description: raw.description,
     expiration: raw.expiration,
     images: raw.images,
-    conditions: raw.conditions ? conditionsFromRaw(raw.conditions): [],
     account: raw.comptes ? fromRawAccount(raw.comptes): undefined,
-    categories: raw.categories ? resourceCategoriesFromRaw(raw.categories): []
+    categories: raw.categories ? resourceCategoriesFromRaw(raw.categories): [],
+    isProduct: raw.produit,
+    isService: raw.service,
+    canBeDelivered: raw.livraison,
+    canBeTakenAway: raw.aEmporter,
+    canBeGifted: raw.donOk,
+    canBeExchanged: raw.trocOk,
 })
-
-export const conditionsFromRaw = (raws: any[]): Condition[] => {
-    return raws.map((raw: any) => ({
-        id: raw.Id as number,
-        title: raw.titre as string,
-        description: raw.description as string
-    }))
-}
 
 export const resourceCategoriesFromRaw = (raws: any[]): Category[] => {
     return raws.map((raw: any) => ({
         id: raw.Id as number,
         name: raw.nom as string
-    }))
-}
-
-export const conditionsToRaw = (conditions: Condition[]): any[] => {
-    return conditions.map((condition: any) => ({
-        Id: condition.id,
-        titre: condition.title,
-        description: condition.description
     }))
 }
 

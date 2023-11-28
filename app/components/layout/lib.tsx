@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, ButtonProps, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
+import { Button, ButtonProps, Checkbox, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
 import { primaryColor } from "./constants"
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates"
 import { getLocales } from "expo-localization"
@@ -48,6 +48,25 @@ export const TransparentTextInput = (props: TextInputProps) => {
 
 const lang = getLocales()[0].languageCode
 
+interface CheckboxGroupProps {
+    title: string
+    options: {
+        [name: string]: string
+    }
+    values: { [name: string]: boolean }
+    onChanged: (values: { [name: string]: boolean }) => void
+}
+
+export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
+    <Text variant="bodyMedium" style={{ marginLeft: 16 }}>{props.title}</Text>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        { Object.entries(props.options).map(p => <Checkbox.Item position="leading" labelVariant="bodySmall" onPress={() => {
+            props.values[p[0]] = !props.values[p[0]]
+            props.onChanged(props.values)
+        }} label={p[1]} status={props.values[p[0]] ? 'checked' : 'unchecked'} />) }
+    </View>
+</View>
+
 interface DateTimePickerFieldProps {
     value?: Date
     onChange: (value: Date | undefined) => void
@@ -62,7 +81,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
 
     return <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
         <Text variant="bodyMedium" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-        <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 6 }}>
             <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
                 {props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}
             </Button>

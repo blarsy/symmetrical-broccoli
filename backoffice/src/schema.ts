@@ -19,21 +19,20 @@ export interface Image {
     mimetype: string
 }
 
-export interface Condition {
-    title: string,
-    description: string,
-    id?: number
-}
-
 export interface Resource {
     id: number,
     images: Image[],
-    conditions: Condition[],
-    categories: Category[],
     title: string,
     description: string,
     expiration?: Date,
-    account?: Account
+    account?: Account,
+    categories: Category[],
+    isService: boolean,
+    isProduct: boolean,
+    canBeTakenAway: boolean,
+    canBeDelivered: boolean,
+    canBeGifted: boolean,
+    canBeExchanged: boolean
 }
 
 export interface Category {
@@ -83,18 +82,15 @@ export const fromRawResource = (raw: any): Resource => ({
     description: raw.description,
     expiration: raw.expiration,
     images: typeof raw.images === 'string' ? JSON.parse(raw.images) : raw.images,
-    conditions: raw.conditions ? conditionsFromRaw(raw.conditions): [],
-    account: raw.comptes ? fromRawAccount(raw.comptes) : undefined,
-    categories: raw.categories ? resourceCategoriesFromRaw(raw.categories) : []
+    account: raw.comptes ? fromRawAccount(raw.comptes): undefined,
+    categories: raw.categories ? resourceCategoriesFromRaw(raw.categories): [],
+    isProduct: raw.produit,
+    isService: raw.service,
+    canBeDelivered: raw.livraison,
+    canBeTakenAway: raw.aEmporter,
+    canBeGifted: raw.donOk,
+    canBeExchanged: raw.trocOk,
 })
-
-export const conditionsFromRaw = (raws: any[]): Condition[] => {
-    return raws.map((raw: any) => ({
-        id: raw.Id as number,
-        title: raw.titre as string,
-        description: raw.description as string
-    }))
-}
 
 export const resourceCategoriesFromRaw = (raws: any[]): Category[] => {
     return raws.map((raw: any) => ({
@@ -107,14 +103,6 @@ export const categoriesToRaw = (categories: Category[]): any[] => categories.map
     Id: category.id,
     nom: category.name
 }))
-
-export const conditionsToRaw = (conditions: Condition[]): any[] => {
-    return conditions.map((condition: Condition) => ({
-        Id: condition.id,
-        titre: condition.title,
-        description: condition.description
-    }))
-}
 
 export const linkRequestFromRaw = (rawLinkRequest: any): AccountLinkRequest => ({
     id: rawLinkRequest.Id,

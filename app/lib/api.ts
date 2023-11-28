@@ -3,6 +3,7 @@ import { Account, Category, ConversationData, Message, Network, Resource } from 
 import { apiUrl } from './settings'
 import { Platform } from 'react-native'
 import { IMessage } from 'react-native-gifted-chat'
+import { SearchOptions } from '@/components/AppContextProvider'
 let loggedOutHandler: () => void
 
 export const registerLoggedOutHandler = (handler: () => void) => {
@@ -196,13 +197,21 @@ export const removeImageFromResource = async (token: string, resourceId: number,
     }
 }
 
-export const getSuggestions = async(token: string, searchTerm: string, categories: string[]): Promise<Resource[]> => {
+export const getSuggestions = async(token: string, searchTerm: string, categories: string[], options?: SearchOptions): Promise<Resource[]> => {
     const queryTokens = []
     if(searchTerm) {
         queryTokens.push(`search=${searchTerm}`)
     }
     if(categories) {
         queryTokens.push(`categories=${categories.join(',')}`)
+    }
+    if(options) {
+        options.canBeDelivered && queryTokens.push(`canBeDelivered=${options.canBeDelivered ? '1': '0'}`)
+        options.canBeExchanged && queryTokens.push(`canBeExchanged=${options.canBeExchanged ? '1': '0'}`)
+        options.canBeGifted && queryTokens.push(`canBeGifted=${options.canBeGifted ? '1': '0'}`)
+        options.canBeTakenAway && queryTokens.push(`canBeTakenAway=${options.canBeTakenAway ? '1': '0'}`)
+        options.isProduct && queryTokens.push(`isProduct=${options.isProduct ? '1': '0'}`)
+        options.isService && queryTokens.push(`isService=${options.isService ? '1': '0'}`)
     }
     const res = await apiCall(`${apiUrl}resource/suggestions${queryTokens.length > 0 ? `?${queryTokens.join('&')}` : ''}`, { method: 'GET', mode: 'cors', headers:{
         'Authorization': token

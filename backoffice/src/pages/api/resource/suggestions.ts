@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 categories = (req.query.categories as string).split(',')
             }
             
-            const resources = await getSuggestions(getToken(req), req.query.search as string, categories)
+            const resources = await getSuggestions(getToken(req), req.query.search as string, !!req.query.isProduct, !!req.query.isService, !!req.query.canBeDelivered, !!req.query.canBeTakenAway, !!req.query.canBeExchanged, !!req.query.canBeGifted, categories )
             respondWithSuccess(res, resources)
         } catch(e: any) {
             respondWithFailure(req, res, e)

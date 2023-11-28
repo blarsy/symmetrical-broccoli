@@ -30,6 +30,8 @@ const CategoriesSelect = ({ value, onChange }: Props) => {
         { categories.data ? <PaperSelect multiEnable arrayList={categories.data!.map(cat => ({ _id: cat.id.toString(), value: cat.name }))} 
             label={t('resourceCategories_label')} value={value.map(cat => cat.name).join(', ')}
             selectedArrayList={value.map(cat => ({ _id: cat.id.toString(), value: cat.name }))}
+            hideSearchBox={true}
+            selectAllEnable={false} searchText="" dialogCloseButtonText={t('close_buttonCaption')} dialogDoneButtonText={t('done_buttonCaption')}
             onSelection={item => onChange(item.selectedList.map(sel => categories.data!.find(cat => cat.id.toString() === sel._id)!))}
             containerStyle={{ backgroundColor: 'transparent' }} textInputStyle={{ backgroundColor: 'transparent' }}
             searchStyle={{ backgroundColor: 'transparent' }}/>:

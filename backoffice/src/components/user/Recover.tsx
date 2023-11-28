@@ -20,8 +20,8 @@ const Recover = ({ recoveryId }: Props) => {
 
     if(success) {
         return <Stack alignItems="center" gap="2rem">
-            <Alert severity="success">Votre mot de passe a été changé</Alert>
-            <Typography variant="overline">Ouvrez l'app pour vous reconnecter</Typography>
+            <Alert severity="success">Votre mot de passe a &#233;t&#233; chang&#233;</Alert>
+            <Typography variant="overline">Ouvrez l&apos;app pour vous reconnecter</Typography>
             <Link href="/webapp">Rester sur le site web</Link>
         </Stack>
     }

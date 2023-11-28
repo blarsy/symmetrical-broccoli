@@ -10,9 +10,19 @@ import dayjs from "dayjs"
 
 const SPLASH_DELAY = 3000
 
+export interface SearchOptions {
+    isProduct: boolean
+    isService: boolean
+    canBeTakenAway: boolean
+    canBeDelivered: boolean
+    canBeExchanged: boolean
+    canBeGifted: boolean
+}
+
 export interface SearchFilter {
-    search: string;
-    categories: Category[];
+    search: string
+    categories: Category[]
+    options: SearchOptions
 }
 
 interface AppState {
@@ -43,8 +53,10 @@ interface Props {
     children: JSX.Element
 }
 
+const emptyState: AppState = { token: initial<string>(true, ''), messages: [], searchFilter: { categories: [], search: '' , options: { canBeDelivered: false, canBeTakenAway: false, canBeExchanged: false, canBeGifted: false, isProduct: false, isService: false }} }
+
 export const AppContext = createContext<AppContext>({
-    state: { token: initial<string>(true, ''), messages: [], searchFilter: { categories: [], search: '' } }, 
+    state: emptyState, 
     actions: {
         loginComplete: (_, account) => Promise.resolve(account),
         tryRestoreToken: () => Promise.resolve(),
@@ -59,9 +71,7 @@ export const AppContext = createContext<AppContext>({
 })
 
 const AppContextProvider = ({ children }: Props) => {
-    const [appState, setAppState] = useState({
-        token: initial<string>(true, ''), account: undefined, messages: [], searchFilter: { categories: [], search: '' }
-    } as AppState)
+    const [appState, setAppState] = useState(emptyState)
     const [lastNotification, setLastNofication] = useState('')
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {

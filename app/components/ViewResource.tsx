@@ -73,6 +73,12 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
         <ResourceViewField title={t('description_label')} titleOnOwnLine>
             <Text variant="bodyMedium">{resource.description}</Text>
         </ResourceViewField>
+        <ResourceViewField title={t('nature_label')}>
+            <View style={{ flexDirection: 'row', gap: 18 }}>
+                { resource.isProduct && <Text variant="bodyMedium">{t('isProduct_label')}</Text>}
+                { resource.isService && <Text variant="bodyMedium">{t('isService_label')}</Text>}
+            </View>
+        </ResourceViewField>
         { expirationText && <View>
             <ResourceViewField title={t('expiration_label')}>
                 <Text variant="bodyMedium">{expirationText}</Text>
@@ -85,22 +91,18 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </View>
             </ResourceViewField>
         }
-        { resource.conditions && resource.conditions.length > 0 && <View>
-            <ResourceViewField title={t('conditions_label')} titleOnOwnLine>
-                <View style={{ flexDirection: 'column', alignSelf: 'stretch' }}>
-                    { resource.conditions.map((condition, idx) => <View key={idx} style={{ paddingBottom: 5, borderTopWidth: 1, borderTopColor: '#aaa' }}>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                            <Text variant="titleSmall" style={{ flexBasis: '30%', flexShrink: 0, flexGrow: 1 }}>{t('title_label')}</Text>
-                            <Text variant="bodySmall" style={{ flexBasis: '70%', flexShrink: 0, flexGrow: 1 }}>{condition.title}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                            <Text variant="titleSmall" style={{ flexBasis: '30%', flexShrink: 0, flexGrow: 1 }}>{t('description_label')}</Text>
-                            <Text variant="bodySmall" style={{ flexBasis: '70%', flexShrink: 0, flexGrow: 1 }}>{condition.description}</Text>
-                        </View>
-                    </View>)}
-                </View>
-            </ResourceViewField>
-        </View> }
+        <ResourceViewField title={t('transport_label')}>
+            <View style={{ flexDirection: 'row', gap: 18 }}>
+                { resource.canBeTakenAway && <Text variant="bodyMedium">{t('canBeTakenAway_label')}</Text>}
+                { resource.canBeDelivered && <Text variant="bodyMedium">{t('canBeDelivered_label')}</Text>}
+            </View>
+        </ResourceViewField>
+        <ResourceViewField title={t('type_label')}>
+            <View style={{ flexDirection: 'row', gap: 18 }}>
+                { resource.canBeGifted && <Text variant="bodyMedium">{t('canBeGifted_label')}</Text>}
+                { resource.canBeExchanged && <Text variant="bodyMedium">{t('canBeExchanged_label')}</Text>}
+            </View>
+        </ResourceViewField>
         <Portal>
             <Modal dismissable onDismiss={() => setFocusedImage('')} visible={ !!focusedImage }>
                 { focusedImage && <PanZoomImage uri={focusedImage} /> }

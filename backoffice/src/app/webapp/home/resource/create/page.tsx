@@ -17,12 +17,13 @@ const Create = () => {
             <Box>
                 <EditResource data={{ id: 0, title: '', description: '', 
                     expiration: new Date(Date.now().valueOf() + 2 * 24 * 60 * 60 * 1000),
-                    images: [], conditions: [], categories: [] }} onSubmit={async (values, images) => {
+                    images: [], categories: [], isProduct: false, isService: false,
+                    canBeDelivered: false, canBeTakenAway: false, canBeExchanged: true, canBeGifted: false }} onSubmit={async (values, images) => {
                         try {
                             const res = await axios.post('/api/resource', { 
                                 title: values.title, description: values.description, 
                                 expiration: values.expiration ? values.expiration.toDate(): undefined,
-                                conditions: values.conditions, categories: values.categories },
+                                categories: values.categories },
                                 { headers: { Authorization: localStorage.getItem('token') }})
                             if(images.length > 0){
                                 await axios.postForm(`/api/resource/${res.data.id}/image`, { files: images.map(img => img.blob) } , { headers: {

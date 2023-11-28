@@ -17,7 +17,6 @@ import Connections from "../Connections"
 import AddFriend from "../AddFriend"
 import RequestsReceived from "../RequestsReceived"
 import RequestsSent from "../RequestsSent"
-import EditCondition from "../form/EditCondition"
 import ViewResource from "../ViewResource"
 import EditResourceContextProvider from "../EditResourceContextProvider"
 
@@ -39,10 +38,6 @@ const getViewTitleI18n = (routeName: string) => {
             return 'requestsReceived_title'
         case 'requestsSent':
             return 'requestsSent_title'
-        case 'editCondition':
-            return 'editCondition_title'
-        case 'addCondition':
-            return 'addCondition_title'
         default:
             return ''
     }
@@ -94,8 +89,6 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                 <StackNav.Screen name="addFriend" component={AddFriend} key="addFriend" />
                 <StackNav.Screen initialParams={{ icon: <Images.Received style={{ margin: 10 }} width={30} height={30} /> }} name="requestsReceived" component={RequestsReceived} key="requestsReceived" />
                 <StackNav.Screen initialParams={{ icon: <Images.Sent style={{ margin: 10 }} width={30} height={30} /> }} name="requestsSent" component={RequestsSent} key="requestsSent" />
-                <StackNav.Screen name="editCondition" component={EditCondition} />
-                <StackNav.Screen name="addCondition" component={EditCondition} />
             </StackNav.Navigator>
         </View>
     </EditResourceContextProvider>

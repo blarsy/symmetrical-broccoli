@@ -1,18 +1,16 @@
-import { Box, Button, IconButton, TextField, Typography } from "@mui/material"
+import { Box, Checkbox, FormControlLabel, FormGroup, Stack, TextField, Typography } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add'
 import { DateTimePicker } from '@mui/x-date-pickers'
-import { FieldArray, Form, Formik, FormikErrors, FormikTouched, getIn } from "formik"
+import { ErrorMessage, Form, Formik } from "formik"
 import { ReactNode, useState } from "react"
 import * as yup from 'yup'
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../Feedback"
 import dayjs, { Dayjs } from "dayjs"
-import { Category, Condition, Image, Resource } from "@/schema"
+import { Category, Image, Resource } from "@/schema"
 import ResourceImages from "./ResourceImages"
 import { fromData, fromError, initial } from "@/DataLoadState"
 import { ResourceImage } from "./ResourceImage"
-import CreateIcon from '@mui/icons-material/Create'
-import DeleteIcon from '@mui/icons-material/Delete'
 import CategoriesSelect from "./CategoriesSelect"
 
 interface Props {
@@ -20,11 +18,11 @@ interface Props {
     buttonName?: string,
     buttonIcon?: ReactNode,
     onSubmit: (values: {
-        title: string
-        description: string
-        expiration: dayjs.Dayjs,
-        conditions: Condition[],
-        categories: Category[]
+        title: string, description: string, 
+        expiration: dayjs.Dayjs, categories: Category[],
+        isProduct: boolean, isService: boolean,
+        canBeDelivered: boolean, canBeExchanged: boolean,
+        canBeGifted : boolean, canBeTakenAway: boolean
     }, images: ResourceImage[]) => Promise<any>,
     onImageSelected?: (file: ResourceImage ) => void,
     onRequestImageDelete?: (image: Image) => Promise<void>
@@ -32,16 +30,36 @@ interface Props {
 
 interface FormValues {
     title: string, description: string, 
-    expiration: dayjs.Dayjs, images: Image[], conditions: Condition[],
-    categories: Category[]
+    expiration: dayjs.Dayjs, images: Image[],
+    categories: Category[], isProduct: boolean,
+    isService: boolean, canBeDelivered: boolean, 
+    canBeExchanged: boolean, canBeGifted : boolean, 
+    canBeTakenAway: boolean
 }
 
-const isTouched = (touched: FormikTouched<FormValues>, idx: number, propName: string):boolean => {
-    return !!touched.conditions && !!touched.conditions[idx] && !!(touched.conditions[idx] as any)[propName]
+interface CheckboxGroupProps {
+    title: string
+    options: {
+        [name: string]: string
+    }
+    values: { [name: string]: boolean }
+    onChanged: (values: { [name: string]: boolean }) => void
 }
 
-const errorMessage = (touched: FormikTouched<FormValues>, idx: number, errors: FormikErrors<FormValues>, propName: string): string | undefined => {
-    return isTouched(touched, idx, propName) && errors.conditions && errors.conditions[idx] && (errors.conditions[idx] as any)[propName]
+export const CheckboxGroup = (props: CheckboxGroupProps) => {
+    const [values, setValues] = useState(props.values)
+    return <Stack flexDirection="column" alignContent="center">
+        <Typography>{props.title}</Typography>
+        <Stack flexDirection="row">
+            { Object.entries(props.options).map((p, idx) => <FormGroup key={idx}>
+                <FormControlLabel label={p[1]} control={<Checkbox onChange={() => {
+                    values[p[0]] = !values[p[0]]
+                    setValues(values)
+                    props.onChanged(values)
+                }} checked={values[p[0]]} />}/>
+            </FormGroup> ) }
+        </Stack>
+    </Stack>
 }
 
 const EditResource = ({ data, onSubmit, buttonName = 'Créer', 
@@ -51,8 +69,9 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
     
     const minExpiration = dayjs(new Date(Date.now() + 60 * 60 * 1000))
     return <Formik initialValues={{ title: data.title, description: data.description, 
-        expiration: dayjs(data.expiration), images: data.images, conditions: data.conditions,
-        categories: data.categories} as FormValues}
+        expiration: dayjs(data.expiration), images: data.images, isProduct: data.isProduct,
+        isService: data.isService, canBeDelivered: data.canBeDelivered, canBeExchanged: data.canBeExchanged,
+        canBeGifted : data.canBeGifted, canBeTakenAway: data.canBeTakenAway, categories: data.categories} as FormValues}
         onSubmit={async (values, { setSubmitting }) => {
             try {
                 await onSubmit(values, images)
@@ -72,11 +91,16 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
             categories: yup.array(yup.object({
                 id: yup.number().required(),
                 name: yup.string()
-            })),
-            conditions: yup.array(yup.object({
-                title: yup.string().max(30, 'Ce titre est trop long.').required('Ce champ est requis.'),
-                description: yup.string().max(8000, 'Cette valeur est trop longue.').required('Ce champ est requis.')
-            }))
+            })),    
+            isProduct: yup.bool().test('natureIsPresent', 'Veuillez sélectionner au moins une option', (val, ctx) => {
+                return val || ctx.parent.isService
+            }),
+            canBeGifted: yup.bool().test('transportIsPresent', 'Veuillez sélectionner au moins une option', (val, ctx) => {
+                return val || ctx.parent.canBeExchanged
+            }),
+            canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', 'Veuillez sélectionner au moins une option', (val, ctx) => {
+                return val || ctx.parent.canBeDelivered
+            })
         })} >
         {({
             values,
@@ -86,7 +110,7 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
             isSubmitting,
             getFieldProps, 
             setFieldValue,
-            handleBlur
+            setTouched
         }) => (
         <Form>
             <Box display="flex" padding="1rem" justifyContent="center">
@@ -97,6 +121,16 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
                         label="Description" type="text" variant="standard" value={values.description} 
                         onChange={handleChange} error={touched.description && !!errors.description} 
                         helperText={touched.description && errors.description as string}/>
+                    <CheckboxGroup title="Nature" options={{
+                        isProduct: "Produit",
+                        isService: "Service"
+                    }} values={{ isProduct: values.isProduct, isService: values.isService }} onChanged={val => {
+                        setFieldValue('isProduct', val.isProduct)
+                        setTouched({ isProduct: true })
+                        setFieldValue('isService', val.isService)
+                        setTouched({ isService: true })
+                    }} />
+                    <ErrorMessage name="isProduct" render={msg => <Typography color="error">{msg}</Typography>} />
                     <DateTimePicker
                         ampm={false}
                         label="Expiration"
@@ -117,25 +151,26 @@ const EditResource = ({ data, onSubmit, buttonName = 'Créer',
                     <CategoriesSelect onChange={(categories: Category[]) => {
                         setFieldValue('categories', categories)
                     }} value={values.categories} />
-                    <Typography variant="body1">Conditions</Typography>
-                    <Box>
-                        <FieldArray name="conditions" 
-                            render={arrayHelpers => <Box display="flex" flexDirection="column" gap="0.5rem">
-                                {values.conditions.map((condition: Condition, idx) => <Box key={idx} display="flex" flexDirection="row">
-                                        <TextField sx={{ flex: '1 0 30%' }} id="title" size="small" name={`conditions[${idx}].title`} multiline
-                                            label="Titre" type="text" variant="standard" value={condition.title} 
-                                            onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'title')} 
-                                            helperText={errorMessage(touched, idx, errors, 'title')}/>
-                                        <TextField sx={{ flex: '1 0 70%' }} id="description" size="small" name={`conditions[${idx}].description`} multiline
-                                            label="Description" type="text" variant="standard" value={condition.description} 
-                                            onChange={handleChange} onBlur={handleBlur} error={!!errorMessage(touched, idx, errors, 'description')} 
-                                            helperText={errorMessage(touched, idx, errors, 'description')}/>
-                                        <IconButton onClick={() => arrayHelpers.remove(idx)}><DeleteIcon /></IconButton>
-                                    </Box>
-                                )}
-                                <Button sx={{ alignSelf: 'flex-start' }} variant="outlined" startIcon={<CreateIcon />} onClick={() => arrayHelpers.push({})}>Ajouter</Button>
-                            </Box>} />
-                    </Box>
+                    <CheckboxGroup title="Transport" options={{
+                        canBeTakenAway: "A emporter",
+                        canBeDelivered: "Livraison"
+                    }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} onChanged={val => {
+                        setFieldValue('canBeTakenAway', val.canBeTakenAway)
+                        setTouched({ canBeTakenAway: true })
+                        setFieldValue('canBeDelivered', val.canBeDelivered)
+                        setTouched({ canBeDelivered: true })
+                    }} />
+                    <ErrorMessage name="canBeTakenAway" render={msg => <Typography color="error">{msg}</Typography>} />
+                    <CheckboxGroup title="Type d'échange" options={{
+                        canBeGifted: "Don Ok",
+                        canBeExchanged:"Troc Ok"
+                    }} values={{ canBeGifted: values.canBeGifted, canBeExchanged: values.canBeExchanged }} onChanged={val => {
+                        setFieldValue('canBeGifted', val.canBeGifted)
+                        setTouched({ canBeGifted: true })
+                        setFieldValue('canBeExchanged', val.canBeExchanged)
+                        setTouched({ canBeExchanged: true })
+                    }} />
+                    <ErrorMessage name="canBeGifted" render={msg => <Typography color="error">{msg}</Typography>} />
                     <LoadingButton loading={isSubmitting}
                         loadingPosition="start"
                         startIcon={buttonIcon}

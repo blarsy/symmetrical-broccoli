@@ -25,7 +25,17 @@ export default ({ route, navigation }:RouteProps) => {
     return <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
         title: yup.string().max(50).required(t('field_required')),
         description: yup.string(),
-        expiration: yup.date().required(t('field_required'))
+        expiration: yup.date().required(t('field_required')),
+        categories: yup.array().min(1, t('field_required')),
+        isProduct: yup.bool().test('natureIsPresent', t('nature_required'), (val, ctx) => {
+            return val || ctx.parent.isService
+        }),
+        canBeGifted: yup.bool().test('transportIsPresent', t('transport_required'), (val, ctx) => {
+            return val || ctx.parent.canBeTakenAway
+        }),
+        canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', t('exchangeType_required'), (val, ctx) => {
+            return val || ctx.parent.canBeDelivered
+        })
      })} onSubmit={async (values) => {
         setSaveResourcestate(beginOperation())
         try {
@@ -40,11 +50,7 @@ export default ({ route, navigation }:RouteProps) => {
     }}>
     {formikState => {
         return <ScrollView style={{ margin: 10 }}>
-            <EditResourceFields formikState={formikState} onConditionAddRequested={() => {
-                navigation.navigate('addCondition', { condition: { title: '', description: ''}} )
-            }} onConditionEditRequested={condition => {
-                navigation.navigate('editCondition', { condition } )
-            }} processing={saveResourceState.loading} />
+            <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
             <Portal>
                 <Snackbar role="alert" visible={!!saveResourceState.error && !!saveResourceState.error.message} 
                     onDismiss={() => setSaveResourcestate(initial<null>(false, null))}>

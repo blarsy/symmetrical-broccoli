@@ -1,28 +1,20 @@
-import Images from "@/Images"
 import { ErrorMessage, FormikProps } from "formik"
 import { t } from "i18next"
 import React, { useContext, useEffect } from "react"
-import { List, IconButton, Text, Surface } from "react-native-paper"
-import AppendableList from "../AppendableList"
-import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton } from "../layout/lib"
+import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton, CheckboxGroup } from "../layout/lib"
 import PicturesField from "./PicturesField"
-import { Category, Condition, Resource } from "@/lib/schema"
+import { Category, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { AppContext } from "../AppContextProvider"
 import CategoriesSelect from "./CategoriesSelect"
-import ResponsiveListItem from "../ResponsiveListItem"
-
-const limitWithEllipsis = (text: string, amountChars: number) => text.length > amountChars ?`${text.substring(0, amountChars)}...` : text
 
 interface Props {
     formikState: FormikProps<Resource>
-    onConditionAddRequested: () => void
-    onConditionEditRequested: (condition: Condition) => void
     processing: boolean
 }
 
-const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEditRequested, processing}: Props) => {
+const EditResourceFields = ({formikState, processing}: Props) => {
     const appContext = useContext(AppContext)
     const { handleChange, handleBlur, values, setFieldValue, setTouched, resetForm, handleSubmit } = formikState
     const editResourceContext = useContext(EditResourceContext)
@@ -50,32 +42,45 @@ const EditResourceFields = ({formikState, onConditionAddRequested, onConditionEd
         <TransparentTextInput label={t('description_label')} value={values.description}
             onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
         <ErrorMessage component={ErrorText} name="description" />
+        <CheckboxGroup title={t('nature_label')} onChanged={val => {
+            setFieldValue('isProduct', val.isProduct)
+            setTouched({ isProduct: true })
+            setFieldValue('isService', val.isService)
+            setTouched({ isService: true })
+        }} values={{ isProduct: values.isProduct, isService: values.isService }} options={{
+            isProduct: t('isProduct_label'), 
+            isService: t('isService_label')
+        }} />
+        <ErrorMessage component={ErrorText} name="isProduct" />
         <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
             setFieldValue('expiration', d)
             setTouched({ expiration: true })
-            //editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ expiration: d }  })
         }} label={t('expiration_label')} />
         <ErrorMessage component={ErrorText} name="expiration" />
         <CategoriesSelect value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
-            //editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{ categories }  })
         }} />
-        <Surface style={{ marginTop: 8 }}>
-            <Text variant="bodyMedium" style={{ marginLeft: 16, marginTop: 16 }}>{t('conditions_label')}</Text>
-            <AppendableList state={values.conditions} onAddRequested={() => {
-                editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
-                onConditionAddRequested()
-            }} displayItem={(item, idx) => <ResponsiveListItem key={idx} title={item.title}
-                    description={limitWithEllipsis(item.description, 30)}
-                    onPress={() => {
-                        editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
-                        onConditionEditRequested(item)}
-                    } 
-                    right={() => <IconButton icon={Images.Cross} onPress={e => {
-                        e.stopPropagation()
-                        editResourceContext.actions.deleteCondition(values, item)
-                    }} />} />} />
-        </Surface>
+        <ErrorMessage component={ErrorText} name="categories" />
+        <CheckboxGroup title={t('type_label')} onChanged={val => {
+            setFieldValue('canBeGifted', val.canBeGifted)
+            setTouched({ canBeGifted: true })
+            setFieldValue('canBeExchanged', val.canBeExchanged)
+            setTouched({ canBeExchanged: true })
+        }} values={{ canBeGifted: values.canBeGifted, canBeExchanged: values.canBeExchanged }} options={{
+            canBeGifted: t('canBeGifted_label'), 
+            canBeExchanged: t('canBeExchanged_label')
+        }} />
+        <ErrorMessage component={ErrorText} name="canBeGifted" />
+        <CheckboxGroup title={t('transport_label')} onChanged={val => {
+            setFieldValue('canBeTakenAway', val.canBeTakenAway)
+            setTouched({ canBeTakenAway: true })
+            setFieldValue('canBeDelivered', val.canBeDelivered)
+            setTouched({ canBeDelivered: true })
+        }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} options={{
+            canBeTakenAway: t('canBeTakenAway_label'), 
+            canBeDelivered: t('canBeDelivered_label')
+        }} />
+        <ErrorMessage component={ErrorText} name="canBeTakenAway" />
         <OrangeButton style={{ marginTop: 20 }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
             loading={processing}>
             {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')}
