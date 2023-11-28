@@ -60,7 +60,7 @@ interface CheckboxGroupProps {
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
     <Text variant="bodyMedium" style={{ marginLeft: 16 }}>{props.title}</Text>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        { Object.entries(props.options).map(p => <Checkbox.Item position="leading" labelVariant="bodySmall" onPress={() => {
+        { Object.entries(props.options).map((p, idx) => <Checkbox.Item key={idx} position="leading" labelVariant="bodySmall" onPress={() => {
             props.values[p[0]] = !props.values[p[0]]
             props.onChanged(props.values)
         }} label={p[1]} status={props.values[p[0]] ? 'checked' : 'unchecked'} />) }

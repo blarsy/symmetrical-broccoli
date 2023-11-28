@@ -31,7 +31,7 @@ export default ({ route, navigation }:RouteProps) => {
             return val || ctx.parent.isService
         }),
         canBeGifted: yup.bool().test('transportIsPresent', t('transport_required'), (val, ctx) => {
-            return val || ctx.parent.canBeTakenAway
+            return val || ctx.parent.canBeExchanged
         }),
         canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', t('exchangeType_required'), (val, ctx) => {
             return val || ctx.parent.canBeDelivered
