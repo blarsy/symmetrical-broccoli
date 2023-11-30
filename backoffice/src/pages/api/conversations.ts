@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     conversation: {
                         id: conversation.Id,
                         lastMessageExcerpt: conversation.dernier_message[0].texte,
-                        ressource: fromRawResource(conversation.ressource[0]),
+                        resource: fromRawResource(conversation.ressource[0]),
                     },
                     withUser: fromRawAccount(conversation['participants List'].find((part: any) => part.compte[0].Id != account.Id)!.compte[0]),
                 } as ConversationData)))
