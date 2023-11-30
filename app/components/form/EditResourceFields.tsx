@@ -71,16 +71,18 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             canBeExchanged: t('canBeExchanged_label')
         }} />
         <ErrorMessage component={ErrorText} name="canBeGifted" />
-        <CheckboxGroup title={t('transport_label')} onChanged={val => {
-            setFieldValue('canBeTakenAway', val.canBeTakenAway)
-            setTouched({ canBeTakenAway: true })
-            setFieldValue('canBeDelivered', val.canBeDelivered)
-            setTouched({ canBeDelivered: true })
-        }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} options={{
-            canBeTakenAway: t('canBeTakenAway_label'), 
-            canBeDelivered: t('canBeDelivered_label')
-        }} />
-        <ErrorMessage component={ErrorText} name="canBeTakenAway" />
+        { values.isProduct && <>
+            <CheckboxGroup title={t('transport_label')} onChanged={val => {
+                setFieldValue('canBeTakenAway', val.canBeTakenAway)
+                setTouched({ canBeTakenAway: true })
+                setFieldValue('canBeDelivered', val.canBeDelivered)
+                setTouched({ canBeDelivered: true })
+            }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} options={{
+                canBeTakenAway: t('canBeTakenAway_label'), 
+                canBeDelivered: t('canBeDelivered_label')
+            }} />
+            <ErrorMessage component={ErrorText} name="canBeTakenAway" />
+        </> }
         <OrangeButton style={{ marginTop: 20 }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
             loading={processing}>
             {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')}

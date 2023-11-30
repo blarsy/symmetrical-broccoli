@@ -53,9 +53,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     }
     const windowDimension = Dimensions.get('window')
     const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
+    const hasOnlyOneImage = resource.images && resource.images.length === 1
     
-    return <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
-        { resource.images && resource.images.length >0 && <View style={{ flex: 1, flexDirection: 'row', alignSelf: resource.images && resource.images.length === 1 ? 'center': 'auto', marginBottom: 10 }}>
+    return <ScrollView  style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
+        { resource.images && resource.images.length >0 && <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10, alignItems: hasOnlyOneImage ? 'center': 'flex-start' }}>
             <SwiperFlatList data={getSwiperData(resource)} 
                 renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => {
                     setFocusedImage(item.source)
@@ -91,12 +92,12 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </View>
             </ResourceViewField>
         }
-        <ResourceViewField title={t('transport_label')}>
+        { resource.isProduct && <ResourceViewField title={t('transport_label')}>
             <View style={{ flexDirection: 'row', gap: 18 }}>
                 { resource.canBeTakenAway && <Text variant="bodyMedium">{t('canBeTakenAway_label')}</Text>}
                 { resource.canBeDelivered && <Text variant="bodyMedium">{t('canBeDelivered_label')}</Text>}
             </View>
-        </ResourceViewField>
+        </ResourceViewField> }
         <ResourceViewField title={t('type_label')}>
             <View style={{ flexDirection: 'row', gap: 18 }}>
                 { resource.canBeGifted && <Text variant="bodyMedium">{t('canBeGifted_label')}</Text>}

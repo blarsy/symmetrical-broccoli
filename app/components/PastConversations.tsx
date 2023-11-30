@@ -1,6 +1,6 @@
 import { t } from "@/i18n"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { Account, ConversationData } from "@/lib/schema"
+import { ConversationData, Resource } from "@/lib/schema"
 import React, { useContext, useEffect } from "react"
 import { useState } from "react"
 import { View } from "react-native"
@@ -12,7 +12,7 @@ import { Icon, Text } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 
 interface Props {
-    onConversationSelected: (conversationId: number) => void
+    onConversationSelected: (resource: Resource) => void
 }
 
 const PastConversations = ({ onConversationSelected }: Props) => {
@@ -32,11 +32,11 @@ const PastConversations = ({ onConversationSelected }: Props) => {
     }, [])
 
     return <View style={{ flex: 1 }}>
-        <LoadedList loading={conversations.loading} data={conversations.data} error={conversations.error}
-            displayItem={(item, idx) => <ResponsiveListItem left={p => <Icon size={40} source="account" color={primaryColor} />} key={idx} onPress={() => onConversationSelected(item.conversation.resourceId)} 
+        <LoadedList loading={conversations.loading} data={conversations.data} error={conversations.error} noDataLabel={t('noConversationLoaded_label')}
+            displayItem={(item, idx) => <ResponsiveListItem left={p => <Icon size={40} source="account" color={primaryColor} />} key={idx} onPress={() => onConversationSelected(item.conversation.resource)} 
                 title={() => <View style={{ flexDirection: 'column' }}>
                     <Text variant="headlineMedium" style={{ color: primaryColor }}>{ item.withUser.name }</Text>
-                    <Text variant="bodyMedium">{item.conversation.ressourceTitle}</Text>
+                    <Text variant="bodyMedium">{item.conversation.resource.title}</Text>
                 </View>} description={item.conversation.lastMessageExcerpt} />} />
     </View>
 }

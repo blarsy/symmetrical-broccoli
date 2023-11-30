@@ -42,7 +42,7 @@ function AccordionItem({ children, title }: AccordionItemPros): JSX.Element {
       <View>
         <TouchableOpacity onPress={ () => setExpanded(!expanded) }>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16 }}>
-                <Text variant="headlineMedium">{ title }</Text>
+                <Text variant="bodyMedium">{ title }</Text>
                 <Icon source={ expanded ? 'chevron-up' : 'chevron-down' }
                     size={20} />
             </View>
@@ -92,9 +92,9 @@ export default function Search ({ route, navigation }: RouteProps) {
                     { resource.canBeGifted && <Text variant="bodySmall" style={{ textTransform: 'uppercase' }}>{t('canBeGifted_label')}</Text>}
                     { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase' }}>{t('canBeExchanged_label')}</Text>}
                 </View>
-            </View>} style={{ margin: 0, padding: 0, backgroundColor: lightPrimaryColor, paddingLeft: 6 }}
+            </View>} style={{ margin: 1, padding: 0, backgroundColor: lightPrimaryColor, paddingLeft: 6 }}
             left={() => <MainResourceImage resource={resource} />} right={p => <View style={{ justifyContent: 'flex-end' }}>
-                <IconButton style={{ borderRadius: 0 }} size={15} icon={Images.Chat} onPress={() => navigation.navigate('chat', { resourceId: resource.id })}/>
+                { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0 }} size={15} icon={Images.Chat} onPress={() => navigation.navigate('chat', { resource })}/> }
             </View>}
         />}/>
     </ScrollView>

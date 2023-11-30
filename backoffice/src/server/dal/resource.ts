@@ -26,7 +26,7 @@ export const getSuggestions = async (token: string, searchText: string, isProduc
     canBeDelivered: boolean, canBeTakenAway: boolean, canBeExchanged: boolean, canBeGifted: boolean, categories?: string[]): Promise<Resource[]> => {
     const account = await getAccount(token, ['Id', 'nom'])
     const andFilters = []
-    andFilters.push(`(comptes,neq,${account.name})`)
+    //andFilters.push(`(comptes,neq,${account.name})`)
     andFilters.push(`(expiration,gt,today)`)
     if(searchText) andFilters.push(`(titre,like,%${searchText}%)`)
 

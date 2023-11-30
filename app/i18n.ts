@@ -79,7 +79,7 @@ const resources = {
       "isService_label": "Service",
       "type_label": "Exchange type",
       "canBeGifted_label": "Gift",
-      "canBeExchanged_label": "Bartered",
+      "canBeExchanged_label": "Barter",
       "transport_label": "Transport",
       "canBeTakenAway_label": "Take away",
       "canBeDelivered_label": "Delivery",
@@ -88,7 +88,8 @@ const resources = {
       "exchangeType_required": "Please select at least one option",
       "close_buttonCaption": "Close",
       "done_buttonCaption": "Ok",
-      "options_title": "Options"
+      "options_title": "Options",
+      "noConversationLoaded_label": "No conversation yet ..."
     }
   },
   fr: {
@@ -164,8 +165,8 @@ const resources = {
       "isProduct_label": "Produit",
       "isService_label": "Service",
       "type_label": "Type d'échange",
-      "canBeGifted_label": "Don Ok",
-      "canBeExchanged_label": "Troc Ok",
+      "canBeGifted_label": "Don",
+      "canBeExchanged_label": "Troc",
       "transport_label": "Transport",
       "canBeTakenAway_label": "A emporter",
       "canBeDelivered_label": "Livraison",
@@ -174,7 +175,8 @@ const resources = {
       "exchangeType_required": "Choissisez au moins une option",
       "close_buttonCaption": "Annuler",
       "done_buttonCaption": "Ok",
-      "options_title": "Options"
+      "options_title": "Options",
+      "noConversationLoaded_label": "Aucune conversation pour l'instant ..."
     }
   }
 }

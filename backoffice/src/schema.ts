@@ -51,8 +51,7 @@ export interface ConversationData {
     conversation: {
         id: number,
         lastMessageExcerpt: string | undefined,
-        ressourceTitle: string,
-        resourceId: number
+        resource: Resource
     }
 }
 

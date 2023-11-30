@@ -38,7 +38,7 @@ interface Props {
 const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: undefined,
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
-    canBeExchanged: true,  canBeGifted: false }
+    canBeExchanged: false,  canBeGifted: false }
 
 export const EditResourceContext = createContext<EditResourceContext>({
     state: { 

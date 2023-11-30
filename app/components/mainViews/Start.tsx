@@ -10,12 +10,12 @@ import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { PaperProvider, Snackbar, configureFonts } from 'react-native-paper'
-import { isMdWidth } from "@/lib/settings"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { aboveMdWidth } from "@/lib/utils"
 
-let fontSizeLarge = 20
-let fontSizeMedium = 16
-let fontSizeSmall = 14
+export let fontSizeLarge = 20
+export let fontSizeMedium = 16
+export let fontSizeSmall = 14
 
 export default () => {
     const { t } = i18n
@@ -29,9 +29,9 @@ export default () => {
     
 
     useEffect(() => {
-        fontSizeLarge =  isMdWidth() ? 24 : 20
-        fontSizeMedium = isMdWidth() ? 20 : 16
-        fontSizeSmall = isMdWidth() ? 18 : 14
+        fontSizeLarge =  aboveMdWidth() ? 24 : 20
+        fontSizeMedium = aboveMdWidth() ? 20 : 16
+        fontSizeSmall = aboveMdWidth() ? 18 : 14
         const load = async () => {
             try {
                 registerLoggedOutHandler(() => {
@@ -57,9 +57,9 @@ export default () => {
                     displayLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
                     displayMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
                     displaySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-                    headlineLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-                    headlineMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-                    headlineSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                    headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                    headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                    headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
                     labelLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
                     labelMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
                     labelSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},

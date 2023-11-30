@@ -11,13 +11,15 @@ const copyBackupToDrive = async (backupFilename: string, backupFilePath: string)
     return createOrReplaceFile(service, backupFilename, workDir.id!, createReadStream(backupFilePath))
 }
 
+const bcpCommand = '/usr/bin/pg_dump'
+
 export default {
     dailyBackup: async () => {
         const backupFilename = `backup${dayjs(new Date()).format('YYYYMMDD')}.sql`
         const backupFilePath = `./${backupFilename}`
 
         await new Promise((res, rej) => {
-            exec(`/usr/bin/pg_dump 'postgresql://${settings.dbUser}:${settings.dbPassword}@${settings.dbHost}:${settings.dbPort}/${settings.dbName}' -f ${backupFilePath}`, (err, outStream, errStream) => {
+            exec(`${bcpCommand} 'postgresql://${settings.dbUser}:${settings.dbPassword}@${settings.dbHost}:${settings.dbPort}/${settings.dbName}' -f ${backupFilePath}`, (err, outStream, errStream) => {
                 if(err) {
                     rej(errStream)
                 } else {

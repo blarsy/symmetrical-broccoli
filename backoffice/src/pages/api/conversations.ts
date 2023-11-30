@@ -1,7 +1,7 @@
 import { getJwt } from "@/server/apiutil"
 import { NextApiRequest, NextApiResponse } from "next"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
-import { ConversationData, fromRawAccount } from "@/schema"
+import { ConversationData, fromRawAccount, fromRawResource } from "@/schema"
 import { create, getOne, link, list } from "@/server/noco"
 
 export const createMessage = async (participant: any, text: string, image: string): Promise<any> => {
@@ -29,25 +29,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
 
             const participantsInfo = account['participants List'].map((participant: any) => ({ account: participant.compte[0], conversationId: participant.conversation[0].Id }))
-            const conversationIds = participantsInfo.map((info: any) => info.conversationId)
+            if(participantsInfo.length > 0) {
+                const conversationIds = participantsInfo.map((info: any) => info.conversationId)
+    
+                const conversations = await list('conversations', '', [], {
+                    query: {
+                    'where': `(Id,in,${conversationIds.join(',')})`,
+                    'fields': 'Id,dernier_message,participants List,ressource',
+                    'nested[ressource][fields]': 'Id,titre,images',
+                    'nested[participants List][fields]': 'Id,compte',
+                }})
 
-            const conversations = await list('conversations', '', [], {
-                query: {
-                'where': `(Id,in,${conversationIds.join(',')})`,
-                'fields': 'Id,dernier_message,participants List,ressource',
-                'nested[ressource][fields]': 'Id,titre',
-                'nested[participants List][fields]': 'Id,compte',
-            }})
-
-            respondWithSuccess(res, conversations.map((conversation: any) => ({ 
-                conversation: {
-                    id: conversation.Id,
-                    ressourceTitle: conversation.ressource[0].titre,
-                    resourceId: conversation.ressource[0].Id,
-                    lastMessageExcerpt: conversation.dernier_message[0].texte
-                },
-                withUser: fromRawAccount(conversation['participants List'].find((part: any) => part.compte[0].Id != account.Id)!.compte[0]),
-            } as ConversationData)))
+                respondWithSuccess(res, conversations.map((conversation: any) => ({ 
+                    conversation: {
+                        id: conversation.Id,
+                        lastMessageExcerpt: conversation.dernier_message[0].texte,
+                        ressource: fromRawResource(conversation.ressource[0]),
+                    },
+                    withUser: fromRawAccount(conversation['participants List'].find((part: any) => part.compte[0].Id != account.Id)!.compte[0]),
+                } as ConversationData)))
+            } else {
+                respondWithSuccess(res, [])
+            }
         } catch(e: any) {
             respondWithFailure(req, res, e)
         }

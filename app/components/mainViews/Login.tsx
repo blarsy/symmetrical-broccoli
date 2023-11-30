@@ -7,7 +7,7 @@ import RegisterForm from "@/components/form/RegisterForm"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { Text } from "react-native-paper"
 import RecoveryForm from "../form/RecoveryForm"
-import { isMdWidth, mdScreenWidth } from "@/lib/settings"
+import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
 
 interface ConnectProps {
     children: JSX.Element,
@@ -16,7 +16,7 @@ interface ConnectProps {
 
 const ConnectContainer = ({ children, titleI18n }: ConnectProps) => <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
     <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', margin: 10, 
-        alignSelf: 'stretch', gap: 30, maxWidth: isMdWidth() ? mdScreenWidth : 'auto' }}>
+        alignSelf: 'stretch', gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
         <Text variant="titleLarge" style={{ color: '#000', fontWeight: "bold", fontSize: 38, textTransform: "uppercase", textAlign: 'center', lineHeight: 38 }}>{t(titleI18n)}</Text>
         { children }
     </View>

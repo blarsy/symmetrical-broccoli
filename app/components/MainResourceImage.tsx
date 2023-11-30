@@ -1,5 +1,6 @@
 import { Resource } from "@/lib/schema"
-import { hasMinWidth, imgUrl, isMdWidth } from "@/lib/settings"
+import { imgUrl } from "@/lib/settings"
+import { aboveMdWidth, hasMinWidth } from "@/lib/utils"
 import React from "react"
 import { Image } from "react-native"
 
@@ -8,8 +9,17 @@ interface Props {
 }
 
 const MainResourceImage = ({ resource }: Props) => {
-    const size = isMdWidth() ? 350 :
-        (hasMinWidth(450) ? 200 : 100)
+    const size = aboveMdWidth() ? 350 :
+        (hasMinWidth(450) ? 200 : 150)
+    return <ResourceImage size={size} resource={resource} />
+}
+
+interface ResourceImageProps {
+    resource: Resource
+    size: number
+}
+
+export const ResourceImage = ({ resource, size }: ResourceImageProps) => {
     if(resource.images && resource.images.length > 0) {
         const imgData = resource.images[0]
         return <Image source={{ uri: `${imgUrl}${imgData.path}` }} alt={imgData.title} style={{ width: size, height: size }} />

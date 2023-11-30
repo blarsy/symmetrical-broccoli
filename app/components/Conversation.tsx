@@ -51,13 +51,11 @@ const Conversation = ({ resourceId }: Props) => {
     useEffect(() => {
         loadMessages()
     }, [ resourceId ])
-
-    console.log('messages.data', messages.data)
     
-    return <View style={{ flex: 1 }}>
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }}>
         <GiftedChat
             alwaysShowSend
-            messages={messages.data}
+            messages={messages.data || []}
             onSend={onSend}
             isLoadingEarlier={messages.loading}
             user={{
@@ -77,7 +75,6 @@ const Conversation = ({ resourceId }: Props) => {
         />
         <Portal>
             <Snackbar visible={!!messages.error} onDismiss={() => {
-                console.log('reset messages')
                 setMessages(initial(false, []))
             }}>{messages.error?.message}</Snackbar>
         </Portal>

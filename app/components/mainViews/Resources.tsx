@@ -7,7 +7,7 @@ import { IconButton, List, useTheme } from "react-native-paper"
 import { deleteResource, getResources } from "@/lib/api"
 import { t } from "@/i18n"
 import { View } from "react-native"
-import { RouteProps } from "@/lib/utils"
+import { RouteProps, ScreenSize, getScreenSize } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import MainResourceImage from "../MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
@@ -47,7 +47,7 @@ const Resources = ({ route, navigation }: RouteProps) => {
             displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
                 description={resource.description} style={{ margin: 0, padding: 0 }}
                 left={() => <MainResourceImage resource={resource} />}
-                right={() => <View style={{ flexDirection: 'row' }}>
+                right={() => <View style={{ flexDirection: getScreenSize() != ScreenSize.lg ? 'column' : 'row', justifyContent: 'center' }}>
                     <IconButton style={{ alignSelf: 'center' }} mode="outlined" size={34} icon="pencil" onPress={e => {
                         e.stopPropagation()
                         editResourceContext.actions.setResource(resource)

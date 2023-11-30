@@ -237,7 +237,7 @@ const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string, projectName
     await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Santé & confort' })
     await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Matériaux construction & outillage' })
     await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Electronique & technologie' })
-    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Livre & éducation' })
+    await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Livres & éducation' })
     await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Divers' })
     await api.dbTableRow.create(orgs, projectName, resourceCategoriesTableName, { nom: 'Habillement' })
 
