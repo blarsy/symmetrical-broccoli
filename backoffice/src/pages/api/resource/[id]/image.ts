@@ -1,6 +1,6 @@
 import { getAccount, getResource } from "@/server/apiutil"
 import { getOne, update, uploadResourceImage } from "@/server/noco"
-import { Image, fromRawResource } from "@/schema"
+import { Image } from "@/schema"
 import { respondWithSuccess, respondWithFailure, getToken } from "@/server/respond"
 import { NextApiRequest, NextApiResponse } from "next"
 import formidable, { File } from "formidable"

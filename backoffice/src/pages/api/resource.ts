@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const resources = await Promise.all(account.resources.map((res: any) => getResource(res.id)))
                 resources.forEach((res: Resource) => res.account = { id: account.id, name: account.name, email:'', balance: 0, linkedAccounts: [], recoveryCode: '', invitedAccounts: [], invitedByAccounts:[], expirationRecoveryCode: new Date() })
                 
-                respondWithSuccess(res, resources)
+                respondWithSuccess(res, resources.sort((a, b) => a.created < b.created ? 1 : -1))
             } else {
                 respondWithSuccess(res, [])
             }
@@ -23,7 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if (req.method === 'POST') {
         try {
-            
             const { title, description, expiration, categories, isProduct, isService, canBeDelivered, canBeTakenAway, canBeGifted, canBeExchanged } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
             const account = await getAccount(getToken(req))
             const resource = await create(account.id, title, description, expiration, categories || [], isProduct, isService, canBeDelivered, canBeTakenAway, canBeGifted, canBeExchanged)

@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     query: {
                         'where': `(Id,in,${conversationIds.join(',')})`,
                         'fields': 'Id,dernier_message,participants List,ressource,code',
-                        'nested[ressource][fields]': 'Id,titre,images,comptes,donOk,trocOk',
+                        'nested[ressource][fields]': 'Id,titre,images,comptes,donOk,trocOk,CreatedAt',
                         'nested[participants List][fields]': 'Id,compte,messages_non_lus',
                     }
                 })

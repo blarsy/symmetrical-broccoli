@@ -32,7 +32,8 @@ export interface Resource {
     canBeTakenAway: boolean,
     canBeDelivered: boolean,
     canBeGifted: boolean,
-    canBeExchanged: boolean
+    canBeExchanged: boolean,
+    created: Date
 }
 
 export interface Category {
@@ -93,6 +94,7 @@ export const fromRawResource = (raw: any): Resource => ({
     canBeTakenAway: raw.aEmporter,
     canBeGifted: raw.donOk,
     canBeExchanged: raw.trocOk,
+    created: raw.CreatedAt
 })
 
 export const fromRawMessage = (raw: any): Message => ({

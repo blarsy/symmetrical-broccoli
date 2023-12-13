@@ -40,6 +40,6 @@ export const createToken = async (secret: string, data: any): Promise<string> =>
 export const getResource = async(resourceId: number): Promise<Resource> => {
     const resource = await getOne('ressources', `(Id,eq,${resourceId})`, [
         'Id', 'titre', 'description', 'images', 'expiration', 'comptes', 'categories', 
-        'produit', 'service', 'livraison', 'aEmporter', 'donOk', 'trocOk'])
+        'produit', 'service', 'livraison', 'aEmporter', 'donOk', 'trocOk', 'CreatedAt'])
     return fromRawResource(resource)
 }
