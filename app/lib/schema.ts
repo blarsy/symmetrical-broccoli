@@ -23,11 +23,13 @@ export interface Category {
 }
 
 export interface Message {
-    text: string,
-    id: number,
-    created: Date,
-    from: Account,
+    text: string
+    id: number
+    created: Date
+    from: Account
     image?: Image
+    conversationId?: number
+    received?: Date
 }
 
 export interface Resource {
@@ -47,11 +49,13 @@ export interface Resource {
 }
 
 export interface ConversationData {
-    withUser: Account,
+    withUser: Account
     conversation: {
-        id: number,
-        lastMessageExcerpt: string | undefined,
+        id: number
+        lastMessageExcerpt: string | undefined
+        code: string
         resource: Resource
+        hasUnread: boolean
     }
 }
 

@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import Conversation from "../Conversation"
 import PastConversations from "../PastConversations"
-import { Resource } from "@/lib/schema"
 import Images from "@/Images"
-import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import { lightPrimaryColor } from "../layout/constants"
 
 const Chat = ({ route, navigation }: RouteProps) => {
-    const [resource, setResource] = useState(undefined as Resource | undefined)
-    useEffect(() => {
-      if(route.params && route.params.resource) {
-        setResource(route.params.resource)
-      }
-    }, [route.params && route.params.resource])
     return <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <Images.BackgroundChat fill={lightPrimaryColor} style={{
             position: 'absolute',
@@ -23,8 +16,8 @@ const Chat = ({ route, navigation }: RouteProps) => {
             bottom: 0
           }}
         />
-        { resource ? <Conversation resourceId={resource.id} /> :
-            <PastConversations onConversationSelected={resource => setResource(resource)} />}
+        { route.params && route.params.resource ? <Conversation resourceId={route.params.resource.id} /> :
+            <PastConversations onConversationSelected={resource => navigation.navigate('chat', { resource })} />}
     </View>
 }
 

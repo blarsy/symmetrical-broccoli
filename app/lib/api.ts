@@ -118,6 +118,15 @@ export const getResources = async (token: string): Promise<Resource[]> => {
     }
 }
 
+export const getResource = async (resourceId: number): Promise<Resource> => {
+    const res = await apiCall(`${apiUrl}resource/${resourceId}`, { method: 'GET', mode: 'cors'})
+    if(res.status === 200) {
+        return resourceFromApi((await res.json()) as Resource)
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
 export const getResourceCategories = async () => {
     const res = await apiCall(`${apiUrl}resource/categories`, { method: 'GET', mode: 'cors' })
     if(res.status === 200) {
@@ -131,8 +140,9 @@ const resourceFromApi = (rawResource: Resource) => {
     if(typeof rawResource.images === 'string') {
         rawResource.images = JSON.parse(rawResource.images)
     }
-    if(typeof(rawResource.expiration) === 'string')
-    rawResource.expiration = new Date(rawResource.expiration as unknown as string)
+    if(typeof(rawResource.expiration) === 'string') {
+        rawResource.expiration = new Date(rawResource.expiration as unknown as string)
+    }
     return rawResource
 }
 
@@ -223,8 +233,8 @@ export const getSuggestions = async(token: string, searchTerm: string, categorie
     }
 }
 
-export const getMessages = async(token: string, conversationId: number): Promise<Message[]> => {
-    const res = await apiCall(`${apiUrl}messages/${conversationId}`, { method: 'GET', mode: 'cors', headers: {
+export const getMessages = async(token: string, ressourceId: number): Promise<Message[]> => {
+    const res = await apiCall(`${apiUrl}messages/${ressourceId}`, { method: 'GET', mode: 'cors', headers: {
         'Authorization': token
     }})
     if(res.status === 200) {
@@ -242,6 +252,24 @@ export const sendChatMessages = async(token: string, resourceId: number, message
     if(res.status === 200) {
         return (await res.json()) as Message[]
     } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const getConversation = async(token: string, resourceId: number): Promise<any> => {
+    const res = await apiCall(`${apiUrl}conversations/${resourceId}`, { method: 'GET', mode: 'cors', headers: {
+        'Authorization': token
+    } })
+    if(res.status === 200) {
+        return await res.json()
+    } else {
+        throw new Error(res.statusText)
+    }
+}
+
+export const ensureChatSocketActive = async(): Promise<void> => {
+    const res = await apiCall(`${apiUrl}chatio`, { method: 'GET', mode: 'cors' })
+    if(res.status != 200) {
         throw new Error(res.statusText)
     }
 }

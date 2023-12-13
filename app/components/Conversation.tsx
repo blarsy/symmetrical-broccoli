@@ -8,12 +8,16 @@ import { t } from "@/i18n"
 import { Message } from "@/lib/schema"
 import { AppContext } from "./AppContextProvider"
 import { getMessages, sendChatMessages } from "@/lib/api"
+import { NewMessageData } from "@/lib/utils"
+import { getLocales } from "expo-localization"
 
 interface Props {
     resourceId: number
 }
 
-const asIMessages = (messages: Message[]): IMessage[] => messages.map(msg => ({
+const asIMessages = (messages: Message[]): IMessage[] => messages.map(msg => asIMessage(msg))
+
+const asIMessage = (msg: Message): IMessage => ({
     _id: msg.id,
     text: msg.text,
     createdAt: msg.created,
@@ -22,27 +26,51 @@ const asIMessages = (messages: Message[]): IMessage[] => messages.map(msg => ({
         name: msg.from.name
     },
     pending: false,
+    received: !!msg.received,
     sent: true,
     image: msg.image?.path
-}))
+})
 
 const Conversation = ({ resourceId }: Props) => {
     const appContext = useContext(AppContext)
-    const [messages, setMessages] = useState(initial<IMessage[]>(false, []))
+    const [messages, setMessages] = useState(initial<{ message: IMessage, resourceId: number }[]>(false, []))
 
     const onSend = useCallback(async (newMessages = [] as IMessage[]) => {
-        const sentMessages = await sendChatMessages(appContext.state.token.data!, resourceId, newMessages)
+        await sendChatMessages(appContext.state.token.data!, resourceId, newMessages)
 
-        setMessages(fromData(GiftedChat.append(messages.data, newMessages)))
+        setMessages(
+            fromData(
+                GiftedChat.append(messages.data!.map(data => data.message), newMessages)
+                    .map((msg: IMessage) => ({ message: msg, resourceId }))))
     }, [messages])
+
+    const appendMessages = (messageList: { message: IMessage, resourceId: number }[]) => {
+        setMessages(prevMessages => {
+            const fullMessageList = GiftedChat.append(prevMessages.data?.map(msg => msg.message), messageList.map(msg => msg.message))
+                .map(msg => ({ message: msg, resourceId}))
+
+            const messagesIAuthored = fullMessageList.filter(msg => msg.message.user._id != appContext.state.account!.id)
+            if(messagesIAuthored.length > 0)
+                appContext.state.chatSocket!.setLastReadMessage(appContext.state.token.data!, messagesIAuthored[0].message._id as number)
+            
+            return fromData(fullMessageList)
+        })
+    }
 
     const loadMessages = async () => {
         try {
             setMessages(beginOperation())
-            // connect to this conversation's namespace over the configured socket server
+            
+            const messagesPromise = getMessages(appContext.state.token.data!, resourceId)
 
-            const messages = await getMessages(appContext.state.token.data!, resourceId)
-            setMessages(fromData(asIMessages(messages)))
+            const loadedMessages = asIMessages(await messagesPromise).map(msg => ({ message: msg, resourceId }))
+            appContext.state.chatSocket!.pushStackChatMessageListener((data: NewMessageData) => {
+                if(data.message.from.id != appContext.state.account?.id) {
+                    appendMessages([{ message: asIMessage(data.message), resourceId }])
+                }
+            })
+
+            appendMessages(loadedMessages)
         } catch(e) {
             setMessages(fromError(e, t('requestError')))
         }
@@ -50,18 +78,20 @@ const Conversation = ({ resourceId }: Props) => {
 
     useEffect(() => {
         loadMessages()
+        return () => { appContext.state.chatSocket!.popStackChatMessageListener() }
     }, [ resourceId ])
     
     return <View style={{ flex: 1, backgroundColor: 'transparent' }}>
         <GiftedChat
             alwaysShowSend
-            messages={messages.data || []}
+            messages={messages.data?.map(data => data.message) || []}
             onSend={onSend}
             isLoadingEarlier={messages.loading}
             user={{
                 _id: appContext.state.account?.id!,
                 name: appContext.state.account?.name
             }}
+            locale={getLocales()[0].languageCode}
             renderSend={p => <Send {...p} containerStyle={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -69,8 +99,8 @@ const Conversation = ({ resourceId }: Props) => {
                 <Icon color={primaryColor} source="send" size={35} />
             </Send>}
             renderActions={p => <View style={{ flexDirection: 'row' }}>
-                <IconButton icon="image" iconColor={primaryColor} style={{ margin: 0 }} />
-                <IconButton icon="emoticon" iconColor={primaryColor} style={{ margin: 0 }} />
+                {/* <IconButton icon="image" iconColor={primaryColor} style={{ margin: 0 }} /> */}
+                {/* <IconButton icon="emoticon" iconColor={primaryColor} style={{ margin: 0 }} /> */}
             </View>}
         />
         <Portal>

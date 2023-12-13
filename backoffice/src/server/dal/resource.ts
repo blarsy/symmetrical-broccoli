@@ -1,6 +1,6 @@
 import { Category, Resource, fromRawResource, resourceCategoriesFromRaw } from "@/schema"
-import { link, list, create as nocoCreate } from '@/server/noco'
-import { getAccount, getResource } from "../apiutil"
+import { getOne, link, list, create as nocoCreate } from '@/server/noco'
+import { getAccount, getJwt, getResource } from "../apiutil"
 
 export const create = async (accountId: number, title: string, description: string, expiration: Date, categories: Category[], 
         isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
@@ -26,7 +26,7 @@ export const getSuggestions = async (token: string, searchText: string, isProduc
     canBeDelivered: boolean, canBeTakenAway: boolean, canBeExchanged: boolean, canBeGifted: boolean, categories?: string[]): Promise<Resource[]> => {
     const account = await getAccount(token, ['Id', 'nom'])
     const andFilters = []
-    //andFilters.push(`(comptes,neq,${account.name})`)
+    
     andFilters.push(`(expiration,gt,today)`)
     if(searchText) andFilters.push(`(titre,like,%${searchText}%)`)
 
@@ -69,6 +69,31 @@ export const getSuggestions = async (token: string, searchText: string, isProduc
         }
     }
     
-    const resourceRaw = await list('ressources', filter, ['Id'], undefined, ['expiration','titre'])
+    const resourceRaw = await list('ressources', filter, ['Id'], undefined, ['expiration','titre','comptes'])
     return Promise.all(resourceRaw.map(raw => getResource(raw.Id)))
+}
+
+export const getParticipantForResource = async (token: string, resourceId: string): Promise<{ account: any, resource: any, participant: any }> => {
+    const jwt = await getJwt(token)
+
+    //Select the account & participants list
+    const accountPromise = getOne('comptes', `(email,eq,${jwt.email})`, ['Id', 'participants List'])
+
+    //Select the resource with convo's & participants list
+    const resource = await getOne('ressources', '', ['Id'], {
+        query: {
+            'where': `(Id,eq,${resourceId})`,
+            'fields': 'Id,conversations List,comptes',
+            'nested[conversations List][fields]': 'Id,participants List,code,dernier_message',
+        }
+    })
+
+    const account = await accountPromise
+
+    //Find the conversation that has a participant match, along with the matching participant
+    return {
+        account,
+        resource,
+        participant: account['participants List'].find((part: any) => resource['conversations List'].some((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === part.Id)))
+    }
 }

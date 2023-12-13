@@ -1,5 +1,5 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken"
-import { getChildItems, getOne } from "./noco"
+import { getOne } from "./noco"
 import { Account, Resource, fromRawAccount, fromRawResource } from "../schema"
 import { RequestParams } from "nocodb-sdk"
 

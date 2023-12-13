@@ -1,42 +1,31 @@
 import { getJwt } from "@/server/apiutil"
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextApiRequest } from "next"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
-import { Message, fromRawAccount } from "@/schema"
-import { bulkCreate, create, getOne, link, list } from "@/server/noco"
+import { Message, fromRawAccount, fromRawMessage } from "@/schema"
+import { bulkCreate, create, getOne, link, list, unlink } from "@/server/noco"
 import { createMessage } from "../conversations"
+import { NextApiResponseServerIO } from "@/types/next"
+import { generateCode } from "@/utils"
+import { Server } from "socket.io"
+import { DefaultEventsMap } from "socket.io/dist/typed-events"
+import { getParticipantForResource } from "@/server/dal/resource"
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponseServerIO) {
     if(req.method === 'GET') {
         try {
-            const jwt = await getJwt(getToken(req))
             const { resourceId } = req.query
-
-            //Select the account & participants list
-            const accountPromise = getOne('comptes', `(email,eq,${jwt.email})`, ['Id', 'participants List'])
-
-            //Select the resource with convo's & participants list
-            const resource = await getOne('ressources', '', ['Id'], {
-                query: {
-                    'where': `(Id,eq,${resourceId})`,
-                    'fields': 'Id,conversations List',
-                    'nested[conversations List][fields]': 'Id,participants List',
-                }
-            })
-
-            const account = await accountPromise
-
-            //Find the conversation that has a participant match, along with the matching participant
-            const participant = account['participants List'].find((part: any) => resource['conversations List'].find((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === part.Id)))
+            const data = await getParticipantForResource(getToken(req), resourceId as string)
             
-            if(!participant) {
+            if(!data.participant) {
                 respondWithSuccess(res, [])
             } else {
-                const conversation = resource['conversations List'].find((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === participant.Id))
+                const conversation = data.resource['conversations List'].find((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === data.participant.Id))
             
                 const participantsMessages = await list('participants', '', [], { query: {
                     'where': `(Id,in,${conversation['participants List'].map((convPart: any) => convPart.Id).join(',')})`,
                     'fields': 'Id,messages List,compte',
                     'nested[messages List][fields]': 'Id,texte,participant,image,envoye',
+                    'nested[messages List][sort]': '-CreatedAt'
                 }})
                 
                 let messages: any[] = []
@@ -52,53 +41,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     } else if(req.method === 'POST') {
         try{
-            const jwt = await getJwt(getToken(req))
             const { resourceId } = req.query
             const { messages } : { messages: { text: string, image: string }[]} = req.body
-
-            //Select the account & participants list
-            const accountPromise = getOne('comptes', `(email,eq,${jwt.email})`, ['Id', 'participants List'])
-
-            //Select the resource with convo's & participants list
-            const resource = await getOne('ressources', '', ['Id'], {
-                query: {
-                    'where': `(Id,eq,${resourceId})`,
-                    'fields': 'Id,conversations List',
-                    'nested[conversations List][fields]': 'Id,participants List',
-                }
-            })
-
-            const account = await accountPromise
-
-            //Find the conversation that has a participant match, along with the matching participant
-            let participant = account['participants List'].find((part: any) => resource['conversations List'].some((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === part.Id)))
+            const data = await getParticipantForResource(getToken(req), resourceId as string)
             
-            let conversationId: number
-            if(!participant) {
-                const conversation = await create('conversations', { demarre: new Date() })
-                await link('conversations', conversation.Id, 'resssource', resourceId as string)
+            let participantId: string
+            let conversation: any
+            if(!data.participant) {
+                conversation = await create('conversations', { demarre: new Date(), code: generateCode(8) })
+                await link('conversations', conversation.Id, 'ressource', resourceId as string)
         
                 const participants = await bulkCreate('participants', [{ rejoint: new Date() }, { rejoint: new Date() }])
+                
                 await Promise.all([
-                    link('participants', participants[0].Id, 'conversation', conversation.Id),
-                    link('participants', participants[1].Id, 'conversation', conversation.Id),
-                    link('participants', participants[0].Id, 'compte', resource.account!.id.toString()),
-                    link('participants', participants[1].Id, 'compte', account.id.toString()),
+                    link('participants', participants[0].id, 'conversation', conversation.Id),
+                    link('participants', participants[1].id, 'conversation', conversation.Id),
+                    link('participants', participants[0].id, 'compte', data.resource.comptes.Id),
+                    link('participants', participants[1].id, 'compte', data.account.Id),
                 ])
-                conversationId = conversation.Id
-                participant = participants[1]
-                participant.conversation = conversation
-            } else {
-                const conversation = resource['conversations List'].find((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === participant.Id))
-                conversationId = conversation.Id
-                participant.conversation = conversation
-            }
 
+                //'bulkCreate' creates items with an 'id' property, where I would expect 'Id' as everywhere else in the Nocodb api.
+                //work around this by making the following chitty tranformation
+                conversation['participants List'] = participants.map((part: any) => ({ Id: part.id }))
+                participantId = participants[1].id
+            } else {
+                conversation = data.resource['conversations List'].find((conv: any) => conv['participants List'].some((convpart: any) => convpart.Id === data.participant.Id))
+                participantId = data.participant.Id
+            }
+            
             //Create the messages on the participant
-            const newMessages = await Promise.all(messages.map(m => createMessage(participant, m.text, m.image)))
-    
+            const newMessages = await Promise.all(messages.map(m => createMessage(participantId, conversation['participants List'].filter((part:any) => part.Id != participantId).map((part:any) => part.Id), m.text, m.image)))
+
             //Link the latest message to the convo
-            await link('conversations', conversationId, 'dernier_message', newMessages[newMessages.length- 1].Id)
+            if(conversation.dernier_message && conversation.dernier_message.length > 0) await unlink('conversations', conversation.Id, 'dernier_message', conversation.dernier_message[0].Id )
+            await link('conversations', conversation.Id, 'dernier_message', newMessages[newMessages.length- 1].Id.toString())
+
+            newMessages.forEach(msg => emitMessageInConversation(res.socket.server.io, conversation.Id, msg))
             
             respondWithSuccess(res, newMessages)
         } catch(e: any) {
@@ -107,4 +85,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
         res.end()
     }
+}
+
+async function emitMessageInConversation(io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, conversationId: number, msg: any): Promise<void> {
+    const socketsPromise = await io.fetchSockets()
+    const conversation = await getOne('conversations', '',['Id'], {
+        query: {
+            'where': `(Id,eq,${conversationId})`,
+            'fields': 'Id,participants List,code,ressource',
+            'nested[participants List][fields]' : 'Id,compte'
+        }
+    })
+
+    const sockets = await socketsPromise
+    sockets.filter(socket => socket.data.account && conversation['participants List'].some((part: any) => part.compte[0].Id === socket.data.account.id)).forEach(socket => {
+        socket.join(conversation.code)
+    })
+
+    const message = fromRawMessage(await getOne('messages', '', ['Id'], {
+        query: {
+            'where': `(Id,eq,${msg.Id})`,
+            'fields': 'Id,participant,texte,image,conversations,CreatedAt',
+            'nested[participant][fields]': 'Id,compte'
+        }
+    }))
+
+    io.in(conversation.code).emit('chat_message', { message, resourceId: conversation.ressource[0].Id })
 }

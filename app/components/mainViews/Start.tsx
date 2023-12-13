@@ -1,4 +1,3 @@
-
 import { useContext, useEffect } from "react"
 import { fromData, fromError } from "@/lib/DataLoadState"
 import Login from "./Login"
@@ -9,7 +8,7 @@ import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
-import { PaperProvider, Snackbar, configureFonts } from 'react-native-paper'
+import { ActivityIndicator, Modal, PaperProvider, Portal, Snackbar, Text, configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { aboveMdWidth } from "@/lib/utils"
 
@@ -71,6 +70,11 @@ export default () => {
                 { appContext.state.token.data ? 
                     <Main /> :
                     <Login /> }
+                <Portal>
+                    <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
+                        <ActivityIndicator size="large" />
+                    </Modal>
+                </Portal>
             </PaperProvider>
         </GestureHandlerRootView>
     } else {

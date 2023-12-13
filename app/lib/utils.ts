@@ -1,5 +1,6 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
+import { Message } from "./schema"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^\w]/)
 
@@ -28,4 +29,16 @@ export const getScreenSize = (): ScreenSize => {
     } else {
         return ScreenSize.sm
     }
+}
+
+export interface NewMessageData {
+    message: Message
+    resourceId: number
+}
+
+export const adaptHeight = (sm: number, md: number, lg: number):number => {
+    const screenHeight = Dimensions.get("window").height
+    if(screenHeight < 400) return sm
+    if(screenHeight < 1000) return md
+    return lg
 }

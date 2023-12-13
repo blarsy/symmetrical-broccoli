@@ -1,5 +1,5 @@
 import { getAccount, getResource } from "@/server/apiutil"
-import { bulkCreate, bulkDelete, bulkUpdate, getChildItems, getOne, link, remove, unlink, update } from "@/server/noco"
+import { getOne, link, remove, unlink, update } from "@/server/noco"
 import { getToken, respondWithFailure, respondWithSuccess } from "@/server/respond"
 import { Category } from "@/schema"
 import { NextApiRequest, NextApiResponse } from "next"
@@ -7,14 +7,9 @@ import { NextApiRequest, NextApiResponse } from "next"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method === 'GET') {
         try {
-            const account = await getAccount(getToken(req))
             const { id } = req.query
             const resourceId = Number(id)
             
-            if(!account.resources || !account.resources.find(res => res.id == resourceId)) {
-                respondWithFailure(req, res, new Error('Resource not found'), 404)
-                return
-            }
             const resource = await getResource(resourceId)
 
             respondWithSuccess(res, resource)

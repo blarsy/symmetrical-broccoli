@@ -9,6 +9,9 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import NextLink from "next/link"
 import { Account } from "@/schema"
 import Image from 'next/image'
+import { Socket, io } from "socket.io-client"
+
+const websiteUrl = process.env.TOPELA_API_URL!
 
 interface Props {
     title?: string,
@@ -18,6 +21,7 @@ interface Props {
 const pages = [
     { name: 'Tableau de bord', path: '/webapp/home' },
     { name: 'Resources', path: '/webapp/home/resource' },
+    { name: 'Chat', path: '/webapp/home/chat' },
     // { name: 'Réseau', path: '/webapp/home/network' },
 ]
 
@@ -36,6 +40,7 @@ const LoggedInLayout = ({ title, children }: Props) => {
                     const res = await axios.get(`/api/user`, { headers: { Authorization: localStorage.getItem('token') } })
                     appContext.loggedIn(res.data.account)
                     setAccount(fromData<Account>(res.data.account))
+                    
                 } catch (e: any) {
                     setAccount(fromError(e, 'Echec lors du chargement du compte.'))
                     localStorage.removeItem('token')

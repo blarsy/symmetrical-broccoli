@@ -80,6 +80,7 @@ const createInitial = async (api: Api<unknown>, projectName: string, nocoUrl: st
     await migrateToV1_0_3()
     await migrateToV1_0_4(apiInNewProject, projectId)
     await migrateToV1_0_5(apiInNewProject, projectId, projectName, orgs)
+    await migrateToV1_0_6(apiInNewProject, projectId)
 }
 
 const migrateToV1_0_0 = async (api: Api<unknown>, projectId: string, orgs: string, projectName: string): Promise<void> => {
@@ -255,6 +256,35 @@ const migrateToV1_0_5 = async (api: Api<unknown>, projectId: string, projectName
     await update(systemTableName, 1, { version: '1.0.5' })
 }
 
+const migrateToV1_0_6 = async (api: Api<unknown>, projectId: string) => {
+    const tables = await api.dbTable.list(projectId)
+    const conversationsTbl = tables.list.find(table => table.title === conversationsTableName)! 
+    const conversationsTblFull = await api.dbTable.read(conversationsTbl.id!)
+    const messagesTbl = tables.list.find(table => table.title === messagesTableName)!
+    const messagesTblFull = await api.dbTable.read(messagesTbl.id!)
+    const participantsTbl = tables.list.find(table => table.title === participantsTableName)!
+
+    const lastMessageColId = conversationsTblFull.columns!.find(col => col.title === 'dernier_message' )!.id!
+    await api.dbTableColumn.delete(lastMessageColId)
+
+    await api.dbTableColumn.create(conversationsTbl.id!, {
+        childId: messagesTbl.id!, parentId: conversationsTbl.id!, column_name: 'dernier_message', title: 'dernier_message',
+        type: 'hm', uidt: 'LinkToAnotherRecord', virtual: false
+    } as LinkToAnotherColumnReqType)
+    await api.dbTableColumn.create(conversationsTbl.id!, {
+        title: 'code', column_name: 'code', uidt: 'SingleLineText'
+    })
+    const receivedColId = messagesTblFull.columns!.find(col => col.title === 'recu')!.id!
+    await api.dbTableColumn.delete(receivedColId)
+
+    await api.dbTableColumn.create(participantsTbl.id!, {
+        childId: messagesTbl.id!, parentId: participantsTbl.id!, column_name: 'messages_non_lus', title: 'messages_non_lus',
+        type: 'hm', uidt: 'LinkToAnotherRecord'
+    })
+
+    await update(systemTableName, 1, { version: '1.0.6' })
+}
+
 const insertTestData  = async () => {
     if(process.env.NODE_ENV === 'development') {
         const accounts = await Promise.all([
@@ -293,7 +323,8 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         await migrateToV1_0_3()
         await migrateToV1_0_4(api, projectId)
         await migrateToV1_0_5(api, projectId, projectName, orgs)
-        return 'Migrated to 1.0.5'
+        await migrateToV1_0_6(api, projectId)
+        return 'Migrated to 1.0.6'
     } else {
         const systemRow = await getOne('systeme', `{1,eq,1}`, ['version'])
         if(systemRow.version === '1.0.0') {
@@ -311,6 +342,9 @@ const ensureMigrationApplied = async (api: Api<unknown>, projectName: string, or
         } else if(systemRow.version === '1.0.4') {
             await migrateToV1_0_5(api, projectId, projectName, orgs)
             return 'Migrated to 1.0.5'
+        } else if(systemRow.version === '1.0.5') {
+            await migrateToV1_0_6(api, projectId)
+            return 'Migrated to 1.0.6'
         } else {
             return 'Db already up to date'
         }

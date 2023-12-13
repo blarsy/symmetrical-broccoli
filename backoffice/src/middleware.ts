@@ -3,15 +3,16 @@ import { NextRequest, NextResponse } from "next/server"
 const allowedOriginsStr = process.env.NEXT_PUBLIC_APP_URLS as string
 const allowedOrigins = JSON.parse(allowedOriginsStr) as string[]
 
+export const getAllowedOrigin = (originFromHeader: string | null | undefined) => {
+    if(!originFromHeader) return allowedOrigins[0]
+    const soleOriginToAllow = allowedOrigins.find(ao => ao.toLowerCase().startsWith(originFromHeader!.toLowerCase()))
+    return soleOriginToAllow || allowedOrigins[0]
+}
+
 export function middleware(req: NextRequest) {
     const res= NextResponse.next()
 
-    if (req.headers.get('origin')) {
-        const soleOriginToAllow = allowedOrigins.find(ao => ao.toLowerCase().startsWith(req.headers.get('origin')!.toLowerCase()))
-        res.headers.append('Access-Control-Allow-Origin', soleOriginToAllow || allowedOrigins[0])
-    } else {
-        res.headers.append('Access-Control-Allow-Origin', allowedOrigins[0])
-    }
+    res.headers.append('Access-Control-Allow-Origin', getAllowedOrigin(req.headers.get('origin')))
     
     // add the CORS headers to the response
     res.headers.append('Access-Control-Allow-Credentials', "true")

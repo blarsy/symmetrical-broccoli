@@ -36,7 +36,6 @@ export const remove = async (tableName: string, itemId: string): Promise<number>
 export const list = async (tableName: string, filter?: string, fields?: string[], otherParams?: RequestParams, sort?: string | string[], limit?: number): Promise<any[]> => {
     try{
       const res = await api.dbTableRow.list(orgs, projectName, tableName, { where: filter, fields, sort, limit }, otherParams)
-      //console.log('List, tableName', tableName, 'filter', filter, 'fields', fields, 'otherParams', otherParams, 'sort', sort)
       logData(`Querying ${tableName} with filter ${filter} ${otherParams ? 'other params: ' + JSON.stringify(otherParams):''}`, res)
       return res.list
     } catch(e: any) {
@@ -85,7 +84,7 @@ export const link = async (tableName: string, sourceItemId: number, columnName: 
     logData(`Linking item from ${tableName} via column ${columnName}: `, res)
     return res
   } catch(e: any) {
-    logData(`Error trying to link item from ${tableName} via column ${columnName}: `, e, true)
+    logData(`Error trying to link item from ${tableName}, parent item ${sourceItemId} via column ${columnName}, child item ${targetItemId}: `, e, true)
     throw e
   }
 }

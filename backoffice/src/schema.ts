@@ -51,16 +51,20 @@ export interface ConversationData {
     conversation: {
         id: number,
         lastMessageExcerpt: string | undefined,
+        code: string,
         resource: Resource
+        hasUnread: boolean
     }
 }
 
 export interface Message {
-    text: string,
-    id: number,
-    created: Date,
-    from: Account,
+    text: string
+    id: number
+    created: Date
+    from: Account
     image?: Image
+    conversationId: number
+    received?: Date
 }
 
 export const fromRawAccount = (raw: any): Account => {
@@ -89,6 +93,11 @@ export const fromRawResource = (raw: any): Resource => ({
     canBeTakenAway: raw.aEmporter,
     canBeGifted: raw.donOk,
     canBeExchanged: raw.trocOk,
+})
+
+export const fromRawMessage = (raw: any): Message => ({
+    id: raw.Id, created: raw.CreatedAt, from: fromRawAccount(raw.participant[0].compte[0]), 
+    text: raw.texte, image: raw.image, conversationId: raw.conversations.Id
 })
 
 export const resourceCategoriesFromRaw = (raws: any[]): Category[] => {

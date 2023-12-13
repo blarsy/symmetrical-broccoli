@@ -7,6 +7,9 @@ import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Snackbar } from "react-native-paper"
 import dayjs from "dayjs"
+import { t } from "@/i18n"
+import { NewMessageData } from "@/lib/utils"
+import { ChatSocket } from "@/lib/ChatSocket"
 
 const SPLASH_DELAY = 3000
 
@@ -26,10 +29,13 @@ export interface SearchFilter {
 }
 
 interface AppState {
-    token: DataLoadState<string>,
-    account?: Account,
-    messages: string[],
+    token: DataLoadState<string>
+    account?: Account
+    messages: string[]
     searchFilter: SearchFilter
+    chatSocket?: ChatSocket
+    processing: boolean
+    numberOfUnread: number
 }
 
 interface AppActions {
@@ -42,6 +48,9 @@ interface AppActions {
     setMessage: (message: any) => void
     notify: (message: any) => void
     setSearchFilter: (newFilter: SearchFilter) => void
+    beginOp: () => void
+    endOp: () => void
+    endOpWithError: (error: any) => void
 }
 
 interface AppContext {
@@ -53,7 +62,18 @@ interface Props {
     children: JSX.Element
 }
 
-const emptyState: AppState = { token: initial<string>(true, ''), messages: [], searchFilter: { categories: [], search: '' , options: { canBeDelivered: false, canBeTakenAway: false, canBeExchanged: false, canBeGifted: false, isProduct: false, isService: false }} }
+const emptyState: AppState = { 
+    token: initial<string>(true, ''), 
+    messages: [], 
+    searchFilter: { 
+        categories: [], 
+        search: '' , 
+        options: { canBeDelivered: false, canBeTakenAway: false, canBeExchanged: false, canBeGifted: false, isProduct: false, isService: false }
+    },
+    chatSocket: undefined,
+    numberOfUnread: 0,
+    processing: false
+}
 
 export const AppContext = createContext<AppContext>({
     state: emptyState, 
@@ -66,7 +86,10 @@ export const AppContext = createContext<AppContext>({
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
-        setSearchFilter: () => {}
+        setSearchFilter: () => {},
+        beginOp: () => {},
+        endOp: () => {},
+        endOpWithError: e => {}
     }
 })
 
@@ -89,16 +112,22 @@ const AppContextProvider = ({ children }: Props) => {
 
     const actions: AppActions = {
         loginComplete: async (token: string, account: Account): Promise<Account> => {
-            await AsyncStorage.setItem('token', token)
-            setAppState({ ...appState, ...{ token: fromData(token), account } })
+            const storagePromise = AsyncStorage.setItem('token', token)
+            const chatSocket = new ChatSocket(token, newNumber => setAppState({ ...appState, ...{ numberOfUnread: newNumber } }))
+            await chatSocket.init()
+
+            setAppState({ ...appState, ...{ token: fromData(token), account, chatSocket } })
+            await storagePromise
             return account
         },
         tryRestoreToken: async (): Promise<void> => {
             const token = await AsyncStorage.getItem('token')
             if(token) {
                 const accountPromise = getAccount(token)
+                const chatSocket = new ChatSocket(token, newNumber => setAppState({ ...appState, ...{ numberOfUnread: newNumber } }))
+                await chatSocket.init()
                 const account = await executeWithinMinimumDelay(accountPromise)
-                setAppState({ ...appState, ...{ token: fromData(token), account } })
+                setAppState({ ...appState, ...{ token: fromData(token), account, chatSocket} })
                 
             } else {
                 setTimeout(() => setAppState({ ...appState, ...{ token: fromData('') } }), SPLASH_DELAY)
@@ -126,6 +155,16 @@ const AppContextProvider = ({ children }: Props) => {
         notify: setLastNofication,
         setSearchFilter: (newFilter: SearchFilter) => {
             setAppState({ ...appState, ...{ searchFilter: newFilter }})
+        },
+        beginOp: () => {
+            setAppState({...appState, ...{ processing: true }})
+        },
+        endOp: () => {
+            setAppState({...appState, ...{ processing: false }})
+        },
+        endOpWithError: e => {
+            setAppState({...appState, ...{ processing: false }})
+            setLastNofication(t('requestError'))
         }
     }
 

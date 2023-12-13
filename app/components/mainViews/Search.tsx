@@ -3,7 +3,7 @@ import React, { PropsWithChildren, useContext, useEffect, useState } from "react
 import LoadedList from "../LoadedList"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
-import { Icon, IconButton, List, Text, TextInput } from "react-native-paper"
+import { Icon, IconButton, Text, TextInput } from "react-native-paper"
 import { getSuggestions } from "@/lib/api"
 import { AppContext, SearchFilter, SearchOptions } from "../AppContextProvider"
 import { t } from "@/i18n"
@@ -94,7 +94,8 @@ export default function Search ({ route, navigation }: RouteProps) {
                 </View>
             </View>} style={{ margin: 1, padding: 0, backgroundColor: lightPrimaryColor, paddingLeft: 6 }}
             left={() => <MainResourceImage resource={resource} />} right={p => <View style={{ justifyContent: 'flex-end' }}>
-                { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0 }} size={15} icon={Images.Chat} onPress={() => navigation.navigate('chat', { resource })}/> }
+                { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0 }} size={15} icon={Images.Chat}
+                    onPress={() => navigation.navigate('chat', { resource }) }/> }
             </View>}
         />}/>
     </ScrollView>
