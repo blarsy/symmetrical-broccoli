@@ -22,7 +22,6 @@ export default () => {
 
     const [fontsLoaded, fontError] = useFonts({
         'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
-        'Futura-std-book': require('@/assets/fonts/futura-std-book.otf'),
         'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
       })
     
@@ -50,18 +49,18 @@ export default () => {
         return <GestureHandlerRootView style={{ flex: 1 }}>
             <PaperProvider theme={{
                 fonts: configureFonts({ config: { 
-                    bodyLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-                    bodyMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-                    bodySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-                    displayLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-                    displayMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-                    displaySmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                    bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+                    bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+                    bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                    displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                    displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                    displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
                     headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
                     headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
                     headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-                    labelLarge: { fontFamily: 'Futura-std-book', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-                    labelMedium: { fontFamily: 'Futura-std-book', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-                    labelSmall: { fontFamily: 'Futura-std-book', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+                    labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+                    labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+                    labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
                     titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
                     titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
                     titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }

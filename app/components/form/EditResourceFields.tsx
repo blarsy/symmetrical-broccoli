@@ -1,13 +1,14 @@
 import { ErrorMessage, FormikProps } from "formik"
 import { t } from "i18next"
 import React, { useContext, useEffect } from "react"
-import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton, CheckboxGroup } from "../layout/lib"
+import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton, CheckboxGroup, StyledLabel } from "../layout/lib"
 import PicturesField from "./PicturesField"
 import { Category, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { AppContext } from "../AppContextProvider"
 import CategoriesSelect from "./CategoriesSelect"
+import { aboveMdWidth } from "@/lib/utils"
 
 interface Props {
     formikState: FormikProps<Resource>
@@ -36,13 +37,13 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             onImageDeleteRequested={img => {editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
                 return editResourceContext.actions.deleteImage(values, appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
             }} />
-        <TransparentTextInput label={t('title_label')} value={values.title}
+        <TransparentTextInput label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
         <ErrorMessage component={ErrorText} name="title" />
-        <TransparentTextInput label={t('description_label')} value={values.description}
+        <TransparentTextInput label={<StyledLabel label={t('description_label')} />} value={values.description}
             onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
         <ErrorMessage component={ErrorText} name="description" />
-        <CheckboxGroup title={t('nature_label')} onChanged={val => {
+        <CheckboxGroup title={t('nature_label') + ' *'} onChanged={val => {
             setFieldValue('isProduct', val.isProduct)
             setTouched({ isProduct: true })
             setFieldValue('isService', val.isService)
@@ -55,13 +56,13 @@ const EditResourceFields = ({formikState, processing}: Props) => {
         <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
             setFieldValue('expiration', d)
             setTouched({ expiration: true })
-        }} label={t('expiration_label')} />
+        }} label={t('expiration_label') + ' *'} />
         <ErrorMessage component={ErrorText} name="expiration" />
-        <CategoriesSelect value={values.categories} onChange={(categories: Category[]) => {
+        <CategoriesSelect label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
         }} />
         <ErrorMessage component={ErrorText} name="categories" />
-        <CheckboxGroup title={t('type_label')} onChanged={val => {
+        <CheckboxGroup title={t('type_label') + ' *'} onChanged={val => {
             setFieldValue('canBeGifted', val.canBeGifted)
             setTouched({ canBeGifted: true })
             setFieldValue('canBeExchanged', val.canBeExchanged)
@@ -72,7 +73,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
         }} />
         <ErrorMessage component={ErrorText} name="canBeGifted" />
         { values.isProduct && <>
-            <CheckboxGroup title={t('transport_label')} onChanged={val => {
+            <CheckboxGroup title={t('transport_label') + ' *'} onChanged={val => {
                 setFieldValue('canBeTakenAway', val.canBeTakenAway)
                 setTouched({ canBeTakenAway: true })
                 setFieldValue('canBeDelivered', val.canBeDelivered)
@@ -83,7 +84,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             }} />
             <ErrorMessage component={ErrorText} name="canBeTakenAway" />
         </> }
-        <OrangeButton style={{ marginTop: 20 }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
+        <OrangeButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
             loading={processing}>
             {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')}
         </OrangeButton>

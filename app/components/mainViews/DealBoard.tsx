@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Appbar, BottomNavigation, Icon, IconButton, List, Portal, Snackbar, Text } from "react-native-paper"
+import { Appbar, BottomNavigation, Button, Icon, IconButton, List, Portal, Snackbar, Text } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { ScrollView, View } from "react-native"
@@ -11,7 +11,7 @@ import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
 import { NativeStackHeaderProps, createNativeStackNavigator } from "@react-navigation/native-stack"
-import { NewMessageData, RouteProps, ScreenSize, adaptHeight, getScreenSize } from "@/lib/utils"
+import { NewMessageData, RouteProps, ScreenSize, adaptHeight, appBarsTitleFontSize, getScreenSize } from "@/lib/utils"
 import EditResource from "../form/EditResource"
 import Connections from "../Connections"
 import AddFriend from "../AddFriend"
@@ -25,6 +25,7 @@ import { fontSizeMedium } from "./Start"
 import { AppContext } from "../AppContextProvider"
 import ListOf from "../ListOf"
 import { getResource } from "@/lib/api"
+import SearchFilterContextProvider from "../SearchFilterContextProvider"
 const StackNav = createNativeStackNavigator()
 
 interface ChatHeaderProps {
@@ -36,7 +37,7 @@ const ChatHeader = (p: ChatHeaderProps) => {
     const exchangeTypes: string[] = []
     if(resource.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
     if(resource.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
-    return (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    return (<View style={{ flexDirection: 'row' }}>
         <ResourceImage size={50} resource={resource} />
         <View style={{ flexDirection: 'column', padding: 6, gap: 2 }}>
             <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {resource.account!.name}</Text>
@@ -45,6 +46,10 @@ const ChatHeader = (p: ChatHeaderProps) => {
         </View>
     </View>)
 }
+
+const simpleBackHeader = (props: NativeStackHeaderProps) => <View style={{ flexDirection: 'row', backgroundColor: '#fff' }}>
+ <Button textColor={primaryColor} icon={p => <Icon size={p.size} source="chevron-left" color={p.color} /> } onPress={() => props.navigation.goBack() }>{t('back_label')}</Button>
+</View>
 
 const getViewTitleI18n = (headerProps: NativeStackHeaderProps): React.ReactNode | string => {
     switch(headerProps.route.name) {
@@ -94,69 +99,76 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
     }, [])
 
     return <EditResourceContextProvider>
-        <View style={{ flex: 1 }}>
-            <Appbar.Header style={{ backgroundColor: primaryColor } }>
-                <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center' }} />
-                <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
-            </Appbar.Header>
-            <StackNav.Navigator screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor, height: getScreenSize() != ScreenSize.sm ? 90 : 64 }}>
-                <Appbar.BackAction onPress={() => props.navigation.goBack()} />
-                <Appbar.Content titleStyle={{ textTransform: 'uppercase' }} title={getViewTitleI18n(props)} />
-            </Appbar.Header> }}>
-                <StackNav.Screen name="dealMain" key="dealMain">
-                    {(props: RouteProps) => <BottomNavigation onIndexChange={setTabIndex}
-                        barStyle={{ backgroundColor: lightPrimaryColor }}
-                        renderScene={
-                            BottomNavigation.SceneMap({
-                                search: () => <Search {...props} />,
-                                history: History,
-                                resource: () => <Resources {...props} />,
-                                chat: () => <ScrollView><Chat {...props} /></ScrollView>,
-                                myNetwork: () => <ScrollView><MyNetwork {...props} /></ScrollView>,
-                            })
-                        }
-                        activeColor={primaryColor}
-                        navigationState={{ index: tabIndex, routes: bottomRoutes }} />}
-                </StackNav.Screen>
-                <StackNav.Screen name="newResource" key="newResource"
-                    component={EditResource} initialParams={{isNew: true}}/>
-                <StackNav.Screen name="viewResource" key="viewResource"
-                    component={ViewResource} />
-                <StackNav.Screen name="editResource" key="editResource"
-                    component={EditResource} />
-                <StackNav.Screen name="chat" key="chat" component={Chat} />
-                <StackNav.Screen name="networkMain" component={MyNetwork} key="networkMain" />
-                <StackNav.Screen initialParams={{ icon: <Images.Heart style={{ margin: 10 }} width={30} height={30} /> }} name="connections" component={Connections} key="connections" />
-                <StackNav.Screen name="addFriend" component={AddFriend} key="addFriend" />
-                <StackNav.Screen initialParams={{ icon: <Images.Received style={{ margin: 10 }} width={30} height={30} /> }} name="requestsReceived" component={RequestsReceived} key="requestsReceived" />
-                <StackNav.Screen initialParams={{ icon: <Images.Sent style={{ margin: 10 }} width={30} height={30} /> }} name="requestsSent" component={RequestsSent} key="requestsSent" />
-            </StackNav.Navigator>
-            <Portal>
-                <Snackbar visible={newMessages.length > 0} onDismiss={() => setNewMessages([])} duration={600000}
-                    style={{ backgroundColor: lightPrimaryColor}}>
-                    <ScrollView style={{ maxHeight: adaptHeight(80, 150, 300) }}>
-                        <View style={{ flexDirection: 'row', flexWrap: 'nowrap', flex: 1 }}>
-                            <View style={{ flexDirection: 'column', flex: 1 }}>
-                                <ListOf data={newMessages} 
-                                    displayItem={(data, idx) => <List.Item key={idx} title={data.message.from.name} 
-                                        description={data.message.text || '<image>'} onPress={async () => {
-                                            appContext.actions.beginOp()
-                                            try {
-                                                const resource = await getResource(data.resourceId)
-                                                navigation.navigate('chat', { resource } )
-                                                appContext.actions.endOp()
-                                                setNewMessages([])
-                                            } catch(e) {
-                                                appContext.actions.endOpWithError(e)
-                                            }
-                                        }} />} />
+        <SearchFilterContextProvider>
+            <View style={{ flex: 1 }}>
+                <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
+                    <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize }} />
+                    <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
+                </Appbar.Header>
+                <StackNav.Navigator
+                    screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header mode="center-aligned" statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor, height: getScreenSize() != ScreenSize.sm ? 90 : 64 }}>
+                    <Appbar.BackAction onPress={() => props.navigation.goBack()} />
+                    <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontSize: appBarsTitleFontSize }} title={getViewTitleI18n(props)} />
+                </Appbar.Header> }}>
+                    <StackNav.Screen name="dealMain" key="dealMain">
+                        {(props: RouteProps) => <BottomNavigation onIndexChange={setTabIndex}
+                            barStyle={{ backgroundColor: lightPrimaryColor }}
+                            renderScene={
+                                BottomNavigation.SceneMap({
+                                    search: () => <Search {...props} />,
+                                    history: History,
+                                    resource: () => <Resources {...props} />,
+                                    chat: () => <ScrollView><Chat {...props} /></ScrollView>,
+                                    myNetwork: () => <ScrollView><MyNetwork {...props} /></ScrollView>,
+                                })
+                            }
+                            theme={{ colors: { secondaryContainer: lightPrimaryColor }}}
+                            renderIcon={(p) => {
+                                return p.route.focusedIcon({ fill: p.focused ? primaryColor : p.color })}
+                            }
+                            activeColor={primaryColor}
+                            navigationState={{ index: tabIndex, routes: bottomRoutes }} />}
+                    </StackNav.Screen>
+                    <StackNav.Screen name="newResource" key="newResource" options={{ header: simpleBackHeader }}
+                        component={EditResource} initialParams={{isNew: true}}/>
+                    <StackNav.Screen name="viewResource" key="viewResource" options={{ header: simpleBackHeader }}
+                        component={ViewResource} />
+                    <StackNav.Screen name="editResource" key="editResource" options={{ header: simpleBackHeader }}
+                        component={EditResource} />
+                    <StackNav.Screen name="chat" key="chat" component={Chat} />
+                    <StackNav.Screen name="networkMain" component={MyNetwork} key="networkMain" />
+                    <StackNav.Screen initialParams={{ icon: <Images.Heart style={{ margin: 10 }} width={30} height={30} /> }} name="connections" component={Connections} key="connections" />
+                    <StackNav.Screen name="addFriend" component={AddFriend} key="addFriend" />
+                    <StackNav.Screen initialParams={{ icon: <Images.Received style={{ margin: 10 }} width={30} height={30} /> }} name="requestsReceived" component={RequestsReceived} key="requestsReceived" />
+                    <StackNav.Screen initialParams={{ icon: <Images.Sent style={{ margin: 10 }} width={30} height={30} /> }} name="requestsSent" component={RequestsSent} key="requestsSent" />
+                </StackNav.Navigator>
+                <Portal>
+                    <Snackbar visible={newMessages.length > 0} onDismiss={() => setNewMessages([])} duration={600000}
+                        style={{ backgroundColor: lightPrimaryColor}}>
+                        <ScrollView style={{ maxHeight: adaptHeight(80, 150, 300) }}>
+                            <View style={{ flexDirection: 'row', flexWrap: 'nowrap', flex: 1 }}>
+                                <View style={{ flexDirection: 'column', flex: 1 }}>
+                                    <ListOf data={newMessages} 
+                                        displayItem={(data, idx) => <List.Item key={idx} title={data.message.from.name} 
+                                            description={data.message.text || '<image>'} onPress={async () => {
+                                                appContext.actions.beginOp()
+                                                try {
+                                                    const resource = await getResource(data.resourceId)
+                                                    navigation.navigate('chat', { resource } )
+                                                    appContext.actions.endOp()
+                                                    setNewMessages([])
+                                                } catch(e) {
+                                                    appContext.actions.endOpWithError(e)
+                                                }
+                                            }} />} />
+                                </View>
+                                <IconButton icon="close" onPress={() => setNewMessages([])} />
                             </View>
-                            <IconButton icon="close" onPress={() => setNewMessages([])} />
-                        </View>
-                    </ScrollView>
-                 </Snackbar>
-            </Portal>
-        </View>
+                        </ScrollView>
+                    </Snackbar>
+                </Portal>
+            </View>
+        </SearchFilterContextProvider>
     </EditResourceContextProvider>
 }
 

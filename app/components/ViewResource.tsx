@@ -8,6 +8,8 @@ import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-nat
 import dayjs from "dayjs"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import PanZoomImage from "./PanZoomImage"
+import { lightPrimaryColor, primaryColor } from "./layout/constants"
+import { Props } from "react-native-paper/lib/typescript/components/Chip"
 
 interface ResourceViewFieldProps {
     title: string,
@@ -21,10 +23,12 @@ interface ImgMetadata {
     idx: number
 }
 
+const ResourceInfoChip = (p: Props) => <Chip style={{ backgroundColor: primaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
+
 const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFieldProps) => <View style={{ 
         flexDirection: titleOnOwnLine ? "column": "row", gap: titleOnOwnLine ? 0: 10, alignItems: titleOnOwnLine ?  'flex-start' : 'center', borderBottomColor: '#000', borderBottomWidth: 1
     }}>
-    <Text variant="titleMedium">{title}</Text>
+    <Text variant="titleMedium" style={{ flexGrow: titleOnOwnLine ? 'auto': 0, flexShrink: titleOnOwnLine ? 'auto': 0, flexBasis: titleOnOwnLine ? 'auto' : '40%' }}>{title}</Text>
     {children}
 </View>
 
@@ -55,7 +59,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
     const hasOnlyOneImage = resource.images && resource.images.length === 1
     
-    return <ScrollView  style={{ flex: 1, flexDirection: 'column', margin: 10 }}>
+    return <ScrollView  style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff'}}>
         { resource.images && resource.images.length >0 && <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10, alignItems: hasOnlyOneImage ? 'center': 'flex-start' }}>
             <SwiperFlatList data={getSwiperData(resource)} 
                 renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => {
@@ -74,10 +78,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
         <ResourceViewField title={t('description_label')} titleOnOwnLine>
             <Text variant="bodyMedium">{resource.description}</Text>
         </ResourceViewField>
-        <ResourceViewField title={t('nature_label')}>
-            <View style={{ flexDirection: 'row', gap: 18 }}>
-                { resource.isProduct && <Text variant="bodyMedium">{t('isProduct_label')}</Text>}
-                { resource.isService && <Text variant="bodyMedium">{t('isService_label')}</Text>}
+        <ResourceViewField title={t('nature_label')} titleOnOwnLine>
+            <View style={{ flexDirection: 'row', gap: 1 }}>
+                { resource.isProduct && <ResourceInfoChip>{t('isProduct_label')}</ResourceInfoChip>}
+                { resource.isService && <ResourceInfoChip>{t('isService_label')}</ResourceInfoChip>}
             </View>
         </ResourceViewField>
         { expirationText && <View>
@@ -87,21 +91,21 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
         </View>}
         { resource.categories && resource.categories.length > 0 && 
             <ResourceViewField title={t('resourceCategories_label')} titleOnOwnLine>
-                <View style={{ flexDirection: "row", gap: 10, flexWrap: 'wrap' }}>
-                    { resource.categories.map((cat, idx) => <Chip icon="label" key={idx}>{cat.name}</Chip>) }
+                <View style={{ flexDirection: "row", gap: 3, flexWrap: 'wrap' }}>
+                    { resource.categories.map((cat, idx) => <ResourceInfoChip key={idx}>{cat.name}</ResourceInfoChip>) }
                 </View>
             </ResourceViewField>
         }
-        { resource.isProduct && <ResourceViewField title={t('transport_label')}>
-            <View style={{ flexDirection: 'row', gap: 18 }}>
-                { resource.canBeTakenAway && <Text variant="bodyMedium">{t('canBeTakenAway_label')}</Text>}
-                { resource.canBeDelivered && <Text variant="bodyMedium">{t('canBeDelivered_label')}</Text>}
+        { resource.isProduct && <ResourceViewField title={t('transport_label')} titleOnOwnLine>
+            <View style={{ flexDirection: 'row', gap: 1 }}>
+                { resource.canBeTakenAway && <ResourceInfoChip>{t('canBeTakenAway_label')}</ResourceInfoChip>}
+                { resource.canBeDelivered && <ResourceInfoChip>{t('canBeDelivered_label')}</ResourceInfoChip>}
             </View>
         </ResourceViewField> }
-        <ResourceViewField title={t('type_label')}>
-            <View style={{ flexDirection: 'row', gap: 18 }}>
-                { resource.canBeGifted && <Text variant="bodyMedium">{t('canBeGifted_label')}</Text>}
-                { resource.canBeExchanged && <Text variant="bodyMedium">{t('canBeExchanged_label')}</Text>}
+        <ResourceViewField title={t('type_label')} titleOnOwnLine>
+            <View style={{ flexDirection: 'row', gap: 1 }}>
+                { resource.canBeGifted && <ResourceInfoChip>{t('canBeGifted_label')}</ResourceInfoChip>}
+                { resource.canBeExchanged && <ResourceInfoChip>{t('canBeExchanged_label')}</ResourceInfoChip>}
             </View>
         </ResourceViewField>
         <Portal>

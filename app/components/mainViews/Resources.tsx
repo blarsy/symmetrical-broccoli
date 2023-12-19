@@ -3,15 +3,16 @@ import AppendableList from "../AppendableList"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
-import { IconButton, List, useTheme } from "react-native-paper"
+import { IconButton } from "react-native-paper"
 import { deleteResource, getResources } from "@/lib/api"
 import { t } from "@/i18n"
 import { View } from "react-native"
-import { RouteProps, ScreenSize, getScreenSize } from "@/lib/utils"
+import { RouteProps, aboveMdWidth } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
-import MainResourceImage from "../MainResourceImage"
+import { SmallResourceImage } from "../MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
+import { lightPrimaryColor } from "../layout/constants"
 
 const Resources = ({ route, navigation }: RouteProps) => {
     const [resources, setResources] = useState(initial<Resource[]>(true, []))
@@ -39,21 +40,23 @@ const Resources = ({ route, navigation }: RouteProps) => {
         loadResources()
     }, [])
 
-    const theme = useTheme()
+    const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
     return <>
         <AppendableList state={resources} dataFromState={state => state.data!}
             onAddRequested={() => navigation.navigate('newResource')} 
+            contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
             displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
-                description={resource.description} style={{ margin: 0, padding: 0 }}
-                left={() => <MainResourceImage resource={resource} />}
-                right={() => <View style={{ flexDirection: getScreenSize() != ScreenSize.lg ? 'column' : 'row', justifyContent: 'center' }}>
-                    <IconButton style={{ alignSelf: 'center' }} mode="outlined" size={34} icon="pencil" onPress={e => {
+                titleNumberOfLines={1}
+                description={resource.description} style={{ margin: 0, padding: 0, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
+                left={() => <SmallResourceImage resource={resource} />}
+                right={() => <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} icon="pencil-circle-outline" onPress={e => {
                         e.stopPropagation()
                         editResourceContext.actions.setResource(resource)
                         navigation.navigate('editResource')
                     }} />
-                    <IconButton style={{ alignSelf: 'center' }} mode="outlined" iconColor="red" size={34} icon="close" onPress={e => {
+                    <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor="red" size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
                         e.stopPropagation()
                         setDeletingResource(resource.id)
                     }} />

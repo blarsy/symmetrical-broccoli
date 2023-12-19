@@ -7,7 +7,7 @@ import * as yup from 'yup'
 import { View } from "react-native"
 import { AppContext } from "@/components/AppContextProvider"
 import { Portal, Snackbar } from "react-native-paper"
-import { OrangeBackedErrorText, OrangeTextInput, WhiteButton } from "@/components/layout/lib"
+import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 
 interface Props {
     toggleRegistering: () => void
@@ -35,16 +35,16 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View>
-            <OrangeTextInput label={t('organization_name_label')} textContentType="givenName" value={values.name}
+            <OrangeTextInput label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
                 onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={OrangeBackedErrorText} name="name" />
-            <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
-            <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
+            <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={OrangeBackedErrorText} name="password" />
-            <OrangeTextInput label={t('repeatpassword_label')} textContentType="password" secureTextEntry value={values.repeatPassword}
+            <OrangeTextInput label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
                 onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
             <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>

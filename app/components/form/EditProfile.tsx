@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { AppContext } from "@/components/AppContextProvider"
 import { aboveMdWidth, isValidPassword } from "@/lib/utils"
 import { t } from '@/i18n'
-import { WhiteButton, OrangeTextInput, ErrorText } from "@/components/layout/lib"
+import { WhiteButton, OrangeTextInput, ErrorText, StyledLabel } from "@/components/layout/lib"
 import { View } from "react-native"
 import { IconButton, Snackbar } from "react-native-paper"
 
@@ -58,22 +58,19 @@ export default function EditProfile () {
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View style={{ flex: 1, padding: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                <OrangeTextInput style={{ flex: 1 }} label={t('organization_name_label')} textContentType="name" value={values.name}
-                    onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
-                <IconButton icon="logout" size={30} iconColor="#000" background="transparent" onPress={() => appContext.actions.logout()} />
-            </View>
+            <OrangeTextInput style={{ flex: 1 }} label={<StyledLabel label={t('organization_name_label')} color="#fff"/>} textContentType="name" value={values.name}
+                onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={ErrorText} name="name" />
-            <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput label={<StyledLabel label={t('email_label')} color="#fff"/>} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={ErrorText} name="email" />
-            <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
+            <OrangeTextInput label={<StyledLabel label={t('password_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={ErrorText} name="password" />
-            <OrangeTextInput label={t('newpassword_label')} textContentType="password" secureTextEntry value={values.newPassword}
+            <OrangeTextInput label={<StyledLabel label={t('newpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.newPassword}
                 onChangeText={handleChange('newPassword')} onBlur={handleBlur('newPassword')} />
             <ErrorMessage component={ErrorText} name="newPassword" />
-            <OrangeTextInput label={t('repeatnewpassword_label')} textContentType="password" secureTextEntry value={values.passwordRepeat}
+            <OrangeTextInput label={<StyledLabel label={t('repeatnewpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.passwordRepeat}
                 onChangeText={handleChange('passwordRepeat')} onBlur={handleBlur('passwordRepeat')} />
             <ErrorMessage component={ErrorText} name="passwordRepeat" />
             <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => handleSubmit()} loading={updateProfileState.loading}>

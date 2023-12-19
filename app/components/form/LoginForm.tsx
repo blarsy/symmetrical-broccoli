@@ -8,7 +8,7 @@ import * as yup from "yup"
 import { AppContext } from "@/components/AppContextProvider"
 import { Button, Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
-import { OrangeBackedErrorText, OrangeTextInput, WhiteButton } from "@/components/layout/lib"
+import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { aboveMdWidth } from "@/lib/utils"
 
 interface Props {
@@ -37,10 +37,10 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View>
-            <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
-            <OrangeTextInput label={t('password_label')} textContentType="password" secureTextEntry value={values.password}
+            <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={OrangeBackedErrorText} name="password" />
             <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 

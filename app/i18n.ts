@@ -89,7 +89,10 @@ const resources = {
       "close_buttonCaption": "Close",
       "done_buttonCaption": "Ok",
       "options_title": "Options",
-      "noConversationLoaded_label": "No conversation yet ..."
+      "noConversationLoaded_label": "No conversation yet ...",
+      "search_hint": "What are you looking for ?",
+      "published_at": "Published ",
+      "back_label": "Back"
     }
   },
   fr: {
@@ -176,7 +179,10 @@ const resources = {
       "close_buttonCaption": "Annuler",
       "done_buttonCaption": "Ok",
       "options_title": "Options",
-      "noConversationLoaded_label": "Aucune conversation pour l'instant ..."
+      "noConversationLoaded_label": "Aucune conversation pour l'instant ...",
+      "search_hint": "Qu'est-ce que tu recherches ?",
+      "published_at": "Publié le ",
+      "back_label": "Retour"
     }
   }
 }

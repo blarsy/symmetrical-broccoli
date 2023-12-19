@@ -1,5 +1,5 @@
 import React from "react"
-import { ActivityIndicator, ScrollView, View } from "react-native"
+import { ActivityIndicator, Dimensions, ScrollView, StyleProp, View, ViewStyle } from "react-native"
 import ListOf from "./ListOf"
 import { Snackbar } from "react-native-paper"
 import { t } from "@/i18n"
@@ -10,11 +10,22 @@ interface Props<T> {
     error?: StateError,
     data?: T[],
     displayItem: (item: T, index: number) => JSX.Element
-    noDataLabel?: string
+    noDataLabel?: string,
+    style?: StyleProp<ViewStyle>,
+    contentContainerStyle? : StyleProp<ViewStyle>
 }
 
-function LoadedList<T>({ loading, error, data, displayItem, noDataLabel }:Props<T>) {
-    return <ScrollView style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
+function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, contentContainerStyle }:Props<T>) {
+    let actualStyle: StyleProp<ViewStyle>
+    const basicStyle: StyleProp<ViewStyle> = { flexDirection: 'column', paddingTop: 10, paddingBottom: 10, maxWidth: Dimensions.get('window').width }
+
+    if(style) {
+        actualStyle = { ...basicStyle, ...(style as object) }
+    } else {
+        actualStyle = basicStyle
+    }
+
+    return <ScrollView style={actualStyle} contentContainerStyle={contentContainerStyle}>
     { loading && <ActivityIndicator /> }
     { !loading && !error && <ListOf data={data} displayItem={displayItem} noDataLabel={noDataLabel} /> }
     {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}

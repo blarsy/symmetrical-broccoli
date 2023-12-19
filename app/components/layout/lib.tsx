@@ -6,11 +6,20 @@ import { getLocales } from "expo-localization"
 import { ColorValue, View } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
+import OptionSelect from "../OptionSelect"
+import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 
-export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff" {...props} />
+const mergeWith = (a: object, b: any): object => {
+    if(b && typeof b === 'object') {
+        return { ...a, ...b }
+    }
+    return a
+}
+
+export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff" {...props} style={mergeWith({ borderRadius: 5 } , props.style )}/>
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
-    {...props} />
+    {...props} style={mergeWith({ borderRadius: 5 } , props.style )} />
     
 export function ErrorText(props: TextProps<never>) {
     return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>
@@ -19,6 +28,8 @@ export function ErrorText(props: TextProps<never>) {
 export const OrangeBackedErrorText = (props: TextProps<never>) => <Text variant="bodyMedium" style={{
     backgroundColor: 'orange', color: '#fff'
 }}>{props.children}</Text>
+
+export const StyledLabel = ({ label, color, variant }: { label: string, color?: ColorValue, variant?: VariantProp<never> | undefined }) => <Text variant={variant || 'labelSmall'} style={{ color: color }}>{label}</Text>
 
 export const OrangeTextInput = (props: TextInputProps) => <TextInput 
     {...props}
@@ -58,12 +69,12 @@ interface CheckboxGroupProps {
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
-    <Text variant="bodyMedium" style={{ marginLeft: 16 }}>{props.title}</Text>
+    <Text variant="labelSmall" style={{ marginLeft: 16 }}>{props.title}</Text>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        { Object.entries(props.options).map((p, idx) => <Checkbox.Item key={idx} position="leading" labelVariant="bodySmall" onPress={() => {
-            props.values[p[0]] = !props.values[p[0]]
+        { Object.entries(props.options).map((p, idx) => <OptionSelect key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
+            props.values[p[0]] = newValue
             props.onChanged(props.values)
-        }} label={p[1]} status={props.values[p[0]] ? 'checked' : 'unchecked'} />) }
+        }}/>) }
     </View>
 </View>
 
@@ -80,7 +91,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
     return <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
-        <Text variant="bodyMedium" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
+        <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
         <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 6 }}>
             <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
                 {props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}

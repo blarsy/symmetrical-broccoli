@@ -7,7 +7,7 @@ import * as yup from "yup"
 import { AppContext } from "@/components/AppContextProvider"
 import { Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
-import { OrangeBackedErrorText, OrangeTextInput, WhiteButton } from "@/components/layout/lib"
+import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { requestRecovery } from "@/lib/api"
 
 interface Props {
@@ -34,7 +34,7 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View>
-            <OrangeTextInput label={t('email_label')} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>

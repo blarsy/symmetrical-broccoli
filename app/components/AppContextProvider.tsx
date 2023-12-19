@@ -8,31 +8,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Snackbar } from "react-native-paper"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
-import { NewMessageData } from "@/lib/utils"
 import { ChatSocket } from "@/lib/ChatSocket"
 
 const SPLASH_DELAY = 3000
-
-export interface SearchOptions {
-    isProduct: boolean
-    isService: boolean
-    canBeTakenAway: boolean
-    canBeDelivered: boolean
-    canBeExchanged: boolean
-    canBeGifted: boolean
-}
-
-export interface SearchFilter {
-    search: string
-    categories: Category[]
-    options: SearchOptions
-}
 
 interface AppState {
     token: DataLoadState<string>
     account?: Account
     messages: string[]
-    searchFilter: SearchFilter
     chatSocket?: ChatSocket
     processing: boolean
     numberOfUnread: number
@@ -47,7 +30,6 @@ interface AppActions {
     resetMessages: () => void
     setMessage: (message: any) => void
     notify: (message: any) => void
-    setSearchFilter: (newFilter: SearchFilter) => void
     beginOp: () => void
     endOp: () => void
     endOpWithError: (error: any) => void
@@ -65,11 +47,6 @@ interface Props {
 const emptyState: AppState = { 
     token: initial<string>(true, ''), 
     messages: [], 
-    searchFilter: { 
-        categories: [], 
-        search: '' , 
-        options: { canBeDelivered: false, canBeTakenAway: false, canBeExchanged: false, canBeGifted: false, isProduct: false, isService: false }
-    },
     chatSocket: undefined,
     numberOfUnread: 0,
     processing: false
@@ -86,7 +63,6 @@ export const AppContext = createContext<AppContext>({
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
-        setSearchFilter: () => {},
         beginOp: () => {},
         endOp: () => {},
         endOpWithError: e => {}
@@ -153,9 +129,6 @@ const AppContextProvider = ({ children }: Props) => {
             setAppState({ ...appState, ...{ messages: [] }})
         },
         notify: setLastNofication,
-        setSearchFilter: (newFilter: SearchFilter) => {
-            setAppState({ ...appState, ...{ searchFilter: newFilter }})
-        },
         beginOp: () => {
             setAppState({...appState, ...{ processing: true }})
         },

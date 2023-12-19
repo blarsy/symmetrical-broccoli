@@ -1,6 +1,6 @@
 import { ImageZoom } from "@likashefqet/react-native-image-zoom"
 import React from "react"
-import { Dimensions, ImageSourcePropType } from "react-native"
+import { Dimensions } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 interface Props {
