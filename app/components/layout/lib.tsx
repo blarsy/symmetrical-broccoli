@@ -1,13 +1,14 @@
 import React, { useState } from "react"
-import { Button, ButtonProps, Checkbox, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
+import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
 import { primaryColor } from "./constants"
-import { DatePickerModal, TimePickerModal } from "react-native-paper-dates"
+import { DatePickerModal } from "react-native-paper-dates"
 import { getLocales } from "expo-localization"
 import { ColorValue, View } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -51,7 +52,8 @@ export const TransparentTextInput = (props: TextInputProps) => {
         theme={{ colors: { onSurfaceVariant: '#222'} }}
         contentStyle={{
             color: '#000'
-        }} style={Object.assign({
+        }} 
+        style={Object.assign({
             backgroundColor: 'transparent',
             marginTop: 10,
         }, props.style)}/>
@@ -87,18 +89,14 @@ interface DateTimePickerFieldProps {
 }
 
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
-    const [timeOpen, setTimeOpen] = useState(false)
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignContent: 'center', marginTop: 5 }}>
+    return <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5 }}
+        onPress={() => setDateOpen(true)}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-        <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 6 }}>
-            <Button icon="calendar" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setDateOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
-                {props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}
-            </Button>
-            { props.value && <Button icon="clock" mode="outlined" style={{ borderRadius: 0, borderColor: props.textColor, backgroundColor: props.backgroundColor }} onPress={() => setTimeOpen(true)} labelStyle={{ margin: 10, marginLeft: 20, color: props.textColor }}>
-                {props.value ? `${props.value.getHours().toString().padStart(2, '0')}:${props.value.getMinutes().toString().padStart(2, '0')}` : ''}
-            </Button>}
+        <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
+        <View style={{ marginRight: 14 }}>
+            <Icon source="chevron-right" size={26} color="#000" />
         </View>
         <DatePickerModal
             locale={lang}
@@ -115,15 +113,5 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
                 setDateOpen(false)
             }}
         />
-        <TimePickerModal locale={lang} visible={timeOpen} onConfirm={val => {
-            let date = new Date()
-            if(props.value) {
-                date = props.value
-            }
-            date.setHours(val.hours)
-            date.setMinutes(val.minutes)
-            setTimeOpen(false)
-            props.onChange(date)
-        }} onDismiss={() => setTimeOpen(false)} />
-    </View>
+    </TouchableOpacity>
 }

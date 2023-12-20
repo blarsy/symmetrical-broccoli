@@ -12,7 +12,7 @@ import { EditResourceContext } from "../EditResourceContextProvider"
 import { SmallResourceImage } from "../MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
-import { lightPrimaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 
 const Resources = ({ route, navigation }: RouteProps) => {
     const [resources, setResources] = useState(initial<Resource[]>(true, []))
@@ -48,15 +48,15 @@ const Resources = ({ route, navigation }: RouteProps) => {
             contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
             displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
                 titleNumberOfLines={1}
-                description={resource.description} style={{ margin: 0, padding: 0, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
+                description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
                 left={() => <SmallResourceImage resource={resource} />}
                 right={() => <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} icon="pencil-circle-outline" onPress={e => {
+                    <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
                         e.stopPropagation()
                         editResourceContext.actions.setResource(resource)
                         navigation.navigate('editResource')
                     }} />
-                    <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor="red" size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
+                    <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor={primaryColor} size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
                         e.stopPropagation()
                         setDeletingResource(resource.id)
                     }} />

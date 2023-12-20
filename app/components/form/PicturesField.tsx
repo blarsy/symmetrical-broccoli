@@ -24,7 +24,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
             <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
                 { images.map((image, idx) => <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
                     <Image style={{ height: 100, width: 100 }} source={{ uri: image.blob ? image.path : `${imgUrl}${image.path}` }} />
-                    <IconButton size={20} icon="close-thick" iconColor="red" onPress={() => onImageDeleteRequested(image)}/>
+                    <IconButton size={20} icon="close-thick" iconColor={primaryColor} onPress={() => onImageDeleteRequested(image)}/>
                 </View>)}
             </View>
         }

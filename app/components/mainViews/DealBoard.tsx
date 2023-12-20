@@ -37,8 +37,8 @@ const ChatHeader = (p: ChatHeaderProps) => {
     const exchangeTypes: string[] = []
     if(resource.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
     if(resource.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
-    return (<View style={{ flexDirection: 'row' }}>
-        <ResourceImage size={50} resource={resource} />
+    return (<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <ResourceImage size={70} resource={resource} />
         <View style={{ flexDirection: 'column', padding: 6, gap: 2 }}>
             <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {resource.account!.name}</Text>
             <Text variant="headlineMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
@@ -86,6 +86,8 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
     const [tabIndex, setTabIndex] = useState(0)
     const [newMessages, setNewMessages] = useState([] as NewMessageData[])
 
+    const appBarHeaderHeight = getScreenSize() != ScreenSize.sm ? 90 : 75
+
     const bottomRoutes = makeBottomRoutes(appContext.state.numberOfUnread)
 
     useEffect(() => {
@@ -106,7 +108,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                     <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
                 </Appbar.Header>
                 <StackNav.Navigator
-                    screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header mode="center-aligned" statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor, height: getScreenSize() != ScreenSize.sm ? 90 : 64 }}>
+                    screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header mode="center-aligned" statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor, height: appBarHeaderHeight }}>
                     <Appbar.BackAction onPress={() => props.navigation.goBack()} />
                     <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontSize: appBarsTitleFontSize }} title={getViewTitleI18n(props)} />
                 </Appbar.Header> }}>
@@ -124,8 +126,8 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                             }
                             theme={{ colors: { secondaryContainer: lightPrimaryColor }}}
                             renderIcon={(p) => {
-                                return p.route.focusedIcon({ fill: p.focused ? primaryColor : p.color })}
-                            }
+                                return p.route.focusedIcon({ fill: p.focused ? primaryColor : '#000' })
+                            }}
                             activeColor={primaryColor}
                             navigationState={{ index: tabIndex, routes: bottomRoutes }} />}
                     </StackNav.Screen>

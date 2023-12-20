@@ -86,8 +86,8 @@ android {
         applicationId 'com.topela'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 73
-        versionName "0.0.61"
+        versionCode 76
+        versionName "0.0.64"
         buildConfigField("boolean", "REACT_NATIVE_UNSTABLE_USE_RUNTIME_SCHEDULER_ALWAYS", (findProperty("reactNative.unstable_useRuntimeSchedulerAlways") ?: true).toString())
     }
     signingConfigs {

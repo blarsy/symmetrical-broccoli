@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         'fields': 'Id,dernier_message,participants List,ressource,code',
                         'nested[ressource][fields]': 'Id,titre,images,comptes,donOk,trocOk,CreatedAt',
                         'nested[participants List][fields]': 'Id,compte,messages_non_lus',
+                        'nested[dernier_message][fields]': 'Id,texte,CreatedAt',
                     }
                 })
                 respondWithSuccess(res, conversations.map((conversation: any) => {
@@ -50,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         conversation: {
                             id: conversation.Id,
                             lastMessageExcerpt: conversation.dernier_message && conversation.dernier_message.length > 0 && conversation.dernier_message[0].texte,
+                            lastMessageTime: conversation.dernier_message && conversation.dernier_message.length > 0 && conversation.dernier_message[0].CreatedAt,
                             code: conversation.code,
                             resource: fromRawResource(conversation.ressource[0]),
                             hasUnread:  unreads && unreads.length > 0

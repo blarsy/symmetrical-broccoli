@@ -9,11 +9,14 @@ import Icons from "@expo/vector-icons/FontAwesome"
 import { AppContext } from "../AppContextProvider"
 import CategoriesSelect from "./CategoriesSelect"
 import { aboveMdWidth } from "@/lib/utils"
+import { View } from "react-native"
 
 interface Props {
     formikState: FormikProps<Resource>
     processing: boolean
 }
+
+const Hr = () => <View style={{ backgroundColor: '#343434', height: 1, transform: 'scaleY(0.5)' }}></View>
 
 const EditResourceFields = ({formikState, processing}: Props) => {
     const appContext = useContext(AppContext)
@@ -52,11 +55,13 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             isProduct: t('isProduct_label'), 
             isService: t('isService_label')
         }} />
+        <Hr />
         <ErrorMessage component={ErrorText} name="isProduct" />
-        <DateTimePickerField textColor="#000" value={values.expiration} onChange={d => {
-            setFieldValue('expiration', d)
+        <DateTimePickerField textColor="#000" value={values.expiration} onChange={async d => {
+            await setFieldValue('expiration', d)
             setTouched({ expiration: true })
         }} label={t('expiration_label') + ' *'} />
+        <Hr />
         <ErrorMessage component={ErrorText} name="expiration" />
         <CategoriesSelect label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
@@ -71,6 +76,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             canBeGifted: t('canBeGifted_label'), 
             canBeExchanged: t('canBeExchanged_label')
         }} />
+        <Hr />
         <ErrorMessage component={ErrorText} name="canBeGifted" />
         { values.isProduct && <>
             <CheckboxGroup title={t('transport_label') + ' *'} onChanged={val => {
@@ -82,6 +88,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
                 canBeTakenAway: t('canBeTakenAway_label'), 
                 canBeDelivered: t('canBeDelivered_label')
             }} />
+            <Hr />
             <ErrorMessage component={ErrorText} name="canBeTakenAway" />
         </> }
         <OrangeButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 

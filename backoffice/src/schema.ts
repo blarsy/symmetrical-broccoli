@@ -52,6 +52,7 @@ export interface ConversationData {
     conversation: {
         id: number,
         lastMessageExcerpt: string | undefined,
+        lastMessageTime: Date | undefined,
         code: string,
         resource: Resource
         hasUnread: boolean

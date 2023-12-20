@@ -81,7 +81,7 @@ const Conversation = ({ resourceId }: Props) => {
         return () => { appContext.state.chatSocket!.popStackChatMessageListener() }
     }, [ resourceId ])
     
-    return <View style={{ flex: 1, backgroundColor: 'transparent' }}>
+    return <View style={{ flex: 1, backgroundColor: 'transparent', paddingBottom: 20 }}>
         <GiftedChat
             alwaysShowSend
             messages={messages.data?.map(data => data.message) || []}

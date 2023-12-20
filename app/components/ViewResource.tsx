@@ -1,4 +1,4 @@
-import { RouteProps } from "@/lib/utils"
+import { RouteProps, ScreenSize, aboveMdWidth, getScreenSize } from "@/lib/utils"
 import React, { useState } from "react"
 import { Chip, Modal, Portal, Text } from "react-native-paper"
 import { imgUrl } from "@/lib/settings"
@@ -8,7 +8,7 @@ import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-nat
 import dayjs from "dayjs"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import PanZoomImage from "./PanZoomImage"
-import { lightPrimaryColor, primaryColor } from "./layout/constants"
+import { lightPrimaryColor } from "./layout/constants"
 import { Props } from "react-native-paper/lib/typescript/components/Chip"
 
 interface ResourceViewFieldProps {
@@ -23,7 +23,7 @@ interface ImgMetadata {
     idx: number
 }
 
-const ResourceInfoChip = (p: Props) => <Chip style={{ backgroundColor: primaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
+const ResourceInfoChip = (p: Props) => <Chip style={{ backgroundColor: lightPrimaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
 
 const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFieldProps) => <View style={{ 
         flexDirection: titleOnOwnLine ? "column": "row", gap: titleOnOwnLine ? 0: 10, alignItems: titleOnOwnLine ?  'flex-start' : 'center', borderBottomColor: '#000', borderBottomWidth: 1
@@ -31,6 +31,36 @@ const ResourceViewField = ({ title, children, titleOnOwnLine }: ResourceViewFiel
     <Text variant="titleMedium" style={{ flexGrow: titleOnOwnLine ? 'auto': 0, flexShrink: titleOnOwnLine ? 'auto': 0, flexBasis: titleOnOwnLine ? 'auto' : '40%' }}>{title}</Text>
     {children}
 </View>
+
+const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImagePress: (imgSource: string) => void}) => {
+    const windowDimension = Dimensions.get('window')
+    const hasOnlyOneImage = resource.images && resource.images.length === 1
+    const smallestDimension = Math.min(windowDimension.height, windowDimension.width)
+    const absoluteMaxImgSize = aboveMdWidth() ?
+        getScreenSize() === ScreenSize.lg ? 500 : 400
+        : 300
+    let imgSize: number
+    if(hasOnlyOneImage) {
+        imgSize = Math.min( absoluteMaxImgSize, smallestDimension)
+    } else {
+        imgSize = Math.min( absoluteMaxImgSize, smallestDimension * 70 / 100)
+    }
+
+    if(hasOnlyOneImage) {
+        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1 }} onPress={() => onImagePress(`${imgUrl}${resource.images[0].path}`)}>
+            <Image style={{ flexGrow: 1 }} source={{ uri: `${imgUrl}${resource.images[0].path}` }} 
+                alt={resource.images[0].title} width={imgSize} height={imgSize} /> 
+        </TouchableOpacity>
+    }
+
+    return <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10 }}>
+        <SwiperFlatList data={getSwiperData(resource)} 
+            renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
+                <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} 
+                    style={{ width: imgSize, height: imgSize }} />
+        </TouchableOpacity>} />
+    </View>
+}
 
 const getSwiperData = (resource: Resource): ImgMetadata[] => {
     if(resource.images && resource.images.length > 0) {
@@ -48,32 +78,21 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const resource = route.params.resource as Resource
     const [ focusedImage, setFocusedImage] = useState('')
     
-    let expirationText: string
+    let expiration: { text: string, date: string }
     if(resource.expiration) {
         const dateObj = dayjs(resource.expiration)
-        expirationText = `${dateObj.fromNow()} (${dateObj.format(t('dateTimeFormat'))})`
+        expiration = { text: dateObj.fromNow(), date: dateObj.format(t('dateFormat'))}
     } else {
-        expirationText = ''
+        expiration = { text: '', date: ''}
     }
-    const windowDimension = Dimensions.get('window')
-    const imgSize = Math.min( 300, Math.min(windowDimension.height, windowDimension.width) * 60 / 100)
-    const hasOnlyOneImage = resource.images && resource.images.length === 1
     
     return <ScrollView  style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff'}}>
-        { resource.images && resource.images.length >0 && <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10, alignItems: hasOnlyOneImage ? 'center': 'flex-start' }}>
-            <SwiperFlatList data={getSwiperData(resource)} 
-                renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => {
-                    setFocusedImage(item.source)
-                }}>
-                    <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} 
-                        style={{ width: imgSize, height: imgSize }} />
-            </TouchableOpacity>} />
-        </View> }
+        { resource.images && resource.images.length > 0 && <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }
         <ResourceViewField title={t('brought_by_label')}>
-            <Text variant="bodyLarge">{resource.account?.name}</Text>
+            <Text variant="bodyMedium">{resource.account?.name}</Text>
         </ResourceViewField>
         <ResourceViewField title={t('title_label')}>
-            <Text variant="bodyLarge" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
+            <Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
         </ResourceViewField>
         <ResourceViewField title={t('description_label')} titleOnOwnLine>
             <Text variant="bodyMedium">{resource.description}</Text>
@@ -84,9 +103,12 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 { resource.isService && <ResourceInfoChip>{t('isService_label')}</ResourceInfoChip>}
             </View>
         </ResourceViewField>
-        { expirationText && <View>
+        { expiration && <View>
             <ResourceViewField title={t('expiration_label')}>
-                <Text variant="bodyMedium">{expirationText}</Text>
+                <View style={{ flexDirection: 'column' }}>
+                    <Text variant="bodyMedium">{expiration.text}</Text>
+                    <Text variant="bodyMedium">{expiration.date}</Text>
+                </View>
             </ResourceViewField>
         </View>}
         { resource.categories && resource.categories.length > 0 && 

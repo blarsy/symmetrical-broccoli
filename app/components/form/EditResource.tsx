@@ -24,7 +24,7 @@ export default ({ route, navigation }:RouteProps) => {
 
     return <View style={{ backgroundColor: '#fff' }}>
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
-            title: yup.string().max(50).required(t('field_required')),
+            title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
             expiration: yup.date().required(t('field_required')),
             categories: yup.array().min(1, t('field_required')),
