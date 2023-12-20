@@ -6,11 +6,10 @@ import { IconButton, Text, TextInput } from "react-native-paper"
 import { getSuggestions } from "@/lib/api"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
-import { StyleSheet, View } from "react-native"
+import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
 import MainResourceImage from "../MainResourceImage"
-import ResponsiveListItem from "../ResponsiveListItem"
 import CategoriesSelect from "../form/CategoriesSelect"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import Images from '@/Images'
@@ -28,6 +27,34 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
     return <View>
         <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
     </View>
+}
+
+interface ResourceCartProps {
+    onPress: ((event: GestureResponderEvent) => void) | undefined,
+    resource: Resource
+    onChatOpen: (resource: Resource) => void
+}
+
+const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
+    const appContext = useContext(AppContext)
+    return <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 10, 
+        paddingHorizontal: 8, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
+        borderRadius: 15 }} onPress={onPress}>
+        <MainResourceImage resource={resource} />
+        <View style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <Text variant="displaySmall" style={{ color: primaryColor, alignSelf: 'flex-end', fontSize: 10 }}>{`${t('published_at')} ${dayjs(resource.created).format(t('dateFormat'))}`}</Text>
+            <View style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <Text variant="displayLarge">{resource.title}</Text>
+                <Text variant="displaySmall" style={{ color: primaryColor, fontSize: 10 }}>{`${t('brought_by_label')} ${resource.account?.name}`}</Text>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                    { resource.canBeGifted && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeGifted_label')}</Text>}
+                    { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
+                </View>
+            </View>
+            { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
+                onPress={() => onChatOpen(resource)}/> }
+        </View>
+    </TouchableOpacity>
 }
 
 export default function Search ({ route, navigation }: RouteProps) {
@@ -65,7 +92,7 @@ export default function Search ({ route, navigation }: RouteProps) {
                     borderBottomWidth: StyleSheet.hairlineWidth,
                     borderStyle: 'dashed'
                 }} />
-                <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.state.options as any}
+            <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.state.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
                     categories: searchFilterContext.state.categories, 
                     options: values as any as SearchOptions })} />
@@ -74,7 +101,7 @@ export default function Search ({ route, navigation }: RouteProps) {
                     borderBottomWidth: StyleSheet.hairlineWidth,
                     borderStyle: 'dashed'
                 }} />
-                <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.state.options as any}
+            <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.state.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
                     categories: searchFilterContext.state.categories, 
                     options: values as any as SearchOptions })} />
@@ -82,25 +109,10 @@ export default function Search ({ route, navigation }: RouteProps) {
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 12 }} contentContainerStyle={{ gap: 20 }} loading={resources.loading} error={resources.error} data={resources.data}
-            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx}
-            title={<>
-                    <Text variant="displaySmall" style={{ color: primaryColor, alignSelf: 'flex-end', fontSize: 10 }}>{`${t('published_at')} ${dayjs(resource.created).format(t('dateFormat'))}`}</Text>
-                    <View style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                        <Text variant="displayLarge">{resource.title}</Text>
-                        <Text variant="displaySmall" style={{ color: primaryColor, fontSize: 10 }}>{`${t('brought_by_label')} ${resource.account?.name}`}</Text>
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
-                            { resource.canBeGifted && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeGifted_label')}</Text>}
-                            { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
-                        </View>
-                    </View>
-                    { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
-                        onPress={() => navigation.navigate('chat', { resource }) }/> }
-            </>}
-            style={{ paddingHorizontal: 8, paddingVertical: 2, backgroundColor: lightPrimaryColor, borderRadius: 15 }}
-            titleStyle={{ flex: 1, display: 'flex', flexDirection: 'column' }}
-            left={() => <MainResourceImage resource={resource} />}
-        />} />
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={resources.loading} error={resources.error} data={resources.data}
+            displayItem={(resource, idx) => <ResourceCard 
+                key={idx} resource={resource} 
+                onChatOpen={() => navigation.navigate('chat', { resource })} 
+                onPress={() => navigation.navigate('viewResource', { resource })} />} />
     </ScrollView>
-
 }

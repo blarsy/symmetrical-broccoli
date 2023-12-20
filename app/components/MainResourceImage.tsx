@@ -1,6 +1,6 @@
 import { Resource } from "@/lib/schema"
 import { imgUrl } from "@/lib/settings"
-import { aboveMdWidth, hasMinWidth } from "@/lib/utils"
+import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import React from "react"
 import { Image } from "react-native"
 
@@ -12,7 +12,7 @@ const IMAGE_BORDER_RADIUS = 15
 
 const MainResourceImage = ({ resource }: Props) => {
     const size = aboveMdWidth() ? 350 :
-        (hasMinWidth(450) ? 200 : 150)
+        (hasMinWidth(450) ? 200 : percentOfWidth(30))
     return <ResourceImage size={size} resource={resource} />
 }
 

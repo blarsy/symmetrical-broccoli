@@ -104,13 +104,13 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
         <SearchFilterContextProvider>
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
-                    <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize }} />
+                    <Appbar.Content title={bottomRoutes[tabIndex].title} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
                     <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
                 </Appbar.Header>
                 <StackNav.Navigator
                     screenOptions={{ header: props => props.route.name != 'dealMain' && <Appbar.Header mode="center-aligned" statusBarHeight={0} style={{ backgroundColor: lightPrimaryColor, height: appBarHeaderHeight }}>
                     <Appbar.BackAction onPress={() => props.navigation.goBack()} />
-                    <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontSize: appBarsTitleFontSize }} title={getViewTitleI18n(props)} />
+                    <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={getViewTitleI18n(props)} />
                 </Appbar.Header> }}>
                     <StackNav.Screen name="dealMain" key="dealMain">
                         {(props: RouteProps) => <BottomNavigation onIndexChange={setTabIndex}

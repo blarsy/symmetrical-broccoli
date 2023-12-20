@@ -14,6 +14,7 @@ export const appBarsTitleFontSize = 32
 
 export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdScreenWidth
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
+export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
 
 export enum ScreenSize {
     sm,

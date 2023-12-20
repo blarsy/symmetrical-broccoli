@@ -24,13 +24,15 @@ const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, o
     return <Modal visible={open} onDismiss={() => setOpen(false)} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
         <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
         <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-            {categories.map(cat => <Text style={{ color: selectedCategories.some(selectedCat => selectedCat.id === cat.id ) ? primaryColor : 'initial' }} variant="bodyLarge" onPress={() => {
-                if(selectedCategories.some(selectedCat => selectedCat.id === cat.id )) {
-                    setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.id != cat.id))
-                } else {
-                    setSelectedCategories([...selectedCategories, cat])
-                }
-            }} key={cat.id}>{cat.name}</Text>)}
+            {categories.map(cat => <TouchableOpacity onPress={() => {
+                    if(selectedCategories.some(selectedCat => selectedCat.id === cat.id )) {
+                        setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.id != cat.id))
+                    } else {
+                        setSelectedCategories([...selectedCategories, cat])
+                    }
+                }} key={cat.id}>
+                <Text style={{ color: selectedCategories.some(selectedCat => selectedCat.id === cat.id ) ? primaryColor : '#000' }} variant="bodyLarge">{cat.name}</Text>
+            </TouchableOpacity>)}
         </View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
             <OrangeButton onPress={() => setOpen(false)}>{t('close_buttonCaption')}</OrangeButton>
