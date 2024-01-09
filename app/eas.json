@@ -12,9 +12,12 @@
         "buildConfiguration": "Debug"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://localhost:3000/api/",
-        "EXPO_PUBLIC_BASE_URL": "http://localhost:3000/",
-        "EXPO_PUBLIC_DIAGNOSTIC": "1"
+        "EXPO_PUBLIC_API_URL": "http://localhost:3000/graphql",
+        "EXPO_PUBLIC_SUBSCRIPTION_URL": "ws://localhost:3000/graphql",
+        "EXPO_PUBLIC_DIAGNOSTIC": "0",
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD": "dsgfeclck",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "ecibpquo",
+        "EXPO_PUBLIC_CLOUDINARY_REST_URL": "https://api.cloudinary.com/v1_1/"
       }
     },
     "preview": {
@@ -22,9 +25,12 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://www.tope-la.com/api/",
-        "EXPO_PUBLIC_BASE_URL": "http://www.tope-la.com/",
-        "EXPO_PUBLIC_DIAGNOSTIC": "0"
+        "EXPO_PUBLIC_API_URL": "https://www.tope-la.com/graphql",
+        "EXPO_PUBLIC_SUBSCRIPTION_URL": "wss://www.tope-la.com/graphql",
+        "EXPO_PUBLIC_DIAGNOSTIC": "0",
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD": "dsgfeclck",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "ecibpquo",
+        "EXPO_PUBLIC_CLOUDINARY_REST_URL": "https://api.cloudinary.com/v1_1/"
       }
     }
   },
