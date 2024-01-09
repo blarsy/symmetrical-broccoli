@@ -121,7 +121,7 @@ export const getAuthenticatedApolloClient = (token: string) => {
       }
     })
   }
-  
+
 export const getLocale = (): string => {
   const rawLocale = Platform.OS === "web" ? new LanguageDetector().detect() : RNLanguageDetector.detect()
   let locale = 'en'

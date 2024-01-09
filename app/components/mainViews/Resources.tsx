@@ -74,7 +74,7 @@ const Resources = ({ route, navigation }: RouteProps) => {
     }, [route])
 
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
-
+    
     return <>
         <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
             onAddRequested={() => navigation.navigate('newResource')} 

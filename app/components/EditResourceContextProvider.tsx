@@ -133,13 +133,12 @@ const EditResourceContextProvider = ({ children }: Props) => {
             if(editResourceState.editedResource.id) {
                 if(editResourceState.imagesToAdd.length > 0) {
                     const newPublicIds = await Promise.all(editResourceState.imagesToAdd.map(async img => { 
-                        console.log('uploading', img)
                         return await uploadImage(img.path!)
                     }))
                     resource.images = resource.images.filter(curImg => !curImg.path)
                     resource.images.push(...newPublicIds.map(publicId => ({ publicId } as ImageInfo)))
                 }
-                console.log('images', resource.images.map(img => img.publicId))
+
                 await updateResource({ variables: {
                     resourceId: resource.id,
                     title: resource.title,
@@ -160,7 +159,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                 if(editResourceState.imagesToAdd.length > 0) {
                     imagesPublicIds = await Promise.all(editResourceState.imagesToAdd.map(img => uploadImage(img.path!)))
                 }
-                console.log('images', imagesPublicIds)
+
                 await createResource({ variables: {
                     title: resource.title,
                     description: resource.description,

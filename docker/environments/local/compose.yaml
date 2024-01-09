@@ -16,8 +16,5 @@ services:
     restart: always
     volumes: 
       - "db_data:/var/lib/postgresql/data"
-  sb_webapi:
-    
 volumes: 
   db_data: {}
-  nc_data: {}

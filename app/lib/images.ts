@@ -20,16 +20,9 @@ export const uploadImage = async (path: string):Promise<string> => {
         formData.append('file', {name: "file", uri: path, type: 'image/jpeg'})
     }
 
-    try {
-        console.log('upload url', `${cloudinaryRestUrl}${cloudinaryCloud}/image/upload`, 'formData', formData)
-        const res = await fetch(`${cloudinaryRestUrl}${cloudinaryCloud}/image/upload`, { method: 'POST', body: formData })
-        const parsedResult = await res.json()
-        console.log('parsedResult', parsedResult)
-        return parsedResult.public_id
-    } catch(e) {
-        console.log('e.toString()', e.toString(), 'e', e, 'stack', (e as Error).stack, 'message', (e as Error).message)
-        return ''
-    }
+    const res = await fetch(`${cloudinaryRestUrl}${cloudinaryCloud}/image/upload`, { method: 'POST', body: formData })
+    const parsedResult = await res.json()
+    return parsedResult.public_id
     
 }
 
