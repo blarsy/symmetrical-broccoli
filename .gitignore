@@ -25,16 +25,20 @@ web-build/
 *.log
 web.zip
 web_test.zip
-web/
 
 .yarn
+.vscode
 .keystore
 app/android/app/build/
 app/android/.*
 app/android/app/*.keystore
 *.aab
-/backoffice/mails/*
+/webapi/mails/*
 
 /docker/*/scheduler/src
 /scheduler/build
 .pnp*
+
+/webapi/build
+/build
+/build.zip

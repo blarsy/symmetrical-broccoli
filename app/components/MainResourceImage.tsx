@@ -1,5 +1,5 @@
+import { urlFromPublicId } from "@/lib/images"
 import { Resource } from "@/lib/schema"
-import { imgUrl } from "@/lib/settings"
 import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import React from "react"
 import { Image } from "react-native"
@@ -30,7 +30,7 @@ interface ResourceImageProps {
 export const ResourceImage = ({ resource, size }: ResourceImageProps) => {
     if(resource.images && resource.images.length > 0) {
         const imgData = resource.images[0]
-        return <Image source={{ uri: `${imgUrl}${imgData.path}` }} alt={imgData.title} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
+        return <Image source={{ uri: urlFromPublicId(imgData.publicId!) }} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
     }
     return <Image source={require('@/assets/img/placeholder.png')} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
 }

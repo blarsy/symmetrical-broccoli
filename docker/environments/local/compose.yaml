@@ -1,0 +1,23 @@
+version: '2.1'
+services: 
+  sb_db:
+    env_file:
+      - .env
+    healthcheck: 
+      interval: 10s
+      retries: 10
+      test: "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
+      timeout: 2s
+    build:
+      context: './../../containers/db'
+      dockerfile: './Dockerfile'
+    ports: 
+      - "5432:5432"
+    restart: always
+    volumes: 
+      - "db_data:/var/lib/postgresql/data"
+  sb_webapi:
+    
+volumes: 
+  db_data: {}
+  nc_data: {}

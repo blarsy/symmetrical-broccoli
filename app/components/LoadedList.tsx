@@ -17,7 +17,7 @@ interface Props<T> {
 
 function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, contentContainerStyle }:Props<T>) {
     let actualStyle: StyleProp<ViewStyle>
-    const basicStyle: StyleProp<ViewStyle> = { flexDirection: 'column', paddingTop: 10, paddingBottom: 10, maxWidth: Dimensions.get('window').width }
+    const basicStyle: StyleProp<ViewStyle> = { flexDirection: 'column', paddingTop: 10, paddingBottom: 10, maxWidth: Dimensions.get('window').width, alignSelf: 'stretch' }
 
     if(style) {
         actualStyle = { ...basicStyle, ...(style as object) }

@@ -7,22 +7,28 @@ import Feedback from "@/components/Feedback"
 import { useState } from "react"
 import axios from "axios"
 import { isValidPassword } from "@/utils"
-import { initial } from "@/DataLoadState"
 import Link from "next/link"
+import { gql, useMutation } from "@apollo/client"
+
+const RECOVER = gql`mutation RecoverAccount($newPassword: String, $recoveryCode: String) {
+    recoverAccount(input: {newPassword: $newPassword, recoveryCode: $recoveryCode}) {
+      integer
+    }
+  }
+  `
 
 interface Props {
     recoveryId: string
 }
 
 const Recover = ({ recoveryId }: Props) => {
-    const [errorInfo, setErrorInfo] = useState({ message: '', detail: '' })
     const [success, setSuccess] = useState(false)
+    const [recover, { error, reset }] = useMutation(RECOVER)
 
     if(success) {
         return <Stack alignItems="center" gap="2rem">
             <Alert severity="success">Votre mot de passe a &#233;t&#233; chang&#233;</Alert>
-            <Typography variant="overline">Ouvrez l&apos;app pour vous reconnecter</Typography>
-            <Link href="/webapp">Rester sur le site web</Link>
+            <Typography variant="overline">Ouvrez l&apos;app mobile pour vous reconnecter</Typography>
         </Stack>
     }
 
@@ -30,10 +36,8 @@ const Recover = ({ recoveryId }: Props) => {
         onSubmit={async (values, { setSubmitting }) => {
             try {
                 setSubmitting(true)
-                await axios.post('/api/user/recovery', { id: recoveryId, password: values.password })
+                await recover({ variables: { newPassword: values.password, recoveryCode: recoveryId }})
                 setSuccess(true)
-            } catch(e: any) {
-                setErrorInfo({ message: e.toString(), detail: '' })
             } finally {
                 setSubmitting(false)
             }
@@ -68,9 +72,9 @@ const Recover = ({ recoveryId }: Props) => {
                         startIcon={<RecoverIcon />}
                         type="submit"
                         variant="contained">Récupération</LoadingButton>
-                    {errorInfo.message && <Feedback severity="error" message={errorInfo.message} 
-                        detail={errorInfo.detail} 
-                        onClose={() => setErrorInfo({ message: '', detail: '' })}/>}
+                    {error && <Feedback severity="error" message={error.name} 
+                        detail={error.message} 
+                        onClose={() => reset()}/>}
                 </Box>
             </Box>
         </form>

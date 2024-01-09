@@ -10,6 +10,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.8",
+    "@cloudinary/url-gen": "^1.14.0",
     "@expo/webpack-config": "^19.0.0",
     "@likashefqet/react-native-image-zoom": "^2.1.1",
     "@os-team/i18next-react-native-language-detector": "^1.0.28",
@@ -18,8 +20,9 @@
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
     "@svgr/webpack": "^8.1.0",
+    "cloudinary-react-native": "^0.2.0",
     "dayjs": "^1.11.10",
-    "expo": "^49.0.13",
+    "expo": "^49.0.21",
     "expo-dev-client": "~2.4.11",
     "expo-image-manipulator": "~11.3.0",
     "expo-image-picker": "~14.3.2",
@@ -27,6 +30,8 @@
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "formik": "^2.4.4",
+    "graphql": "^16.8.1",
+    "graphql-ws": "^5.14.3",
     "i18next": "^23.5.1",
     "i18next-browser-languagedetector": "^7.1.0",
     "react": "18.2.0",

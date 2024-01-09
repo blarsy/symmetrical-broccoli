@@ -35,12 +35,12 @@ export default ({ route, navigation }:RouteProps) => {
                 return val || ctx.parent.canBeExchanged
             }),
             canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', t('exchangeType_required'), (val, ctx) => {
-                return val || ctx.parent.canBeDelivered
+                return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
             })
         })} onSubmit={async (values) => {
             setSaveResourcestate(beginOperation())
             try {
-                await editResourceContext.actions.save(appContext.state.token.data!, values)
+                await editResourceContext.actions.save(values)
                 setSaveResourcestate(fromData(null))
 
                 navigation.goBack()

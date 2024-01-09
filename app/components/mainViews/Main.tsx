@@ -20,8 +20,10 @@ const getViewTitleI18n = (viewName: string) => {
     }
 }
 
+
 export default function Main () {
     const appContext = useContext(AppContext)
+
     return <Container style={{ flexDirection: 'column' }}>
         <NavigationContainer theme={{
             colors: {

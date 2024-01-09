@@ -1,92 +1,91 @@
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { View } from "react-native"
 import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
-import { Icon, IconButton, Portal, Snackbar } from "react-native-paper"
+import { Icon, Portal, Snackbar } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
-import { t } from "@/i18n"
-import { Message } from "@/lib/schema"
 import { AppContext } from "./AppContextProvider"
-import { getMessages, sendChatMessages } from "@/lib/api"
-import { NewMessageData } from "@/lib/utils"
 import { getLocales } from "expo-localization"
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 
 interface Props {
     resourceId: number
 }
 
-const asIMessages = (messages: Message[]): IMessage[] => messages.map(msg => asIMessage(msg))
+const asIMessages = (messages: any[]): IMessage[] => messages.map(msg => asIMessage(msg))
 
-const asIMessage = (msg: Message): IMessage => ({
+const asIMessage = (msg: any): IMessage => ({
     _id: msg.id,
     text: msg.text,
     createdAt: msg.created,
     user: {
-        _id: msg.from.id,
-        name: msg.from.name
+        _id: msg.participantByParticipantId.accountByAccountId.id,
+        name: msg.participantByParticipantId.accountByAccountId.name
     },
     pending: false,
     received: !!msg.received,
     sent: true,
-    image: msg.image?.path
+    image: undefined //TODO
 })
+
+const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int) {
+    conversationMessages(resourceId: $resourceId) {
+      nodes {
+        id
+        text
+        created
+        received
+        participantByParticipantId {
+          accountByAccountId {
+            id
+            name
+          }
+        }
+      }
+    }
+  }`
+
+const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $imagePublicId: String) {
+    createMessage(
+      input: {imagePublicId: $imagePublicId, resourceId: $resourceId, text: $text}
+    ) {
+      integer
+    }
+  }`
 
 const Conversation = ({ resourceId }: Props) => {
     const appContext = useContext(AppContext)
-    const [messages, setMessages] = useState(initial<{ message: IMessage, resourceId: number }[]>(false, []))
+    const [ getMessages, { loading, error }] = useLazyQuery(CONVERSATION_MESSAGES)
+    const [createMessage, { error: createError, loading: creating}] = useMutation(CREATE_MESSAGE)
+    const [messages, setMessages] = useState([] as IMessage[])
 
     const onSend = useCallback(async (newMessages = [] as IMessage[]) => {
-        await sendChatMessages(appContext.state.token.data!, resourceId, newMessages)
+        await Promise.all(newMessages.map(message => createMessage({ variables: { text: message.text, resourceId, imagePublicId: message.image } })))
 
-        setMessages(
-            fromData(
-                GiftedChat.append(messages.data!.map(data => data.message), newMessages)
-                    .map((msg: IMessage) => ({ message: msg, resourceId }))))
+        setMessages(prevMessages => GiftedChat.append(prevMessages, newMessages))
     }, [messages])
 
-    const appendMessages = (messageList: { message: IMessage, resourceId: number }[]) => {
-        setMessages(prevMessages => {
-            const fullMessageList = GiftedChat.append(prevMessages.data?.map(msg => msg.message), messageList.map(msg => msg.message))
-                .map(msg => ({ message: msg, resourceId}))
-
-            const messagesIAuthored = fullMessageList.filter(msg => msg.message.user._id != appContext.state.account!.id)
-            if(messagesIAuthored.length > 0)
-                appContext.state.chatSocket!.setLastReadMessage(appContext.state.token.data!, messagesIAuthored[0].message._id as number)
-            
-            return fromData(fullMessageList)
-        })
-    }
-
     const loadMessages = async () => {
-        try {
-            setMessages(beginOperation())
-            
-            const messagesPromise = getMessages(appContext.state.token.data!, resourceId)
+        const res = await getMessages({ variables: { resourceId }})
 
-            const loadedMessages = asIMessages(await messagesPromise).map(msg => ({ message: msg, resourceId }))
-            appContext.state.chatSocket!.pushStackChatMessageListener((data: NewMessageData) => {
-                if(data.message.from.id != appContext.state.account?.id) {
-                    appendMessages([{ message: asIMessage(data.message), resourceId }])
-                }
-            })
-
-            appendMessages(loadedMessages)
-        } catch(e) {
-            setMessages(fromError(e, t('requestError')))
+        if(res.data) {
+            const loadedMessages = asIMessages(res.data.conversationMessages.nodes)
+    
+            setMessages(loadedMessages)
+            GiftedChat.append([], loadedMessages)
         }
     }
 
     useEffect(() => {
         loadMessages()
-        return () => { appContext.state.chatSocket!.popStackChatMessageListener() }
+        // return () => { appContext.state.chatSocket!.popStackChatMessageListener() }
     }, [ resourceId ])
     
     return <View style={{ flex: 1, backgroundColor: 'transparent', paddingBottom: 20 }}>
         <GiftedChat
+            messages={messages || []}
             alwaysShowSend
-            messages={messages.data?.map(data => data.message) || []}
             onSend={onSend}
-            isLoadingEarlier={messages.loading}
+            isLoadingEarlier={loading}
             user={{
                 _id: appContext.state.account?.id!,
                 name: appContext.state.account?.name
@@ -104,9 +103,7 @@ const Conversation = ({ resourceId }: Props) => {
             </View>}
         />
         <Portal>
-            <Snackbar visible={!!messages.error} onDismiss={() => {
-                setMessages(initial(false, []))
-            }}>{messages.error?.message}</Snackbar>
+            <Snackbar visible={!!error || !!createError} onDismiss={() => {}}>{(error && error.message) || (createError && createError.message)}</Snackbar>
         </Portal>
     </View>
 }

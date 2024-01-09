@@ -1,7 +1,6 @@
 import { RouteProps, ScreenSize, aboveMdWidth, getScreenSize } from "@/lib/utils"
 import React, { useState } from "react"
 import { Chip, Modal, Portal, Text } from "react-native-paper"
-import { imgUrl } from "@/lib/settings"
 import { Resource } from "@/lib/schema"
 import { t } from "@/i18n"
 import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-native"
@@ -10,6 +9,7 @@ import SwiperFlatList from "react-native-swiper-flatlist"
 import PanZoomImage from "./PanZoomImage"
 import { lightPrimaryColor } from "./layout/constants"
 import { Props } from "react-native-paper/lib/typescript/components/Chip"
+import { urlFromPublicId } from "@/lib/images"
 
 interface ResourceViewFieldProps {
     title: string,
@@ -19,7 +19,6 @@ interface ResourceViewFieldProps {
 
 interface ImgMetadata { 
     source: string
-    alt: string
     idx: number
 }
 
@@ -47,16 +46,16 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
     }
 
     if(hasOnlyOneImage) {
-        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1 }} onPress={() => onImagePress(`${imgUrl}${resource.images[0].path}`)}>
-            <Image style={{ flexGrow: 1 }} source={{ uri: `${imgUrl}${resource.images[0].path}` }} 
-                alt={resource.images[0].title} width={imgSize} height={imgSize} /> 
+        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1 }} onPress={() => onImagePress(urlFromPublicId(resource.images[0].publicId!))}>
+            <Image style={{ flexGrow: 1 }} source={{ uri: urlFromPublicId(resource.images[0].publicId!)} }
+                width={imgSize} height={imgSize} /> 
         </TouchableOpacity>
     }
 
     return <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10 }}>
         <SwiperFlatList data={getSwiperData(resource)} 
             renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
-                <Image key={item.idx} source={{ uri: item.source}} alt={item.alt} width={imgSize} height={imgSize} 
+                <Image key={item.idx} source={{ uri: item.source}} width={imgSize} height={imgSize} 
                     style={{ width: imgSize, height: imgSize }} />
         </TouchableOpacity>} />
     </View>
@@ -65,12 +64,11 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
 const getSwiperData = (resource: Resource): ImgMetadata[] => {
     if(resource.images && resource.images.length > 0) {
         return resource.images.map((img, idx) => ({
-            source: `${imgUrl}${img.path}`,
-            alt: img.title,
+            source: urlFromPublicId(img.publicId!),
             idx
         }))
     } else {
-        return [{ source: '/placeholder.png', alt: 'placeholder', idx: 0}]
+        return [{ source: '/placeholder.png', idx: 0}]
     }
 }
 

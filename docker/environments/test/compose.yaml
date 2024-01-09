@@ -1,0 +1,62 @@
+version: '2.1'
+services:
+  sb_web_test:
+    depends_on:
+      - sb_webapi_test
+    build:
+      context: './../../containers/website'
+      dockerfile: './Dockerfile'
+    ports:
+      - "3100:3000"
+    networks:
+      - kamatera
+  sb_webapi_test:
+    depends_on:
+      - sb_db_test
+    build:
+      context: './../../containers/webapi'
+      dockerfile: './Dockerfile'
+    ports:
+      - "3101:3000"
+    restart: always
+    networks:
+      - kamatera
+  sb_db_test:
+    env_file:
+      - .env
+    healthcheck: 
+      interval: 10s
+      retries: 10
+      test: "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
+      timeout: 2s
+    build:
+      context: './../../containers/db'
+      dockerfile: './Dockerfile'
+    ports: 
+      - "5532:5432"
+    restart: always
+    volumes: 
+      - "db_data_test:/var/lib/postgresql/data"
+    networks:
+      - kamatera
+  state_test:
+    image: redis
+    ports:
+      - "6479:6379"
+    restart: always
+  scheduler_test:
+    depends_on:
+      - sb_db_test
+      - state_test
+    build:
+      context: './../../containers/scheduler'
+      dockerfile: './Dockerfile'
+    restart: always
+    networks:
+      - kamatera
+volumes: 
+  db_data_test: {}
+networks:
+  kamatera:
+    name: prod_default
+    external: true

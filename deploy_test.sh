@@ -1,38 +1,48 @@
+# build the scheduler
 cd scheduler
 yarn build
 cd ..
-mkdir -p ./docker/test/scheduler/src/
-cp -r scheduler/* ./docker/test/scheduler/src/
-rm -rf ./docker/test/scheduler/src/node_modules
-cp scheduler/.env.test ./docker/test/scheduler/src/.env
 
+# build the web api
+cd webapi
+yarn build
+cd ..
+
+# build the website
 cd backoffice
-
-yarn build:test || exit 1
-
+yarn build || exit 1
 cd ..
 
-# make sure you upload your SSH key to the target server first:
-# ssh-copy-id -i ~/.ssh/id_rsa.pub YOUR_USER_NAME@IP_ADDRESS_OF_THE_SERVER
-# ssh-copy-id -i ~/.ssh/id_rsa.pub root@45.91.168.78
+# clean build folder
+rm -rf ./build
+mkdir -p ./build
 
-ssh root@45.91.168.78 "mkdir -p /home/symbro_test/docker;"
-# copy docker nocodb files
-scp -rp ./docker/test/* root@45.91.168.78:/home/symbro_test/docker
-scp -rp ./docker/test/.env root@45.91.168.78:/home/symbro_test/docker
+# copy the built scheduler to a location easy to zip
+rsync -av --progress scheduler ./build --exclude node_modules --exclude .yarn
+cp ./build/scheduler/.env.test ./build/scheduler/.env
 
-# copy settings file
-scp -rp ./backoffice/.env.test root@45.91.168.78:/home/symbro_test/.env
-# Zip web build files
-rm ./web_test.zip
-cp -r ./backoffice/src/server/mailing/templates ./backoffice/.next/mailtemplates
-cp -rf ./backoffice/.env.test ./backoffice/.next/standalone/.env.production
-cd backoffice/.next
-zip -q -r --symlinks ../../web_test.zip ./static ./standalone ./mailtemplates ../next.config.js
-cd ..
-cd ..
+# copy the built web api to a location easy to zip
+rsync -av --progress webapi ./build --exclude node_modules --exclude .yarn
+cp ./build/webapi/.env.test ./build/webapi/.env
 
-# copy other files
-scp -rp backoffice/public/ ./web_test.zip *.js *.json yarn.lock root@45.91.168.78:/home/symbro_test
+# copy the built website to a location easy to zip
+rsync -av --progress backoffice/.next/static ./build/website
+rsync -av --progress backoffice/.next/standalone ./build/website
+rsync -av --progress backoffice/next.config.js ./build/website
+rsync -av --progress backoffice/public ./build/website
 
+rm -f ./build.zip
+zip -q -r --symlinks ./build.zip ./build
+
+# create docker folder
+ssh root@45.91.168.78 "mkdir -p /home/symbro_test/docker/containers;mkdir -p /home/symbro_test/docker/environments/test;"
+# copy docker files
+scp -rp ./docker/containers/* root@45.91.168.78:/home/symbro_test/docker/containers
+scp -rp ./docker/environments/test/.env root@45.91.168.78:/home/symbro_test/docker/environments/test
+scp -rp ./docker/environments/test/* root@45.91.168.78:/home/symbro_test/docker/environments/test
+
+scp -rp ./build.zip root@45.91.168.78:/home/symbro_test
+
+
+# execute remote deployment script
 ssh root@45.91.168.78 "sh " < ./remote_test.sh

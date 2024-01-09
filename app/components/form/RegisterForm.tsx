@@ -1,36 +1,42 @@
 import { Formik, ErrorMessage } from "formik"
 import { t } from "i18next"
-import React, { useContext, useState } from "react"
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
-import { register } from "@/lib/api"
+import React, { useContext } from "react"
 import * as yup from 'yup'
 import { View } from "react-native"
 import { AppContext } from "@/components/AppContextProvider"
 import { Portal, Snackbar } from "react-native-paper"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
+import { gql, useMutation } from "@apollo/client"
+import { isValidPassword } from "@/lib/utils"
 
 interface Props {
     toggleRegistering: () => void
 }
 
+const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String) {
+    registerAccount(input: {email: $email, name: $name, password: $password}) {
+      jwtToken
+    }
+  }`
+
 const RegisterForm = ({ toggleRegistering }: Props) => {
     const appContext = useContext(AppContext)
-    const [registerState, setRegisterState] = useState(initial<null>(false, null))
+    const [registerAccount, { data, loading, error }] = useMutation(REGISTER_ACCOUNT)
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')),
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
-        password: yup.string().required(t('field_required')),
+        password: yup.string().required(t('field_required')).test({ 
+            name: 'passwordValid', 
+            message: t('password_invalid'), 
+            test: isValidPassword
+        }),
         repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
     })} onSubmit={async (values) => {
-        setRegisterState(beginOperation())
-        try {
-            const res = await register(values.email, values.password, values.name)
-            const data = await res.json()
-            appContext.actions.loginComplete(data.token, data.account)
-            setRegisterState(fromData(null))
-        } catch(e: any) {
-
-            setRegisterState(fromError(e, t('registration_error')))
+        const res = await registerAccount({ variables: { email: values.email,
+            name: values.name, 
+            password: values.password } })
+        if(res.data) {
+            appContext.actions.loginComplete(res.data.registerAccount.jwtToken)
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -48,11 +54,11 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
                 onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
             <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-                <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={registerState.loading}>
+                <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                     {t('ok_caption')}
                 </WhiteButton>
                 <Portal>
-                    <Snackbar visible={!!registerState.error && !!registerState.error.message} onDismiss={() => setRegisterState(initial<null>(false, null))}>{registerState.error && registerState.error.message}</Snackbar>
+                    <Snackbar visible={!!error} onDismiss={() => {}}>{error && error.message}</Snackbar>
                 </Portal>
                 <WhiteButton style={{ flex: 1 }} onPress={() => {
                     toggleRegistering()

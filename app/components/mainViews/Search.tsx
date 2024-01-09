@@ -1,9 +1,7 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import LoadedList from "../LoadedList"
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
-import { Resource } from "@/lib/schema"
+import { Resource, fromServerGraphResources } from "@/lib/schema"
 import { IconButton, Text, TextInput } from "react-native-paper"
-import { getSuggestions } from "@/lib/api"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
 import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
@@ -17,7 +15,9 @@ import { CheckboxGroup } from "../layout/lib"
 import { ScrollView } from "react-native-gesture-handler"
 import dayjs from "dayjs"
 import AccordionItem from "../AccordionItem"
-import { SearchFilterContext, SearchFilterState, SearchOptions } from "../SearchFilterContextProvider"
+import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
+import { gql, useLazyQuery } from "@apollo/client"
+import { EditResourceContext } from "../EditResourceContextProvider"
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
@@ -28,6 +28,48 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
         <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
     </View>
 }
+
+const SUGGESTED_RESOURCES = gql`query SuggestedResources($isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
+    suggestedResources(
+      canBeDelivered: $canBeDelivered
+      canBeExchanged: $canBeExchanged
+      canBeGifted: $canBeGifted
+      canBeTakenAway: $canBeTakenAway
+      isProduct: $isProduct
+      isService: $isService
+      categoryCodes: $categoryCodes
+    ) {
+      nodes {
+        accountByAccountId {
+          name
+          id
+        }
+        created
+        description
+        title
+        canBeExchanged
+        canBeGifted
+        resourcesImagesByResourceId {
+          nodes {
+            imageByImageId {
+              publicId
+            }
+          }
+        }
+        expiration
+        isProduct
+        isService
+        id
+        canBeTakenAway
+        canBeDelivered
+        resourcesResourceCategoriesByResourceId {
+          nodes {
+            resourceCategoryCode
+          }
+        }
+      }
+    }
+  }`
 
 interface ResourceCartProps {
     onPress: ((event: GestureResponderEvent) => void) | undefined,
@@ -58,22 +100,20 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
 }
 
 export default function Search ({ route, navigation }: RouteProps) {
-    const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const [resources, setResources] = useState(initial<Resource[]>(true, []))
-    const load = async(filter: SearchFilterState) => {
-        try{
-            setResources(beginOperation())
-            const queried = await getSuggestions(appContext.state.token.data!, filter.search, filter.categories.map(cat => cat.id.toString()), filter.options)
-            setResources(fromData(queried))
-        } catch(e) {
-            setResources(fromError(e, t('requestError')))
-        }
-    }
+    const editResourceState = useContext(EditResourceContext)
+    const [getSuggestedArticles, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
+        categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
+        ...searchFilterContext.state.options
+    } })
+
     const debouncedFilters = useDebounce(searchFilterContext.state, 700)
 
     useEffect(() => {
-        load(searchFilterContext.state)
+        getSuggestedArticles({ variables: {
+            categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
+            ...searchFilterContext.state.options
+        }})
     }, [debouncedFilters])
 
     return <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
@@ -109,9 +149,9 @@ export default function Search ({ route, navigation }: RouteProps) {
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={resources.loading} error={resources.error} data={resources.data}
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={loading || editResourceState.state.categories.loading} error={error} data={data && data.suggestedResources && fromServerGraphResources(data.suggestedResources.nodes, editResourceState.state.categories.data!)}
             displayItem={(resource, idx) => <ResourceCard 
-                key={idx} resource={resource} 
+                key={idx} resource={resource as Resource} 
                 onChatOpen={() => navigation.navigate('chat', { resource })} 
                 onPress={() => navigation.navigate('viewResource', { resource })} />} />
     </ScrollView>

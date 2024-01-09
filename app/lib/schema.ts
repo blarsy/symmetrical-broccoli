@@ -2,23 +2,23 @@ export interface Account {
     name: string,
     id: number,
     email: string,
-    balance: number,
     hash?: string,
-    resources?: Resource[],
-    linkedAccounts: Account[],
-    invitedAccounts: Account[],
-    invitedByAccounts: Account[]
+    resources?: Resource[]
 }
 
-export interface Image {
-    path: string,
-    size: number,
-    title: string,
-    mimetype: string
+export interface AccountInfo {
+    name: string
+    id: number
+    email: string
+}
+
+export interface ImageInfo {
+    path?: string
+    publicId?: string
 }
 
 export interface Category {
-    id: number,
+    code: string,
     name: string
 }
 
@@ -27,14 +27,14 @@ export interface Message {
     id: number
     created: Date
     from: Account
-    image?: Image
+    image?: ImageInfo
     conversationId?: number
     received?: Date
 }
 
 export interface Resource {
     id: number,
-    images: Image[],
+    images: ImageInfo[],
     title: string,
     description: string,
     expiration?: Date,
@@ -55,7 +55,6 @@ export interface ConversationData {
         id: number
         lastMessageExcerpt: string | undefined
         lastMessageTime: Date | undefined
-        code: string
         resource: Resource
         hasUnread: boolean
     }
@@ -71,4 +70,67 @@ export interface Network {
     linkRequests: Account[], 
     linkedAccounts: Account[], 
     receivedLinkRequests: Account[]
+}
+
+export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
+    const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
+        rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
+        []
+    const images = rawRes.resourcesImagesByResourceId && rawRes.resourcesImagesByResourceId.nodes ?
+        rawRes.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ publicId: imgData.imageByImageId.publicId} as ImageInfo)) :
+        []
+    return {
+        id: rawRes.id, title: rawRes.title, description: rawRes.description, expiration: rawRes.expiration, created: rawRes.created,
+        isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
+        canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
+        categories: resourceCategories, 
+        account: rawRes.accountByAccountId,
+        images
+} as Resource
+}
+
+export const fromServerGraphResources = (data: any[], categories: Category[]): Resource[] => {
+    return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories))
+}
+
+export const fromServerGraphConversations = (data: any[], loggedInAccountId: number): ConversationData[] => {
+    return data.map((rawConversation: any) => {
+        const meAsParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id === loggedInAccountId)
+        const otherParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id != loggedInAccountId)
+        return ({
+            conversation: {
+                hasUnread: meAsParticipant.unreadMessagesByParticipantId.totalCount > 0,
+                id: rawConversation.id,
+                lastMessageExcerpt: rawConversation.messageByLastMessage.text,
+                lastMessageTime: rawConversation.messageByLastMessage.created,
+                resource: {
+                    title: rawConversation.resourceByResourceId.title,
+                    id: rawConversation.resourceByResourceId.id,
+                    canBeGifted: rawConversation.resourceByResourceId.canBeGifted,
+                    canBeExchanged: rawConversation.resourceByResourceId.canBeExchanged,
+                    images: rawConversation.resourceByResourceId.resourcesImagesByResourceId.nodes.map((img: any) => ({
+                        publicId: img.imageByImageId.publicId
+                    })),
+                    account: {
+                        id: rawConversation.resourceByResourceId.accountByAccountId.id,
+                        name: rawConversation.resourceByResourceId.accountByAccountId.name,
+                        email: rawConversation.resourceByResourceId.accountByAccountId.email,
+                    },
+                    //Following values are not used, so just give them some default values
+                    canBeDelivered: false,
+                    canBeTakenAway: false,
+                    description: '',
+                    isProduct: false,
+                    isService: false,
+                    categories: [],
+                    created: new Date()
+                }
+            },
+            withUser: {
+                id: otherParticipant.accountByAccountId.id,
+                email: otherParticipant.accountByAccountId.email,
+                name: otherParticipant.accountByAccountId.name,
+            }
+        })
+    })
 }

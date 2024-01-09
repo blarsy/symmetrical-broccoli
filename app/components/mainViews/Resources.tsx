@@ -1,33 +1,70 @@
 import React, { useContext, useEffect, useState } from "react"
 import AppendableList from "../AppendableList"
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
-import { Resource } from "@/lib/schema"
+import { fromServerGraphResources } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
 import { IconButton } from "react-native-paper"
-import { deleteResource, getResources } from "@/lib/api"
 import { t } from "@/i18n"
 import { View } from "react-native"
-import { RouteProps, aboveMdWidth } from "@/lib/utils"
+import { LoadState, RouteProps, aboveMdWidth } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import { SmallResourceImage } from "../MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import { gql, useMutation, useQuery } from "@apollo/client"
+
+const RESOURCES = gql`query MyResources {
+    myresources {
+      nodes {
+        id
+        expiration
+        description
+        created
+        isProduct
+        isService
+        title
+        canBeTakenAway
+        canBeExchanged
+        canBeGifted
+        canBeDelivered
+        accountByAccountId {
+          id
+          name
+          email
+        }
+        resourcesImagesByResourceId {
+          nodes {
+            imageByImageId {
+              created
+              id
+              publicId
+            }
+          }
+        }
+        resourcesResourceCategoriesByResourceId {
+          nodes {
+            resourceCategoryCode
+          }
+        }
+      }
+    }
+  }`
+
+const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
+  deleteResource(input: {resourceId: $resourceId}) {
+    integer
+  }
+}`
 
 const Resources = ({ route, navigation }: RouteProps) => {
-    const [resources, setResources] = useState(initial<Resource[]>(true, []))
+    const {data, loading, error, refetch} = useQuery(RESOURCES)
     const [deletingResource, setDeletingResource] = useState(0)
     const appContext = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
+    const [deleteResource] = useMutation(DELETE_RESOURCE)
 
-    const loadResources = async () => {
-        setResources(beginOperation())
-        try {
-            const resources = await getResources(appContext.state.token.data!)
-            setResources(fromData(resources))
-        } catch(e) {
-            setResources(fromError(e, t('requestError')))
-        }
+    const loadResources = () => {
+      return refetch()
     }
 
     useEffect(() => {
@@ -36,14 +73,10 @@ const Resources = ({ route, navigation }: RouteProps) => {
         }
     }, [route])
 
-    useEffect(() => {
-        loadResources()
-    }, [])
-
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
     return <>
-        <AppendableList state={resources} dataFromState={state => state.data!}
+        <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
             onAddRequested={() => navigation.navigate('newResource')} 
             contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
             displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
@@ -65,11 +98,15 @@ const Resources = ({ route, navigation }: RouteProps) => {
         />
         <ConfirmDialog title={t('Confirmation_DialogTitle')} question={t('Confirm_Resource_Delete_Question')}
             visible={!!deletingResource} onResponse={async response => {
-                if(response) {
-                    await deleteResource(appContext.state.token.data!, deletingResource)
-                    await loadResources()
-                }
+              if(response) {
+                await deleteResource({ variables: {
+                  resourceId: deletingResource
+                } })
+                await loadResources()
                 setDeletingResource(0)
+              } else {
+                setDeletingResource(0)
+              }
             }} />
     </>
 }

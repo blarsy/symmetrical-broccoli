@@ -1,8 +1,6 @@
 import { t } from "@/i18n"
-import { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { getResourceCategories } from "@/lib/api"
 import { Category } from "@/lib/schema"
-import { useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import LoadedZone from "../LoadedZone"
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
@@ -10,6 +8,9 @@ import { Modal, Portal, Text, TextInput } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
+import { gql, useQuery } from "@apollo/client"
+import { getLocale } from "@/lib/utils"
+import { EditResourceContext } from "../EditResourceContextProvider"
 
 interface CategoriesSelectModalProps {
     open: boolean
@@ -25,13 +26,13 @@ const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, o
         <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
         <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
             {categories.map(cat => <TouchableOpacity onPress={() => {
-                    if(selectedCategories.some(selectedCat => selectedCat.id === cat.id )) {
-                        setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.id != cat.id))
+                    if(selectedCategories.some(selectedCat => selectedCat.code === cat.code )) {
+                        setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.code != cat.code))
                     } else {
                         setSelectedCategories([...selectedCategories, cat])
                     }
-                }} key={cat.id}>
-                <Text style={{ color: selectedCategories.some(selectedCat => selectedCat.id === cat.id ) ? primaryColor : '#000' }} variant="bodyLarge">{cat.name}</Text>
+                }} key={cat.code}>
+                <Text style={{ color: selectedCategories.some(selectedCat => selectedCat.code === cat.code ) ? primaryColor : '#000' }} variant="bodyLarge">{cat.name}</Text>
             </TouchableOpacity>)}
         </View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
@@ -52,24 +53,13 @@ interface Props {
 }
 
 const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
-    const [ categories, setCategories ] = useState(initial<Category[]>(true, []))
+    const editResourceState = useContext(EditResourceContext)
     const [ open, setOpen ] = useState(false)
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const categories = await getResourceCategories()
-                setCategories(fromData(categories.sort((a, b) => a.name.localeCompare(b.name))))
-            } catch (e) {
-                setCategories(fromError(e, t('requestError')))
-            }
-        }
-        load()
-    }, [])
 
     const openModal = () => setOpen(true)
     
-    return <LoadedZone loading={categories.loading} error={categories.error}>
-        { categories.data ? <View style={{ paddingVertical: 10 }}>
+    return <LoadedZone loading={editResourceState.state.categories.loading} error={editResourceState.state.categories.error}>
+        { editResourceState.state.categories.data ? <View style={{ paddingVertical: 10 }}>
             <TouchableOpacity onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <TransparentTextInput label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
@@ -78,7 +68,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
                 </View>
             </TouchableOpacity>
             <Portal>
-                <CategoriesSelectModal categories={categories.data} initialCategories={value} open={open} setOpen={setOpen}
+                <CategoriesSelectModal categories={editResourceState.state.categories.data} initialCategories={value} open={open} setOpen={setOpen}
                     onChange={onChange} />
             </Portal>
         </View> : <></> }

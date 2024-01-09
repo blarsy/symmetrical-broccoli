@@ -1,7 +1,7 @@
 import { t } from "@/i18n"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import React, { useState } from "react"
-import { ActivityIndicator, Button, Dialog, IconButton, Portal, Snackbar, Text } from "react-native-paper"
+import { ActivityIndicator, Dialog, IconButton, Portal, Snackbar, Text } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 
 interface Props {
@@ -19,7 +19,9 @@ const ConfirmDialog = ({ visible, onResponse, title, question }: Props) => {
             <Dialog.Content>
                 <Text variant="bodyMedium">{question}</Text>
                 { processing.loading && <ActivityIndicator /> }
-                <Snackbar visible={!!processing.error} onDismiss={() => setProcessing(initial(false, null))}>{processing.error && processing.error.message}</Snackbar>
+                <Portal>
+                    <Snackbar visible={!!processing.error} onDismiss={() => setProcessing(initial(false, null))}>{processing.error && processing.error.message}</Snackbar>
+                </Portal>
             </Dialog.Content>
             <Dialog.Actions>
                 <IconButton size={30} iconColor="#000" icon="check" onPress={async () => {

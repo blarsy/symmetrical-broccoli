@@ -1,4 +1,3 @@
-import { Account } from "@/schema"
 import { createContext, useState } from "react"
 
 interface AppStateData {
@@ -10,8 +9,7 @@ interface AppStateData {
 }
 
 export interface AppContext {
-  data: AppStateData,
-  loggedIn: (account: Account) => void
+  data: AppStateData
 }
 interface Props {
   children: JSX.Element
@@ -31,11 +29,7 @@ export const AppContext = createContext<AppContext>(blankAppContext)
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(blankAppContext.data)
 
-    const loggedIn = (account: Account): void => {
-      setAppState({ ...appState, ...{ account } })
-    }
-
-    return <AppContext.Provider value={{ data: appState, loggedIn }}>
+    return <AppContext.Provider value={{ data: appState }}>
         {children}
     </AppContext.Provider>
 }

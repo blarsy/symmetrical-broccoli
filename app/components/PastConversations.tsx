@@ -1,17 +1,57 @@
 import { t } from "@/i18n"
-import { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { ConversationData, Resource } from "@/lib/schema"
-import React, { useContext, useEffect } from "react"
-import { useState } from "react"
+import { ConversationData, Resource, fromServerGraphConversations } from "@/lib/schema"
+import React, { useContext } from "react"
 import { Image, View } from "react-native"
 import LoadedList from "./LoadedList"
 import ResponsiveListItem from "./ResponsiveListItem"
 import { AppContext } from "./AppContextProvider"
-import { getPastConversations } from "@/lib/api"
 import { Text } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
-import { imgUrl } from "@/lib/settings"
 import dayjs from "dayjs"
+import { urlFromPublicId } from "@/lib/images"
+import { gql, useQuery } from "@apollo/client"
+
+const MY_CONVERSATIONS = gql`query MyConversations {
+    myConversations {
+      nodes {
+        created
+        messageByLastMessage {
+          text
+          created
+        }
+        participantsByConversationId {
+          nodes {
+            unreadMessagesByParticipantId {
+              totalCount
+            }
+            accountByAccountId {
+              id
+              name
+              email
+            }
+          }
+        }
+        resourceByResourceId {
+          id
+          canBeGifted
+          canBeExchanged
+          title
+          accountByAccountId {
+            name
+            id
+            email
+          }
+          resourcesImagesByResourceId {
+            nodes {
+              imageByImageId {
+                publicId
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
 
 interface Props {
     onConversationSelected: (resource: Resource) => void
@@ -19,25 +59,13 @@ interface Props {
 
 const PastConversations = ({ onConversationSelected }: Props) => {
     const appContext = useContext(AppContext)
-    const [conversations, setConversations] = useState(initial<ConversationData[]>(true, []))
-
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const conversations = await getPastConversations(appContext.state.token.data!)
-                setConversations(fromData(conversations)) 
-            } catch (e) {
-                setConversations(fromError(e, t('requestError')))
-            }
-        }
-        load()
-    }, [])
+    const {data, loading, error} = useQuery(MY_CONVERSATIONS)
 
     return <View style={{ flex: 1 }}>
-        <LoadedList loading={conversations.loading} data={conversations.data} error={conversations.error} noDataLabel={t('noConversationLoaded_label')}
+        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.state.account!.id) : [] as ConversationData[]} error={error} noDataLabel={t('noConversationLoaded_label')}
             displayItem={(item, idx) => {
-                const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 1) ?
-                    { uri: `${imgUrl}${item.conversation.resource.images[0].path}` } : 
+                const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) ?
+                    { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
                     require('@/assets/img/placeholder.png')
                 return <ResponsiveListItem style={{ paddingLeft: 5, borderBottomColor: '#000', borderBottomWidth: 1, borderStyle: 'dashed' }} left={() => <Image style={{ width: 50, height: 50 }} source={imgSource} />} key={idx}
                     onPress={() => onConversationSelected(item.conversation.resource)}

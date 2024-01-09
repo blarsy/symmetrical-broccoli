@@ -31,14 +31,14 @@ const EditResourceFields = ({formikState, processing}: Props) => {
         <PicturesField images={values.images} 
             onImageSelected={async img => {
                 try {
-                    await editResourceContext.actions.addImage(values, appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
+                    await editResourceContext.actions.addImage(img)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
                     appContext.actions.notify(t('requestError'))
                 }
             }}
             onImageDeleteRequested={img => {editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
-                return editResourceContext.actions.deleteImage(values, appContext.state.token!.data!, editResourceContext.state.editedResource.id, img)
+                return editResourceContext.actions.deleteImage(img)
             }} />
         <TransparentTextInput label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />

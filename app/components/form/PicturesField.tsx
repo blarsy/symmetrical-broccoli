@@ -5,16 +5,16 @@ import { IconButton, Text } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { t } from "@/i18n"
 import Images from "@/Images"
-import { imgUrl } from "@/lib/settings"
 import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
 import { manipulateAsync } from 'expo-image-manipulator'
-import { NewOrExistingImage } from "../EditResourceContextProvider"
 import { AppContext } from "../AppContextProvider"
+import { ImageInfo } from "@/lib/schema"
+import { urlFromPublicId } from "@/lib/images"
 
 interface Props {
-    images: NewOrExistingImage[]
-    onImageSelected: (img: NewOrExistingImage) => void
-    onImageDeleteRequested: (img: NewOrExistingImage) => Promise<void>
+    images: ImageInfo[]
+    onImageSelected: (img: ImageInfo) => void
+    onImageDeleteRequested: (img: ImageInfo) => Promise<void>
 }
 
 const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Props) => {
@@ -22,10 +22,12 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
     return <View style={{ flex: 1, alignItems: 'stretch', flexDirection: 'column' }}>
         { images && images.length > 0 &&
             <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-                { images.map((image, idx) => <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
-                    <Image style={{ height: 100, width: 100 }} source={{ uri: image.blob ? image.path : `${imgUrl}${image.path}` }} />
-                    <IconButton size={20} icon="close-thick" iconColor={primaryColor} onPress={() => onImageDeleteRequested(image)}/>
-                </View>)}
+                { images.map((image, idx) => {
+                    return <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
+                        <Image style={{ height: 100, width: 100 }} source={{ uri: image.path || urlFromPublicId(image.publicId!) }} />
+                        <IconButton size={20} icon="close-thick" iconColor={primaryColor} onPress={() => onImageDeleteRequested(image)}/>
+                    </View>
+                })}
             </View>
         }
         <TouchableOpacity onPress={async () => {
@@ -41,15 +43,9 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 if(!result.canceled && result.assets.length > 0) {
                     const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height: 400 }}])
 
-                    const imgRes = await fetch(img.uri)
-                    const imgBlob = await imgRes.blob()
-
                     onImageSelected({ 
-                        path: img.uri, 
-                        blob: imgBlob, 
-                        size: imgBlob.size, 
-                        mimetype: '',
-                        title: result.assets[0].fileName || '' })
+                        path: img.uri
+                    })
                 }
             } catch(e) {
                 appContext.actions.setMessage((e as Error).stack!)

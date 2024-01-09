@@ -1,32 +1,29 @@
 import { createContext, useState } from "react"
-import { Account, Category } from "@/lib/schema"
+import { Account, AccountInfo } from "@/lib/schema"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { getAccount } from "@/lib/api"
 import React from "react"
-import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Snackbar } from "react-native-paper"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
-import { ChatSocket } from "@/lib/ChatSocket"
+import { gql } from "@apollo/client"
+import { TOKEN_KEY, apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
 
 const SPLASH_DELAY = 3000
 
 interface AppState {
-    token: DataLoadState<string>
-    account?: Account
+    token: string
+    account?: AccountInfo
     messages: string[]
-    chatSocket?: ChatSocket
     processing: boolean
     numberOfUnread: number
 }
 
 interface AppActions {
-    loginComplete: (token: string, account: Account) => Promise<Account>
+    loginComplete: (token: string) => Promise<void>
     logout: () => Promise<void>
     tryRestoreToken: () => Promise<void>
     accountUpdated: (account: Account) => Promise<void>
-    setTokenState: (newState: DataLoadState<string>) => void
     resetMessages: () => void
     setMessage: (message: any) => void
     notify: (message: any) => void
@@ -45,9 +42,8 @@ interface Props {
 }
 
 const emptyState: AppState = { 
-    token: initial<string>(true, ''), 
+    token: '', 
     messages: [], 
-    chatSocket: undefined,
     numberOfUnread: 0,
     processing: false
 }
@@ -55,11 +51,10 @@ const emptyState: AppState = {
 export const AppContext = createContext<AppContext>({
     state: emptyState, 
     actions: {
-        loginComplete: (_, account) => Promise.resolve(account),
+        loginComplete: async () => {},
         tryRestoreToken: () => Promise.resolve(),
         accountUpdated: () => Promise.resolve(),
         logout: () => Promise.resolve(),
-        setTokenState: () => {},
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
@@ -68,6 +63,14 @@ export const AppContext = createContext<AppContext>({
         endOpWithError: e => {}
     }
 })
+
+const GET_SESSION_DATA = gql`query GetSessionData {
+    getSessionData {
+      accountId
+      email
+      name
+    }
+  }`
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
@@ -86,39 +89,49 @@ const AppContextProvider = ({ children }: Props) => {
         })
     }
 
-    const actions: AppActions = {
-        loginComplete: async (token: string, account: Account): Promise<Account> => {
-            const storagePromise = AsyncStorage.setItem('token', token)
-            const chatSocket = new ChatSocket(token, newNumber => setAppState({ ...appState, ...{ numberOfUnread: newNumber } }))
-            await chatSocket.init()
+    const logout = async () => {
+        await AsyncStorage.removeItem('token')
+        setAppState({ ...appState, ...{ token: '', account: undefined } })
+    }
 
-            setAppState({ ...appState, ...{ token: fromData(token), account, chatSocket } })
-            await storagePromise
-            return account
+    const actions: AppActions = {
+        loginComplete: async (token: string): Promise<void> => {
+            await AsyncStorage.setItem(TOKEN_KEY, token)
+
+            apolloTokenExpiredHandler.handle = () => { 
+                AsyncStorage.removeItem(TOKEN_KEY)
+                setAppState({ ...appState, ...{ token: '', account: undefined } })
+            }
+            const authenticatedClient = getAuthenticatedApolloClient(token)
+            const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
+
+            setAppState({ ...appState, ...{ token, account: {
+                id: res.data.getSessionData.accountId, name: res.data.getSessionData.name, email: res.data.getSessionData.email
+            }} })
         },
         tryRestoreToken: async (): Promise<void> => {
             const token = await AsyncStorage.getItem('token')
             if(token) {
-                const accountPromise = getAccount(token)
-                const chatSocket = new ChatSocket(token, newNumber => setAppState({ ...appState, ...{ numberOfUnread: newNumber } }))
-                await chatSocket.init()
-                const account = await executeWithinMinimumDelay(accountPromise)
-                setAppState({ ...appState, ...{ token: fromData(token), account, chatSocket} })
+                apolloTokenExpiredHandler.handle = () => { 
+                    AsyncStorage.removeItem(TOKEN_KEY)
+                    setAppState({ ...appState, ...{ token: '', account: undefined } })
+                }
+                const authenticatedClient = getAuthenticatedApolloClient(token)
+                const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
+
+                const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
+                setAppState({ ...appState, ...{ token:token, account: {
+                    id: sessionRes.data.getSessionData.accountId, name: sessionRes.data.getSessionData.name, email: sessionRes.data.getSessionData.email
+                }} })
                 
             } else {
-                setTimeout(() => setAppState({ ...appState, ...{ token: fromData('') } }), SPLASH_DELAY)
+                setTimeout(() => setAppState({ ...appState, ...{ token: '' } }), SPLASH_DELAY)
             }
         },
         accountUpdated: async (updatedAccount: Account) => {
             setAppState({ ...appState, ...{ account: updatedAccount } })
         },
-        logout: async () => {
-            await AsyncStorage.removeItem('token')
-            setAppState({ ...appState, ...{ token: fromData(''), account: undefined } })
-        },
-        setTokenState: (newState: DataLoadState<string>) => {
-            setAppState({ ...appState, ...{ token: newState, message: newState.error && newState.error.detail} })
-        },
+        logout,
         setMessage: (messageObj: any) => {
             let message: string
             if(messageObj instanceof Error) message = (messageObj as Error).stack!

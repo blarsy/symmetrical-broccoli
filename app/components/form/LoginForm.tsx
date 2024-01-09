@@ -1,8 +1,6 @@
 import { Formik, ErrorMessage } from "formik"
 import { t } from "i18next"
 import { View } from "react-native"
-import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
-import { login } from "@/lib/api"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
 import { AppContext } from "@/components/AppContextProvider"
@@ -10,29 +8,33 @@ import { Button, Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { aboveMdWidth } from "@/lib/utils"
+import { gql, useMutation } from "@apollo/client"
 
 interface Props {
     toggleRegistering: () => void,
     toggleRecovering: () => void
 }
 
+const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
+    authenticate(input: {email: $email, password: $password}) {
+        jwtToken
+    }
+}`
+
 const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
     const appContext = useContext(AppContext)
-    const [loginState, setLoginstate] = useState(initial<null>(false, null))
+    const [authenticate, {data, loading, error}] = useMutation(GET_JWT)
+    const [authFailed, setAuthFailed] = useState(false)
 
     return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
         password: yup.string().required(t('field_required'))
     })} onSubmit={async (values) => {
-        setLoginstate(beginOperation())
-        try {
-            const res = await login(values.email.trim(), values.password)
-            const data = await res.json()
-            appContext.actions.loginComplete(data.token, data.account)
-            setLoginstate(fromData(null))
-        } catch(e: any) {
-            setLoginstate(fromError(e, t('connection_error')))
-            appContext.actions.setMessage(e)
+        const res = await authenticate({variables: { email: values.email, password: values.password }})
+        if(res.data && res.data.authenticate.jwtToken) {
+            appContext.actions.loginComplete(res.data.authenticate.jwtToken)
+        } else {
+            setAuthFailed(true)
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -44,7 +46,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={OrangeBackedErrorText} name="password" />
             <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
-                loading={loginState.loading}>
+                loading={loading}>
                 {t('connection_label')}
             </WhiteButton>
             <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
@@ -56,8 +58,11 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
                 {t('forgotPassword_label')}
             </Button>
             <Portal>
-                <Snackbar role="alert" visible={!!loginState.error && !!loginState.error.message} onDismiss={() => setLoginstate(initial<null>(false, null))}>
-                    {loginState.error && loginState.error.message}
+                <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>
+                    {error && error.message}
+                </Snackbar>
+                <Snackbar role="alert" visible={authFailed} onDismiss={() => setAuthFailed(false)}>
+                    {t('authentication_failed')}
                 </Snackbar>
             </Portal>
         </View>)}
