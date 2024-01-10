@@ -2,13 +2,13 @@ import React, { useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
 import { primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { getLocales } from "expo-localization"
 import { ColorValue, View } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { getLanguage } from "@/lib/utils"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -59,8 +59,6 @@ export const TransparentTextInput = (props: TextInputProps) => {
         }, props.style)}/>
 }
 
-const lang = getLocales()[0].languageCode
-
 interface CheckboxGroupProps {
     title: string
     options: {
@@ -99,7 +97,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
             <Icon source="chevron-right" size={26} color="#000" />
         </View>
         <DatePickerModal
-            locale={lang}
+            locale={getLanguage()}
             mode="single"
             visible={dateOpen}
             onDismiss={() => setDateOpen(false)}

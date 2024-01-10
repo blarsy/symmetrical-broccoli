@@ -8,8 +8,6 @@ import { Modal, Portal, Text, TextInput } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
-import { gql, useQuery } from "@apollo/client"
-import { getLocale } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 
 interface CategoriesSelectModalProps {

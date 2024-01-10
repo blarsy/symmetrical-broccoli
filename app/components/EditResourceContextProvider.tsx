@@ -4,7 +4,7 @@ import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import DataLoadState, { fromData, initial, fromError } from "@/lib/DataLoadState"
-import { getLocale } from "@/lib/utils"
+import { getLanguage } from "@/lib/utils"
 import { t } from "@/i18n"
 
 const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
@@ -89,7 +89,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await getCategories({ variables: { locale: getLocale().substring(0, 2) }})
+                const res = await getCategories({ variables: { locale: getLanguage() }})
                 setEditResourceState({ ...editResourceState, categories: fromData(res.data.allResourceCategories.nodes) })
             } catch(e) {
                 setEditResourceState({ ...editResourceState, categories: fromError(e, t('requestError')) })

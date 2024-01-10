@@ -1,15 +1,14 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
-import { Dimensions, Platform } from "react-native"
+import { Dimensions } from "react-native"
 import { Message } from "./schema"
 import { ApolloClient, ApolloError, InMemoryCache, createHttpLink, from, split } from "@apollo/client"
 import { apiUrl, subscriptionsUrl } from "./settings"
 import { setContext } from "@apollo/client/link/context"
 import { ErrorResponse, onError } from '@apollo/client/link/error'
-import RNLanguageDetector from "@os-team/i18next-react-native-language-detector"
-import LanguageDetector from 'i18next-browser-languagedetector'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from "@apollo/client/utilities"
+import { getLocales } from "expo-localization"
 
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^\w]/)
@@ -122,12 +121,17 @@ export const getAuthenticatedApolloClient = (token: string) => {
     })
   }
 
-export const getLocale = (): string => {
-  const rawLocale = Platform.OS === "web" ? new LanguageDetector().detect() : RNLanguageDetector.detect()
-  let locale = 'en'
-  if (rawLocale && typeof rawLocale != 'string' && rawLocale.length) {
-    return locale[0]
-  } else {
-    return rawLocale as string
+let language: string | undefined = undefined
+export const getLanguage = (): string => {
+  if(!language) {
+      const supportedLanguages = ['fr', 'en']
+      const deviceLocales = getLocales()
+    
+      // find the first supported language that is also installed on the device
+      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales.some(deviceLocale => deviceLocale.languageCode.toLowerCase() === supportedLanguage))
+      
+      // If the device is not installed with any comptible language, default to the first supported language
+      language = firstCompatibleLanguage || supportedLanguages[0]
   }
+  return language
 }

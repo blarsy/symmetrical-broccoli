@@ -7,11 +7,11 @@ import { en, fr, registerTranslation } from 'react-native-paper-dates'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
-import { getLocale } from './lib/utils'
+import { getLanguage } from './lib/utils'
 
 function App() {
   dayjs.extend(relativeTime)
-  dayjs.locale(getLocale())
+  dayjs.locale(getLanguage())
   
   registerTranslation('en', en)
   registerTranslation('fr', fr)

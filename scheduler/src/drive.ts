@@ -1,5 +1,5 @@
 import { GoogleAuth } from 'google-auth-library'
-import { google, drive_v3, sheets_v4, docs_v1 } from 'googleapis'
+import { google, drive_v3 } from 'googleapis'
 import { Readable } from 'stream'
 import settings from './settings.js'
 

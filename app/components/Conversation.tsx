@@ -4,8 +4,8 @@ import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
 import { Icon, Portal, Snackbar } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 import { AppContext } from "./AppContextProvider"
-import { getLocales } from "expo-localization"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
+import { getLanguage } from "@/lib/utils"
 
 interface Props {
     resourceId: number
@@ -77,7 +77,6 @@ const Conversation = ({ resourceId }: Props) => {
 
     useEffect(() => {
         loadMessages()
-        // return () => { appContext.state.chatSocket!.popStackChatMessageListener() }
     }, [ resourceId ])
     
     return <View style={{ flex: 1, backgroundColor: 'transparent', paddingBottom: 20 }}>
@@ -90,7 +89,7 @@ const Conversation = ({ resourceId }: Props) => {
                 _id: appContext.state.account?.id!,
                 name: appContext.state.account?.name
             }}
-            locale={getLocales()[0].languageCode}
+            locale={getLanguage()}
             renderSend={p => <Send {...p} containerStyle={{
                 justifyContent: 'center',
                 alignItems: 'center',
