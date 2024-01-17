@@ -12,6 +12,10 @@ import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { gql, useMutation, useQuery } from "@apollo/client"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import SimpleBackHeader from "../layout/SimpleBackHeader"
+import EditResource from "../form/EditResource"
+import ViewResource from "../ViewResource"
 
 const RESOURCES = gql`query MyResources {
     myresources {
@@ -56,10 +60,9 @@ const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
   }
 }`
 
-const Resources = ({ route, navigation }: RouteProps) => {
+const ResourcesList = ({ route, navigation }: RouteProps) => {
     const {data, loading, error, refetch} = useQuery(RESOURCES)
     const [deletingResource, setDeletingResource] = useState(0)
-    const appContext = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
 
@@ -79,7 +82,7 @@ const Resources = ({ route, navigation }: RouteProps) => {
         <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
             onAddRequested={() => navigation.navigate('newResource')} 
             contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
-            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resource })} key={idx} title={resource.title} 
+            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} key={idx} title={resource.title} 
                 titleNumberOfLines={1}
                 description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
                 left={() => <SmallResourceImage resource={resource} />}
@@ -109,6 +112,17 @@ const Resources = ({ route, navigation }: RouteProps) => {
               }
             }} />
     </>
+}
+
+const StackNav = createNativeStackNavigator()
+
+const Resources = ({ route, navigation }: RouteProps) => {
+  return <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
+      <StackNav.Screen name="resources" component={ResourcesList} options={{ headerShown: false }} />
+      <StackNav.Screen name="newResource" key="newResource" options={{ header: SimpleBackHeader }} component={EditResource} initialParams={{isNew: true}}/>
+      <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
+      <StackNav.Screen name="editResource" key="editResource" options={{ header: SimpleBackHeader }} component={EditResource} />
+  </StackNav.Navigator>
 }
 
 export default Resources

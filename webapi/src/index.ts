@@ -4,6 +4,9 @@ import config from './config'
 import cors from 'cors'
 import { run } from "graphile-worker"
 import { sendAccountRecoveryMail } from "./mailing"
+import { NotificationsListener } from "./notifications/listener"
+
+const connectionString = `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
 
 const launchPostgraphileWebApi = () => {
     const allowedOrigins = JSON.parse(config.webClientUrls!) as string[]
@@ -19,11 +22,12 @@ const launchPostgraphileWebApi = () => {
     }, }))
     app.use(postgraphile)
     app.listen(3000)
+    console.log('Express web api server listening on port 3000.')
 }
 
 const launchJobWorker = async () => {
     const runner = await run({
-        connectionString: `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`,
+        connectionString,
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
@@ -42,5 +46,10 @@ const launchJobWorker = async () => {
       await runner.promise
 }
 
+const launchPushNotificationsSender = () => {
+    new NotificationsListener(connectionString, err => console.error(err.message))
+}
+
 launchJobWorker().catch(e => console.error(e))
 launchPostgraphileWebApi()
+launchPushNotificationsSender()

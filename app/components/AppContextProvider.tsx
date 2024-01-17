@@ -17,6 +17,7 @@ interface AppState {
     messages: string[]
     processing: boolean
     numberOfUnread: number
+    messageReceivedStack: ((msg: any) => void)[]
 }
 
 interface AppActions {
@@ -30,6 +31,8 @@ interface AppActions {
     beginOp: () => void
     endOp: () => void
     endOpWithError: (error: any) => void
+    pushMessageReceivedHandler: (handler : (msg: any) => void) => void
+    popMessageReceivedHandler: () => void
 }
 
 interface AppContext {
@@ -45,7 +48,8 @@ const emptyState: AppState = {
     token: '', 
     messages: [], 
     numberOfUnread: 0,
-    processing: false
+    processing: false,
+    messageReceivedStack: []
 }
 
 export const AppContext = createContext<AppContext>({
@@ -60,7 +64,9 @@ export const AppContext = createContext<AppContext>({
         notify: () => {},
         beginOp: () => {},
         endOp: () => {},
-        endOpWithError: e => {}
+        endOpWithError: e => {},
+        pushMessageReceivedHandler: () => {},
+        popMessageReceivedHandler: () => {}
     }
 })
 
@@ -151,6 +157,14 @@ const AppContextProvider = ({ children }: Props) => {
         endOpWithError: e => {
             setAppState({...appState, ...{ processing: false }})
             setLastNofication(t('requestError'))
+        },
+        pushMessageReceivedHandler: handler => {
+            appState.messageReceivedStack.push(handler)
+            setAppState({ ...appState, ...{ messageReceivedStack: appState.messageReceivedStack } })
+        },
+        popMessageReceivedHandler: () => {
+            appState.messageReceivedStack.pop()
+            setAppState({ ...appState, ...{ messageReceivedStack: appState.messageReceivedStack } })
         }
     }
 

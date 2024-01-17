@@ -23,7 +23,7 @@ const resources = {
       "connection_label": "Connection",
       "search_label": "Search",
       "history_label": "History",
-      "resource_label": "Ressources",
+      "resource_label": "Resources",
       "chat_label": "Chat",
       "profile_label": "Profile",
       "name_too_long": "Please use a shorter name",

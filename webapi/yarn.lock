@@ -3235,10 +3235,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pg-format@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "pg-format@npm:1.0.4"
+  checksum: 159b43ad57d2f963f1072def86080dd2a6dd42c1a86046e388d47b491e00afe795139520eb01c8dffc43ac0243c77b3c4c5882d0ec5f488bb3281f17458b1b3d
+  languageName: node
+  linkType: hard
+
 "pg-int8@npm:1.0.1":
   version: 1.0.1
   resolution: "pg-int8@npm:1.0.1"
   checksum: a1e3a05a69005ddb73e5f324b6b4e689868a447c5fa280b44cd4d04e6916a344ac289e0b8d2695d66e8e89a7fba023affb9e0e94778770ada5df43f003d664c9
+  languageName: node
+  linkType: hard
+
+"pg-listen@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "pg-listen@npm:1.7.0"
+  dependencies:
+    debug: ^4.1.1
+    pg-format: ^1.0.4
+    typed-emitter: ^0.1.0
+  peerDependencies:
+    pg: 7.x || 8.x
+  checksum: 900997272d939f0db073143e9b3d27871997deeb5d5fc5d8118fdc95cdbc2ae072e126290cfdea1b5755c1883332395eb67e93fdcf53a345e5121d063ef537c4
   languageName: node
   linkType: hard
 
@@ -4166,6 +4186,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typed-emitter@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "typed-emitter@npm:0.1.0"
+  checksum: b0878795f0443a14cdef7a7b2f87692637230a40dd35ce337f716e1a26f45ea3a929f339c7577afbe6974fcae587397f9b8599ea72ea3647bb5c01d2788633a9
+  languageName: node
+  linkType: hard
+
 "typescript-starter@workspace:.":
   version: 0.0.0-use.local
   resolution: "typescript-starter@workspace:."
@@ -4193,6 +4220,7 @@ __metadata:
     nodemon: ^2.0.19
     onchange: ^7.1.0
     pg: ^8.11.3
+    pg-listen: ^1.7.0
     postgraphile: ^4.13.0
     prettier: ^2.7.1
     rimraf: ^3.0.2

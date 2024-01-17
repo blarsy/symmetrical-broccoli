@@ -18,6 +18,13 @@ import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
 import { gql, useLazyQuery } from "@apollo/client"
 import { EditResourceContext } from "../EditResourceContextProvider"
+import { Link, NavigationHelpers, ParamListBase } from "@react-navigation/native"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import ViewResource from "../ViewResource"
+import SimpleBackHeader from "../layout/SimpleBackHeader"
+import Chat from "./Chat"
+
+const StackNav = createNativeStackNavigator()
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
@@ -99,7 +106,7 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
     </TouchableOpacity>
 }
 
-export default function Search ({ route, navigation }: RouteProps) {
+const SearchResults = ({ route, navigation }: RouteProps) => {
     const searchFilterContext = useContext(SearchFilterContext)
     const editResourceState = useContext(EditResourceContext)
     const [getSuggestedArticles, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
@@ -145,14 +152,28 @@ export default function Search ({ route, navigation }: RouteProps) {
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
                     categories: searchFilterContext.state.categories, 
                     options: values as any as SearchOptions })} />
-
             </View>
         </AccordionItem>
 
         <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={loading || editResourceState.state.categories.loading} error={error} data={data && data.suggestedResources && fromServerGraphResources(data.suggestedResources.nodes, editResourceState.state.categories.data!)}
-            displayItem={(resource, idx) => <ResourceCard 
-                key={idx} resource={resource as Resource} 
-                onChatOpen={() => navigation.navigate('chat', { resource })} 
-                onPress={() => navigation.navigate('viewResource', { resource })} />} />
+            displayItem={(res, idx) => {
+                const resource = res as Resource
+                return <ResourceCard 
+                    key={idx} resource={resource} 
+                    onChatOpen={() => navigation.navigate('chat', {
+                        screen: 'conversation',
+                        params: {
+                            resourceId: resource.id
+                        }
+                    })} 
+                    onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
+                }} />
     </ScrollView>
+}
+
+export default function Search ({ route, navigation }: RouteProps) {
+    return <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
+        <StackNav.Screen name="searchResults" component={SearchResults} options={{ headerShown: false }} />
+        <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
+    </StackNav.Navigator>
 }

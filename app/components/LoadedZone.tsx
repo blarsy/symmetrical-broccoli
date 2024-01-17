@@ -1,17 +1,18 @@
 import { StateError } from "@/lib/DataLoadState"
 import { t } from "i18next"
 import React from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, StyleProp, View, ViewStyle } from "react-native"
 import { Snackbar } from "react-native-paper"
 
-interface Props<T> {
+interface Props {
     loading: boolean,
     error?: StateError,
-    children: JSX.Element
+    children?: React.ReactNode,
+    containerStyle?: StyleProp<ViewStyle>
 }
 
-function LoadedZone<T>({ loading, error, children }: Props<T>) {
-    return <View style={{ flexDirection: 'column', paddingTop: 10, paddingBottom: 10 }}>
+function LoadedZone({ loading, error, children, containerStyle }: Props) {
+    return <View style={containerStyle || { flexDirection: 'column' }}>
         { loading && <ActivityIndicator /> }
         { !loading && !error && children }
         {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}

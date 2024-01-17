@@ -6,6 +6,7 @@ import { primaryColor } from "./layout/constants"
 import { AppContext } from "./AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { getLanguage } from "@/lib/utils"
+import { useNavigation } from "@react-navigation/native"
 
 interface Props {
     resourceId: number
@@ -54,6 +55,7 @@ const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: In
 
 const Conversation = ({ resourceId }: Props) => {
     const appContext = useContext(AppContext)
+    const navigation = useNavigation()
     const [ getMessages, { loading, error }] = useLazyQuery(CONVERSATION_MESSAGES)
     const [createMessage, { error: createError, loading: creating}] = useMutation(CREATE_MESSAGE)
     const [messages, setMessages] = useState([] as IMessage[])
@@ -65,7 +67,7 @@ const Conversation = ({ resourceId }: Props) => {
     }, [messages])
 
     const loadMessages = async () => {
-        const res = await getMessages({ variables: { resourceId }})
+        const res = await getMessages({ variables: { resourceId: new Number(resourceId) }})
 
         if(res.data) {
             const loadedMessages = asIMessages(res.data.conversationMessages.nodes)
@@ -77,9 +79,20 @@ const Conversation = ({ resourceId }: Props) => {
 
     useEffect(() => {
         loadMessages()
+        navigation.addListener('focus', () => appContext.actions.pushMessageReceivedHandler((msg: any) => {
+          const receivedMsg = asIMessage(msg)
+          setMessages(messages => {
+            GiftedChat.append(messages, [receivedMsg])
+            return [receivedMsg, ...messages]
+          })
+        }))
+        navigation.addListener('blur', () => appContext.actions.popMessageReceivedHandler())
+        return () => {
+            appContext.actions.popMessageReceivedHandler()
+        }
     }, [ resourceId ])
-    
-    return <View style={{ flex: 1, backgroundColor: 'transparent', paddingBottom: 20 }}>
+
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }}>
         <GiftedChat
             messages={messages || []}
             alwaysShowSend

@@ -22,7 +22,7 @@ export default ({ route, navigation }:RouteProps) => {
         }
     }, [])
 
-    return <View style={{ backgroundColor: '#fff' }}>
+    return <ScrollView style={{ backgroundColor: '#fff' }}>
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
@@ -61,5 +61,5 @@ export default ({ route, navigation }:RouteProps) => {
             </ScrollView>
         }}
         </Formik>
-    </View>
+    </ScrollView>
 }

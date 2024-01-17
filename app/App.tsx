@@ -27,4 +27,3 @@ function App() {
 AppRegistry.registerComponent("topela", () => App)
 
 export default App
-

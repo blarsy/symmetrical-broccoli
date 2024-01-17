@@ -1,7 +1,7 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
 import { Message } from "./schema"
-import { ApolloClient, ApolloError, InMemoryCache, createHttpLink, from, split } from "@apollo/client"
+import { ApolloClient, ApolloError, InMemoryCache, createHttpLink, from, gql, split } from "@apollo/client"
 import { apiUrl, subscriptionsUrl } from "./settings"
 import { setContext } from "@apollo/client/link/context"
 import { ErrorResponse, onError } from '@apollo/client/link/error'
@@ -135,3 +135,36 @@ export const getLanguage = (): string => {
   }
   return language
 }
+
+export const GET_RESOURCE = gql`query GetResource($id: Int!) {
+  resourceById(id: $id) {
+    accountByAccountId {
+      email
+      id
+      name
+    }
+    canBeDelivered
+    canBeExchanged
+    canBeGifted
+    canBeTakenAway
+    description
+    id
+    isProduct
+    isService
+    expiration
+    title
+    resourcesResourceCategoriesByResourceId {
+      nodes {
+        resourceCategoryCode
+      }
+    }
+    resourcesImagesByResourceId {
+      nodes {
+        imageByImageId {
+          publicId
+        }
+      }
+    }
+    created
+  }
+}`

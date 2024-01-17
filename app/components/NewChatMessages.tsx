@@ -2,50 +2,17 @@ import React, { useContext } from "react"
 import { View } from "react-native"
 import { List, IconButton } from "react-native-paper"
 import ListOf from "./ListOf"
-import { NewMessageData } from "@/lib/utils"
 import { AppContext } from "./AppContextProvider"
-import { gql, useLazyQuery } from "@apollo/client"
+import { useLazyQuery } from "@apollo/client"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import { EditResourceContext } from "./EditResourceContextProvider"
+import { GET_RESOURCE } from "@/lib/utils"
 
 interface Props {
     newMessages: any[]
     onRequestConversationOpen: (resource: Resource) => void
     onClose: () => void
 }
-
-const GET_RESOURCE = gql`query GetResource($id: Int!) {
-    resourceById(id: $id) {
-      accountByAccountId {
-        email
-        id
-        name
-      }
-      canBeDelivered
-      canBeExchanged
-      canBeGifted
-      canBeTakenAway
-      description
-      id
-      isProduct
-      isService
-      expiration
-      title
-      resourcesResourceCategoriesByResourceId {
-        nodes {
-          resourceCategoryCode
-        }
-      }
-      resourcesImagesByResourceId {
-        nodes {
-          imageByImageId {
-            publicId
-          }
-        }
-      }
-      created
-    }
-  }`
 
 const NewChatMessages = ({ newMessages, onRequestConversationOpen, onClose }: Props) => {
     const appContext = useContext(AppContext)

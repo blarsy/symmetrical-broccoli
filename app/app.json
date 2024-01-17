@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "Tope la",
-    "slug": "topela",
+    "slug": "tope-la",
+    "scheme": "topela",
     "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,6 +20,7 @@
       "bundleIdentifier": "com.topela"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ff4401"
@@ -29,11 +31,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c4e978e0-e2f9-4891-bef0-05d731dc5ffd"
+        "projectId": "484b7ec5-78c2-47e0-bc80-4f9182b4916a"
       }
     },
     "plugins": [
       "expo-localization"
-    ]
+    ],
+    "owner": "tope_la"
   }
 }
