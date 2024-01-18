@@ -17,7 +17,6 @@ interface AppState {
     messages: string[]
     processing: boolean
     numberOfUnread: number
-    messageReceivedStack: ((msg: any) => void)[]
 }
 
 interface AppActions {
@@ -37,6 +36,7 @@ interface AppActions {
 
 interface AppContext {
     state: AppState,
+    messageReceivedStack: ((msg: any) => void)[]
     actions: AppActions
 }
 
@@ -48,12 +48,12 @@ const emptyState: AppState = {
     token: '', 
     messages: [], 
     numberOfUnread: 0,
-    processing: false,
-    messageReceivedStack: []
+    processing: false
 }
 
 export const AppContext = createContext<AppContext>({
     state: emptyState, 
+    messageReceivedStack: [],
     actions: {
         loginComplete: async () => {},
         tryRestoreToken: () => Promise.resolve(),
@@ -80,6 +80,7 @@ const GET_SESSION_DATA = gql`query GetSessionData {
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
+    const [messageReceivedStack, setMessageReceivedStack] = useState([] as ((msg: any) => void)[])
     const [lastNotification, setLastNofication] = useState('')
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
@@ -95,9 +96,15 @@ const AppContextProvider = ({ children }: Props) => {
         })
     }
 
+    const setNewAppState = (newAppState: any) => {
+        const fullNewAppState = { ...appState, ...newAppState }
+        console.log('AppState changed', fullNewAppState)
+        setAppState(fullNewAppState)
+    }
+
     const logout = async () => {
         await AsyncStorage.removeItem('token')
-        setAppState({ ...appState, ...{ token: '', account: undefined } })
+        setNewAppState({ token: '', account: undefined })
     }
 
     const actions: AppActions = {
@@ -106,69 +113,69 @@ const AppContextProvider = ({ children }: Props) => {
 
             apolloTokenExpiredHandler.handle = () => { 
                 AsyncStorage.removeItem(TOKEN_KEY)
-                setAppState({ ...appState, ...{ token: '', account: undefined } })
+                setNewAppState({ token: '', account: undefined })
             }
             const authenticatedClient = getAuthenticatedApolloClient(token)
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
 
-            setAppState({ ...appState, ...{ token, account: {
+            setNewAppState({ token, account: {
                 id: res.data.getSessionData.accountId, name: res.data.getSessionData.name, email: res.data.getSessionData.email
-            }} })
+            }})
         },
         tryRestoreToken: async (): Promise<void> => {
             const token = await AsyncStorage.getItem('token')
             if(token) {
                 apolloTokenExpiredHandler.handle = () => { 
                     AsyncStorage.removeItem(TOKEN_KEY)
-                    setAppState({ ...appState, ...{ token: '', account: undefined } })
+                    setNewAppState({ token: '', account: undefined })
                 }
                 const authenticatedClient = getAuthenticatedApolloClient(token)
                 const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
 
                 const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
-                setAppState({ ...appState, ...{ token:token, account: {
+                setNewAppState({ token:token, account: {
                     id: sessionRes.data.getSessionData.accountId, name: sessionRes.data.getSessionData.name, email: sessionRes.data.getSessionData.email
-                }} })
+                }})
                 
             } else {
-                setTimeout(() => setAppState({ ...appState, ...{ token: '' } }), SPLASH_DELAY)
+                setTimeout(() => setNewAppState({ token: '' }), SPLASH_DELAY)
             }
         },
         accountUpdated: async (updatedAccount: Account) => {
-            setAppState({ ...appState, ...{ account: updatedAccount } })
+            setNewAppState({ account: updatedAccount })
         },
         logout,
         setMessage: (messageObj: any) => {
             let message: string
             if(messageObj instanceof Error) message = (messageObj as Error).stack!
             else message = messageObj as string
-            setAppState({ ...appState, ...{ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}: ${message}\n`] }})
+            setNewAppState({ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}: ${message}\n`] })
         },
         resetMessages: () => {
-            setAppState({ ...appState, ...{ messages: [] }})
+            setNewAppState({ ...appState, ...{ messages: [] }})
         },
         notify: setLastNofication,
         beginOp: () => {
-            setAppState({...appState, ...{ processing: true }})
+            setNewAppState({ processing: true })
         },
         endOp: () => {
-            setAppState({...appState, ...{ processing: false }})
+            setNewAppState({ processing: false })
         },
         endOpWithError: e => {
-            setAppState({...appState, ...{ processing: false }})
+            setNewAppState({ processing: false })
             setLastNofication(t('requestError'))
         },
         pushMessageReceivedHandler: handler => {
-            appState.messageReceivedStack.push(handler)
-            setAppState({ ...appState, ...{ messageReceivedStack: appState.messageReceivedStack } })
+            messageReceivedStack.push(handler)
+            setMessageReceivedStack(messageReceivedStack)
         },
         popMessageReceivedHandler: () => {
-            appState.messageReceivedStack.pop()
-            setAppState({ ...appState, ...{ messageReceivedStack: appState.messageReceivedStack } })
+            messageReceivedStack.pop()
+            setMessageReceivedStack(messageReceivedStack)
         }
     }
 
-    return <AppContext.Provider value={{ state: appState, actions}}>
+    return <AppContext.Provider value={{ state: appState, messageReceivedStack, actions}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
             <Snackbar visible={!!lastNotification} duration={4000} onDismiss={() => setLastNofication('')}>

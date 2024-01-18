@@ -18,11 +18,9 @@ import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
 import { gql, useLazyQuery } from "@apollo/client"
 import { EditResourceContext } from "../EditResourceContextProvider"
-import { Link, NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
-import Chat from "./Chat"
 
 const StackNav = createNativeStackNavigator()
 
@@ -36,8 +34,9 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
     </View>
 }
 
-const SUGGESTED_RESOURCES = gql`query SuggestedResources($isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
+const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: String, $isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
     suggestedResources(
+      searchTerm: $searchTerm
       canBeDelivered: $canBeDelivered
       canBeExchanged: $canBeExchanged
       canBeGifted: $canBeGifted
@@ -111,6 +110,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
     const editResourceState = useContext(EditResourceContext)
     const [getSuggestedArticles, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
         categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
+        searchTerm: searchFilterContext.state.search,
         ...searchFilterContext.state.options
     } })
 
@@ -119,6 +119,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
     useEffect(() => {
         getSuggestedArticles({ variables: {
             categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
+            searchTerm: searchFilterContext.state.search,
             ...searchFilterContext.state.options
         }})
     }, [debouncedFilters])

@@ -134,7 +134,7 @@ export default function Main () {
     const [syncPushToken] = useMutation(SYNC_PUSH_TOKEN)
 
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
-        appContext.state.messageReceivedStack[appContext.state.messageReceivedStack.length - 1](options.data.data.messageReceived.message)
+        appContext.messageReceivedStack[appContext.messageReceivedStack.length - 1](options.data.data.messageReceived.message)
     } })
 
     useEffect(() => {
@@ -168,9 +168,11 @@ export default function Main () {
         }}>
             <View style={{ flex: 1,alignItems: 'stretch', alignSelf: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
                 <StackNav.Navigator screenOptions={{ header: (props) => <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
-                        <Appbar.BackAction onPress={() => props.navigation.goBack()} />
+                        <Appbar.BackAction onPress={() => props.navigation.navigate('main')} />
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
-                        <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => appContext.actions.logout()} />
+                        <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => {
+                            appContext.actions.logout()
+                        }} />
                     </Appbar.Header> }}>
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />
                     <StackNav.Screen name="profile" component={Profile} key="profile"  />

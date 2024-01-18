@@ -446,6 +446,7 @@ type Query implements Node {
 
   """Reads and enables pagination through a set of `Resource`."""
   suggestedResources(
+    searchTerm: String
     isProduct: Boolean
     isService: Boolean
     canBeGifted: Boolean
