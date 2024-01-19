@@ -4626,14 +4626,14 @@ __metadata:
     dayjs: ^1.11.10
     eas-cli: ^5.2.0
     expo: ^49.0.21
-    expo-constants: ~14.4.2
+    expo-constants: ^15.4.5
     expo-dev-client: ~2.4.11
     expo-device: ~5.4.0
     expo-image-manipulator: ~11.3.0
     expo-image-picker: ~14.3.2
     expo-linking: ^6.0.0
     expo-localization: ~14.3.0
-    expo-modules-core: ^1.5.12
+    expo-modules-core: ^1.11.7
     expo-notifications: ~0.20.1
     expo-splash-screen: ~0.20.5
     expo-status-bar: ~1.6.0
@@ -7290,6 +7290,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-constants@npm:^15.4.5":
+  version: 15.4.5
+  resolution: "expo-constants@npm:15.4.5"
+  dependencies:
+    "@expo/config": ~8.5.0
+  peerDependencies:
+    expo: "*"
+  checksum: 2141ae97a484827f13fdd34c3e39a2a7b9a4ffa10d14428f7b91b252ffab316c997bc40149bac11bc920559496fc2f28bdb3064a24974abb25f47deec76d5e6a
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~14.4.2":
   version: 14.4.2
   resolution: "expo-constants@npm:14.4.2"
@@ -7532,12 +7543,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-modules-core@npm:^1.5.12":
-  version: 1.11.6
-  resolution: "expo-modules-core@npm:1.11.6"
+"expo-modules-core@npm:^1.11.7":
+  version: 1.11.7
+  resolution: "expo-modules-core@npm:1.11.7"
   dependencies:
     invariant: ^2.2.4
-  checksum: b3b07ff6180354d09e627c25c6151148f9880cbfeafb6d9c006d4bf8d904360290b6fa47b727cfbc7730b3efb8324d959116e58d64f84d2f841e82e642ddc838
+  checksum: 52bcf48ae49fca3b5de4a6fcf07250268d7e9eb6effeb5b368c2fc5b683c83746f3e2738cf19b0ae2d3af4e6ea398bf5f87ec324d28674639087962fabaa2243
   languageName: node
   linkType: hard
 

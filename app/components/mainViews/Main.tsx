@@ -13,8 +13,9 @@ import { AppContext } from '../AppContextProvider'
 import * as Linking from 'expo-linking'
 import { gql, useMutation, useSubscription } from '@apollo/client'
 import { registerForPushNotificationsAsync } from '@/lib/pushNotifications'
-import { addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
+import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../NewChatMessages'
+import * as Device from 'expo-device'
 
 const StackNav = createNativeStackNavigator()
 
@@ -60,12 +61,11 @@ const prefix = Linking.createURL('/')
 const getInitialURL = async () => {
     // First, you may want to do the default deep link handling
     // Check if app was opened from a deep link
-    // const url = await Linking.getInitialURL()
+    const url = await Linking.getInitialURL()
 
-    // if (url != null) {
-    //     console.log(`Initial Url from deep link config: ${url}`)
-    //     return url
-    // }
+    if (url != null) {
+        return url
+    }
 
     // Handle URL from expo push notifications
     const response = await getLastNotificationResponseAsync()
@@ -81,23 +81,24 @@ const subscribe = (listener: any) => {
     }
 
     // Listen to incoming links from deep linking
-    // const eventListenerSubscription = Linking.addEventListener('url', onReceiveURL)
+    const eventListenerSubscription = Linking.addEventListener('url', onReceiveURL)
 
-    // console.log('subscribed ...')
-
+    let subscription: Subscription | undefined = undefined
     // Listen to expo push notifications
-    const subscription = addNotificationResponseReceivedListener(response => {
-        const url = response.notification.request.content.data.url
-        console.log(`navigating to ${url}`)
-
-        // Let React Navigation handle the URL
-        listener(url)
-    })
+    //if(Device.isDevice && Device.brand) {
+        subscription = addNotificationResponseReceivedListener(response => {
+            const url = response.notification.request.content.data.url
+            console.log(`navigating to ${url}`)
+    
+            // Let React Navigation handle the URL
+            listener(url)
+        })
+    //}
 
     return () => {
         // Clean up the event listeners
-        //eventListenerSubscription.remove()
-        subscription.remove()
+        eventListenerSubscription.remove()
+        subscription?.remove()
     }
 }
 
@@ -117,7 +118,7 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
                         navigation.navigate('chat', {
                             screen: 'conversation',
                             params: {
-                                resourceId: resource.id
+                                resourceid: resource.id
                             }
                         })
                         onClose()
@@ -154,7 +155,11 @@ export default function Main () {
                 screens: {
                     main: {
                         screens: {
-                            chat: 'chat'
+                            chat: {
+                                screens: {
+                                    conversation: 'conversation'
+                                }
+                            }
                         }
                     },
                     profile: 'profile'

@@ -5,7 +5,7 @@ export interface PushNotification {
     data: object
 }
 
-export async function sendPushNotification(expoPushToken: string, message: PushNotification) {
+export async function sendPushNotification(messages: PushNotification[]) {
     await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {
@@ -13,6 +13,6 @@ export async function sendPushNotification(expoPushToken: string, message: PushN
         'Accept-encoding': 'gzip, deflate',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(message),
+      body: JSON.stringify(messages),
     })
 }

@@ -164,10 +164,10 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     onChatOpen={() => navigation.navigate('chat', {
                         screen: 'conversation',
                         params: {
-                            resourceId: resource.id
+                            resourceid: resource.id
                         }
                     })} 
-                    onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
+                    onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} />
                 }} />
     </ScrollView>
 }

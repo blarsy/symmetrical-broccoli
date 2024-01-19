@@ -82,7 +82,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
         <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
             onAddRequested={() => navigation.navigate('newResource')} 
             contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
-            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} key={idx} title={resource.title} 
+            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} key={idx} title={resource.title} 
                 titleNumberOfLines={1}
                 description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
                 left={() => <SmallResourceImage resource={resource} />}

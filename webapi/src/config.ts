@@ -14,6 +14,7 @@ export default {
     user: process.env.POSTGRES_USER || rawConfig.parsed?.POSTGRES_USER,
     mailApiKey: process.env.SENDGRID_API_KEY || rawConfig.parsed?.SENDGRID_API_KEY,
     production: process.env.NODE_ENV || rawConfig.parsed?.NODE_ENV === 'production',
+    pushNotificationsUrlPrefix: process.env.PUSH_NOTIFICATIONS_URL_PREFIX || rawConfig.parsed?.PUSH_NOTIFICATIONS_URL_PREFIX,
     noreplyEmail: process.env.NOREPLY_EMAIL || rawConfig.parsed?.NOREPLY_EMAIL,
     websiteUrl: process.env.PUBLIC_WEBSITE_URL || rawConfig.parsed?.PUBLIC_WEBSITE_URL,
     webAppUrl: process.env.TOPELA_WEBAPP_URL || rawConfig.parsed?.TOPELA_WEBAPP_URL,

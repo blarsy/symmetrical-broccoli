@@ -61,7 +61,7 @@ const Conversation = ({ resourceId }: Props) => {
     const [messages, setMessages] = useState([] as IMessage[])
 
     const onSend = useCallback(async (newMessages = [] as IMessage[]) => {
-        await Promise.all(newMessages.map(message => createMessage({ variables: { text: message.text, resourceId, imagePublicId: message.image } })))
+        await Promise.all(newMessages.map(message => createMessage({ variables: { text: message.text, resourceId: new Number(resourceId), imagePublicId: message.image } })))
 
         setMessages(prevMessages => GiftedChat.append(prevMessages, newMessages))
     }, [messages])

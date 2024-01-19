@@ -98,7 +98,6 @@ const AppContextProvider = ({ children }: Props) => {
 
     const setNewAppState = (newAppState: any) => {
         const fullNewAppState = { ...appState, ...newAppState }
-        console.log('AppState changed', fullNewAppState)
         setAppState(fullNewAppState)
     }
 

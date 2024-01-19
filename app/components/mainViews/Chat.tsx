@@ -5,7 +5,6 @@ import Conversation from "../Conversation"
 import PastConversations from "../PastConversations"
 import Images from "@/Images"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
-import { ScrollView } from "react-native-gesture-handler"
 import { NativeStackHeaderProps, createNativeStackNavigator } from "@react-navigation/native-stack"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import { ResourceImage } from "../MainResourceImage"
@@ -22,7 +21,7 @@ interface ChatHeaderProps extends NativeStackHeaderProps {
 
 const ChatHeader = (p: ChatHeaderProps) => {
     const editResourceContext = useContext(EditResourceContext)
-    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: (p.route.params! as any).resourceId }})
+    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number((p.route.params! as any).resourceid) }})
     let resource: Resource | undefined = undefined
     const exchangeTypes: string[] = []
     
@@ -48,7 +47,7 @@ const ChatHeader = (p: ChatHeaderProps) => {
 }
 
 const ChatBackground = ({ children }: { children: ReactNode }) => {
-    return <ScrollView style={{ display: 'flex', flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ flex: 1 }}>
+    return <View style={{ display: 'flex', flex: 1, backgroundColor: '#fff' }}>
     <Images.BackgroundChat fill={lightPrimaryColor} style={{
         position: 'absolute',
         top: 0,
@@ -58,15 +57,15 @@ const ChatBackground = ({ children }: { children: ReactNode }) => {
       }}
     />
     { children }
-</ScrollView>
+</View>
 }
 
 const ConversationsList = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <PastConversations onConversationSelected={resource => navigation.navigate('conversation', { resourceId: resource.id })} />
+    <PastConversations onConversationSelected={resource => navigation.navigate('conversation', { resourceid: resource.id })} />
 </ChatBackground>
 
 const ConversationDetail = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <Conversation resourceId={route.params.resourceId} />
+    <Conversation resourceId={route.params.resourceid} />
 </ChatBackground>
 
 const StackNav = createNativeStackNavigator()
