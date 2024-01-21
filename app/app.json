@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ff4401"
-      }
+      },
+      "package": "com.topela"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +37,7 @@
     },
     "plugins": [
       "expo-localization"
+
     ],
     "owner": "tope_la"
   }

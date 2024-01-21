@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940052967066",
+    "project_id": "topela-57ac8",
+    "storage_bucket": "topela-57ac8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940052967066:android:de5d0f7b8eda1d4141f923",
+        "android_client_info": {
+          "package_name": "com.topela"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBN8f_2n4IqhRykn77gSNmohODTZRYL5pk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

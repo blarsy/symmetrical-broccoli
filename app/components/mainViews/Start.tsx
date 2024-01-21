@@ -39,6 +39,7 @@ export default () => {
         fontSizeMedium = aboveMdWidth() ? 20 : 16
         fontSizeSmall = aboveMdWidth() ? 18 : 14
     }, [])
+
     if(restoringSession || !fontsLoaded) {
         return <Splash />
     }
