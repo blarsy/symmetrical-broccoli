@@ -42,6 +42,14 @@ export const getScreenSize = (): ScreenSize => {
     }
 }
 
+export const adaptToWidth = (sm: number, md: number, lg: number):number => {
+  switch(getScreenSize()) {
+    case ScreenSize.sm: return sm
+    case ScreenSize.md: return md
+    case ScreenSize.lg: return lg
+  }
+}
+
 export interface NewMessageData {
     message: Message
     resourceId: number
@@ -142,6 +150,9 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       email
       id
       name
+      imageByAvatarImageId {
+        publicId
+      }
     }
     canBeDelivered
     canBeExchanged

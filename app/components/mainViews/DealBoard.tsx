@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Appbar } from "react-native-paper"
+import React, { useContext, useState } from "react"
+import { Appbar, Avatar } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -12,6 +12,8 @@ import { appBarsTitleFontSize } from "@/lib/utils"
 import EditResourceContextProvider from "../EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
+import { AppContext } from "../AppContextProvider"
+import { urlFromPublicId } from "@/lib/images"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -29,6 +31,7 @@ const getViewTitleI18n = (screenName: string): string => {
 }
 
 const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
+    const appContext = useContext(AppContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
 
     return <EditResourceContextProvider>
@@ -36,7 +39,9 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
-                    <Appbar.Action style={{ backgroundColor: '#fff', borderRadius: 23 }} icon={Images.Profile} size={30} onPress={() => { navigation.navigate('profile')}} />
+                    <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff' }} 
+                        icon={appContext.state.account?.avatarPublicId ? p => <Avatar.Image size={54} source={{ uri:urlFromPublicId(appContext.state.account!.avatarPublicId!) }} /> : Images.Profile} 
+                        size={appContext.state.account!.avatarPublicId ? 54 : 30} onPress={() => { navigation.navigate('profile')}} />
                 </Appbar.Header>
                 <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
                     theme={{ colors: { secondaryContainer: lightPrimaryColor }}}

@@ -1,15 +1,18 @@
+import { urlFromPublicId } from "./images"
+
 export interface Account {
     name: string,
     id: number,
     email: string,
     hash?: string,
-    resources?: Resource[]
+    avatarImageUrl?: string
 }
 
 export interface AccountInfo {
     name: string
     id: number
     email: string
+    avatarPublicId: string
 }
 
 export interface ImageInfo {
@@ -60,18 +63,6 @@ export interface ConversationData {
     }
 }
 
-export interface AccountLinkRequest {
-    id: number,
-    requester: Account,
-    target: Account
-}
-
-export interface Network {
-    linkRequests: Account[], 
-    linkedAccounts: Account[], 
-    receivedLinkRequests: Account[]
-}
-
 export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
@@ -88,6 +79,8 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         images
 } as Resource
 }
+
+
 
 export const fromServerGraphResources = (data: any[], categories: Category[]): Resource[] => {
     return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories))
@@ -115,6 +108,7 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                         id: rawConversation.resourceByResourceId.accountByAccountId.id,
                         name: rawConversation.resourceByResourceId.accountByAccountId.name,
                         email: rawConversation.resourceByResourceId.accountByAccountId.email,
+                        avatarImageUrl: rawConversation.resourceByResourceId.accountByAccountId.imageByAvatarImageId ? urlFromPublicId(rawConversation.resourceByResourceId.accountByAccountId.imageByAvatarImageId.publicId) : undefined
                     },
                     //Following values are not used, so just give them some default values
                     canBeDelivered: false,
@@ -130,6 +124,7 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                 id: otherParticipant.accountByAccountId.id,
                 email: otherParticipant.accountByAccountId.email,
                 name: otherParticipant.accountByAccountId.name,
+                avatarImageUrl: otherParticipant.accountByAccountId.imageByAvatarImageId ? urlFromPublicId(otherParticipant.accountByAccountId.imageByAvatarImageId.publicId) : undefined
             }
         })
     })

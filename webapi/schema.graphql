@@ -561,6 +561,10 @@ type Account implements Node {
   recoveryCode: String
   recoveryCodeExpiration: Datetime
   created: Datetime!
+  avatarImageId: Int
+
+  """Reads a single `Image` that is related to this `Account`."""
+  imageByAvatarImageId: Image
 
   """Reads and enables pagination through a set of `Resource`."""
   resourcesByAccountId(
@@ -656,46 +660,17 @@ A point in time as described by the [ISO
 """
 scalar Datetime
 
-"""A connection to a list of `Resource` values."""
-type ResourcesConnection {
-  """A list of `Resource` objects."""
-  nodes: [Resource!]!
-
-  """
-  A list of edges which contains the `Resource` and cursor to aid in pagination.
-  """
-  edges: [ResourcesEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Resource` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Resource implements Node {
+type Image implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: Int!
-  title: String!
-  description: String!
-  expiration: Datetime!
-  accountId: Int!
+  publicId: String!
   created: Datetime!
-  isService: Boolean!
-  isProduct: Boolean!
-  canBeDelivered: Boolean!
-  canBeTakenAway: Boolean!
-  canBeExchanged: Boolean!
-  canBeGifted: Boolean!
 
-  """Reads a single `Account` that is related to this `Resource`."""
-  accountByAccountId: Account
-
-  """Reads and enables pagination through a set of `Conversation`."""
-  conversationsByResourceId(
+  """Reads and enables pagination through a set of `Account`."""
+  accountsByAvatarImageId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -714,17 +689,46 @@ type Resource implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering `Conversation`."""
-    orderBy: [ConversationsOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `Account`."""
+    orderBy: [AccountsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: ConversationCondition
-  ): ConversationsConnection!
+    condition: AccountCondition
+  ): AccountsConnection!
+
+  """Reads and enables pagination through a set of `Message`."""
+  messagesByImageId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Message`."""
+    orderBy: [MessagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MessageCondition
+  ): MessagesConnection!
 
   """Reads and enables pagination through a set of `ResourcesImage`."""
-  resourcesImagesByResourceId(
+  resourcesImagesByImageId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -751,100 +755,83 @@ type Resource implements Node {
     """
     condition: ResourcesImageCondition
   ): ResourcesImagesConnection!
-
-  """
-  Reads and enables pagination through a set of `ResourcesResourceCategory`.
-  """
-  resourcesResourceCategoriesByResourceId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `ResourcesResourceCategory`."""
-    orderBy: [ResourcesResourceCategoriesOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ResourcesResourceCategoryCondition
-  ): ResourcesResourceCategoriesConnection!
 }
 
-"""A connection to a list of `Conversation` values."""
-type ConversationsConnection {
-  """A list of `Conversation` objects."""
-  nodes: [Conversation!]!
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Methods to use when ordering `Account`."""
+enum AccountsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  HASH_ASC
+  HASH_DESC
+  SALT_ASC
+  SALT_DESC
+  RECOVERY_CODE_ASC
+  RECOVERY_CODE_DESC
+  RECOVERY_CODE_EXPIRATION_ASC
+  RECOVERY_CODE_EXPIRATION_DESC
+  CREATED_ASC
+  CREATED_DESC
+  AVATAR_IMAGE_ID_ASC
+  AVATAR_IMAGE_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Account` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input AccountCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `hash` field."""
+  hash: String
+
+  """Checks for equality with the object’s `salt` field."""
+  salt: String
+
+  """Checks for equality with the object’s `recoveryCode` field."""
+  recoveryCode: String
+
+  """Checks for equality with the object’s `recoveryCodeExpiration` field."""
+  recoveryCodeExpiration: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `avatarImageId` field."""
+  avatarImageId: Int
+}
+
+"""A connection to a list of `Message` values."""
+type MessagesConnection {
+  """A list of `Message` objects."""
+  nodes: [Message!]!
 
   """
-  A list of edges which contains the `Conversation` and cursor to aid in pagination.
+  A list of edges which contains the `Message` and cursor to aid in pagination.
   """
-  edges: [ConversationsEdge!]!
+  edges: [MessagesEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Conversation` you could get from the connection."""
+  """The count of *all* `Message` you could get from the connection."""
   totalCount: Int!
-}
-
-type Conversation implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  resourceId: Int!
-  lastMessage: Int
-  created: Datetime!
-
-  """Reads a single `Resource` that is related to this `Conversation`."""
-  resourceByResourceId: Resource
-
-  """Reads a single `Message` that is related to this `Conversation`."""
-  messageByLastMessage: Message
-
-  """Reads and enables pagination through a set of `Participant`."""
-  participantsByConversationId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Participant`."""
-    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParticipantCondition
-  ): ParticipantsConnection!
 }
 
 type Message implements Node {
@@ -999,34 +986,188 @@ type Participant implements Node {
   ): UnreadMessagesConnection!
 }
 
-"""A connection to a list of `Message` values."""
-type MessagesConnection {
-  """A list of `Message` objects."""
-  nodes: [Message!]!
+type Conversation implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  resourceId: Int!
+  lastMessage: Int
+  created: Datetime!
+
+  """Reads a single `Resource` that is related to this `Conversation`."""
+  resourceByResourceId: Resource
+
+  """Reads a single `Message` that is related to this `Conversation`."""
+  messageByLastMessage: Message
+
+  """Reads and enables pagination through a set of `Participant`."""
+  participantsByConversationId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection!
+}
+
+type Resource implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  title: String!
+  description: String!
+  expiration: Datetime!
+  accountId: Int!
+  created: Datetime!
+  isService: Boolean!
+  isProduct: Boolean!
+  canBeDelivered: Boolean!
+  canBeTakenAway: Boolean!
+  canBeExchanged: Boolean!
+  canBeGifted: Boolean!
+
+  """Reads a single `Account` that is related to this `Resource`."""
+  accountByAccountId: Account
+
+  """Reads and enables pagination through a set of `Conversation`."""
+  conversationsByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Conversation`."""
+    orderBy: [ConversationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConversationCondition
+  ): ConversationsConnection!
+
+  """Reads and enables pagination through a set of `ResourcesImage`."""
+  resourcesImagesByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesImage`."""
+    orderBy: [ResourcesImagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesImageCondition
+  ): ResourcesImagesConnection!
 
   """
-  A list of edges which contains the `Message` and cursor to aid in pagination.
+  Reads and enables pagination through a set of `ResourcesResourceCategory`.
   """
-  edges: [MessagesEdge!]!
+  resourcesResourceCategoriesByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesResourceCategory`."""
+    orderBy: [ResourcesResourceCategoriesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesResourceCategoryCondition
+  ): ResourcesResourceCategoriesConnection!
+}
+
+"""A connection to a list of `Conversation` values."""
+type ConversationsConnection {
+  """A list of `Conversation` objects."""
+  nodes: [Conversation!]!
+
+  """
+  A list of edges which contains the `Conversation` and cursor to aid in pagination.
+  """
+  edges: [ConversationsEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Message` you could get from the connection."""
+  """The count of *all* `Conversation` you could get from the connection."""
   totalCount: Int!
 }
 
-"""A `Message` edge in the connection."""
-type MessagesEdge {
+"""A `Conversation` edge in the connection."""
+type ConversationsEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Message` at the end of the edge."""
-  node: Message!
+  """The `Conversation` at the end of the edge."""
+  node: Conversation!
 }
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
 
 """Information about pagination in a connection."""
 type PageInfo {
@@ -1041,6 +1182,227 @@ type PageInfo {
 
   """When paginating forwards, the cursor to continue."""
   endCursor: Cursor
+}
+
+"""Methods to use when ordering `Conversation`."""
+enum ConversationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  LAST_MESSAGE_ASC
+  LAST_MESSAGE_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Conversation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ConversationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `lastMessage` field."""
+  lastMessage: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ResourcesImage` values."""
+type ResourcesImagesConnection {
+  """A list of `ResourcesImage` objects."""
+  nodes: [ResourcesImage!]!
+
+  """
+  A list of edges which contains the `ResourcesImage` and cursor to aid in pagination.
+  """
+  edges: [ResourcesImagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ResourcesImage` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ResourcesImage {
+  resourceId: Int!
+  imageId: Int!
+  created: Datetime!
+
+  """Reads a single `Resource` that is related to this `ResourcesImage`."""
+  resourceByResourceId: Resource
+
+  """Reads a single `Image` that is related to this `ResourcesImage`."""
+  imageByImageId: Image
+}
+
+"""A `ResourcesImage` edge in the connection."""
+type ResourcesImagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourcesImage` at the end of the edge."""
+  node: ResourcesImage!
+}
+
+"""Methods to use when ordering `ResourcesImage`."""
+enum ResourcesImagesOrderBy {
+  NATURAL
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  IMAGE_ID_ASC
+  IMAGE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+}
+
+"""
+A condition to be used against `ResourcesImage` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ResourcesImageCondition {
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `imageId` field."""
+  imageId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ResourcesResourceCategory` values."""
+type ResourcesResourceCategoriesConnection {
+  """A list of `ResourcesResourceCategory` objects."""
+  nodes: [ResourcesResourceCategory!]!
+
+  """
+  A list of edges which contains the `ResourcesResourceCategory` and cursor to aid in pagination.
+  """
+  edges: [ResourcesResourceCategoriesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ResourcesResourceCategory` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type ResourcesResourceCategory {
+  resourceId: Int!
+  created: Datetime!
+  resourceCategoryCode: String!
+
+  """
+  Reads a single `Resource` that is related to this `ResourcesResourceCategory`.
+  """
+  resourceByResourceId: Resource
+}
+
+"""A `ResourcesResourceCategory` edge in the connection."""
+type ResourcesResourceCategoriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourcesResourceCategory` at the end of the edge."""
+  node: ResourcesResourceCategory!
+}
+
+"""Methods to use when ordering `ResourcesResourceCategory`."""
+enum ResourcesResourceCategoriesOrderBy {
+  NATURAL
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  RESOURCE_CATEGORY_CODE_ASC
+  RESOURCE_CATEGORY_CODE_DESC
+}
+
+"""
+A condition to be used against `ResourcesResourceCategory` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input ResourcesResourceCategoryCondition {
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `resourceCategoryCode` field."""
+  resourceCategoryCode: String
+}
+
+"""A connection to a list of `Participant` values."""
+type ParticipantsConnection {
+  """A list of `Participant` objects."""
+  nodes: [Participant!]!
+
+  """
+  A list of edges which contains the `Participant` and cursor to aid in pagination.
+  """
+  edges: [ParticipantsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Participant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Participant` edge in the connection."""
+type ParticipantsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Participant` at the end of the edge."""
+  node: Participant!
+}
+
+"""Methods to use when ordering `Participant`."""
+enum ParticipantsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  CONVERSATION_ID_ASC
+  CONVERSATION_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Participant` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ParticipantCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `conversationId` field."""
+  conversationId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
 }
 
 """Methods to use when ordering `Message`."""
@@ -1149,302 +1511,30 @@ input UnreadMessageCondition {
   created: Datetime
 }
 
-type Image implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  publicId: String!
-  created: Datetime!
+"""A `Message` edge in the connection."""
+type MessagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """Reads and enables pagination through a set of `Message`."""
-  messagesByImageId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Message`."""
-    orderBy: [MessagesOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MessageCondition
-  ): MessagesConnection!
-
-  """Reads and enables pagination through a set of `ResourcesImage`."""
-  resourcesImagesByImageId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `ResourcesImage`."""
-    orderBy: [ResourcesImagesOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ResourcesImageCondition
-  ): ResourcesImagesConnection!
+  """The `Message` at the end of the edge."""
+  node: Message!
 }
 
-"""A connection to a list of `ResourcesImage` values."""
-type ResourcesImagesConnection {
-  """A list of `ResourcesImage` objects."""
-  nodes: [ResourcesImage!]!
+"""A connection to a list of `Resource` values."""
+type ResourcesConnection {
+  """A list of `Resource` objects."""
+  nodes: [Resource!]!
 
   """
-  A list of edges which contains the `ResourcesImage` and cursor to aid in pagination.
+  A list of edges which contains the `Resource` and cursor to aid in pagination.
   """
-  edges: [ResourcesImagesEdge!]!
+  edges: [ResourcesEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `ResourcesImage` you could get from the connection."""
+  """The count of *all* `Resource` you could get from the connection."""
   totalCount: Int!
-}
-
-type ResourcesImage {
-  resourceId: Int!
-  imageId: Int!
-  created: Datetime!
-
-  """Reads a single `Resource` that is related to this `ResourcesImage`."""
-  resourceByResourceId: Resource
-
-  """Reads a single `Image` that is related to this `ResourcesImage`."""
-  imageByImageId: Image
-}
-
-"""A `ResourcesImage` edge in the connection."""
-type ResourcesImagesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ResourcesImage` at the end of the edge."""
-  node: ResourcesImage!
-}
-
-"""Methods to use when ordering `ResourcesImage`."""
-enum ResourcesImagesOrderBy {
-  NATURAL
-  RESOURCE_ID_ASC
-  RESOURCE_ID_DESC
-  IMAGE_ID_ASC
-  IMAGE_ID_DESC
-  CREATED_ASC
-  CREATED_DESC
-}
-
-"""
-A condition to be used against `ResourcesImage` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input ResourcesImageCondition {
-  """Checks for equality with the object’s `resourceId` field."""
-  resourceId: Int
-
-  """Checks for equality with the object’s `imageId` field."""
-  imageId: Int
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-}
-
-"""Methods to use when ordering `Conversation`."""
-enum ConversationsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  RESOURCE_ID_ASC
-  RESOURCE_ID_DESC
-  LAST_MESSAGE_ASC
-  LAST_MESSAGE_DESC
-  CREATED_ASC
-  CREATED_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-A condition to be used against `Conversation` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input ConversationCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `resourceId` field."""
-  resourceId: Int
-
-  """Checks for equality with the object’s `lastMessage` field."""
-  lastMessage: Int
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-}
-
-"""A connection to a list of `Participant` values."""
-type ParticipantsConnection {
-  """A list of `Participant` objects."""
-  nodes: [Participant!]!
-
-  """
-  A list of edges which contains the `Participant` and cursor to aid in pagination.
-  """
-  edges: [ParticipantsEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Participant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Participant` edge in the connection."""
-type ParticipantsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Participant` at the end of the edge."""
-  node: Participant!
-}
-
-"""Methods to use when ordering `Participant`."""
-enum ParticipantsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  ACCOUNT_ID_ASC
-  ACCOUNT_ID_DESC
-  CONVERSATION_ID_ASC
-  CONVERSATION_ID_DESC
-  CREATED_ASC
-  CREATED_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-A condition to be used against `Participant` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input ParticipantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `accountId` field."""
-  accountId: Int
-
-  """Checks for equality with the object’s `conversationId` field."""
-  conversationId: Int
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-}
-
-"""A `Conversation` edge in the connection."""
-type ConversationsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Conversation` at the end of the edge."""
-  node: Conversation!
-}
-
-"""A connection to a list of `ResourcesResourceCategory` values."""
-type ResourcesResourceCategoriesConnection {
-  """A list of `ResourcesResourceCategory` objects."""
-  nodes: [ResourcesResourceCategory!]!
-
-  """
-  A list of edges which contains the `ResourcesResourceCategory` and cursor to aid in pagination.
-  """
-  edges: [ResourcesResourceCategoriesEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `ResourcesResourceCategory` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type ResourcesResourceCategory {
-  resourceId: Int!
-  created: Datetime!
-  resourceCategoryCode: String!
-
-  """
-  Reads a single `Resource` that is related to this `ResourcesResourceCategory`.
-  """
-  resourceByResourceId: Resource
-}
-
-"""A `ResourcesResourceCategory` edge in the connection."""
-type ResourcesResourceCategoriesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ResourcesResourceCategory` at the end of the edge."""
-  node: ResourcesResourceCategory!
-}
-
-"""Methods to use when ordering `ResourcesResourceCategory`."""
-enum ResourcesResourceCategoriesOrderBy {
-  NATURAL
-  RESOURCE_ID_ASC
-  RESOURCE_ID_DESC
-  CREATED_ASC
-  CREATED_DESC
-  RESOURCE_CATEGORY_CODE_ASC
-  RESOURCE_CATEGORY_CODE_DESC
-}
-
-"""
-A condition to be used against `ResourcesResourceCategory` object types. All
-fields are tested for equality and combined with a logical ‘and.’
-"""
-input ResourcesResourceCategoryCondition {
-  """Checks for equality with the object’s `resourceId` field."""
-  resourceId: Int
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-
-  """Checks for equality with the object’s `resourceCategoryCode` field."""
-  resourceCategoryCode: String
 }
 
 """A `Resource` edge in the connection."""
@@ -1611,58 +1701,6 @@ type AccountsEdge {
 
   """The `Account` at the end of the edge."""
   node: Account!
-}
-
-"""Methods to use when ordering `Account`."""
-enum AccountsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  HASH_ASC
-  HASH_DESC
-  SALT_ASC
-  SALT_DESC
-  RECOVERY_CODE_ASC
-  RECOVERY_CODE_DESC
-  RECOVERY_CODE_EXPIRATION_ASC
-  RECOVERY_CODE_EXPIRATION_DESC
-  CREATED_ASC
-  CREATED_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-A condition to be used against `Account` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input AccountCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `email` field."""
-  email: String
-
-  """Checks for equality with the object’s `hash` field."""
-  hash: String
-
-  """Checks for equality with the object’s `salt` field."""
-  salt: String
-
-  """Checks for equality with the object’s `recoveryCode` field."""
-  recoveryCode: String
-
-  """Checks for equality with the object’s `recoveryCodeExpiration` field."""
-  recoveryCodeExpiration: Datetime
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
 }
 
 """A connection to a list of `Image` values."""
@@ -1840,6 +1878,7 @@ type SessionDatum {
   name: String
   email: String
   role: String
+  avatarPublicId: String
 }
 
 """
@@ -2388,6 +2427,7 @@ input UpdateAccountInput {
   clientMutationId: String
   name: String
   email: String
+  avatarPublicId: String
 }
 
 """The output of our `updateResource` mutation."""

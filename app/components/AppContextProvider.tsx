@@ -75,6 +75,7 @@ const GET_SESSION_DATA = gql`query GetSessionData {
       accountId
       email
       name
+      avatarPublicId
     }
   }`
 
@@ -118,7 +119,10 @@ const AppContextProvider = ({ children }: Props) => {
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
 
             setNewAppState({ token, account: {
-                id: res.data.getSessionData.accountId, name: res.data.getSessionData.name, email: res.data.getSessionData.email
+                id: res.data.getSessionData.accountId, 
+                name: res.data.getSessionData.name, 
+                email: res.data.getSessionData.email, 
+                avatarPublicId: res.data.getSessionData.avatarPublicId
             }})
         },
         tryRestoreToken: async (): Promise<void> => {
@@ -133,7 +137,10 @@ const AppContextProvider = ({ children }: Props) => {
 
                 const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
                 setNewAppState({ token:token, account: {
-                    id: sessionRes.data.getSessionData.accountId, name: sessionRes.data.getSessionData.name, email: sessionRes.data.getSessionData.email
+                    id: sessionRes.data.getSessionData.accountId,
+                    name: sessionRes.data.getSessionData.name, 
+                    email: sessionRes.data.getSessionData.email, 
+                    avatarPublicId: sessionRes.data.getSessionData.avatarPublicId
                 }})
                 
             } else {
