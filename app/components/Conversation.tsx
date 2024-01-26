@@ -1,12 +1,13 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { View } from "react-native"
-import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
+import { Avatar, GiftedChat, IMessage, Send } from "react-native-gifted-chat"
 import { Icon, Portal, Snackbar } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 import { AppContext } from "./AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { getLanguage } from "@/lib/utils"
 import { useNavigation } from "@react-navigation/native"
+import { urlFromPublicId } from "@/lib/images"
 
 interface Props {
     resourceId: number
@@ -20,7 +21,10 @@ const asIMessage = (msg: any): IMessage => ({
     createdAt: msg.created,
     user: {
         _id: msg.participantByParticipantId.accountByAccountId.id,
-        name: msg.participantByParticipantId.accountByAccountId.name
+        name: msg.participantByParticipantId.accountByAccountId.name,
+        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId ?
+          urlFromPublicId(msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId.publicId):
+          undefined
     },
     pending: false,
     received: !!msg.received,
@@ -39,6 +43,9 @@ const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int) {
           accountByAccountId {
             id
             name
+            imageByAvatarImageId {
+              publicId
+            }
           }
         }
       }
@@ -100,7 +107,8 @@ const Conversation = ({ resourceId }: Props) => {
             isLoadingEarlier={loading}
             user={{
                 _id: appContext.state.account?.id!,
-                name: appContext.state.account?.name
+                name: appContext.state.account?.name,
+                avatar: appContext.state.account?.avatarPublicId ? urlFromPublicId(appContext.state.account.avatarPublicId) : undefined
             }}
             locale={getLanguage()}
             renderSend={p => <Send {...p} containerStyle={{

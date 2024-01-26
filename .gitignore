@@ -42,4 +42,3 @@ app/android/app/*.keystore
 /webapi/build
 /build
 /build.zip
-google-services.json

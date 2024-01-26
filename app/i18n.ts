@@ -37,7 +37,6 @@ const resources = {
       "cancel_caption": "Cancel",
       "ok_caption": "Ok",
       "editProfileMenuTitle": "Account",
-      "friendsMenuTitle": "Network",
       "requestError": "Error while processing request",
       "noData": "No data",
       "back": "Back",
@@ -84,7 +83,8 @@ const resources = {
       "change_password_label": "Change password",
       "success_message": "Operation successful",
       "password_changed_message": "Password change successful",
-      "recover_label": "Restore"
+      "recover_label": "Restore",
+      "modify_logo": "Modify logo"
     }
   },
   fr: {
@@ -119,7 +119,6 @@ const resources = {
       "cancel_caption": "Annuler",
       "ok_caption": "Ok",
       "editProfileMenuTitle": "Compte",
-      "friendsMenuTitle": "Réseau",
       "requestError": "Erreur pendant l'exécution de la requête",
       "noData": "Pas de donnée",
       "back": "Retour",
@@ -166,7 +165,8 @@ const resources = {
       "change_password_label": "Changer le mot de passe",
       "success_message": "Operation réussie",
       "password_changed_message": "Mot de passe changé",
-      "recover_label": "Restaurer"
+      "recover_label": "Restaurer",
+      "modify_logo": "Modifier le logo"
     }
   }
 }

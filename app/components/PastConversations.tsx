@@ -28,6 +28,9 @@ const MY_CONVERSATIONS = gql`query MyConversations {
               id
               name
               email
+              imageByAvatarImageId {
+                publicId
+              }
             }
           }
         }
@@ -40,6 +43,9 @@ const MY_CONVERSATIONS = gql`query MyConversations {
             name
             id
             email
+            imageByAvatarImageId {
+              publicId
+            }
           }
           resourcesImagesByResourceId {
             nodes {
