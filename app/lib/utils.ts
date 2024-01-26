@@ -25,6 +25,10 @@ export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdS
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
 export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
 
+export const fontSizeLarge =  aboveMdWidth() ? 24 : 20
+export const fontSizeMedium = aboveMdWidth() ? 20 : 16
+export const fontSizeSmall = aboveMdWidth() ? 18 : 14
+
 export enum ScreenSize {
     sm,
     md,

@@ -8,12 +8,8 @@ import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { ActivityIndicator, Modal, PaperProvider, Portal, Snackbar, Text, configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { aboveMdWidth, getAuthenticatedApolloClient } from "@/lib/utils"
+import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient } from "@/lib/utils"
 import { ApolloProvider } from "@apollo/client"
-
-export let fontSizeLarge = 20
-export let fontSizeMedium = 16
-export let fontSizeSmall = 14
 
 export default () => {
     const { t } = i18n
@@ -35,9 +31,6 @@ export default () => {
 
     useEffect(() => {
         load()
-        fontSizeLarge =  aboveMdWidth() ? 24 : 20
-        fontSizeMedium = aboveMdWidth() ? 20 : 16
-        fontSizeSmall = aboveMdWidth() ? 18 : 14
     }, [])
 
     if(restoringSession || !fontsLoaded) {
