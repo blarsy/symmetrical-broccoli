@@ -37,6 +37,8 @@ LEFT JOIN sb.images i ON a.avatar_image_id = i.id
 WHERE a.id = (SELECT NULLIF(current_setting('jwt.claims.account_id', true), '')::integer)
 $BODY$;
 
+DROP FUNCTION IF EXISTS sb.update_account(character varying, character varying);
+
 CREATE OR REPLACE FUNCTION sb.update_account(
 	name character varying,
 	email character varying,
@@ -47,7 +49,7 @@ CREATE OR REPLACE FUNCTION sb.update_account(
     VOLATILE SECURITY DEFINER PARALLEL UNSAFE
 AS $BODY$
 begin
-	IF avatar_public_id IS NOT NULL AND NOT EXISTS (SELECT * FROM sb.accounts a LEFT JOIN sb.images i ON a.avatar_image_id = i.id WHERE a.id = sb.current_account_id AND i.public_id = avatar_public_id) THEN
+	IF avatar_public_id IS NOT NULL AND NOT EXISTS (SELECT * FROM sb.accounts a LEFT JOIN sb.images i ON a.avatar_image_id = i.id WHERE a.id = sb.current_account_id() AND i.public_id = avatar_public_id) THEN
 		INSERT INTO sb.images (public_id) VALUES (avatar_public_id);
 	END IF;
 	UPDATE sb.accounts
