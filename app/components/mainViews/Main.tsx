@@ -6,7 +6,7 @@ import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import Profile from './Profile'
 import DealBoard from './DealBoard'
-import { Appbar, Portal, Snackbar } from 'react-native-paper'
+import { Appbar, Banner, Button, Portal, Snackbar, Text } from 'react-native-paper'
 import Container from '../layout/Container'
 import { adaptHeight, appBarsTitleFontSize } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
@@ -15,7 +15,6 @@ import { gql, useMutation, useSubscription } from '@apollo/client'
 import { registerForPushNotificationsAsync } from '@/lib/pushNotifications'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../NewChatMessages'
-import * as Device from 'expo-device'
 
 const StackNav = createNativeStackNavigator()
 
@@ -54,6 +53,12 @@ const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
                 }
             }
         }
+    }
+}`
+
+const SEND_AGAIN = gql`mutation SendAgain {
+    sendActivationAgain(input: {}) {
+        integer
     }
 }`
 
@@ -108,6 +113,7 @@ interface ChatMessagesNotificationAreaProps {
 }
 
 const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotificationAreaProps) => {
+    const appContext = useContext(AppContext)
     const navigation = useNavigation()
     return <Portal>
         <Snackbar visible={!!newMessage} onDismiss={onClose} duration={6000}
@@ -118,7 +124,8 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
                         navigation.navigate('chat', {
                             screen: 'conversation',
                             params: {
-                                resourceid: resource.id
+                                resourceid: resource.id,
+                                otherResourceId: appContext.state.account!.id
                             }
                         })
                         onClose()
@@ -131,6 +138,7 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 export default function Main () {
     const appContext = useContext(AppContext)
     const [newMessage, setNewMessage] = useState(undefined as any | undefined)
+    const [sendAgain, { loading: sending}] = useMutation(SEND_AGAIN)
 
     const [syncPushToken] = useMutation(SYNC_PUSH_TOKEN)
 
@@ -147,6 +155,19 @@ export default function Main () {
     }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
+        <Banner visible={!!appContext.state.account && !appContext.state.account.activated} style={{ alignSelf: 'stretch' }}>
+            <View style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center' }}>
+                <Text style={{ textAlign: 'center' }}>{t('activate_account', { email: appContext.state.account!.email })}</Text>
+                <Button loading={sending} style={{ marginHorizontal: 5, borderRadius: 5 }} mode='outlined' labelStyle={{ margin: 3 }} onPress={async () => {
+                        try {
+                            await sendAgain()
+                        } catch(e) {
+                            appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
+                        }
+                    }}><Text variant='displaySmall'>{t('send_activation_mail_again_button')}</Text>
+                </Button>
+            </View>
+        </Banner>
         <NavigationContainer linking={{
             prefixes: [prefix],
             getInitialURL,

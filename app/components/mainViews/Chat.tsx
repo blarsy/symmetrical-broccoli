@@ -60,11 +60,11 @@ const ChatBackground = ({ children }: { children: ReactNode }) => {
 }
 
 const ConversationsList = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <PastConversations onConversationSelected={resource => navigation.navigate('conversation', { resourceid: resource.id })} />
+    <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceid: resource.id, otherAccountId })} />
 </ChatBackground>
 
 const ConversationDetail = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <Conversation resourceId={route.params.resourceid} />
+    <Conversation resourceId={route.params.resourceid} otherAccountId={route.params.otherAccountId} />
 </ChatBackground>
 
 const StackNav = createNativeStackNavigator()

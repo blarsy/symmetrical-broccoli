@@ -16,7 +16,7 @@ export default function Profile () {
             alignSelf: "stretch", gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {
-                    if(success) appContext.actions.notify(t('password_changed_message'))
+                    if(success) appContext.actions.notify({ message: t('password_changed_message') })
                     setChangingPassword(false)
                 }}/> : 
                 <View>

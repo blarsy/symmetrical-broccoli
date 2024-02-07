@@ -13,6 +13,7 @@ export interface AccountInfo {
     id: number
     email: string
     avatarPublicId: string
+    activated: Date
 }
 
 export interface ImageInfo {

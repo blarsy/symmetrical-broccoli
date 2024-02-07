@@ -4,11 +4,12 @@ import { View } from "react-native"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
 import { AppContext } from "@/components/AppContextProvider"
-import { Button, Portal, Snackbar } from "react-native-paper"
+import { Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
+import { ErrorSnackbar } from "../OperationFeedback"
 
 interface Props {
     toggleRegistering: () => void,
@@ -23,18 +24,22 @@ const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
 
 const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
     const appContext = useContext(AppContext)
-    const [authenticate, {data, loading, error}] = useMutation(GET_JWT)
-    const [authFailed, setAuthFailed] = useState(false)
+    const [authenticate, {loading}] = useMutation(GET_JWT)
+    const [authError, setAuthError] = useState(undefined as Error|undefined)
 
     return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
         password: yup.string().required(t('field_required'))
     })} onSubmit={async (values) => {
-        const res = await authenticate({variables: { email: values.email, password: values.password }})
-        if(res.data && res.data.authenticate.jwtToken) {
-            appContext.actions.loginComplete(res.data.authenticate.jwtToken)
-        } else {
-            setAuthFailed(true)
+        try {
+            const res = await authenticate({variables: { email: values.email, password: values.password }})
+            if(res.data && res.data.authenticate.jwtToken) {
+                appContext.actions.loginComplete(res.data.authenticate.jwtToken)
+            } else {
+                setAuthError(new Error('Authentication failed'))
+            }
+        }catch(e) {
+            setAuthError(e as Error)
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -58,12 +63,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
                 {t('forgotPassword_label')}
             </Button>
             <Portal>
-                <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>
-                    {error && error.message}
-                </Snackbar>
-                <Snackbar role="alert" visible={authFailed} onDismiss={() => setAuthFailed(false)}>
-                    {t('authentication_failed')}
-                </Snackbar>
+                <ErrorSnackbar error={authError} message={authError ? t('authentication_failed') : undefined} onDismissError={() => setAuthError(undefined)} />
             </Portal>
         </View>)}
     </Formik>

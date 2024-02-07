@@ -61,19 +61,14 @@ const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
 }`
 
 const ResourcesList = ({ route, navigation }: RouteProps) => {
-    const {data, loading, error, refetch} = useQuery(RESOURCES)
+    const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
 
-    const loadResources = () => {
-      return refetch()
-    }
-
     useEffect(() => {
-        if(route.params && route.params.hasChanged) {
-            loadResources()
-        }
+      refetch()
+      editResourceContext.actions.setChangeCallback(refetch)
     }, [route])
 
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
@@ -105,7 +100,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
                 await deleteResource({ variables: {
                   resourceId: deletingResource
                 } })
-                await loadResources()
+                await refetch()
                 setDeletingResource(0)
               } else {
                 setDeletingResource(0)

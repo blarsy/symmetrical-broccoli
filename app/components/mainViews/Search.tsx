@@ -106,6 +106,7 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
 }
 
 const SearchResults = ({ route, navigation }: RouteProps) => {
+    const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const editResourceState = useContext(EditResourceContext)
     const [getSuggestedArticles, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
@@ -164,7 +165,8 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     onChatOpen={() => navigation.navigate('chat', {
                         screen: 'conversation',
                         params: {
-                            resourceid: resource.id
+                            resourceid: resource.id,
+                            otherAccountId: appContext.state.account!.id
                         }
                     })} 
                     onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} />

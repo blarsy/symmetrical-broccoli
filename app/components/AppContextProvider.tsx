@@ -3,11 +3,11 @@ import { Account, AccountInfo } from "@/lib/schema"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import { Snackbar } from "react-native-paper"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { gql } from "@apollo/client"
 import { TOKEN_KEY, apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
+import { ErrorSnackbar, SuccessSnackbar } from "./OperationFeedback"
 
 const SPLASH_DELAY = 3000
 
@@ -19,6 +19,11 @@ interface AppState {
     numberOfUnread: number
 }
 
+interface AppNotification {
+    message?: string
+    error?: Error
+}
+
 interface AppActions {
     loginComplete: (token: string) => Promise<void>
     logout: () => Promise<void>
@@ -26,17 +31,19 @@ interface AppActions {
     accountUpdated: (account: Account) => Promise<void>
     resetMessages: () => void
     setMessage: (message: any) => void
-    notify: (message: any) => void
+    notify: ( data: AppNotification ) => void
     beginOp: () => void
     endOp: () => void
     endOpWithError: (error: any) => void
     pushMessageReceivedHandler: (handler : (msg: any) => void) => void
     popMessageReceivedHandler: () => void
+    resetLastNofication: () => void
 }
 
 interface AppContext {
     state: AppState,
     messageReceivedStack: ((msg: any) => void)[]
+    lastNotification?: AppNotification
     actions: AppActions
 }
 
@@ -54,6 +61,7 @@ const emptyState: AppState = {
 export const AppContext = createContext<AppContext>({
     state: emptyState, 
     messageReceivedStack: [],
+    lastNotification: undefined,
     actions: {
         loginComplete: async () => {},
         tryRestoreToken: () => Promise.resolve(),
@@ -66,7 +74,8 @@ export const AppContext = createContext<AppContext>({
         endOp: () => {},
         endOpWithError: e => {},
         pushMessageReceivedHandler: () => {},
-        popMessageReceivedHandler: () => {}
+        popMessageReceivedHandler: () => {},
+        resetLastNofication: () => {}
     }
 })
 
@@ -76,13 +85,14 @@ const GET_SESSION_DATA = gql`query GetSessionData {
       email
       name
       avatarPublicId
+      activated
     }
   }`
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
     const [messageReceivedStack, setMessageReceivedStack] = useState([] as ((msg: any) => void)[])
-    const [lastNotification, setLastNofication] = useState('')
+    const [lastNotification, setLastNofication] = useState({ message: '' } as AppNotification | undefined)
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
@@ -122,7 +132,8 @@ const AppContextProvider = ({ children }: Props) => {
                 id: res.data.getSessionData.accountId, 
                 name: res.data.getSessionData.name, 
                 email: res.data.getSessionData.email, 
-                avatarPublicId: res.data.getSessionData.avatarPublicId
+                avatarPublicId: res.data.getSessionData.avatarPublicId,
+                activated: res.data.getSessionData.activated
             }})
         },
         tryRestoreToken: async (): Promise<void> => {
@@ -140,7 +151,8 @@ const AppContextProvider = ({ children }: Props) => {
                     id: sessionRes.data.getSessionData.accountId,
                     name: sessionRes.data.getSessionData.name, 
                     email: sessionRes.data.getSessionData.email, 
-                    avatarPublicId: sessionRes.data.getSessionData.avatarPublicId
+                    avatarPublicId: sessionRes.data.getSessionData.avatarPublicId,
+                    activated: sessionRes.data.getSessionData.activated
                 }})
                 
             } else {
@@ -169,7 +181,7 @@ const AppContextProvider = ({ children }: Props) => {
         },
         endOpWithError: e => {
             setNewAppState({ processing: false })
-            setLastNofication(t('requestError'))
+            setLastNofication({ error: e })
         },
         pushMessageReceivedHandler: handler => {
             messageReceivedStack.push(handler)
@@ -178,15 +190,15 @@ const AppContextProvider = ({ children }: Props) => {
         popMessageReceivedHandler: () => {
             messageReceivedStack.pop()
             setMessageReceivedStack(messageReceivedStack)
+        },
+        resetLastNofication: () => {
+            setLastNofication(undefined)
         }
     }
 
-    return <AppContext.Provider value={{ state: appState, messageReceivedStack, actions}}>
+    return <AppContext.Provider value={{ state: appState, lastNotification, messageReceivedStack, actions}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
-            <Snackbar visible={!!lastNotification} duration={4000} onDismiss={() => setLastNofication('')}>
-                {lastNotification}
-            </Snackbar>
         </SafeAreaProvider>
     </AppContext.Provider>
 }

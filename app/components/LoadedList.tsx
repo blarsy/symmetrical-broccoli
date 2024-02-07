@@ -1,9 +1,9 @@
 import React from "react"
 import { ActivityIndicator, Dimensions, ScrollView, StyleProp, View, ViewStyle } from "react-native"
 import ListOf from "./ListOf"
-import { Snackbar } from "react-native-paper"
 import { t } from "@/i18n"
 import { StateError } from "@/lib/DataLoadState"
+import { ErrorSnackbar } from "./OperationFeedback"
 
 interface Props<T> {
     loading: boolean,
@@ -30,7 +30,7 @@ function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, 
     { !loading && !error && <ListOf data={data} displayItem={displayItem} noDataLabel={noDataLabel} /> }
     {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
     { error && <View style={{ height: 60 }}>
-        <Snackbar role="alert" visible={!!error} onDismiss={() => {}}>{t('requestError')}</Snackbar>
+        <ErrorSnackbar message={error.message} onDismissError={() => {}} />
     </View> }
 </ScrollView>
 }

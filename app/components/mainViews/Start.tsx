@@ -6,10 +6,11 @@ import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
-import { ActivityIndicator, Modal, PaperProvider, Portal, Snackbar, Text, configureFonts } from 'react-native-paper'
+import { ActivityIndicator, Modal, PaperProvider, Portal, configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient } from "@/lib/utils"
 import { ApolloProvider } from "@apollo/client"
+import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 
 export default () => {
     const { t } = i18n
@@ -66,12 +67,14 @@ export default () => {
                             <ActivityIndicator size="large" />
                         </Modal>
                     </Portal>
+                    <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appContext.actions.resetLastNofication()} />
+                    <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appContext.actions.resetLastNofication()} />
                 </PaperProvider>
             </GestureHandlerRootView>
         </ApolloProvider>
     } else {
         <PaperProvider>
-            <Snackbar visible={!!fontError} onDismiss={() => {}}>{fontError && fontError.toString()}</Snackbar>
+            <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
         </PaperProvider>
     }
 }

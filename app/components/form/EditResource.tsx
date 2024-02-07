@@ -8,7 +8,8 @@ import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
 import { ScrollView, View } from "react-native"
-import { Portal, Snackbar } from "react-native-paper"
+import { Portal } from "react-native-paper"
+import { ErrorSnackbar } from "../OperationFeedback"
 
 
 export default ({ route, navigation }:RouteProps) => {
@@ -53,10 +54,7 @@ export default ({ route, navigation }:RouteProps) => {
             return <ScrollView style={{ margin: 10 }}>
                 <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
                 <Portal>
-                    <Snackbar role="alert" visible={!!saveResourceState.error && !!saveResourceState.error.message} 
-                        onDismiss={() => setSaveResourcestate(initial<null>(false, null))}>
-                        {saveResourceState.error && saveResourceState.error.message}
-                    </Snackbar>
+                    <ErrorSnackbar error={saveResourceState.error} message={saveResourceState.error && t('requestError')} onDismissError={() => setSaveResourcestate(initial<null>(false, null))} />
                 </Portal>
             </ScrollView>
         }}

@@ -1,5 +1,4 @@
-export interface StateError {
-    message?: string, 
+export interface StateError extends Error {
     detail?: string
 }
 
@@ -7,7 +6,7 @@ class DataLoadState<T> {
     data?: T
     loading: boolean
     error?: StateError
-    constructor(data: T|undefined, loading: boolean, error?: { message?: string, detail?: string}) {
+    constructor(data: T|undefined, loading: boolean, error?: StateError) {
         this.data = data
         this.loading = loading
         this.error = error
@@ -27,7 +26,7 @@ export function initial<M> (loading: boolean, value: M): DataLoadState<M> {
 }
 
 export function fromError<M> (err: any, message: string): DataLoadState<M> {
-    return new DataLoadState<M>(undefined, false, { message, detail: err.toString() })
+    return new DataLoadState<M>(undefined, false, { name: 'Error', message, detail: err.toString() })
 }
 
 export default DataLoadState

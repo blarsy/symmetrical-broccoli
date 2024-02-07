@@ -49,7 +49,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 }
             } catch(e) {
                 appContext.actions.setMessage((e as Error).stack!)
-                appContext.actions.notify(t('requestError'))
+                appContext.actions.notify({ error: e as Error })
             }
         }}>
             <View style={{ flex: 1, backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 15 }}>
