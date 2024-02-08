@@ -35,7 +35,7 @@ export const StyledLabel = ({ label, color, variant }: { label: string, color?: 
 export const OrangeTextInput = (props: TextInputProps) => <TextInput 
     {...props}
     placeholderTextColor="#ddd" mode="flat" textColor="#fff" underlineColor="#fff"
-    activeUnderlineColor="#fff" selectionColor="transparent"
+    activeUnderlineColor="#fff" selectionColor="#fff"
     theme={{ colors: { onSurfaceVariant: '#ddd'} }}
     contentStyle={{
         color: '#fff'
