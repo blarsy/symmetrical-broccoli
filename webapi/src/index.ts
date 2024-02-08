@@ -2,9 +2,10 @@ import express from "express"
 import postgraphile from "./postgraphile"
 import config from './config'
 import cors from 'cors'
-import { run } from "graphile-worker"
-import { sendAccountRecoveryMail } from "./mailing"
+import { JobHelpers, run } from "graphile-worker"
+import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./notifications/listener"
+import logger from "./logger"
 
 const connectionString = `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
 
@@ -25,6 +26,15 @@ const launchPostgraphileWebApi = () => {
     console.log('Express web api server listening on port 3000.')
 }
 
+const executeJob = async (executor: (payload: any, helpers: JobHelpers) => Promise<void>, payload: any, helpers: JobHelpers, jobName: String) => {
+    try {
+        await executor(payload, helpers)
+        logger.info(`Successfully executed job ${jobName}, with payload ${JSON.stringify(payload)}`)
+    } catch(e) {
+        logger.error(`Error while executing job ${jobName}, with payload ${JSON.stringify(payload)}`, e)
+    }
+}
+
 const launchJobWorker = async () => {
     const runner = await run({
         connectionString,
@@ -33,8 +43,16 @@ const launchJobWorker = async () => {
         noHandleSignals: false,
         taskList : {
             mailPasswordRecovery: async (payload: any, helpers) => {
-                const { email, code } = payload
-                await sendAccountRecoveryMail(email, code)
+                executeJob(async (payload, helpers) => {
+                    const { email, code, lang } = payload
+                    await sendAccountRecoveryMail(email, code, lang)
+                }, payload, helpers, 'mailPasswordRecovery')
+            },
+            mailActivation: async (payload: any, helpers: JobHelpers) =>{
+                executeJob(async (payload, helpers) => {
+                    const { email, code, lang } = payload
+                    await sendEmailActivationCode(email, code, lang)
+                }, payload, helpers, 'mailActivation')
             }
         },
         schema: 'worker'

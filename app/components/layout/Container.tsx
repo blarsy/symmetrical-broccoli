@@ -1,12 +1,12 @@
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native"
 import { primaryColor } from "./constants"
-import React, { useContext } from "react"
+import React, { ReactNode, useContext } from "react"
 import { AppContext } from "@/components/AppContextProvider"
 import { diagnostic } from "@/lib/settings"
 import { IconButton } from "react-native-paper"
 
 interface Props {
-    children: JSX.Element,
+    children: ReactNode,
     style: StyleProp<ViewStyle>
 }
 

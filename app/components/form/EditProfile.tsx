@@ -5,12 +5,12 @@ import { AppContext } from "@/components/AppContextProvider"
 import { aboveMdWidth, adaptToWidth } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
-import { TouchableOpacity, View } from "react-native"
+import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
 import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
-import { Avatar } from "react-native-paper"
+import { Avatar, Banner } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String, $avatarPublicId: String) {
@@ -26,6 +26,7 @@ const initials = (text: string) => {
 export default function EditProfile () {
     const appContext = useContext(AppContext)
     const [updateAccount, { loading: updating, error, reset }] = useMutation(UPDATE_ACCOUNT)
+    const [newEmailMustBeActivated, setNewEmailMustBeActivated] = useState(false)
     const [success, setSuccess] = useState(false)
     
     let initialValues = { email: '', name: '', avatarPublicId: ''}
@@ -41,21 +42,31 @@ export default function EditProfile () {
         avatarPublicId: string;
     }) => {
         const currentAccount = appContext.state.account!
+        let emailHasChanged = false
+
+        if(currentAccount.email != values.email.toLowerCase()){
+            emailHasChanged = true
+        }
+
         currentAccount.email = values.email
         currentAccount.name = values.name
         currentAccount.avatarPublicId = values.avatarPublicId
         await updateAccount({ variables: currentAccount})
         setSuccess(true)
+
+        setNewEmailMustBeActivated(emailHasChanged)
+
         appContext.actions.accountUpdated(currentAccount)
     }
 
     return <Formik initialValues={initialValues} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')).max(30, t('name_too_long')),
         email: yup.string().email(t('invalid_email')),
-        avatarPublicId: yup.string()
+        avatarPublicId: yup.string().nullable()
     })} onSubmit={update}>
     {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
         <View style={{ flex: 1, padding: 10 }}>
+            <Banner visible={newEmailMustBeActivated}>{t('newEmailMustBeActivated_message')}</Banner>
             <View style={{ alignItems: 'center' }}>
                 { values.avatarPublicId ? 
                     <Avatar.Image source={{ uri: urlFromPublicId(values.avatarPublicId)}} size={adaptToWidth(150, 250, 300)} /> :
@@ -81,7 +92,7 @@ export default function EditProfile () {
                     }
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
-                    appContext.actions.notify(t('requestError'))
+                    appContext.actions.notify({ error: e as Error})
                 }
             }}>
                 {t('modify_logo')}

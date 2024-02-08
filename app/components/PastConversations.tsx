@@ -60,7 +60,7 @@ const MY_CONVERSATIONS = gql`query MyConversations {
   }`
 
 interface Props {
-    onConversationSelected: (resource: Resource) => void
+    onConversationSelected: (resource: Resource, otherAccountId: number) => void
 }
 
 const PastConversations = ({ onConversationSelected }: Props) => {
@@ -74,7 +74,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
                     require('@/assets/img/placeholder.png')
                 return <ResponsiveListItem style={{ paddingLeft: 5, borderBottomColor: '#000', borderBottomWidth: 1, borderStyle: 'dashed' }} left={() => <Image style={{ width: 50, height: 50 }} source={imgSource} />} key={idx}
-                    onPress={() => onConversationSelected(item.conversation.resource)}
+                    onPress={() => onConversationSelected(item.conversation.resource, item.withUser.id)}
                     title={() => <View style={{ flexDirection: 'column' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.withUser.name }</Text>

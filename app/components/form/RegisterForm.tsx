@@ -1,27 +1,27 @@
 import { Formik, ErrorMessage } from "formik"
-import { t } from "i18next"
+import i18n, { t } from "i18next"
 import React, { useContext } from "react"
 import * as yup from 'yup'
 import { View } from "react-native"
 import { AppContext } from "@/components/AppContextProvider"
-import { Portal, Snackbar } from "react-native-paper"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
 import { isValidPassword } from "@/lib/utils"
+import OperationFeedback from "../OperationFeedback"
 
 interface Props {
     toggleRegistering: () => void
 }
 
-const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String) {
-    registerAccount(input: {email: $email, name: $name, password: $password}) {
+const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
+    registerAccount(input: {email: $email, name: $name, password: $password, language: $language}) {
       jwtToken
     }
   }`
 
 const RegisterForm = ({ toggleRegistering }: Props) => {
     const appContext = useContext(AppContext)
-    const [registerAccount, { data, loading, error }] = useMutation(REGISTER_ACCOUNT)
+    const [registerAccount, { data, loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')),
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
@@ -34,7 +34,8 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
     })} onSubmit={async (values) => {
         const res = await registerAccount({ variables: { email: values.email,
             name: values.name, 
-            password: values.password } })
+            password: values.password,
+            language: i18n.language.substring(0, 2).toLowerCase() } })
         if(res.data) {
             appContext.actions.loginComplete(res.data.registerAccount.jwtToken)
         }
@@ -57,9 +58,7 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
                 <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                     {t('ok_caption')}
                 </WhiteButton>
-                <Portal>
-                    <Snackbar visible={!!error} onDismiss={() => {}}>{error && error.message}</Snackbar>
-                </Portal>
+                <OperationFeedback error={error} onDismissError={reset}/>
                 <WhiteButton style={{ flex: 1 }} onPress={() => {
                     toggleRegistering()
                 }}>

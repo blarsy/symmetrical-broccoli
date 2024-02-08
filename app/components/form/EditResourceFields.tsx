@@ -34,7 +34,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
                     await editResourceContext.actions.addImage(img)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
-                    appContext.actions.notify(t('requestError'))
+                    appContext.actions.notify({ error: e as Error })
                 }
             }}
             onImageDeleteRequested={img => {editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })

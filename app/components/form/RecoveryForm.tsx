@@ -4,10 +4,10 @@ import { View } from "react-native"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
 import { AppContext } from "@/components/AppContextProvider"
-import { Portal, Snackbar } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
+import OperationFeedback from "../OperationFeedback"
 
 const REQUEST_RECOVERY = gql`mutation RequestAccountRecovery($email: String) {
     requestAccountRecovery(input: {email: $email}) {
@@ -48,12 +48,8 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
                     {t('cancel_caption')}
                 </WhiteButton>
             </View>
-            <Portal>
-                <Snackbar role="alert" visible={!!error} onDismiss={() => reset()}>
-                    {error && error.message}
-                </Snackbar>
-                <Snackbar role="note" visible={recoveryRequested} duration={60000} onDismiss={toggleRecovering}>{t('recoveryRequested_message')}</Snackbar>
-            </Portal>
+            <OperationFeedback error={error} onDismissError={reset} success={recoveryRequested} 
+                successMessage={t('recoveryRequested_message')} onDismissSuccess={toggleRecovering} />
         </View>)}
     </Formik>
 }

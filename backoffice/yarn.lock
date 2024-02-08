@@ -1427,7 +1427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.22.6, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.23.2
   resolution: "@babel/runtime@npm:7.23.2"
   dependencies:
@@ -3296,7 +3296,8 @@ __metadata:
     formidable: ^3.5.0
     formik: ^2.4.1
     handlebars: ^4.7.8
-    i18next: ^23.4.3
+    i18next: ^23.8.1
+    i18next-browser-languagedetector: ^7.2.0
     jsonwebtoken: ^9.0.0
     next: 13.4.12
     nocodb-sdk: ^0.108.1
@@ -3304,7 +3305,6 @@ __metadata:
     postgraphile: ^4.13.0
     react: 18.2.0
     react-dom: 18.2.0
-    react-i18next: ^13.0.3
     react-image-crop: ^10.1.4
     react-qr-code: ^2.0.12
     socket.io: ^4.7.2
@@ -5296,15 +5296,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-parse-stringify@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "html-parse-stringify@npm:3.0.1"
-  dependencies:
-    void-elements: 3.1.0
-  checksum: 334fdebd4b5c355dba8e95284cead6f62bf865a2359da2759b039db58c805646350016d2017875718bc3c4b9bf81a0d11be5ee0cf4774a3a5a7b97cde21cfd67
-  languageName: node
-  linkType: hard
-
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -5358,12 +5349,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^23.4.3":
-  version: 23.6.0
-  resolution: "i18next@npm:23.6.0"
+"i18next-browser-languagedetector@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "i18next-browser-languagedetector@npm:7.2.0"
   dependencies:
-    "@babel/runtime": ^7.22.5
-  checksum: 0898be75ce56a5901eb9763c8cd941a23cfc24fbe7b32ba0479c08f58c40c1c88c95596430154a6250087ec76d150335144b2cb637ebaa443490b9af7b6e275e
+    "@babel/runtime": ^7.23.2
+  checksum: 757845c7ae7dfc541f5150855c3a3e4f6d29bcee113796d44dc781594abc7f16f2750a2a70d786904c16d23ba952eba2741c0bcfeaa381016669522a6236998f
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^23.8.1":
+  version: 23.8.1
+  resolution: "i18next@npm:23.8.1"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: 1ad8855d465e32c594601ecac74c63df46eba022c835d4c7044194d201ed70fc530a55beff896c2f6afa0e42a458e6725a92e8d24b6ad720401c5d24d2faf619
   languageName: node
   linkType: hard
 
@@ -7186,24 +7186,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^13.0.3":
-  version: 13.3.1
-  resolution: "react-i18next@npm:13.3.1"
-  dependencies:
-    "@babel/runtime": ^7.22.5
-    html-parse-stringify: ^3.0.1
-  peerDependencies:
-    i18next: ">= 23.2.3"
-    react: ">= 16.8.0"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 71a9ae4968d701aa8c11009389f49548058abb16e96d0e0f4107206fe2dfd2df6c43e44b3209824ea42b8d2aefa8fe5ebc56e019a40947b39c3cb703e5293a87
-  languageName: node
-  linkType: hard
-
 "react-image-crop@npm:^10.1.4":
   version: 10.1.8
   resolution: "react-image-crop@npm:10.1.8"
@@ -8406,13 +8388,6 @@ __metadata:
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
   checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
-  languageName: node
-  linkType: hard
-
-"void-elements@npm:3.1.0":
-  version: 3.1.0
-  resolution: "void-elements@npm:3.1.0"
-  checksum: 0390f818107fa8fce55bb0a5c3f661056001c1d5a2a48c28d582d4d847347c2ab5b7f8272314cac58acf62345126b6b09bea623a185935f6b1c3bbce0dfd7f7f
   languageName: node
   linkType: hard
 

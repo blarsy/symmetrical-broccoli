@@ -3,6 +3,7 @@ import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
 import config from '../config'
+import initTranslations from '../i18n'
 
 export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string) => {
     const msg = {
@@ -44,17 +45,39 @@ const preparePartials = async () => {
     return partialsPreparePromise
 }
 
-export const sendAccountRecoveryMail = async (email: string, code: string) => {
-    const heading = 'Récupération de mot de passe'
-    const text = `Voici un lien pour effectuer la récupération de votre mot de passe sur ${config.productName}: `
-    const link = `${config.webAppUrl}recover/${code}`
+export const sendEmailActivationCode = async (email: string, code: string, lang: string) => {
+    const t = await initTranslations(lang)
+    const heading = t('activate_email_subject')
+    const link = `${config.webAppUrl}activate/${code}`
+    const text = t('activate_email_text', { productName: config.productName})
 
     await preparePartials()
     const source = await readFile(`${config.mailTemplatesLocation}recoverAccount.html`)
     const template = Handlebars.compile(source.toString())
 
     const data = { heading, text,
-        "button": 'Restauration', link, header: {
+        "button": t('activate_email_button_label'), link, header: {
+        logoUrl: `${config.websiteUrl}logo.jpeg`
+    }}
+    const htmlContent = template(data)
+
+    await sendNoReplyMail(email, heading, 
+        `${text}${link}`, 
+        htmlContent)
+}
+
+export const sendAccountRecoveryMail = async (email: string, code: string, lang: string) => {
+    const t = await initTranslations(lang)
+    const heading = t('recover_account_subject')
+    const link = `${config.webAppUrl}recover/${code}`
+    const text = t('recover_account_text', { productName: config.productName})
+
+    await preparePartials()
+    const source = await readFile(`${config.mailTemplatesLocation}recoverAccount.html`)
+    const template = Handlebars.compile(source.toString())
+
+    const data = { heading, text,
+        "button": t('restore_account_button_label'), link, header: {
         logoUrl: `${config.websiteUrl}logo.jpeg`
     }}
     const htmlContent = template(data)

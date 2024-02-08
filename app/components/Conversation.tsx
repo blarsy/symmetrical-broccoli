@@ -1,16 +1,18 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { View } from "react-native"
-import { Avatar, GiftedChat, IMessage, Send } from "react-native-gifted-chat"
-import { Icon, Portal, Snackbar } from "react-native-paper"
+import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
+import { Icon } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 import { AppContext } from "./AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { getLanguage } from "@/lib/utils"
 import { useNavigation } from "@react-navigation/native"
 import { urlFromPublicId } from "@/lib/images"
+import OperationFeedback from "./OperationFeedback"
 
 interface Props {
-    resourceId: number
+    resourceId: number,
+    otherAccountId: number
 }
 
 const asIMessages = (messages: any[]): IMessage[] => messages.map(msg => asIMessage(msg))
@@ -32,8 +34,8 @@ const asIMessage = (msg: any): IMessage => ({
     image: undefined //TODO
 })
 
-const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int) {
-    conversationMessages(resourceId: $resourceId) {
+const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int, $otherAccountId: Int) {
+    conversationMessages(resourceId: $resourceId, otherAccountId: $otherAccountId) {
       nodes {
         id
         text
@@ -52,29 +54,33 @@ const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int) {
     }
   }`
 
-const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $imagePublicId: String) {
+const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
-      input: {imagePublicId: $imagePublicId, resourceId: $resourceId, text: $text}
+      input: {imagePublicId: $imagePublicId, resourceId: $resourceId, otherAccountId: $otherAccountId, text: $text}
     ) {
       integer
     }
   }`
 
-const Conversation = ({ resourceId }: Props) => {
+const Conversation = ({ resourceId, otherAccountId }: Props) => {
     const appContext = useContext(AppContext)
     const navigation = useNavigation()
     const [ getMessages, { loading, error }] = useLazyQuery(CONVERSATION_MESSAGES)
-    const [createMessage, { error: createError, loading: creating}] = useMutation(CREATE_MESSAGE)
+    const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
     const [messages, setMessages] = useState([] as IMessage[])
 
     const onSend = useCallback(async (newMessages = [] as IMessage[]) => {
-        await Promise.all(newMessages.map(message => createMessage({ variables: { text: message.text, resourceId: new Number(resourceId), imagePublicId: message.image } })))
+        await Promise.all(newMessages.map(message => createMessage({ variables: { 
+            text: message.text, 
+            resourceId: new Number(resourceId), 
+            otherAccountId: new Number(otherAccountId),
+            imagePublicId: message.image } })))
 
         setMessages(prevMessages => GiftedChat.append(prevMessages, newMessages))
     }, [messages])
 
     const loadMessages = async () => {
-        const res = await getMessages({ variables: { resourceId: new Number(resourceId) }})
+        const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId) }})
 
         if(res.data) {
             const loadedMessages = asIMessages(res.data.conversationMessages.nodes)
@@ -122,9 +128,7 @@ const Conversation = ({ resourceId }: Props) => {
                 {/* <IconButton icon="emoticon" iconColor={primaryColor} style={{ margin: 0 }} /> */}
             </View>}
         />
-        <Portal>
-            <Snackbar visible={!!error || !!createError} onDismiss={() => {}}>{(error && error.message) || (createError && createError.message)}</Snackbar>
-        </Portal>
+        <OperationFeedback error={error || createError} onDismissError={reset} />
     </View>
 }
 
