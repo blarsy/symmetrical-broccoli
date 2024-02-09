@@ -36,7 +36,7 @@ const Recover = ({ recoveryId }: Props) => {
         return <CircularProgress />
     } else if(uiState.success) {
         return <Stack alignItems="center" gap="2rem">
-            <Alert severity="success">uiState.t!('password_changed')</Alert>
+            <Alert severity="success">{uiState.t!('password_changed')}</Alert>
             <Typography variant="overline">{uiState.t!('open_on_mobile')}</Typography>
         </Stack>
     } else {
@@ -47,7 +47,7 @@ const Recover = ({ recoveryId }: Props) => {
                     await recover({ variables: { newPassword: values.password, recoveryCode: recoveryId }})
                     setUiState({ loading: false, success: true, t: uiState.t})
                 } catch(e) {
-                    setUiState({ loading: false, error: { name: uiState.t!('recovery_error'), message: (e as Error).message }, t: uiState.t }
+                    setUiState({ loading: false, error: { name: uiState.t!('recovery_error'), message: (e as Error).message }, t: uiState.t })
                 } finally {
                     setSubmitting(false)
                 }
@@ -69,8 +69,7 @@ const Recover = ({ recoveryId }: Props) => {
                 handleSubmit,
                 isSubmitting,
                 getFieldProps
-            }) => (
-            <form onSubmit={handleSubmit}>
+            }) => <form onSubmit={handleSubmit}>
                 <Box display="flex" padding="1rem" justifyContent="center">
                     <Box display="flex" flexDirection="column" maxWidth="25em" gap="0.5rem">
                         <TextField size="small" id="password" type="password" {...getFieldProps('password')} variant="standard"
@@ -81,14 +80,14 @@ const Recover = ({ recoveryId }: Props) => {
                             loadingPosition="start"
                             startIcon={<RecoverIcon />}
                             type="submit"
-                            variant="contained">uiState.t!('recovery_title')</LoadingButton>
+                            variant="contained">{uiState.t!('recovery_title')}</LoadingButton>
                         {error && <Feedback severity="error" message={error.name} 
                             detail={error.message} 
                             onClose={() => reset()}/>}
                     </Box>
                 </Box>
             </form>
-            )}
+            }
         </Formik>
     }
 }

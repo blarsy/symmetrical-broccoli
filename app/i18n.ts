@@ -85,10 +85,11 @@ const resources = {
       "password_changed_message": "Password change successful",
       "recover_label": "Restore",
       "modify_logo": "Modify logo",
-      "activate_account": "Your email address has not been validated. Your resources will not be visible until you click on the link in the email you received at {{email}}",
+      "activate_account": "Your email address has not been validated. Your resources are currently not visible. Please click on the link in the email you received at {{email}}",
       "send_activation_mail_again_button": "Send again",
       "error_sending_again": "An error occured whe sending the activation mail again.",
-      "newEmailMustBeActivated_message": "The change of email address will proceed when you click on the link you received on the new address."
+      "newEmailMustBeActivated_message": "The change of email address will proceed when you click on the link you received on the new address.",
+      "hide_button": "Hide"
     }
   },
   fr: {
@@ -171,10 +172,11 @@ const resources = {
       "password_changed_message": "Mot de passe changé",
       "recover_label": "Restaurer",
       "modify_logo": "Modifier le logo",
-      "activate_account": "Votre adresse email n'a pas encore été validée. Les ressources que vous créez ne seront pas visibles tant que vous n'aurez pas cliqué sur le lien reçu à {{email}}.",
+      "activate_account": "Votre adresse email n'est pas encore validée. Vos ressources ne sont pas visibles tant que vous n'avez pas cliqué sur le lien reçu à {{email}}.",
       "send_activation_mail_again_button": "Envoyer de nouveau",
       "error_sending_again": "Une erreur est survenu pendant le réenvoi du mail d'activation.",
-      "newEmailMustBeActivated_message": "Le changement de votre adresse email sera pris en compte quand vous aurez cliqué sur le lien reçu à la nouvelle adresse."
+      "newEmailMustBeActivated_message": "Le changement de votre adresse email sera pris en compte quand vous aurez cliqué sur le lien reçu à la nouvelle adresse.",
+      "hide_button": "Cacher"
     }
   }
 }
