@@ -6,7 +6,7 @@ import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import Profile from './Profile'
 import DealBoard from './DealBoard'
-import { Appbar, Banner, Button, Portal, Snackbar, Text } from 'react-native-paper'
+import { Appbar, Banner, Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
 import { adaptHeight, appBarsTitleFontSize } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
@@ -138,7 +138,8 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 export default function Main () {
     const appContext = useContext(AppContext)
     const [newMessage, setNewMessage] = useState(undefined as any | undefined)
-    const [sendAgain, { loading: sending}] = useMutation(SEND_AGAIN)
+    const [sendAgain] = useMutation(SEND_AGAIN)
+    const [hideBanner, setHideBanner] = useState(false)
 
     const [syncPushToken] = useMutation(SYNC_PUSH_TOKEN)
 
@@ -155,18 +156,17 @@ export default function Main () {
     }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
-        <Banner visible={!!appContext.state.account && !appContext.state.account.activated} style={{ alignSelf: 'stretch' }}>
-            <View style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center' }}>
-                <Text style={{ textAlign: 'center' }}>{t('activate_account', { email: appContext.state.account!.email })}</Text>
-                <Button loading={sending} style={{ marginHorizontal: 5, borderRadius: 5 }} mode='outlined' labelStyle={{ margin: 3 }} onPress={async () => {
-                        try {
-                            await sendAgain()
-                        } catch(e) {
-                            appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
-                        }
-                    }}><Text variant='displaySmall'>{t('send_activation_mail_again_button')}</Text>
-                </Button>
-            </View>
+        <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
+            actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
+                try {
+                    await sendAgain()
+                } catch(e) {
+                    appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
+                }
+            } }, { label: t('hide_button'), onPress: () => {
+                setHideBanner(true)  
+            }} ]}>
+            {t('activate_account', { email: appContext.state.account!.email })}
         </Banner>
         <NavigationContainer linking={{
             prefixes: [prefix],
