@@ -6,7 +6,7 @@ import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import Profile from './Profile'
 import DealBoard from './DealBoard'
-import { Appbar, Banner, Portal, Snackbar } from 'react-native-paper'
+import { Appbar, Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
 import { adaptHeight, appBarsTitleFontSize } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
@@ -53,12 +53,6 @@ const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
                 }
             }
         }
-    }
-}`
-
-const SEND_AGAIN = gql`mutation SendAgain {
-    sendActivationAgain(input: {}) {
-        integer
     }
 }`
 
@@ -138,8 +132,6 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 export default function Main () {
     const appContext = useContext(AppContext)
     const [newMessage, setNewMessage] = useState(undefined as any | undefined)
-    const [sendAgain] = useMutation(SEND_AGAIN)
-    const [hideBanner, setHideBanner] = useState(false)
 
     const [syncPushToken] = useMutation(SYNC_PUSH_TOKEN)
 
@@ -156,18 +148,6 @@ export default function Main () {
     }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
-        <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
-            actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
-                try {
-                    await sendAgain()
-                } catch(e) {
-                    appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
-                }
-            } }, { label: t('hide_button'), onPress: () => {
-                setHideBanner(true)  
-            }} ]}>
-            {t('activate_account', { email: appContext.state.account!.email })}
-        </Banner>
         <NavigationContainer linking={{
             prefixes: [prefix],
             getInitialURL,

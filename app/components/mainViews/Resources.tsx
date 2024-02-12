@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import AppendableList from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
-import { IconButton } from "react-native-paper"
+import { Banner, IconButton } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { LoadState, RouteProps, aboveMdWidth } from "@/lib/utils"
@@ -60,11 +60,20 @@ const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
   }
 }`
 
+const SEND_AGAIN = gql`mutation SendAgain {
+  sendActivationAgain(input: {}) {
+      integer
+  }
+}`
+
 const ResourcesList = ({ route, navigation }: RouteProps) => {
+    const appContext = useContext(AppContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
+    const [sendAgain] = useMutation(SEND_AGAIN)
+    const [hideBanner, setHideBanner] = useState(false)
 
     useEffect(() => {
       refetch()
@@ -74,6 +83,18 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
     
     return <>
+        <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
+            actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
+                try {
+                    await sendAgain()
+                } catch(e) {
+                    appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
+                }
+            } }, { label: t('hide_button'), onPress: () => {
+                setHideBanner(true)  
+            }} ]}>
+            {t('activate_account', { email: appContext.state.account!.email })}
+        </Banner>
         <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
             onAddRequested={() => navigation.navigate('newResource')} 
             contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
