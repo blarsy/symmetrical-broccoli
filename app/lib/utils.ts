@@ -9,6 +9,9 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { getMainDefinition } from "@apollo/client/utilities"
 import { getLocales } from "expo-localization"
+import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
+import { ImageResult, manipulateAsync } from "expo-image-manipulator"
+import { IAppContext } from "../components/AppContextProvider"
 
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^\w]/)
@@ -147,6 +150,27 @@ export const getLanguage = (): string => {
   }
   return language
 }
+
+export const pickImage = async (success: ((img: ImageResult)=> void), height: number, appContext: IAppContext) => {
+  try {
+    await requestMediaLibraryPermissionsAsync(true)
+    let result = await launchImageLibraryAsync({
+        mediaTypes: MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+    })
+    
+    if(!result.canceled && result.assets.length > 0) {
+        const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height }}])
+
+        success(img)
+    }
+  } catch(e) {
+    appContext.actions.setMessage((e as Error).stack!)
+    appContext.actions.notify({ error: e as Error})
+  }
+}             
 
 export const GET_RESOURCE = gql`query GetResource($id: Int!) {
   resourceById(id: $id) {

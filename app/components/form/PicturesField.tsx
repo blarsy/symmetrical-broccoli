@@ -5,11 +5,10 @@ import { IconButton, Text } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { t } from "@/i18n"
 import Images from "@/Images"
-import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
-import { manipulateAsync } from 'expo-image-manipulator'
 import { AppContext } from "../AppContextProvider"
 import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
+import { pickImage } from "@/lib/utils"
 
 interface Props {
     images: ImageInfo[]
@@ -30,28 +29,11 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 })}
             </View>
         }
-        <TouchableOpacity onPress={async () => {
-            try {
-                await requestMediaLibraryPermissionsAsync(true)
-                let result = await launchImageLibraryAsync({
-                    mediaTypes: MediaTypeOptions.Images,
-                    allowsEditing: true,
-                    aspect: [1, 1],
-                    quality: 1,
-                })
-                
-                if(!result.canceled && result.assets.length > 0) {
-                    const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height: 400 }}])
-
-                    onImageSelected({ 
-                        path: img.uri
-                    })
-                }
-            } catch(e) {
-                appContext.actions.setMessage((e as Error).stack!)
-                appContext.actions.notify({ error: e as Error })
-            }
-        }}>
+        <TouchableOpacity onPress={async () => pickImage(img => {
+            onImageSelected({ 
+                path: img.uri
+            })
+        }, 400, appContext) }>
             <View style={{ flex: 1, backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 15 }}>
                 <Images.Photos style={{ height: 100, width: '100%', marginBottom: 15 }} fill="#fff" />
                 <Text variant="titleMedium" style={{ color: primaryColor }}>

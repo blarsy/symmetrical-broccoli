@@ -4,10 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import dayjs from "dayjs"
-import { t } from "@/i18n"
 import { gql } from "@apollo/client"
 import { TOKEN_KEY, apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
-import { ErrorSnackbar, SuccessSnackbar } from "./OperationFeedback"
 
 const SPLASH_DELAY = 3000
 
@@ -40,7 +38,7 @@ interface AppActions {
     resetLastNofication: () => void
 }
 
-interface AppContext {
+export interface IAppContext {
     state: AppState,
     messageReceivedStack: ((msg: any) => void)[]
     lastNotification?: AppNotification
@@ -58,7 +56,7 @@ const emptyState: AppState = {
     processing: false
 }
 
-export const AppContext = createContext<AppContext>({
+export const AppContext = createContext<IAppContext>({
     state: emptyState, 
     messageReceivedStack: [],
     lastNotification: undefined,

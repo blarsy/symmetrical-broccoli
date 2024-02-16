@@ -410,7 +410,7 @@ begin
 		INTO block.activation_code;
 		
 		INSERT INTO sb.email_activations (account_id, email, activation_code)
-		VALUES (sb.current_account_id(), update_account.email, block.activation_code);
+		VALUES (sb.current_account_id(), LOWER(update_account.email), block.activation_code);
 		
 		PERFORM sb.add_job('mailActivation', 
 			json_build_object('email', LOWER(update_account.email), 'code', block.activation_code, 'lang', account_language));

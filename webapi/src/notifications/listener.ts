@@ -13,7 +13,7 @@ interface NewMessageNotificationPayload {
 
 const toMessageNotfication = (payload: any): NewMessageNotificationPayload => ({
     messageId: payload.message_id,
-    text: payload.text,
+    text: payload.text || '<Image>',
     sender: payload.sender,
     resourceId: payload.resource_id,
     pushToken: payload.push_token

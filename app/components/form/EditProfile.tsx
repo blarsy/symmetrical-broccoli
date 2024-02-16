@@ -2,7 +2,7 @@ import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
 import * as yup from 'yup'
 import { AppContext } from "@/components/AppContextProvider"
-import { aboveMdWidth, adaptToWidth } from "@/lib/utils"
+import { aboveMdWidth, adaptToWidth, pickImage } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
 import { View } from "react-native"
@@ -72,29 +72,12 @@ export default function EditProfile () {
                     <Avatar.Image source={{ uri: urlFromPublicId(values.avatarPublicId)}} size={adaptToWidth(150, 250, 300)} /> :
                     <Avatar.Text label={initials(values.name)} size={adaptToWidth(150, 250, 300)} />}
             </View>
-            <WhiteButton style={{ alignSelf: 'center', marginVertical: 10}} onPress={async () => {
-                try {
-                    await requestMediaLibraryPermissionsAsync(true)
-                    let result = await launchImageLibraryAsync({
-                        mediaTypes: MediaTypeOptions.Images,
-                        allowsEditing: true,
-                        aspect: [1, 1],
-                        quality: 1,
-                    })
-                    
-                    if(!result.canceled && result.assets.length > 0) {
-                        const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height: 200 }}])
+            <WhiteButton style={{ alignSelf: 'center', marginVertical: 10}} onPress={pickImage(async img => {
+                const avatarPublicId = await uploadImage(img.uri)
+                setFieldValue('avatarPublicId', avatarPublicId)
 
-                        const avatarPublicId = await uploadImage(img.uri)
-                        setFieldValue('avatarPublicId', avatarPublicId)
-
-                        update({ ...values, ...{ avatarPublicId }})
-                    }
-                } catch(e) {
-                    appContext.actions.setMessage((e as Error).stack!)
-                    appContext.actions.notify({ error: e as Error})
-                }
-            }}>
+                update({ ...values, ...{ avatarPublicId }})
+            }, 200, appContext)}>
                 {t('modify_logo')}
             </WhiteButton>
             <OrangeTextInput style={{ flex: 1 }} label={<StyledLabel label={t('organization_name_label')} color="#fff"/>} textContentType="name" value={values.name}

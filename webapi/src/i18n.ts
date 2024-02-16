@@ -16,7 +16,7 @@ export default (lng: string) => i18n.init({
             "recover_account_text": "Voici un lien pour effectuer la récupération de votre compte sur {{productName}}",
             "restore_account_button_label": "Restaurer",
             "activate_email_subject": "Validez votre adresse email",
-            "activate_email_text ": "Validez l'adresse email que vous avez liée à votre compte sur {{productName}}",
+            "activate_email_text": "Validez l'adresse email que vous avez liée à votre compte sur {{productName}} ",
             "activate_email_button_label": "Valider"
         }}
     }

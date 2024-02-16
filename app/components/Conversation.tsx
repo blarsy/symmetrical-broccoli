@@ -1,13 +1,13 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { View } from "react-native"
 import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
-import { Icon } from "react-native-paper"
+import { Icon, IconButton } from "react-native-paper"
 import { primaryColor } from "./layout/constants"
 import { AppContext } from "./AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import { getLanguage } from "@/lib/utils"
+import { getLanguage, pickImage } from "@/lib/utils"
 import { useNavigation } from "@react-navigation/native"
-import { urlFromPublicId } from "@/lib/images"
+import { uploadImage, urlFromPublicId } from "@/lib/images"
 import OperationFeedback from "./OperationFeedback"
 
 interface Props {
@@ -28,10 +28,10 @@ const asIMessage = (msg: any): IMessage => ({
           urlFromPublicId(msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId.publicId):
           undefined
     },
+    image: msg.imageByImageId && urlFromPublicId(msg.imageByImageId.publicId),
     pending: false,
     received: !!msg.received,
     sent: true,
-    image: undefined //TODO
 })
 
 const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int, $otherAccountId: Int) {
@@ -41,6 +41,9 @@ const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int, $
         text
         created
         received
+        imageByImageId {
+          publicId
+        }
         participantByParticipantId {
           accountByAccountId {
             id
@@ -69,12 +72,12 @@ const Conversation = ({ resourceId, otherAccountId }: Props) => {
     const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
     const [messages, setMessages] = useState([] as IMessage[])
 
-    const onSend = useCallback(async (newMessages = [] as IMessage[]) => {
+    const onSend = useCallback(async (newMessages = [] as IMessage[], imagePublicId?: string) => {
         await Promise.all(newMessages.map(message => createMessage({ variables: { 
             text: message.text, 
             resourceId: new Number(resourceId), 
             otherAccountId: new Number(otherAccountId),
-            imagePublicId: message.image } })))
+            imagePublicId } })))
 
         setMessages(prevMessages => GiftedChat.append(prevMessages, newMessages))
     }, [messages])
@@ -105,17 +108,20 @@ const Conversation = ({ resourceId, otherAccountId }: Props) => {
         }
     }, [ resourceId ])
 
+    const user = {
+      _id: appContext.state.account?.id!,
+      name: appContext.state.account?.name,
+      avatar: appContext.state.account?.avatarPublicId ? urlFromPublicId(appContext.state.account.avatarPublicId) : undefined
+    }
+
     return <View style={{ flex: 1, backgroundColor: 'transparent' }}>
         <GiftedChat
             messages={messages || []}
             alwaysShowSend
             onSend={onSend}
+            
             isLoadingEarlier={loading}
-            user={{
-                _id: appContext.state.account?.id!,
-                name: appContext.state.account?.name,
-                avatar: appContext.state.account?.avatarPublicId ? urlFromPublicId(appContext.state.account.avatarPublicId) : undefined
-            }}
+            user={user}
             locale={getLanguage()}
             renderSend={p => <Send {...p} containerStyle={{
                 justifyContent: 'center',
@@ -124,7 +130,16 @@ const Conversation = ({ resourceId, otherAccountId }: Props) => {
                 <Icon color={primaryColor} source="send" size={35} />
             </Send>}
             renderActions={p => <View style={{ flexDirection: 'row' }}>
-                {/* <IconButton icon="image" iconColor={primaryColor} style={{ margin: 0 }} /> */}
+                <IconButton icon="image" iconColor={primaryColor} style={{ margin: 0 }} onPress={() => pickImage(async img => {
+                  const uploadRes = await uploadImage(img.uri)
+                  onSend([{
+                    _id: 0,
+                    text: '',
+                    user,
+                    image: urlFromPublicId(uploadRes),
+                    createdAt: new Date()
+                  }], uploadRes)
+                }, 400, appContext)} />
                 {/* <IconButton icon="emoticon" iconColor={primaryColor} style={{ margin: 0 }} /> */}
             </View>}
         />
