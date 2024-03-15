@@ -72,10 +72,9 @@ export default function EditProfile () {
                     <Avatar.Image source={{ uri: urlFromPublicId(values.avatarPublicId)}} size={adaptToWidth(150, 250, 300)} /> :
                     <Avatar.Text label={initials(values.name)} size={adaptToWidth(150, 250, 300)} />}
             </View>
-            <WhiteButton style={{ alignSelf: 'center', marginVertical: 10}} onPress={pickImage(async img => {
+            <WhiteButton style={{ alignSelf: 'center', marginVertical: 10}} onPress={() => pickImage(async img => {
                 const avatarPublicId = await uploadImage(img.uri)
                 setFieldValue('avatarPublicId', avatarPublicId)
-
                 update({ ...values, ...{ avatarPublicId }})
             }, 200, appContext)}>
                 {t('modify_logo')}
