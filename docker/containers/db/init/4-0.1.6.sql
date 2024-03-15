@@ -91,6 +91,49 @@ BEGIN
 END;
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.suggested_resources(
+	search_term text,
+	is_product boolean,
+	is_service boolean,
+	can_be_gifted boolean,
+	can_be_exchanged boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	category_codes character varying[])
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+SELECT r.*
+  FROM sb.resources r
+  LEFT JOIN sb.active_accounts a ON a.id = r.account_id
+  WHERE r.expiration > LOCALTIMESTAMP
+  AND (ARRAY_LENGTH(category_codes, 1) IS NULL OR EXISTS(
+	  SELECT * 
+	  FROM sb.resources_resource_categories rrc 
+	  WHERE r.id = rrc.resource_id AND rrc.resource_category_code IN (SELECT UNNEST(category_codes))))
+  AND (r.account_id = sb.current_account_id() OR a.id IS NOT NULL)
+  AND
+  (NOT suggested_resources.is_product OR r.is_product)
+  AND
+  (NOT suggested_resources.is_service OR r.is_service)
+  AND
+  (NOT suggested_resources.can_be_gifted OR r.can_be_gifted)
+  AND
+  (NOT suggested_resources.can_be_exchanged OR r.can_be_exchanged)
+  AND
+  (NOT suggested_resources.can_be_delivered OR r.can_be_delivered)
+  AND
+  (NOT suggested_resources.can_be_taken_away OR r.can_be_taken_away)
+  AND
+  (search_term = '' OR 
+	(r.title ILIKE '%' || search_term || '%' OR r.description ILIKE '%' || search_term || '%'));
+ 
+$BODY$;
+
 DO
 $body$
 BEGIN
