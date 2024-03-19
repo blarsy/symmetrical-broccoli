@@ -36,8 +36,11 @@
       }
     },
     "plugins": [
-      "expo-localization"
-
+      "expo-localization",
+      "expo-image-picker",
+      {
+        "photosPermission": "Tope-là voudrait accéder à vos fichiers images pour vous permettre de choisir les photos de vos ressources, et le logo de votre association."
+      }
     ],
     "owner": "tope_la"
   }
