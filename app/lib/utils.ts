@@ -14,7 +14,7 @@ import { ImageResult, manipulateAsync } from "expo-image-manipulator"
 import { IAppContext } from "../components/AppContextProvider"
 
 
-export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^\w]/)
+export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
 export interface RouteProps {
     route: any, 
@@ -86,8 +86,6 @@ export const apolloTokenExpiredHandler = {
 }
 
 export const getAuthenticatedApolloClient = (token: string) => {
-    //const token = await AsyncStorage.getItem(TOKEN_KEY)
-
     const httpLink = createHttpLink({ uri: apiUrl })
     const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, connectionParams: { authorization: `Bearer ${token}` } }))
     

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import { Resource, fromServerGraphResources } from "@/lib/schema"
 import { IconButton, Text, TextInput } from "react-native-paper"
@@ -21,6 +21,7 @@ import { EditResourceContext } from "../EditResourceContextProvider"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
+import ConnectionDialog from "../ConnectionDialog"
 
 const StackNav = createNativeStackNavigator()
 
@@ -99,7 +100,7 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
                     { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
                 </View>
             </View>
-            { resource.account!.id != appContext.state.account!.id && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
+            { (!appContext.state.account || resource.account!.id != appContext.state.account.id) && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
                 onPress={() => onChatOpen(resource)}/> }
         </View>
     </TouchableOpacity>
@@ -114,6 +115,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
         searchTerm: searchFilterContext.state.search,
         ...searchFilterContext.state.options
     } })
+    const [connectingTowardsResource, setConnectingTowardsResource] = useState(undefined as number | undefined)
 
     const debouncedFilters = useDebounce(searchFilterContext.state, 700)
 
@@ -162,15 +164,32 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 const resource = res as Resource
                 return <ResourceCard 
                     key={idx} resource={resource} 
-                    onChatOpen={() => navigation.navigate('chat', {
-                        screen: 'conversation',
-                        params: {
-                            resourceid: resource.id,
-                            otherAccountId: appContext.state.account!.id
+                    onChatOpen={() => {
+                        if(appContext.state.account) {
+                            navigation.navigate('chat', {
+                                screen: 'conversation',
+                                params: {
+                                    resourceid: resource.id,
+                                    otherAccountId: appContext.state.account.id
+                                }
+                            })
+                        } else {
+                            setConnectingTowardsResource(resource.id)
                         }
-                    })} 
+                    }}
                     onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} />
                 }} />
+        <ConnectionDialog onCloseRequested={() => setConnectingTowardsResource(undefined)} visible={!!connectingTowardsResource} infoTextI18n="introduce_yourself"
+            onDone={async (token, account) => {
+                setConnectingTowardsResource(undefined)
+                navigation.navigate('chat', {
+                    screen: 'conversation',
+                    params: {
+                        resourceid: connectingTowardsResource,
+                        otherAccountId: account.id
+                    }
+                })
+            }} />
     </ScrollView>
 }
 

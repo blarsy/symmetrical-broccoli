@@ -23,7 +23,7 @@ interface AppNotification {
 }
 
 interface AppActions {
-    loginComplete: (token: string) => Promise<void>
+    loginComplete: (token: string) => Promise<AccountInfo>
     logout: () => Promise<void>
     tryRestoreToken: () => Promise<void>
     accountUpdated: (account: Account) => Promise<void>
@@ -61,7 +61,7 @@ export const AppContext = createContext<IAppContext>({
     messageReceivedStack: [],
     lastNotification: undefined,
     actions: {
-        loginComplete: async () => {},
+        loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
         accountUpdated: () => Promise.resolve(),
         logout: () => Promise.resolve(),
@@ -116,7 +116,7 @@ const AppContextProvider = ({ children }: Props) => {
     }
 
     const actions: AppActions = {
-        loginComplete: async (token: string): Promise<void> => {
+        loginComplete: async (token: string): Promise<AccountInfo> => {
             await AsyncStorage.setItem(TOKEN_KEY, token)
 
             apolloTokenExpiredHandler.handle = () => { 
@@ -126,13 +126,17 @@ const AppContextProvider = ({ children }: Props) => {
             const authenticatedClient = getAuthenticatedApolloClient(token)
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
 
-            setNewAppState({ token, account: {
+            const account = {
                 id: res.data.getSessionData.accountId, 
                 name: res.data.getSessionData.name, 
                 email: res.data.getSessionData.email, 
                 avatarPublicId: res.data.getSessionData.avatarPublicId,
                 activated: res.data.getSessionData.activated
-            }})
+            }
+
+            setNewAppState({ token, account })
+
+            return account
         },
         tryRestoreToken: async (): Promise<void> => {
             const token = await AsyncStorage.getItem('token')

@@ -27,7 +27,7 @@ const resources = {
       "chat_label": "Chat",
       "profile_label": "Profile",
       "name_too_long": "Please use a shorter name",
-      "password_invalid": "The password must be at least 8 characters long, with at least one uppecase and at least one digit.",
+      "password_invalid": "The password must be at least 8 characters long, with at least one uppercase and at least one non-letter character.",
       "passwords_dont_match": "Provided passwords are not identical.",
       "organization_name_label": "Organization name",
       "save_label": "Save",
@@ -89,7 +89,11 @@ const resources = {
       "send_activation_mail_again_button": "Send again",
       "error_sending_again": "An error occured whe sending the activation mail again.",
       "newEmailMustBeActivated_message": "The change of email address will proceed when you click on the link you received on the new address.",
-      "hide_button": "Hide"
+      "hide_button": "Hide",
+      "connect_to_create_ressource": "Almost ready !",
+      "resource_is_free": "Your first resources are free, and they will always be.",
+      "connect_to_chat": "Sign in to create conversations.",
+      "introduce_yourself": "Présentez vous"
     }
   },
   fr: {
@@ -114,7 +118,7 @@ const resources = {
       "chat_label": "Chat",
       "profile_label": "Profil",
       "name_too_long": "Veuillez utiliser un nom plus court",
-      "password_invalid": "Le mot de passe doit comporter au moins 8 caractères, au moins une majustcule et un chiffre.",
+      "password_invalid": "Le mot de passe doit comporter au moins 8 caractères, au moins une majustcule et un caractère non-alphabétique.",
       "passwords_dont_match": "Les mots de passe fournis ne sont pas identiques.",
       "organization_name_label": "Nom de l'association",
       "save_label": "Sauver",
@@ -176,7 +180,11 @@ const resources = {
       "send_activation_mail_again_button": "Envoyer de nouveau",
       "error_sending_again": "Une erreur est survenu pendant le réenvoi du mail d'activation.",
       "newEmailMustBeActivated_message": "Le changement de votre adresse email sera pris en compte quand vous aurez cliqué sur le lien reçu à la nouvelle adresse.",
-      "hide_button": "Cacher"
+      "hide_button": "Cacher",
+      "connect_to_create_ressource": "Presque fini !",
+      "resource_is_free": "Les premières ressources sont gratuites, et le seront toujours.",
+      "connect_to_chat": "Pour créer des conversations, connectez-vous.",
+      "introduce_yourself": "Présentez vous"
     }
   }
 }

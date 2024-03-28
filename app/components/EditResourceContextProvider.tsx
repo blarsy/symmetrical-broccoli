@@ -4,7 +4,7 @@ import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import DataLoadState, { fromData, initial, fromError } from "@/lib/DataLoadState"
-import { getLanguage } from "@/lib/utils"
+import { getAuthenticatedApolloClient, getLanguage } from "@/lib/utils"
 import { t } from "@/i18n"
 
 const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
@@ -36,16 +36,17 @@ const GET_CATEGORIES = gql`query Categories($locale: String) {
 interface EditResourceState {
     editedResource: Resource
     categories: DataLoadState<Category[]>
-    changeCallback: () => void
+    changeCallbacks: (() => void)[]
     imagesToAdd: ImageInfo[]
 }
 
 interface EditResourceActions {
     setResource: (resource: Resource) => void
     setChangeCallback: (cb: () => void) => void
+    removeChangeCallback: () => void
     addImage: (img: ImageInfo) => Promise<void>
     deleteImage: (img: ImageInfo) => Promise<void>
-    save: (resource: Resource) => Promise<void>
+    save: (resource: Resource, token?: string) => Promise<void>
     reset: () => void
 }
 
@@ -67,12 +68,13 @@ export const EditResourceContext = createContext<EditResourceContext>({
     state: { 
         editedResource: blankResource, 
         categories: initial(true, []),
-        changeCallback: () => {},
+        changeCallbacks: [],
         imagesToAdd: []
     } as EditResourceState, 
     actions: {
         setResource: () => {},
         setChangeCallback: () => {},
+        removeChangeCallback: () => {},
         addImage: async() => {},
         deleteImage: async() => {},
         save: async() => {},
@@ -81,7 +83,7 @@ export const EditResourceContext = createContext<EditResourceContext>({
 })
 
 const EditResourceContextProvider = ({ children }: Props) => {
-    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, imagesToAdd: [], changeCallback: () => {}, categories: initial<Category[]>(true, []) } as EditResourceState)
+    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, imagesToAdd: [], changeCallbacks: [], categories: initial<Category[]>(true, []) } as EditResourceState)
     const [createResource] = useMutation(CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
@@ -105,17 +107,24 @@ const EditResourceContextProvider = ({ children }: Props) => {
         
         const newResourceState = {...editResourceState, ...{ editedResource: resource }}
         setEditResourceState( newResourceState )
-        editResourceState.changeCallback()
+        editResourceState.changeCallbacks.forEach(cb => cb())
     }
 
     const actions: EditResourceActions = {
         setResource,
-        setChangeCallback: changeCallback => setEditResourceState({ ...editResourceState, ...{ changeCallback } }),
+        setChangeCallback: changeCallback => {
+            editResourceState.changeCallbacks.push(changeCallback)
+            setEditResourceState({ ...editResourceState })
+        },
+        removeChangeCallback: () => {
+            editResourceState.changeCallbacks.pop()
+            setEditResourceState({ ...editResourceState })
+        },
         addImage: async (img: ImageInfo) => {
             if(!img.path) throw new Error('Image has not local path')
 
             setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...editResourceState.editedResource, ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
-            editResourceState.changeCallback()
+            editResourceState.changeCallbacks.forEach(cb => cb())
         },
         deleteImage: async (img: ImageInfo) => {
             let updatedImagesToAdd = editResourceState.imagesToAdd
@@ -127,9 +136,9 @@ const EditResourceContextProvider = ({ children }: Props) => {
                 updatedImages = updatedImages.filter(curImg => curImg.publicId != img.publicId)
             }
             setEditResourceState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...editResourceState.editedResource, ...{ images: updatedImages } } })
-            editResourceState.changeCallback()
+            editResourceState.changeCallbacks.forEach(cb => cb())
         },
-        save: async (resource: Resource) => {
+        save: async (resource: Resource, token?: string) => {
             if(editResourceState.editedResource.id) {
                 if(editResourceState.imagesToAdd.length > 0) {
                     const newPublicIds = await Promise.all(editResourceState.imagesToAdd.map(async img => { 
@@ -160,7 +169,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     imagesPublicIds = await Promise.all(editResourceState.imagesToAdd.map(img => uploadImage(img.path!)))
                 }
 
-                await createResource({ variables: {
+                const variables = {
                     title: resource.title,
                     description: resource.description,
                     expiration: resource.expiration,
@@ -172,11 +181,18 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     canBeGifted: resource.canBeGifted,
                     categoryCodes: resource.categories.map(cat => cat.code.toString()),
                     imagesPublicIds
-                }})
+                }
+
+                if(!token) {
+                    await createResource({ variables })
+                } else {
+                    await createResource({ variables, client: getAuthenticatedApolloClient(token) })
+                }
+
                 resource.images = imagesPublicIds.map(pId => ({ publicId: pId }))
                 setEditResourceState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             }
-            editResourceState.changeCallback()
+            editResourceState.changeCallbacks.forEach(cb => cb())
         },
         reset: () => {
             const newResourceState = {...editResourceState, ...{ editedResource: blankResource, imagesToAdd: [] }}

@@ -178,6 +178,9 @@ export default function Main () {
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
                         <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => {
                             appContext.actions.logout()
+                            props.navigation.reset({ routes: [
+                                {name: 'main'}
+                            ], index: 0 })
                         }} />
                     </Appbar.Header> }}>
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />

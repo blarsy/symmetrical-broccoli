@@ -8,9 +8,11 @@ import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from
 import { gql, useMutation } from "@apollo/client"
 import { isValidPassword } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
+import { AccountInfo } from "@/lib/schema"
 
 interface Props {
     toggleRegistering: () => void
+    onAccountRegistered?: (token: string, account: AccountInfo) => void
 }
 
 const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
@@ -19,7 +21,7 @@ const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: Str
     }
   }`
 
-const RegisterForm = ({ toggleRegistering }: Props) => {
+const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
     const appContext = useContext(AppContext)
     const [registerAccount, { data, loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
@@ -37,7 +39,8 @@ const RegisterForm = ({ toggleRegistering }: Props) => {
             password: values.password,
             language: i18n.language.substring(0, 2).toLowerCase() } })
         if(res.data) {
-            appContext.actions.loginComplete(res.data.registerAccount.jwtToken)
+            const account = await appContext.actions.loginComplete(res.data.registerAccount.jwtToken)
+            onAccountRegistered && onAccountRegistered(res.data.registerAccount.jwtToken, account)
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react"
-import Login from "./Login"
 import Main from "./Main"
 import { AppContext } from "@/components/AppContextProvider"
 import React from "react"
@@ -33,7 +32,6 @@ export default () => {
     useEffect(() => {
         load()
     }, [])
-
     if(restoringSession || !fontsLoaded) {
         return <Splash />
     }
@@ -59,9 +57,7 @@ export default () => {
                         titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
                     } })
                 }}>
-                    { appContext.state.token ? 
-                        <Main /> :
-                        <Login /> }
+                        <Main />
                     <Portal>
                         <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
                             <ActivityIndicator size="large" />

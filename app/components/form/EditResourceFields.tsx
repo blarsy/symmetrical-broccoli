@@ -25,6 +25,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
 
     useEffect(() => {
         editResourceContext.actions.setChangeCallback(() => resetForm())
+        return () => editResourceContext.actions.removeChangeCallback()
     }, [])
 
     return <>
