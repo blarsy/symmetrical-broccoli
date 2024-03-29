@@ -38,7 +38,7 @@ const ChatHeader = (p: ChatHeaderProps) => {
         {resource ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <ResourceImage size={70} resource={resource} />
             <View style={{ flexDirection: 'column', padding: 6, gap: 2 }}>
-                <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {resource.account!.name}</Text>
+                <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {resource.account!.name || t('name_account_removed')}</Text>
                 <Text variant="headlineMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
                 <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}>{exchangeTypes.join('/')}</Text>
             </View>
@@ -64,7 +64,7 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     if(appContext.state.account) {
         return <ChatBackground>
-            <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceid: resource.id, otherAccountId })} />
+            <PastConversations onConversationSelected={(resource, otherAccountId, otherAccountName) => navigation.navigate('conversation', { resourceid: resource.id, otherAccountId, otherAccountName })} />
         </ChatBackground>
     } else {
         return <Text style={{ textAlign: 'center', textTransform: 'uppercase', margin:10 }}>{t('connect_to_chat')}</Text>
@@ -72,7 +72,7 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
 }
 
 const ConversationDetail = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <Conversation resourceId={route.params.resourceid} otherAccountId={route.params.otherAccountId} />
+    <Conversation resourceId={route.params.resourceid} otherAccountId={route.params.otherAccountId} otherAccountName={route.params.otherAccountName} />
 </ChatBackground>
 
 const StackNav = createNativeStackNavigator()

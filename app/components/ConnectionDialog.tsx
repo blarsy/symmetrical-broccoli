@@ -4,6 +4,7 @@ import { IconButton, Modal, Portal } from "react-native-paper"
 import Login from "./mainViews/Login"
 import { primaryColor } from "./layout/constants"
 import { AccountInfo } from "@/lib/schema"
+import { View } from "react-native"
 
 interface Props {
     visible: boolean
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const ConnectionDialog = ({ visible, onDone, infoTextI18n, infoSubtextI18n, onCloseRequested }: Props) => <Portal>
-    <Modal visible={visible} contentContainerStyle={{ shadowColor: primaryColor }} style={{ backgroundColor: primaryColor, margin: 5, borderRadius: 20, display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+    <Modal visible={visible} contentContainerStyle={{ shadowColor: primaryColor }} style={{ backgroundColor: primaryColor, margin: 5, borderRadius: 20, display: 'flex', justifyContent: 'space-around', flexDirection: 'column' }}>
         <IconButton icon="close" style={{ alignSelf: 'flex-end' }} onPress={onCloseRequested} iconColor="#000"/>
         <Login onDone={onDone} infoTextI18n={infoTextI18n} infoSubtextI18n={infoSubtextI18n} />
     </Modal>

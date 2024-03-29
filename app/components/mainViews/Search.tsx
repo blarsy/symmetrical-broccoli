@@ -170,7 +170,8 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                                 screen: 'conversation',
                                 params: {
                                     resourceid: resource.id,
-                                    otherAccountId: appContext.state.account.id
+                                    otherAccountId: appContext.state.account.id,
+                                    otherAccountName: appContext.state.account.name
                                 }
                             })
                         } else {
@@ -186,7 +187,8 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     screen: 'conversation',
                     params: {
                         resourceid: connectingTowardsResource,
-                        otherAccountId: account.id
+                        otherAccountId: account.id,
+                        otherAccountName: account.name
                     }
                 })
             }} />

@@ -93,7 +93,16 @@ const resources = {
       "connect_to_create_ressource": "Almost ready !",
       "resource_is_free": "Your first resources are free, and they will always be.",
       "connect_to_chat": "Sign in to create conversations.",
-      "introduce_yourself": "Présentez vous"
+      "introduce_yourself": "Introduce yourself",
+      "delete_account_button": "Delete my account",
+      "delete_account_title": "Account removal",
+      "delete_account_explanation": "Deleting your account will erase all information we have about you.\nWherever you interracted with other accounts, yours will be displayed as \"Deleted account\".\nYou will not be able to connect anymore, and Tope-là will not be able to retrieve your information.",
+      "delete_account_confirmation": "This will completely erase your data, and cannot be undone.\nDo you confirm that is what you want ?",
+      "name_account_removed": "Deleted account",
+      "cannot_send_to_deleted_account": "Cannot send to deleted account",
+      "type_message_here": "Your message here ...",
+      "yes": "YES",
+      "no": "NO"
     }
   },
   fr: {
@@ -184,7 +193,16 @@ const resources = {
       "connect_to_create_ressource": "Presque fini !",
       "resource_is_free": "Les premières ressources sont gratuites, et le seront toujours.",
       "connect_to_chat": "Pour créer des conversations, connectez-vous.",
-      "introduce_yourself": "Présentez vous"
+      "introduce_yourself": "Présentez vous",
+      "delete_account_button": "Effacer mon compte",
+      "delete_account_title": "Effacement du compte",
+      "delete_account_explanation": "Effacer votre compte éliminera toute les informations que nous détenons de vous.\nLà où vous avez interragi avec d'autres comptes, sera affiché la mention \"compte supprimé\".\nIl ne vous sera plus possible de vous reconnecter, et Tope-là ne sera plus en mesure de retrouver vos informations.",
+      "delete_account_confirmation": "Cet action va effacer complètement vos données, et elles seront totalement irrécupérables.\nVeuillez confirmer une dernière fois",
+      "name_account_removed": "Compte supprimé",
+      "cannot_send_to_deleted_account": "Envoi impossible au compte supprimé",
+      "type_message_here": "Votre message ...",
+      "yes": "OUI",
+      "no": "NON"
     }
   }
 }

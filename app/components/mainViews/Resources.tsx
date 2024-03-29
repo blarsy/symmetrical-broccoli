@@ -100,7 +100,9 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
         </Banner>
         { appContext.state.account ?
           <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
-              onAddRequested={() => navigation.navigate('newResource')} 
+              onAddRequested={() => navigation.navigate('newResource')} onRefreshRequested={() => {
+                refetch()
+              }}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
               displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} key={idx} title={resource.title} 
                   titleNumberOfLines={1}

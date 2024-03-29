@@ -28,7 +28,7 @@ interface Props {
 const ConnectContainer = ({ children, titleI18n, infoTextI18n, infoSubtextI18n }: ConnectProps) => {
     const appContext = useContext(AppContext)
     return <ApolloProvider client={getAuthenticatedApolloClient(appContext.state.token)}>
-        <PrimaryColoredView style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <PrimaryColoredView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', margin: 10, 
                 alignSelf: 'stretch', gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
                 <Text variant="titleLarge" style={{ color: '#000', fontSize: 38, textTransform: "uppercase", textAlign: 'center', lineHeight: 38 }}>{t(titleI18n)}</Text>
