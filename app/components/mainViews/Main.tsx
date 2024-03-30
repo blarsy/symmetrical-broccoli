@@ -68,14 +68,10 @@ const getInitialURL = async () => {
 
     // Handle URL from expo push notifications
     const response = await getLastNotificationResponseAsync()
-
-    console.log(`Initial Url from Expo push: ${response?.notification.request.content.data.url}`)
-
     return response?.notification.request.content.data.url
 }
 const subscribe = (listener: any) => {
     const onReceiveURL = ({ url }: { url: string }) => {
-        console.log(`navigating to ${url} via onReceiveURL`)
         listener(url)
     }
 
@@ -87,7 +83,6 @@ const subscribe = (listener: any) => {
     //if(Device.isDevice && Device.brand) {
         subscription = addNotificationResponseReceivedListener(response => {
             const url = response.notification.request.content.data.url
-            console.log(`navigating to ${url}`)
     
             // Let React Navigation handle the URL
             listener(url)
@@ -178,6 +173,9 @@ export default function Main () {
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
                         <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => {
                             appContext.actions.logout()
+                            props.navigation.reset({ routes: [
+                                {name: 'main'}
+                            ], index: 0 })
                         }} />
                     </Appbar.Header> }}>
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />

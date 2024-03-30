@@ -10,7 +10,11 @@ cd ..
 
 # build the website
 cd backoffice
+cp .env.production .env.production.bak
+cp .env.test .env.production
 yarn build || exit 1
+cp .env.production.bak .env.production
+rm .env.production.bak
 cd ..
 
 # clean build folder

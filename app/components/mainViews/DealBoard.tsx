@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react"
-import { Appbar, Avatar } from "react-native-paper"
+import { Appbar, Avatar, Icon } from "react-native-paper"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -14,6 +14,8 @@ import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { AppContext } from "../AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
+import { AccountInfo } from "@/lib/schema"
+import ConnectionDialog from "../ConnectionDialog"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -30,9 +32,18 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
+const ProfileIcon = ({ account}: { account?: AccountInfo }) => {
+    if(!account) return <Icon source="login-variant" size={30}/>
+    if(account.avatarPublicId)
+        return <Avatar.Image size={54} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
+
+    return <Images.Profile />
+}
+
 const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
     const appContext = useContext(AppContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
+    const [connecting, setConnecting] = useState(false)
 
     return <EditResourceContextProvider>
         <SearchFilterContextProvider>
@@ -40,8 +51,14 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
                     <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff' }} 
-                        icon={appContext.state.account?.avatarPublicId ? p => <Avatar.Image size={54} source={{ uri:urlFromPublicId(appContext.state.account!.avatarPublicId!) }} /> : Images.Profile} 
-                        size={appContext.state.account!.avatarPublicId ? 54 : 30} onPress={() => { navigation.navigate('profile')}} />
+                        icon={p => <ProfileIcon account={appContext.state.account} />} 
+                        size={appContext.state.account?.avatarPublicId ? 54 : 30} onPress={() => { 
+                            if(appContext.state.account) {
+                                navigation.navigate('profile')
+                            } else {
+                                setConnecting(true)
+                            }
+                        }} />
                 </Appbar.Header>
                 <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
                     theme={{ colors: { secondaryContainer: lightPrimaryColor }}}
@@ -57,6 +74,7 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
                     <Tab.Screen name="resource" component={Resources} options={{ title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }} />
                     <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <Images.Chat fill={p.color} />}} />
                 </Tab.Navigator>
+                <ConnectionDialog visible={connecting} onCloseRequested={() => setConnecting(false)} onDone={async () => setConnecting(false)} />
             </View>
         </SearchFilterContextProvider>
     </EditResourceContextProvider>

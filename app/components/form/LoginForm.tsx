@@ -10,10 +10,12 @@ import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from
 import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
+import { AccountInfo } from "@/lib/schema"
 
 interface Props {
     toggleRegistering: () => void,
-    toggleRecovering: () => void
+    toggleRecovering: () => void,
+    onDone?: (token: string, account: AccountInfo) => void
 }
 
 const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
@@ -22,7 +24,7 @@ const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
     }
 }`
 
-const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
+const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
     const appContext = useContext(AppContext)
     const [authenticate, {loading}] = useMutation(GET_JWT)
     const [authError, setAuthError] = useState(undefined as Error|undefined)
@@ -34,7 +36,8 @@ const LoginForm = ({ toggleRegistering, toggleRecovering }: Props) => {
         try {
             const res = await authenticate({variables: { email: values.email, password: values.password }})
             if(res.data && res.data.authenticate.jwtToken) {
-                appContext.actions.loginComplete(res.data.authenticate.jwtToken)
+                const account = await appContext.actions.loginComplete(res.data.authenticate.jwtToken)
+                onDone && onDone(res.data.authenticate.jwtToken, account)
             } else {
                 setAuthError(new Error('Authentication failed'))
             }

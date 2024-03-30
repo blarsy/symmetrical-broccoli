@@ -15,9 +15,10 @@ const launchPostgraphileWebApi = () => {
     const app = express()
     
     app.options('*', cors({ origin(requestOrigin, callback) {
-        if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase())) {
+        if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
             callback(null, requestOrigin)
         } else {
+            logger.error(`${requestOrigin} rejected. Allowed origins are ${allowedOrigins}`, new Error('Disallowed'))
             callback(new Error('Disallowed'))
         }
     }, }))

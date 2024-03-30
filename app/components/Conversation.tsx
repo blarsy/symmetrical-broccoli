@@ -9,10 +9,12 @@ import { getLanguage, pickImage } from "@/lib/utils"
 import { useNavigation } from "@react-navigation/native"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
 import OperationFeedback from "./OperationFeedback"
+import { t } from "i18next"
 
 interface Props {
-    resourceId: number,
+    resourceId: number
     otherAccountId: number
+    otherAccountName: string
 }
 
 const asIMessages = (messages: any[]): IMessage[] => messages.map(msg => asIMessage(msg))
@@ -65,7 +67,7 @@ const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: In
     }
   }`
 
-const Conversation = ({ resourceId, otherAccountId }: Props) => {
+const Conversation = ({ resourceId, otherAccountId, otherAccountName }: Props) => {
     const appContext = useContext(AppContext)
     const navigation = useNavigation()
     const [ getMessages, { loading, error }] = useLazyQuery(CONVERSATION_MESSAGES)
@@ -119,18 +121,19 @@ const Conversation = ({ resourceId, otherAccountId }: Props) => {
             messages={messages || []}
             alwaysShowSend
             onSend={onSend}
-            
+            disableComposer={!otherAccountName}
+            placeholder={otherAccountName ? t('type_message_here') : t('cannot_send_to_deleted_account')}
             isLoadingEarlier={loading}
             user={user}
             locale={getLanguage()}
             renderSend={p => <Send {...p} containerStyle={{
                 justifyContent: 'center',
                 alignItems: 'center',
-              }}>
-                <Icon color={primaryColor} source="send" size={35} />
+              }} disabled={!otherAccountName}>
+                <Icon color={otherAccountName ? primaryColor : '#777'} source="send" size={35} />
             </Send>}
             renderActions={p => <View style={{ flexDirection: 'row' }}>
-                <IconButton icon="image" iconColor={primaryColor} style={{ margin: 0 }} onPress={() => pickImage(async img => {
+                <IconButton size={35} icon="image" disabled={!otherAccountName} iconColor={otherAccountName ? primaryColor : '#777'} style={{ margin: 0 }} onPress={() => pickImage(async img => {
                   const uploadRes = await uploadImage(img.uri)
                   onSend([{
                     _id: 0,
@@ -140,7 +143,6 @@ const Conversation = ({ resourceId, otherAccountId }: Props) => {
                     createdAt: new Date()
                   }], uploadRes)
                 }, 400, appContext)} />
-                {/* <IconButton icon="emoticon" iconColor={primaryColor} style={{ margin: 0 }} /> */}
             </View>}
         />
         <OperationFeedback error={error || createError} onDismissError={reset} />

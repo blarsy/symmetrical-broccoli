@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import AppendableList from "../AppendableList"
+import AppendableList, { AddItemButton } from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
 import { Banner, IconButton } from "react-native-paper"
@@ -76,8 +76,11 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
     const [hideBanner, setHideBanner] = useState(false)
 
     useEffect(() => {
-      refetch()
+      if(appContext.state.account)
+        refetch()
+
       editResourceContext.actions.setChangeCallback(refetch)
+      return () => editResourceContext.actions.removeChangeCallback()
     }, [route])
 
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
@@ -93,28 +96,35 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
             } }, { label: t('hide_button'), onPress: () => {
                 setHideBanner(true)  
             }} ]}>
-            {t('activate_account', { email: appContext.state.account!.email })}
+            {t('activate_account', { email: appContext.state.account?.email })}
         </Banner>
-        <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
-            onAddRequested={() => navigation.navigate('newResource')} 
-            contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
-            displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} key={idx} title={resource.title} 
-                titleNumberOfLines={1}
-                description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
-                left={() => <SmallResourceImage resource={resource} />}
-                right={() => <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
-                        e.stopPropagation()
-                        editResourceContext.actions.setResource(resource)
-                        navigation.navigate('editResource')
-                    }} />
-                    <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor={primaryColor} size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
-                        e.stopPropagation()
-                        setDeletingResource(resource.id)
-                    }} />
-                </View>}
-            />}
-        />
+        { appContext.state.account ?
+          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
+              onAddRequested={() => navigation.navigate('newResource')} onRefreshRequested={() => {
+                refetch()
+              }}
+              contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
+              displayItem={(resource, idx) => <ResponsiveListItem onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} key={idx} title={resource.title} 
+                  titleNumberOfLines={1}
+                  description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
+                  left={() => <SmallResourceImage resource={resource} />}
+                  right={() => <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                      <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
+                          e.stopPropagation()
+                          editResourceContext.actions.setResource(resource)
+                          navigation.navigate('editResource')
+                      }} />
+                      <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor={primaryColor} size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
+                          e.stopPropagation()
+                          setDeletingResource(resource.id)
+                      }} />
+                  </View>}
+              />}
+          /> :
+          <View style={{ flexDirection: 'column', margin: 10, flex:1, alignItems: 'center' }}>
+            <AddItemButton onAddRequested={() => navigation.navigate('newResource')} />
+          </View>
+        }
         <ConfirmDialog title={t('Confirmation_DialogTitle')} question={t('Confirm_Resource_Delete_Question')}
             visible={!!deletingResource} onResponse={async response => {
               if(response) {

@@ -8,8 +8,6 @@ import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from
 import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
-import { manipulateAsync } from "expo-image-manipulator"
 import { Avatar, Banner } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
 
@@ -20,7 +18,10 @@ const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String,
 }`
 
 const initials = (text: string) => {
-    return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
+    if(text)
+        return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
+
+    return ""
 }
 
 export default function EditProfile () {
