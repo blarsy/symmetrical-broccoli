@@ -199,7 +199,7 @@ $BODY$;
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.1.8';
+	UPDATE sb.system SET version = '0.1.9';
 END;
 $body$
 LANGUAGE 'plpgsql'; 
