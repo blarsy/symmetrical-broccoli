@@ -1,13 +1,14 @@
 "use client"
 import { primaryColor } from "@/utils"
-import { Box, IconButton, Stack, Theme, Typography } from "@mui/material"
+import { Box, Button, IconButton, Stack, Theme, Typography } from "@mui/material"
 import createTheme, { fonts } from '@/theme'
 import { ThemeProvider } from "@emotion/react"
 import FbLogo from './img/FACEBOOK.svg'
 import InstaLogo from './img/INSTAGRAM.svg'
 import Logo from './img/LOGO-TOPE LA.svg'
 import smartphone from './img/IPHONE.png'
-import ComingSoon from './img/BIENTOT DISPO.svg'
+import Googleplay from './img/google-play.svg'
+import AppStore from './img/app-store.svg'
 import LetsConnect from './img/CONNECTONS NOUS.svg'
 import { useRef, useState } from "react"
 import Step1 from "@/components/explainSteps/Step1"
@@ -24,6 +25,7 @@ import { Swiper as SwiperType } from "swiper"
 import { Autoplay } from 'swiper/modules'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
+import { Apps } from "@mui/icons-material"
 
 const PresentationCarousel = ({ theme }: { theme: Theme }) => {
     const swiperRef = useRef<SwiperType>()
@@ -132,8 +134,9 @@ const Page = () => {
                 </Box>
             </Stack>
             <PresentationCarousel theme={theme} />
-            <Stack alignItems="center" style={{ maxHeight: '274px' }}>
-                <ComingSoon alt="Bientôt disponible"/>
+            <Stack alignItems="center" justifyContent="center" flexDirection="row" paddingBottom="3rem">
+                <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
+                <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
             </Stack>
         </Stack>
     </ThemeProvider>
