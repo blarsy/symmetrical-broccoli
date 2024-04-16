@@ -6,6 +6,7 @@ import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./notifications/listener"
 import logger from "./logger"
+import { dailyBackup } from "./db_backup/jobs"
 
 const connectionString = `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
 
@@ -42,6 +43,7 @@ const launchJobWorker = async () => {
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
+        crontab: '0 0 * * * databaseBackup',
         taskList : {
             mailPasswordRecovery: async (payload: any, helpers) => {
                 executeJob(async (payload, helpers) => {
@@ -54,7 +56,10 @@ const launchJobWorker = async () => {
                     const { email, code, lang } = payload
                     await sendEmailActivationCode(email, code, lang)
                 }, payload, helpers, 'mailActivation')
-            }
+            },
+            databaseBackup: async (payload: any, helpers) => {
+                executeJob(dailyBackup, payload, helpers, 'databaseBackup')
+            },
         },
         schema: 'worker'
       })
