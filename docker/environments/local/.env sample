@@ -1,4 +1,3 @@
-NC_DB: "pg://sb_db:5432?u=sb&p=somepwd&d=sb_db"
 POSTGRES_DB: sb_db
 POSTGRES_PASSWORD: somepwd
 POSTGRES_USER: sb

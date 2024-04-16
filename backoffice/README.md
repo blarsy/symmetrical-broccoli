@@ -40,6 +40,8 @@ First ensure your web server does not systematically redirect everything to SSL,
 
 `}`
 
+make sure [certbot](https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal) is installed
+
 make sure you uploaded your SSH key to the target server first (should be done only once in the server's lifetime)
 
 `ssh-copy-id -i ~/.ssh/id_rsa.pub root@45.91.169.85`

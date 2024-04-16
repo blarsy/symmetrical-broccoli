@@ -23,10 +23,22 @@ mkdir -p ./build
 
 # copy the built scheduler to a location easy to zip
 rsync -av --progress scheduler ./build --exclude node_modules --exclude .yarn
+
+if [[ ! -f ./build/scheduler/.env.test ]] ; then
+    echo 'File "env.test" for scheduler is not there, aborting.'
+    exit
+fi
+
 cp ./build/scheduler/.env.test ./build/scheduler/.env
 
 # copy the built web api to a location easy to zip
 rsync -av --progress webapi ./build --exclude node_modules --exclude .yarn
+
+if [[ ! -f ./build/webapi/.env.test ]] ; then
+    echo 'File "env.test" for webapi is not there, aborting.'
+    exit
+fi
+
 cp ./build/webapi/.env.test ./build/webapi/.env
 
 # copy the built website to a location easy to zip
@@ -38,15 +50,20 @@ rsync -av --progress backoffice/public ./build/website
 rm -f ./build.zip
 zip -q -r --symlinks ./build.zip ./build
 
-# create docker folder
-ssh root@45.91.168.78 "mkdir -p /home/symbro_test/docker/containers;mkdir -p /home/symbro_test/docker/environments/test;"
-# copy docker files
-scp -rp ./docker/containers/* root@45.91.168.78:/home/symbro_test/docker/containers
-scp -rp ./docker/environments/test/.env root@45.91.168.78:/home/symbro_test/docker/environments/test
-scp -rp ./docker/environments/test/* root@45.91.168.78:/home/symbro_test/docker/environments/test
+if [[ ! -f ./docker/environments/test/.env ]] ; then
+    echo 'File ".env" for docker environment is not there, aborting.'
+    exit
+fi
 
-scp -rp ./build.zip root@45.91.168.78:/home/symbro_test
+# create docker folder
+ssh root@103.13.210.152 "mkdir -p /home/symbro_test/docker/containers;mkdir -p /home/symbro_test/docker/environments/test;"
+# copy docker files
+scp -rp ./docker/containers/* root@103.13.210.152:/home/symbro_test/docker/containers
+scp -rp ./docker/environments/test/.env root@103.13.210.152:/home/symbro_test/docker/environments/test
+scp -rp ./docker/environments/test/* root@103.13.210.152:/home/symbro_test/docker/environments/test
+
+scp -rp ./build.zip root@103.13.210.152:/home/symbro_test
 
 
 # execute remote deployment script
-ssh root@45.91.168.78 "sh " < ./remote_test.sh
+ssh root@103.13.210.152 "sh " < ./remote_test.sh

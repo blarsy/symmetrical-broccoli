@@ -8,8 +8,6 @@ services:
       dockerfile: './Dockerfile'
     ports:
       - "3100:3000"
-    networks:
-      - kamatera
   sb_webapi_test:
     depends_on:
       - sb_db_test
@@ -19,8 +17,16 @@ services:
     ports:
       - "3101:3000"
     restart: always
-    networks:
-      - kamatera
+  sb_proxy:
+    build:
+      context: './proxy'
+    depends_on:
+      - sb_web_test
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/var/local
   sb_db_test:
     env_file:
       - .env
@@ -37,8 +43,6 @@ services:
     restart: always
     volumes: 
       - "db_data_test:/var/lib/postgresql/data"
-    networks:
-      - kamatera
   state_test:
     image: redis
     ports:
@@ -52,11 +56,5 @@ services:
       context: './../../containers/scheduler'
       dockerfile: './Dockerfile'
     restart: always
-    networks:
-      - kamatera
 volumes: 
   db_data_test: {}
-networks:
-  kamatera:
-    name: prod_default
-    external: true
