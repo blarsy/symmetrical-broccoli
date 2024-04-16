@@ -35,8 +35,6 @@ app/android/app/*.keystore
 *.aab
 /webapi/mails/*
 
-/docker/*/scheduler/src
-/scheduler/build
 .pnp*
 
 /webapi/build

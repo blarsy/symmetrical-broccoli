@@ -1,8 +1,3 @@
-# build the scheduler
-cd scheduler
-yarn build
-cd ..
-
 # build the web api
 cd webapi
 yarn build
@@ -16,16 +11,6 @@ cd ..
 # clean build folder
 rm -rf ./build
 mkdir -p ./build
-
-# copy the built scheduler to a location easy to zip
-rsync -av --progress scheduler ./build --exclude node_modules --exclude .yarn
-
-if [[ ! -f ./build/scheduler/.env.production ]] ; then
-    echo 'File "env.production" for scheduler is not there, aborting.'
-    exit
-fi
-
-cp ./build/scheduler/.env.production ./build/scheduler/.env
 
 # copy the built web api to a location easy to zip
 rsync -av --progress webapi ./build --exclude node_modules --exclude .yarn

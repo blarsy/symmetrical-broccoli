@@ -43,18 +43,5 @@ services:
     restart: always
     volumes: 
       - "db_data:/var/lib/postgresql/data"
-  state:
-    image: redis
-    ports:
-      - "6379"
-    restart: always
-  scheduler:
-    depends_on:
-      - sb_db
-      - state
-    build:
-      context: './../../containers/scheduler'
-      dockerfile: './Dockerfile'
-    restart: always
 volumes: 
   db_data: {}
