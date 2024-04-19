@@ -46,6 +46,7 @@ const launchJobWorker = async () => {
         crontab: '0 0 * * * databaseBackup',
         taskList : {
             mailPasswordRecovery: async (payload: any, helpers) => {
+                console.log('mailPasswordRecovery')
                 executeJob(async (payload, helpers) => {
                     const { email, code, lang } = payload
                     await sendAccountRecoveryMail(email, code, lang)

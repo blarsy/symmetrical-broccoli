@@ -75,8 +75,6 @@ export const adaptHeight = (sm: number, md: number, lg: number):number => {
     return lg
 }
 
-export const TOKEN_KEY = 'token'
-
 export const apolloTokenExpiredHandler = {
   handle: () => {
     // It is not the intention that this code executes, it should have been replaced by another function that does more sound things,

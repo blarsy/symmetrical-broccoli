@@ -1,13 +1,14 @@
 import { createContext, useState } from "react"
 import { Account, AccountInfo } from "@/lib/schema"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import dayjs from "dayjs"
 import { gql } from "@apollo/client"
-import { TOKEN_KEY, apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
+import { apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
+import { get, remove, set } from "@/lib/secureStore"
 
 const SPLASH_DELAY = 3000
+const TOKEN_KEY = 'token'
 
 interface AppState {
     token: string
@@ -111,17 +112,16 @@ const AppContextProvider = ({ children }: Props) => {
     }
 
     const logout = async () => {
-        await AsyncStorage.removeItem('token')
+        await remove(TOKEN_KEY)
         setNewAppState({ token: '', account: undefined })
     }
 
     const actions: AppActions = {
         loginComplete: async (token: string): Promise<AccountInfo> => {
-            await AsyncStorage.setItem(TOKEN_KEY, token)
-
-            apolloTokenExpiredHandler.handle = () => { 
-                AsyncStorage.removeItem(TOKEN_KEY)
-                setNewAppState({ token: '', account: undefined })
+            await set(TOKEN_KEY, token)
+            
+            apolloTokenExpiredHandler.handle = async () => { 
+                await logout()
             }
             const authenticatedClient = getAuthenticatedApolloClient(token)
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
@@ -139,11 +139,10 @@ const AppContextProvider = ({ children }: Props) => {
             return account
         },
         tryRestoreToken: async (): Promise<void> => {
-            const token = await AsyncStorage.getItem('token')
+            const token = await get(TOKEN_KEY)
             if(token) {
-                apolloTokenExpiredHandler.handle = () => { 
-                    AsyncStorage.removeItem(TOKEN_KEY)
-                    setNewAppState({ token: '', account: undefined })
+                apolloTokenExpiredHandler.handle = async () => { 
+                    await logout()
                 }
                 const authenticatedClient = getAuthenticatedApolloClient(token)
                 const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
