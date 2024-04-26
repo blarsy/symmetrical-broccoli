@@ -16,11 +16,11 @@ interface Props {
 }
 
 export const AddItemButton = ({ onAddRequested }: { onAddRequested: () => void }) => 
-    <WhiteButton style={{ width: aboveMdWidth() ? '60%' : '80%' }} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
+    <WhiteButton style={{flex: 1}} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
 
 function AppendableList ({ state, dataFromState, displayItem, onAddRequested, contentContainerStyle, onRefreshRequested }:Props) {
-    return <View style={{ flexDirection: 'column', margin: 10, flex:1, alignItems: 'center' }}>
-        <View style={{ display: 'flex', flexDirection: 'row' }}>
+    return <View style={{ flexDirection: 'column', margin: 10, flex: 1, alignItems: 'center' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', width: aboveMdWidth() ? '60%' : '80%'  }}>
             <AddItemButton onAddRequested={onAddRequested} />
             { onRefreshRequested && <IconButton style={{ margin: 2 }} icon="refresh" onPress={onRefreshRequested} /> }
         </View>

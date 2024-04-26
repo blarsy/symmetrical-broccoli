@@ -29,11 +29,13 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 })}
             </View>
         }
-        <TouchableOpacity onPress={async () => pickImage(img => {
-            onImageSelected({ 
-                path: img.uri
-            })
-        }, 400, appContext) }>
+        <TouchableOpacity onPress={async () => {
+            pickImage(img => {
+                onImageSelected({ 
+                    path: img.uri
+                })
+            }, 400, appContext)
+        }}>
             <View style={{ flex: 1, backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 15 }}>
                 <Images.Photos style={{ height: 100, width: '100%', marginBottom: 15 }} fill="#fff" />
                 <Text variant="titleMedium" style={{ color: primaryColor }}>

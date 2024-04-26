@@ -121,7 +121,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
                   </View>}
               />}
           /> :
-          <View style={{ flexDirection: 'column', margin: 10, flex:1, alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', margin: 10 }}>
             <AddItemButton onAddRequested={() => navigation.navigate('newResource')} />
           </View>
         }

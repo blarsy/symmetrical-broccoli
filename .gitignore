@@ -29,9 +29,6 @@ web_test.zip
 .yarn
 .vscode
 .keystore
-app/android/app/build/
-app/android/.*
-app/android/app/*.keystore
 *.aab
 /webapi/mails/*
 
@@ -40,3 +37,6 @@ app/android/app/*.keystore
 /webapi/build
 /build
 /build.zip
+
+/app/ios
+/app/android

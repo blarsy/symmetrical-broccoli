@@ -3,9 +3,10 @@ import { Account, AccountInfo } from "@/lib/schema"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import dayjs from "dayjs"
-import { gql } from "@apollo/client"
+import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
 import { apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
 import { get, remove, set } from "@/lib/secureStore"
+import { registerForPushNotificationsAsync } from "@/lib/pushNotifications"
 
 const SPLASH_DELAY = 3000
 const TOKEN_KEY = 'token'
@@ -37,12 +38,14 @@ interface AppActions {
     pushMessageReceivedHandler: (handler : (msg: any) => void) => void
     popMessageReceivedHandler: () => void
     resetLastNofication: () => void
+    setNewChatMessage: (msg: string) => void
 }
 
 export interface IAppContext {
     state: AppState,
     messageReceivedStack: ((msg: any) => void)[]
     lastNotification?: AppNotification
+    newChatMessage: string
     actions: AppActions
 }
 
@@ -61,6 +64,7 @@ export const AppContext = createContext<IAppContext>({
     state: emptyState, 
     messageReceivedStack: [],
     lastNotification: undefined,
+    newChatMessage: '',
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -74,7 +78,8 @@ export const AppContext = createContext<IAppContext>({
         endOpWithError: e => {},
         pushMessageReceivedHandler: () => {},
         popMessageReceivedHandler: () => {},
-        resetLastNofication: () => {}
+        resetLastNofication: () => {},
+        setNewChatMessage: () => {}
     }
 })
 
@@ -88,10 +93,17 @@ const GET_SESSION_DATA = gql`query GetSessionData {
     }
   }`
 
+const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
+    syncPushToken(input: {token: $token}) {
+      integer
+    }
+  }`  
+
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
     const [messageReceivedStack, setMessageReceivedStack] = useState([] as ((msg: any) => void)[])
     const [lastNotification, setLastNofication] = useState({ message: '' } as AppNotification | undefined)
+    const [newChatMessage, setNewChatMessage] = useState('')
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
@@ -114,16 +126,33 @@ const AppContextProvider = ({ children }: Props) => {
     const logout = async () => {
         await remove(TOKEN_KEY)
         setNewAppState({ token: '', account: undefined })
+        setMessageReceivedStack([])
+    }
+
+    const pushMessageReceivedHandler = (handler: (msg: any) => void) => {
+        messageReceivedStack.push(handler)
+        setMessageReceivedStack(messageReceivedStack)
+    }
+
+    const handleLogin = (token: string): ApolloClient<NormalizedCacheObject> => {
+        apolloTokenExpiredHandler.handle = async () => { 
+            await logout()
+        }
+        const authenticatedClient = getAuthenticatedApolloClient(token)
+        registerForPushNotificationsAsync().then(token => {
+            authenticatedClient.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
+        })
+        pushMessageReceivedHandler((msg: any) => setNewChatMessage(msg))
+        
+        return authenticatedClient
     }
 
     const actions: AppActions = {
         loginComplete: async (token: string): Promise<AccountInfo> => {
             await set(TOKEN_KEY, token)
             
-            apolloTokenExpiredHandler.handle = async () => { 
-                await logout()
-            }
-            const authenticatedClient = getAuthenticatedApolloClient(token)
+            const authenticatedClient = handleLogin(token)
+
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
 
             const account = {
@@ -135,16 +164,13 @@ const AppContextProvider = ({ children }: Props) => {
             }
 
             setNewAppState({ token, account })
-
             return account
         },
         tryRestoreToken: async (): Promise<void> => {
             const token = await get(TOKEN_KEY)
             if(token) {
-                apolloTokenExpiredHandler.handle = async () => { 
-                    await logout()
-                }
-                const authenticatedClient = getAuthenticatedApolloClient(token)
+                const authenticatedClient = handleLogin(token)
+                
                 const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
 
                 const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
@@ -184,20 +210,20 @@ const AppContextProvider = ({ children }: Props) => {
             setNewAppState({ processing: false })
             setLastNofication({ error: e })
         },
-        pushMessageReceivedHandler: handler => {
-            messageReceivedStack.push(handler)
-            setMessageReceivedStack(messageReceivedStack)
-        },
+        pushMessageReceivedHandler,
         popMessageReceivedHandler: () => {
             messageReceivedStack.pop()
             setMessageReceivedStack(messageReceivedStack)
         },
         resetLastNofication: () => {
             setLastNofication(undefined)
+        },
+        setNewChatMessage: (msg: string) => {
+            setNewChatMessage(msg)
         }
     }
 
-    return <AppContext.Provider value={{ state: appState, lastNotification, messageReceivedStack, actions}}>
+    return <AppContext.Provider value={{ state: appState, lastNotification, messageReceivedStack, newChatMessage, actions}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
         </SafeAreaProvider>

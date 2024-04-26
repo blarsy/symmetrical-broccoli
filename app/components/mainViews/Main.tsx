@@ -11,8 +11,7 @@ import Container from '../layout/Container'
 import { adaptHeight, appBarsTitleFontSize } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
 import * as Linking from 'expo-linking'
-import { gql, useMutation, useSubscription } from '@apollo/client'
-import { registerForPushNotificationsAsync } from '@/lib/pushNotifications'
+import { gql, useSubscription } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../NewChatMessages'
 
@@ -24,12 +23,6 @@ const getViewTitleI18n = (viewName: string) => {
         default: return ''
     }
 }
-
-const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
-    syncPushToken(input: {token: $token}) {
-      integer
-    }
-  }`  
 
 const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     messageReceived {
@@ -126,20 +119,17 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 
 export default function Main () {
     const appContext = useContext(AppContext)
-    const [newMessage, setNewMessage] = useState(undefined as any | undefined)
-
-    const [syncPushToken] = useMutation(SYNC_PUSH_TOKEN)
 
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
         appContext.messageReceivedStack[appContext.messageReceivedStack.length - 1](options.data.data.messageReceived.message)
     } })
 
     useEffect(() => {
-        registerForPushNotificationsAsync().then(token => syncPushToken({ variables: { token }}))
-        appContext.actions.pushMessageReceivedHandler((msg: any) => setNewMessage(msg))
-        return () => {
-            appContext.actions.popMessageReceivedHandler()
-        }
+        // registerForPushNotificationsAsync().then(token => syncPushToken({ variables: { token }}))
+        // appContext.actions.pushMessageReceivedHandler((msg: any) => setNewMessage(msg))
+        // return () => {
+        //     appContext.actions.popMessageReceivedHandler()
+        // }
     }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
@@ -181,7 +171,7 @@ export default function Main () {
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />
                     <StackNav.Screen name="profile" component={Profile} key="profile"  />
                 </StackNav.Navigator>
-                <ChatMessagesNotificationArea onClose={() => setNewMessage(undefined)} newMessage={newMessage} />
+                <ChatMessagesNotificationArea onClose={() => appContext.actions.setNewChatMessage('')} newMessage={appContext.newChatMessage} />
             </View>
         </NavigationContainer>
     </Container>

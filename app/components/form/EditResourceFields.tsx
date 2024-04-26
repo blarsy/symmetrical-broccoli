@@ -24,7 +24,9 @@ const EditResourceFields = ({formikState, processing}: Props) => {
     const editResourceContext = useContext(EditResourceContext)
 
     useEffect(() => {
-        editResourceContext.actions.setChangeCallback(() => resetForm())
+        editResourceContext.actions.setChangeCallback(() => {
+            resetForm()
+        })
         return () => editResourceContext.actions.removeChangeCallback()
     }, [])
 
@@ -32,14 +34,15 @@ const EditResourceFields = ({formikState, processing}: Props) => {
         <PicturesField images={values.images} 
             onImageSelected={async img => {
                 try {
-                    await editResourceContext.actions.addImage(img)
+                    await editResourceContext.actions.addImage(img, values)
                 } catch(e) {
                     appContext.actions.setMessage((e as Error).stack!)
                     appContext.actions.notify({ error: e as Error })
                 }
             }}
-            onImageDeleteRequested={img => {editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
-                return editResourceContext.actions.deleteImage(img)
+            onImageDeleteRequested={img => {
+                editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
+                return editResourceContext.actions.deleteImage(img, values)
             }} />
         <TransparentTextInput label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />

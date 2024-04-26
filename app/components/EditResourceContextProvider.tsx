@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react"
+import { SetStateAction, createContext, useEffect, useState } from "react"
 import { Category, ImageInfo, Resource } from "@/lib/schema"
 import React from "react"
 import { uploadImage } from "@/lib/images"
@@ -44,8 +44,8 @@ interface EditResourceActions {
     setResource: (resource: Resource) => void
     setChangeCallback: (cb: () => void) => void
     removeChangeCallback: () => void
-    addImage: (img: ImageInfo) => Promise<void>
-    deleteImage: (img: ImageInfo) => Promise<void>
+    addImage: (img: ImageInfo, resource: Resource) => Promise<void>
+    deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
     save: (resource: Resource, token?: string) => Promise<void>
     reset: () => void
 }
@@ -88,26 +88,33 @@ const EditResourceContextProvider = ({ children }: Props) => {
     const [updateResource] = useMutation(UPDATE_RESOURCE)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
+    const setState = (value: SetStateAction<EditResourceState>) => {
+        //console.log('setEditResourceState', value)
+        setEditResourceState(value)
+    }
+
     useEffect(() => {
         const load = async () => {
             try {
                 const res = await getCategories({ variables: { locale: getLanguage() }})
-                setEditResourceState({ ...editResourceState, categories: fromData(res.data.allResourceCategories.nodes) })
+                setState({ ...editResourceState, categories: fromData(res.data.allResourceCategories.nodes) })
             } catch(e) {
-                setEditResourceState({ ...editResourceState, categories: fromError(e, t('requestError')) })
+                setState({ ...editResourceState, categories: fromError(e, t('requestError')) })
             }
         }
 
         load()
     }, [])
-    
-    const setResource = (resource: Resource) => {
+
+    const getResourcWithExpiration = (resource: Resource) => {
         if(typeof(resource.expiration) === 'string')
             resource.expiration = new Date(resource.expiration as unknown as string)
         
-        const newResourceState = {...editResourceState, ...{ editedResource: resource }}
-        setEditResourceState( newResourceState )
-        editResourceState.changeCallbacks.forEach(cb => cb())
+        return resource
+    }
+    
+    const setResource = (resource: Resource) => {
+        setState( {...editResourceState, ...{ editedResource: getResourcWithExpiration(resource) } })
     }
 
     const actions: EditResourceActions = {
@@ -120,13 +127,12 @@ const EditResourceContextProvider = ({ children }: Props) => {
             editResourceState.changeCallbacks.pop()
             setEditResourceState({ ...editResourceState })
         },
-        addImage: async (img: ImageInfo) => {
+        addImage: async (img: ImageInfo, resource: Resource) => {
             if(!img.path) throw new Error('Image has not local path')
 
-            setEditResourceState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...editResourceState.editedResource, ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
-            editResourceState.changeCallbacks.forEach(cb => cb())
+            setState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...getResourcWithExpiration(resource), ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
         },
-        deleteImage: async (img: ImageInfo) => {
+        deleteImage: async (img: ImageInfo, resource: Resource) => {
             let updatedImagesToAdd = editResourceState.imagesToAdd
             let updatedImages = editResourceState.editedResource.images
             if(img.path){
@@ -135,8 +141,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             } else {
                 updatedImages = updatedImages.filter(curImg => curImg.publicId != img.publicId)
             }
-            setEditResourceState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...editResourceState.editedResource, ...{ images: updatedImages } } })
-            editResourceState.changeCallbacks.forEach(cb => cb())
+            setState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...getResourcWithExpiration(resource), ...{ images: updatedImages } } })
         },
         save: async (resource: Resource, token?: string) => {
             if(editResourceState.editedResource.id) {
@@ -162,7 +167,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     categoryCodes: resource.categories.map(cat => cat.code.toString()),
                     imagesPublicIds: resource.images.map(img => img.publicId)
                 }})
-                setEditResourceState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
+                setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             } else {
                 let imagesPublicIds: string[] = []
                 if(editResourceState.imagesToAdd.length > 0) {
@@ -190,13 +195,13 @@ const EditResourceContextProvider = ({ children }: Props) => {
                 }
 
                 resource.images = imagesPublicIds.map(pId => ({ publicId: pId }))
-                setEditResourceState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
+                setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             }
             editResourceState.changeCallbacks.forEach(cb => cb())
         },
         reset: () => {
             const newResourceState = {...editResourceState, ...{ editedResource: blankResource, imagesToAdd: [] }}
-            setEditResourceState( newResourceState )
+            setState( newResourceState )
         }
     }
 
