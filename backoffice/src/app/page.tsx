@@ -1,6 +1,6 @@
 "use client"
 import { primaryColor } from "@/utils"
-import { Box, Button, IconButton, Stack, Theme, Typography } from "@mui/material"
+import { Box, IconButton, Stack, Theme, Typography } from "@mui/material"
 import createTheme, { fonts } from '@/theme'
 import { ThemeProvider } from "@emotion/react"
 import FbLogo from './img/FACEBOOK.svg'
@@ -25,7 +25,6 @@ import { Swiper as SwiperType } from "swiper"
 import { Autoplay } from 'swiper/modules'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
-import { Apps } from "@mui/icons-material"
 
 const PresentationCarousel = ({ theme }: { theme: Theme }) => {
     const swiperRef = useRef<SwiperType>()
@@ -134,7 +133,18 @@ const Page = () => {
                 </Box>
             </Stack>
             <PresentationCarousel theme={theme} />
-            <Stack alignItems="center" justifyContent="center" flexDirection="row" paddingBottom="3rem">
+            <Stack alignItems="center" justifyContent="center" sx={theme => ({
+                flexDirection: 'column',
+                paddingTop: '2rem',
+                gap: '1rem',
+                [theme.breakpoints.up('md')]: {
+                    paddingTop: '0'
+                },
+                [theme.breakpoints.up('sm')]: {
+                    flexDirection: 'row',
+                    gap: '0'
+                },
+            })} paddingBottom="3rem">
                 <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
                 <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
             </Stack>
