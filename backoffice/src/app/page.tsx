@@ -110,7 +110,7 @@ const Page = () => {
                     }
                 })} alignItems="center">
                     <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
-                        sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app des assos&#39; qui fait tourner les ressources.</Typography>
+                        sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app qui fait tourner les ressources.</Typography>
                     <Typography textAlign="center" color="#000" sx={{ 
                         padding: '3rem',
                         backgroundImage: `url('/FOND.svg')`,
@@ -120,7 +120,7 @@ const Page = () => {
                         [theme.breakpoints.down('md')]: {
                             padding: '2.5rem 1.5rem'
                         }
-                    }}>La <b>solidarit&#233;</b>, on y croit dur comme fer.&#160; La mission de Tope-l&#224; est archi-simple : mettre en lien les associations qui ont des ressources &#224; partager avec celles qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
+                    }}>La <b>solidarit&#233;</b>, on y croit dur comme fer. La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
                     <Link href="https://forms.gle/VhgXtnRToprjWYeU8" style={{ alignSelf: 'center', height: '100px' }}><LetsConnect height="100%" /></Link>
                 </Stack>
                 <Box sx={theme => ({

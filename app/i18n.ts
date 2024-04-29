@@ -129,7 +129,7 @@ const resources = {
       "name_too_long": "Veuillez utiliser un nom plus court",
       "password_invalid": "Le mot de passe doit comporter au moins 8 caractères, au moins une majustcule et un caractère non-alphabétique.",
       "passwords_dont_match": "Les mots de passe fournis ne sont pas identiques.",
-      "organization_name_label": "Nom de l'association",
+      "organization_name_label": "Nom de l'activité",
       "save_label": "Sauver",
       "create_label": "Créer",
       "register_page_title": "Inscription",

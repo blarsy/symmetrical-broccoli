@@ -18,11 +18,11 @@ const Step1 = () => <Stack maxWidth={1100} display="flex" justifyContent="center
     <Stack justifyContent="center">
         <Box>
             <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Troc</Typography>
-            <Typography color="#000" component="span">Tu as du mat&eacute;riel dont tu n&apos;as plus besoin ? Tu peux le proposer au troc sur l&apos;application. Cela permet &agrave; d&apos;autres associations de <b>l&apos;emprunter ou de l&apos;utiliser</b> temporairement, tout en vous permettant de r&eacute;cup&eacute;rer des ressources dont tu as besoin.</Typography>
+            <Typography color="#000" component="span">Tu as du mat&eacute;riel dont tu n&apos;as plus besoin ? Tu peux le proposer au troc sur l&apos;application. Cela permet &agrave; d&apos;autres toppeurs de <b>l&apos;emprunter ou de l&apos;utiliser</b> temporairement, tout en te permettant de r&eacute;cup&eacute;rer des ressources dont tu as besoin.</Typography>
         </Box>
         <Box>
             <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Donne</Typography>
-            <Typography color="#000" component="span">Si tu es pr&ecirc;t &agrave; faire don de ressources sans attendre quoi que ce soit en retour (parce que tu es une personne m&eacute;ga sympa), utilise la fonction &quot;Donne&quot; pour <b>partager</b> ta g&eacute;n&eacute;rosit&eacute;. C&apos;est une mani&egrave;re simple et efficace d&apos;aider d&apos;autres associations dans le besoin.</Typography>
+            <Typography color="#000" component="span">Si tu es pr&ecirc;t &agrave; faire don de ressources sans attendre quoi que ce soit en retour (parce que tu es une personne m&eacute;ga sympa), utilise la fonction &quot;Don&quot; pour <b>partager</b> ta g&eacute;n&eacute;rosit&eacute;. C&apos;est une mani&egrave;re simple et efficace d&apos;aider d&apos;autres toppeurs dans le besoin.</Typography>
         </Box>
         <Box>
             <Typography paddingRight="2rem" component="span" fontFamily={fonts.title.style.fontFamily} color={primaryColor}>Tope</Typography>
