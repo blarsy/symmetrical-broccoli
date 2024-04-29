@@ -1,5 +1,5 @@
 import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { ScrollView, View } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { t } from '@/i18n'
@@ -123,14 +123,6 @@ export default function Main () {
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
         appContext.messageReceivedStack[appContext.messageReceivedStack.length - 1](options.data.data.messageReceived.message)
     } })
-
-    useEffect(() => {
-        // registerForPushNotificationsAsync().then(token => syncPushToken({ variables: { token }}))
-        // appContext.actions.pushMessageReceivedHandler((msg: any) => setNewMessage(msg))
-        // return () => {
-        //     appContext.actions.popMessageReceivedHandler()
-        // }
-    }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
         <NavigationContainer linking={{

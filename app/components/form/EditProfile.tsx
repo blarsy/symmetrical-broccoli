@@ -2,7 +2,7 @@ import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
 import * as yup from 'yup'
 import { AppContext } from "@/components/AppContextProvider"
-import { aboveMdWidth, adaptToWidth, pickImage } from "@/lib/utils"
+import { aboveMdWidth, adaptToWidth, initials, pickImage } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
 import { View } from "react-native"
@@ -16,13 +16,6 @@ const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String,
         integer
     }
 }`
-
-const initials = (text: string) => {
-    if(text)
-        return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
-
-    return ""
-}
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)

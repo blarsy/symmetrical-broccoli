@@ -8,7 +8,7 @@ import Chat from './Chat'
 import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
-import { appBarsTitleFontSize } from "@/lib/utils"
+import { appBarsTitleFontSize, initials } from "@/lib/utils"
 import EditResourceContextProvider from "../EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
@@ -32,12 +32,12 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
-const ProfileIcon = ({ account}: { account?: AccountInfo }) => {
-    if(!account) return <Icon source="login-variant" size={30}/>
+const ProfileIcon = ({ account, size}: { account?: AccountInfo, size: number }) => {
+    if(!account) return <Icon source="login-variant" size={size}/>
     if(account.avatarPublicId)
-        return <Avatar.Image size={54} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
+        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
 
-    return <Images.Profile />
+    return <Avatar.Text size={size} label={initials(account.name)} />
 }
 
 const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
@@ -45,14 +45,19 @@ const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHe
     const [currentTabTitle, setCurrentTabTitle] = useState('')
     const [connecting, setConnecting] = useState(false)
 
+    const profileButtonSize = appBarsTitleFontSize * 1.5
+
     return <EditResourceContextProvider>
         <SearchFilterContextProvider>
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
-                    <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff' }} 
-                        icon={p => <ProfileIcon account={appContext.state.account} />} 
-                        size={appContext.state.account?.avatarPublicId ? 54 : 30} onPress={() => { 
+                    <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
+                        icon={p => <ProfileIcon account={appContext.state.account} size={p.size} />} 
+                        size={ appContext.state.account ? profileButtonSize : appBarsTitleFontSize }
+                        centered
+                        borderless
+                        onPress={() => { 
                             if(appContext.state.account) {
                                 navigation.navigate('profile')
                             } else {
