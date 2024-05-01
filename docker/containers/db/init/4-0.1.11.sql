@@ -18,6 +18,26 @@ begin
 end;
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.sync_push_token(
+	token character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+BEGIN
+	UPDATE sb.accounts_push_tokens SET token = sync_push_token.token, last_time_used = NOW()
+	WHERE account_id = sb.current_account_id();
+	
+	IF NOT FOUND THEN
+		INSERT INTO sb.accounts_push_tokens (account_id, token, last_time_used)
+		VALUES (sb.current_account_id(), sync_push_token.token, NOW());
+	END IF;
+	
+	RETURN 1;
+END;
+$BODY$;
+
 DO
 $body$
 BEGIN
