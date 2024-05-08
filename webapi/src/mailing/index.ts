@@ -67,7 +67,6 @@ export const sendEmailActivationCode = async (email: string, code: string, lang:
 }
 
 export const sendAccountRecoveryMail = async (email: string, code: string, lang: string) => {
-    console.log(`sendAccountRecoveryMail ${email}, ${code}`)
     const t = await initTranslations(lang)
     const heading = t('recover_account_subject')
     const link = `${config.webAppUrl}recover/${code}`

@@ -1,9 +1,9 @@
-{
+module.exports = {
   "expo": {
     "name": "Tope la",
     "slug": "tope-la",
     "scheme": "topela",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.topela",
-      "buildNumber": "0.1.12",
+      "buildNumber": "0.1.13",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -55,7 +55,7 @@
         "backgroundColor": "#ff4401"
       },
       "package": "com.topela",
-      "versionCode": 92
+      "versionCode": 93
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -63,7 +63,8 @@
     "extra": {
       "eas": {
         "projectId": "484b7ec5-78c2-47e0-bc80-4f9182b4916a"
-      }
+      },
+      "storybookEnabled": process.env.STORYBOOK_ENABLED
     },
     "plugins": [
       "expo-localization",
@@ -72,7 +73,8 @@
         {
           "photosPermission": "Tope-là voudrait accéder à vos fichiers images pour vous permettre de choisir les photos de vos ressources, et le logo de votre activité."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "owner": "tope_la"
   }

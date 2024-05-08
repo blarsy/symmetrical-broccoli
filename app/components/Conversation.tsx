@@ -19,7 +19,8 @@ interface Props {
 
 const asIMessages = (messages: any[]): IMessage[] => messages.map(msg => asIMessage(msg))
 
-const asIMessage = (msg: any): IMessage => ({
+const asIMessage = (msg: any): IMessage => {
+  return {
     _id: msg.id,
     text: msg.text,
     createdAt: msg.created,
@@ -34,7 +35,8 @@ const asIMessage = (msg: any): IMessage => ({
     pending: false,
     received: !!msg.received,
     sent: true,
-})
+  }
+}
 
 const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int, $otherAccountId: Int) {
     conversationMessages(resourceId: $resourceId, otherAccountId: $otherAccountId) {
@@ -95,18 +97,22 @@ const Conversation = ({ resourceId, otherAccountId, otherAccountName }: Props) =
         }
     }
 
+    const onMessageReceived = (msg: any) => {
+      const receivedMsg = asIMessage(msg)
+      setMessages(messages => {
+        GiftedChat.append(messages, [receivedMsg])
+        return [receivedMsg, ...messages]
+      })
+    }
+
     useEffect(() => {
         loadMessages()
-        navigation.addListener('focus', () => appContext.actions.pushMessageReceivedHandler((msg: any) => {
-          const receivedMsg = asIMessage(msg)
-          setMessages(messages => {
-            GiftedChat.append(messages, [receivedMsg])
-            return [receivedMsg, ...messages]
-          })
-        }))
-        navigation.addListener('blur', () => appContext.actions.popMessageReceivedHandler())
+        navigation.addListener('focus', () => {
+          appContext.actions.setMessageReceived(onMessageReceived)
+        })
+        navigation.addListener('blur', () => appContext.actions.resetMessageReceived())
         return () => {
-            appContext.actions.popMessageReceivedHandler()
+            appContext.actions.resetMessageReceived()
         }
     }, [ resourceId ])
 

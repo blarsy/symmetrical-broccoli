@@ -169,7 +169,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                             navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {
-                                    resourceid: resource.id,
+                                    resourceId: resource.id,
                                     otherAccountId: appContext.state.account.id,
                                     otherAccountName: appContext.state.account.name
                                 }
@@ -178,7 +178,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                             setConnectingTowardsResource(resource.id)
                         }
                     }}
-                    onPress={() => navigation.navigate('viewResource', { resourceid: resource.id })} />
+                    onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
                 }} />
         <ConnectionDialog onCloseRequested={() => setConnectingTowardsResource(undefined)} visible={!!connectingTowardsResource} infoTextI18n="introduce_yourself"
             onDone={async (token, account) => {
@@ -186,7 +186,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 navigation.navigate('chat', {
                     screen: 'conversation',
                     params: {
-                        resourceid: connectingTowardsResource,
+                        resourceId: connectingTowardsResource,
                         otherAccountId: account.id,
                         otherAccountName: account.name
                     }

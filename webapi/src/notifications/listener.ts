@@ -8,14 +8,18 @@ interface NewMessageNotificationPayload {
     text: string
     sender: string
     resourceId: number
+    otherAccountId: number
+    otherAccountName: string
     pushToken: string
 }
 
-const toMessageNotfication = (payload: any): NewMessageNotificationPayload => ({
+const toMessageNotification = (payload: any): NewMessageNotificationPayload => ({
     messageId: payload.message_id,
     text: payload.text || '<Image>',
     sender: payload.sender,
     resourceId: payload.resource_id,
+    otherAccountId: payload.other_account_id,
+    otherAccountName: payload.other_account_name,
     pushToken: payload.push_token
 })
 
@@ -39,16 +43,14 @@ export class NotificationsListener {
     }
 
     async onNotification(notification: PgParsedNotification) {
-        console.log('NOTIF !!', JSON.stringify(notification))
         if(!notification.payload) throw new Error('Expected payload on notification, got none')
 
-        const messageNotif = toMessageNotfication(notification.payload)
+        const messageNotif = toMessageNotification(notification.payload)
 
-        //{"processId":572,"channel":"message_created","payload":{"message_id":57,"text":"content","sender":"Silex","conversation_id":21}}
         try {
             logger.info(`Push notification ${JSON.stringify(messageNotif)}.`)
             await sendPushNotification([ { to: messageNotif.pushToken, body: messageNotif.text, title: messageNotif.sender, data: {
-                url: `${config.pushNotificationsUrlPrefix}conversation?resourceid=${messageNotif.resourceId}`
+                url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${messageNotif.otherAccountName}`
             }} ])
         } catch(e) {
             logger.error(`Error while sending push notification to Expo. Pushtoken: ${messageNotif.pushToken}`, e)

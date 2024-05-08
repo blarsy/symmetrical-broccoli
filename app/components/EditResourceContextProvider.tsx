@@ -89,7 +89,6 @@ const EditResourceContextProvider = ({ children }: Props) => {
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
     const setState = (value: SetStateAction<EditResourceState>) => {
-        //console.log('setEditResourceState', value)
         setEditResourceState(value)
     }
 

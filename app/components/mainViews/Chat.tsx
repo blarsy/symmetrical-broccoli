@@ -21,7 +21,7 @@ interface ChatHeaderProps extends NativeStackHeaderProps {
 
 const ChatHeader = (p: ChatHeaderProps) => {
     const editResourceContext = useContext(EditResourceContext)
-    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number((p.route.params! as any).resourceid) }})
+    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number((p.route.params! as any).resourceId) }})
     let resource: Resource | undefined = undefined
     const exchangeTypes: string[] = []
     
@@ -64,7 +64,7 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     if(appContext.state.account) {
         return <ChatBackground>
-            <PastConversations onConversationSelected={(resource, otherAccountId, otherAccountName) => navigation.navigate('conversation', { resourceid: resource.id, otherAccountId, otherAccountName })} />
+            <PastConversations onConversationSelected={(resource, otherAccountId, otherAccountName) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId, otherAccountName })} />
         </ChatBackground>
     } else {
         return <Text style={{ textAlign: 'center', textTransform: 'uppercase', margin:10 }}>{t('connect_to_chat')}</Text>
@@ -72,7 +72,7 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
 }
 
 const ConversationDetail = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <Conversation resourceId={route.params.resourceid} otherAccountId={route.params.otherAccountId} otherAccountName={route.params.otherAccountName} />
+    <Conversation resourceId={route.params.resourceId} otherAccountId={route.params.otherAccountId} otherAccountName={route.params.otherAccountName} />
 </ChatBackground>
 
 const StackNav = createNativeStackNavigator()

@@ -35,17 +35,17 @@ interface AppActions {
     beginOp: () => void
     endOp: () => void
     endOpWithError: (error: any) => void
-    pushMessageReceivedHandler: (handler : (msg: any) => void) => void
-    popMessageReceivedHandler: () => void
+    onMessageReceived: (msg: any) => void
+    setMessageReceived: (fn: (msg: any) => void) => void
+    resetMessageReceived: () => void
     resetLastNofication: () => void
-    setNewChatMessage: (msg: string) => void
+    setNewChatMessage: (msg: any) => void
 }
 
 export interface IAppContext {
     state: AppState,
-    messageReceivedStack: ((msg: any) => void)[]
     lastNotification?: AppNotification
-    newChatMessage: string
+    newChatMessage: any
     actions: AppActions
 }
 
@@ -62,9 +62,8 @@ const emptyState: AppState = {
 
 export const AppContext = createContext<IAppContext>({
     state: emptyState, 
-    messageReceivedStack: [],
     lastNotification: undefined,
-    newChatMessage: '',
+    newChatMessage: undefined,
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -76,8 +75,9 @@ export const AppContext = createContext<IAppContext>({
         beginOp: () => {},
         endOp: () => {},
         endOpWithError: e => {},
-        pushMessageReceivedHandler: () => {},
-        popMessageReceivedHandler: () => {},
+        onMessageReceived: () => {},
+        setMessageReceived: () => {},
+        resetMessageReceived: () => {},
         resetLastNofication: () => {},
         setNewChatMessage: () => {}
     }
@@ -101,9 +101,11 @@ const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
-    const [messageReceivedStack, setMessageReceivedStack] = useState([] as ((msg: any) => void)[])
+    // Remember: storing functions with useState is little bit weird, as the 'set' function has an overload that
+    // takes a callback, and executes it immediately, we have to work around that using tricks
+    const [messageReceivedCallback, setMessageReceivedCallback] = useState<(msg: any) => void>(() => {})
     const [lastNotification, setLastNofication] = useState({ message: '' } as AppNotification | undefined)
-    const [newChatMessage, setNewChatMessage] = useState('')
+    const [newChatMessage, setNewChatMessage] = useState(undefined as any)
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
@@ -118,6 +120,10 @@ const AppContextProvider = ({ children }: Props) => {
         })
     }
 
+
+
+    const resetMessageReceived = () => setMessageReceivedCallback(() => (msg: any) => setNewChatMessage(msg))
+
     const setNewAppState = (newAppState: any) => {
         const fullNewAppState = { ...appState, ...newAppState }
         setAppState(fullNewAppState)
@@ -126,12 +132,7 @@ const AppContextProvider = ({ children }: Props) => {
     const logout = async () => {
         await remove(TOKEN_KEY)
         setNewAppState({ token: '', account: undefined })
-        setMessageReceivedStack([])
-    }
-
-    const pushMessageReceivedHandler = (handler: (msg: any) => void) => {
-        messageReceivedStack.push(handler)
-        setMessageReceivedStack(messageReceivedStack)
+        resetMessageReceived()
     }
 
     const handleLogin = (token: string): ApolloClient<NormalizedCacheObject> => {
@@ -142,7 +143,7 @@ const AppContextProvider = ({ children }: Props) => {
         registerForPushNotificationsAsync().then(token => {
             authenticatedClient.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
         })
-        pushMessageReceivedHandler((msg: any) => setNewChatMessage(msg))
+        resetMessageReceived()
         
         return authenticatedClient
     }
@@ -210,20 +211,18 @@ const AppContextProvider = ({ children }: Props) => {
             setNewAppState({ processing: false })
             setLastNofication({ error: e })
         },
-        pushMessageReceivedHandler,
-        popMessageReceivedHandler: () => {
-            messageReceivedStack.pop()
-            setMessageReceivedStack(messageReceivedStack)
-        },
+        setMessageReceived: fn => setMessageReceivedCallback(() => fn),
+        resetMessageReceived,
+        onMessageReceived: (msg) => messageReceivedCallback(msg),
         resetLastNofication: () => {
             setLastNofication(undefined)
         },
-        setNewChatMessage: (msg: string) => {
+        setNewChatMessage: (msg: any) => {
             setNewChatMessage(msg)
         }
     }
 
-    return <AppContext.Provider value={{ state: appState, lastNotification, messageReceivedStack, newChatMessage, actions}}>
+    return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, actions}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
         </SafeAreaProvider>

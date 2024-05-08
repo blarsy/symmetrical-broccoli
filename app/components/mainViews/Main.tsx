@@ -32,7 +32,11 @@ const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
             text
             created
             received
+            imageByImageId {
+                publicId
+            }
             participantByParticipantId {
+                id
                 accountByAccountId {
                     name
                     id
@@ -91,7 +95,7 @@ const subscribe = (listener: any) => {
 
 interface ChatMessagesNotificationAreaProps {
     onClose: () => void
-    newMessage: string
+    newMessage: any
 }
 
 const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotificationAreaProps) => {
@@ -102,13 +106,10 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
             style={{ backgroundColor: lightPrimaryColor}}>
             <ScrollView style={{ maxHeight: adaptHeight(80, 150, 300) }}>
                 <NewChatMessages newMessages={newMessage ? [newMessage] : []} onClose={onClose}
-                    onRequestConversationOpen={resource => {
+                    onRequestConversationOpen={(resourceId, otherAccountId, otherAccountName) => {
                         navigation.navigate('chat', {
                             screen: 'conversation',
-                            params: {
-                                resourceid: resource.id,
-                                otherResourceId: appContext.state.account!.id
-                            }
+                            params: { resourceId, otherAccountId, otherAccountName }
                         })
                         onClose()
                     }} />
@@ -121,7 +122,7 @@ export default function Main () {
     const appContext = useContext(AppContext)
 
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
-        appContext.messageReceivedStack[appContext.messageReceivedStack.length - 1](options.data.data.messageReceived.message)
+        appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
     } })
 
     return <Container style={{ flexDirection: 'column' }}>
@@ -163,7 +164,7 @@ export default function Main () {
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />
                     <StackNav.Screen name="profile" component={Profile} key="profile"  />
                 </StackNav.Navigator>
-                <ChatMessagesNotificationArea onClose={() => appContext.actions.setNewChatMessage('')} newMessage={appContext.newChatMessage} />
+                <ChatMessagesNotificationArea onClose={() => appContext.actions.setNewChatMessage(undefined)} newMessage={appContext.newChatMessage} />
             </View>
         </NavigationContainer>
     </Container>
