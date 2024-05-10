@@ -16,6 +16,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import EditResource from "../form/EditResource"
 import ViewResource from "../ViewResource"
+import { SearchFilterContext } from "../SearchFilterContextProvider"
 
 const RESOURCES = gql`query MyResources {
     myresources {
@@ -71,6 +72,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
+    const searchFilterContext = useContext(SearchFilterContext)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
     const [sendAgain] = useMutation(SEND_AGAIN)
     const [hideBanner, setHideBanner] = useState(false)
@@ -132,6 +134,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
                   resourceId: deletingResource
                 } })
                 await refetch()
+                searchFilterContext.actions.requery(editResourceContext.state.categories.data)
                 setDeletingResource(0)
               } else {
                 setDeletingResource(0)

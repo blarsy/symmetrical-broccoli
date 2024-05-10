@@ -40,3 +40,4 @@ web_test.zip
 
 /app/ios
 /app/android
+*storybook.log

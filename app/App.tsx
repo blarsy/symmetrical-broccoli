@@ -28,11 +28,11 @@ function App() {
 
 let AppEntryPoint;
 
-if (Constants.expoConfig.extra.storybookEnabled === "true") {
-  AppEntryPoint = require("./.storybook").default;
-} else {
+// if (Constants.expoConfig.extra.storybookEnabled === "true") {
+//   AppEntryPoint = require("./.storybook").default;
+// } else {
   AppRegistry.registerComponent("topela", () => App)
   AppEntryPoint = App
-}
+// }
 
 export default AppEntryPoint

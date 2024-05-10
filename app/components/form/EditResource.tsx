@@ -12,6 +12,7 @@ import { Portal } from "react-native-paper"
 import { ErrorSnackbar } from "../OperationFeedback"
 import ConnectionDialog from "../ConnectionDialog"
 import { AccountInfo, Resource } from "@/lib/schema"
+import { SearchFilterContext } from "../SearchFilterContextProvider"
 
 interface DialogProps {
     onDone: (token: string, account: AccountInfo) => Promise<void>
@@ -27,6 +28,7 @@ const Dialog = ({ onDone, visible, onCloseRequested}: DialogProps) =>
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
+    const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
     const [connecting, setConnecting] = useState(false)
 
@@ -41,7 +43,7 @@ export default ({ route, navigation }:RouteProps) => {
         try {
             await editResourceContext.actions.save(values, token)
             setSaveResourcestate(fromData(null))
-
+            searchFilterContext.actions.requery(editResourceContext.state.categories.data)
             navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
@@ -80,7 +82,8 @@ export default ({ route, navigation }:RouteProps) => {
                 </Portal>
                 <Dialog visible={connecting} onDone={async (token) => {
                     setConnecting(false)
-                    createResource(formikState.values, token)
+                    await createResource(formikState.values, token)
+                    searchFilterContext.actions.requery(editResourceContext.state.categories.data)
                 }} onCloseRequested={() => {
                     setConnecting(false)
                 }}/>

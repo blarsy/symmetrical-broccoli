@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
-import { Resource, fromServerGraphResources } from "@/lib/schema"
+import { Resource } from "@/lib/schema"
 import { IconButton, Text, TextInput } from "react-native-paper"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
@@ -16,7 +16,6 @@ import { ScrollView } from "react-native-gesture-handler"
 import dayjs from "dayjs"
 import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
-import { gql, useLazyQuery } from "@apollo/client"
 import { EditResourceContext } from "../EditResourceContextProvider"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../ViewResource"
@@ -34,49 +33,6 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
         <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
     </View>
 }
-
-const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: String, $isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
-    suggestedResources(
-      searchTerm: $searchTerm
-      canBeDelivered: $canBeDelivered
-      canBeExchanged: $canBeExchanged
-      canBeGifted: $canBeGifted
-      canBeTakenAway: $canBeTakenAway
-      isProduct: $isProduct
-      isService: $isService
-      categoryCodes: $categoryCodes
-    ) {
-      nodes {
-        accountByAccountId {
-          name
-          id
-        }
-        created
-        description
-        title
-        canBeExchanged
-        canBeGifted
-        resourcesImagesByResourceId {
-          nodes {
-            imageByImageId {
-              publicId
-            }
-          }
-        }
-        expiration
-        isProduct
-        isService
-        id
-        canBeTakenAway
-        canBeDelivered
-        resourcesResourceCategoriesByResourceId {
-          nodes {
-            resourceCategoryCode
-          }
-        }
-      }
-    }
-  }`
 
 interface ResourceCartProps {
     onPress: ((event: GestureResponderEvent) => void) | undefined,
@@ -109,57 +65,48 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
 const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const editResourceState = useContext(EditResourceContext)
-    const [getSuggestedArticles, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
-        categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
-        searchTerm: searchFilterContext.state.search,
-        ...searchFilterContext.state.options
-    } })
+    const editResourceContext = useContext(EditResourceContext)
     const [connectingTowardsResource, setConnectingTowardsResource] = useState(undefined as number | undefined)
 
-    const debouncedFilters = useDebounce(searchFilterContext.state, 700)
+    const debouncedFilters = useDebounce(searchFilterContext.filter, 700)
 
     useEffect(() => {
-        getSuggestedArticles({ variables: {
-            categoryCodes: searchFilterContext.state.categories.map(cat => cat.code.toString()),
-            searchTerm: searchFilterContext.state.search,
-            ...searchFilterContext.state.options
-        }})
+        searchFilterContext.actions.requery(editResourceContext.state.categories.data)
     }, [debouncedFilters])
 
     return <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
-        <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.state.categories, options: searchFilterContext.state.options })} value={searchFilterContext.state.search} />
-        <CategoriesSelect value={searchFilterContext.state.categories} labelVariant="bodyMedium"
-            onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, categories, options: searchFilterContext.state.options })} />
+        <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options })} value={searchFilterContext.filter.search} />
+        <CategoriesSelect value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
+            onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options })} />
         <AccordionItem title={t('options_title')}>
             <View style={{ flexDirection: 'column' }}>
             <CheckboxGroup title={''} options={{
-                    isProduct: t('isProduct_label'), isService: t('isService_label') }} values={searchFilterContext.state.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
-                    categories: searchFilterContext.state.categories, 
+                    isProduct: t('isProduct_label'), isService: t('isService_label') }} values={searchFilterContext.filter.options as any}
+                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                    categories: searchFilterContext.filter.categories, 
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
                     borderBottomWidth: StyleSheet.hairlineWidth,
                     borderStyle: 'dashed'
                 }} />
-            <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.state.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
-                    categories: searchFilterContext.state.categories, 
+            <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
+                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                    categories: searchFilterContext.filter.categories, 
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
                     borderBottomWidth: StyleSheet.hairlineWidth,
                     borderStyle: 'dashed'
                 }} />
-            <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.state.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.state.search, 
-                    categories: searchFilterContext.state.categories, 
+            <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
+                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                    categories: searchFilterContext.filter.categories, 
                     options: values as any as SearchOptions })} />
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={loading || editResourceState.state.categories.loading} error={error} data={data && data.suggestedResources && fromServerGraphResources(data.suggestedResources.nodes, editResourceState.state.categories.data!)}
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || editResourceContext.state.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
             displayItem={(res, idx) => {
                 const resource = res as Resource
                 return <ResourceCard 
