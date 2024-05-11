@@ -11,11 +11,11 @@ const config = getDefaultConfig(__dirname)
 
 const { transformer, resolver } = config
 
-//const { generate } = require('@storybook/react-native/scripts/generate')
+const { generate } = require('@storybook/react-native/scripts/generate')
 
-// generate({
-//   configPath: path.resolve(__dirname, './.storybook'),
-// })
+generate({
+  configPath: path.resolve(__dirname, './.storybook'),
+})
 
 config.transformer = {
   ...transformer,

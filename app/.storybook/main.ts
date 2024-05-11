@@ -1,24 +1,8 @@
-import type { StorybookConfig } from "@storybook/react-webpack5";
+import { StorybookConfig } from '@storybook/react-native';
 
-const config: StorybookConfig = {
-  stories: [
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-  ],
-  addons: [
-    "@storybook/addon-webpack5-compiler-swc",
-    "@storybook/addon-onboarding",
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@chromatic-com/storybook",
-    "@storybook/addon-interactions",
-  ],
-  framework: {
-    name: "@storybook/react-webpack5",
-    options: {},
-  },
-  docs: {
-    autodocs: "tag",
-  },
+const main: StorybookConfig = {
+  stories: ['./stories/**/*.stories.?(ts|tsx|js|jsx)', '../components/**/*.stories.?(ts|tsx|js|jsx)'],
+  addons: ['@storybook/addon-ondevice-controls', '@storybook/addon-ondevice-actions'],
 };
-export default config;
+
+export default main;
