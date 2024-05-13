@@ -7,6 +7,7 @@ import { en, fr, registerTranslation } from 'react-native-paper-dates'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
+import Constants from 'expo-constants'
 import { getLanguage } from './lib/utils'
 import './lib/logger'
 
@@ -26,6 +27,13 @@ function App() {
   </AppContextProvider>
 }
 
-AppRegistry.registerComponent("topela", () => App)
+let AppEntryPoint
 
-export default App
+if (Constants.expoConfig.extra.storybookEnabled === "true") {
+  AppEntryPoint = require("./.storybook").default;
+} else {
+  AppRegistry.registerComponent("topela", () => App)
+  AppEntryPoint = App
+}
+
+export default AppEntryPoint
