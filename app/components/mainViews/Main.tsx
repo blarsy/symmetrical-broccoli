@@ -14,6 +14,7 @@ import * as Linking from 'expo-linking'
 import { gql, useSubscription } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../NewChatMessages'
+import { debug } from '@/lib/logger'
 
 const StackNav = createNativeStackNavigator()
 
@@ -65,10 +66,12 @@ const getInitialURL = async () => {
 
     // Handle URL from expo push notifications
     const response = await getLastNotificationResponseAsync()
+    debug({ message: `Push notifications received in getInitialUrl, linking to ${response?.notification.request.content.data.url}` })
     return response?.notification.request.content.data.url
 }
 const subscribe = (listener: any) => {
     const onReceiveURL = ({ url }: { url: string }) => {
+        debug({ message: `Push notifications received in Linking.addEventListener, linking to ${url}` })
         listener(url)
     }
 
@@ -82,6 +85,7 @@ const subscribe = (listener: any) => {
             const url = response.notification.request.content.data.url
     
             // Let React Navigation handle the URL
+            debug({ message: `Push notifications received in addNotificationResponseReceivedListener, linking to ${url}` })
             listener(url)
         })
     //}
@@ -122,6 +126,7 @@ export default function Main () {
     const appContext = useContext(AppContext)
 
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
+        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account.id })
         appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
     } })
 

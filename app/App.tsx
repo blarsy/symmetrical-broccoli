@@ -8,7 +8,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import { getLanguage } from './lib/utils'
-import Constants from "expo-constants"
+import './lib/logger'
+
 
 function App() {
   dayjs.extend(relativeTime)
@@ -25,14 +26,6 @@ function App() {
   </AppContextProvider>
 }
 
+AppRegistry.registerComponent("topela", () => App)
 
-let AppEntryPoint;
-
-// if (Constants.expoConfig.extra.storybookEnabled === "true") {
-//   AppEntryPoint = require("./.storybook").default;
-// } else {
-  AppRegistry.registerComponent("topela", () => App)
-  AppEntryPoint = App
-// }
-
-export default AppEntryPoint
+export default App

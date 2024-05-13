@@ -1,7 +1,7 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
 import { Message } from "./schema"
-import { ApolloClient, ApolloError, InMemoryCache, createHttpLink, from, gql, split } from "@apollo/client"
+import { ApolloClient, ApolloError, ApolloLink, InMemoryCache, createHttpLink, from, gql, split } from "@apollo/client"
 import { apiUrl, subscriptionsUrl } from "./settings"
 import { setContext } from "@apollo/client/link/context"
 import { ErrorResponse, onError } from '@apollo/client/link/error'
@@ -12,7 +12,7 @@ import { getLocales } from "expo-localization"
 import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
 import { ImageResult, manipulateAsync } from "expo-image-manipulator"
 import { IAppContext } from "../components/AppContextProvider"
-
+import { debug, error, info } from "./logger"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -112,12 +112,36 @@ export const getAuthenticatedApolloClient = (token: string) => {
       wsLink,
       httpLink,
     )
+
+    const makeVariablesSafe = (vars: Record<string, any>) => {
+      const sanitizedVars = { ...vars }
+      Object.getOwnPropertyNames(vars).forEach(propName => {
+        if(['password', 'Password'].includes(propName) ) {
+          sanitizedVars[propName] = '<undisclosed>'
+        }
+      })
+
+      return sanitizedVars
+    }
+
+    const traceLink = new ApolloLink((operation, forward) => {
+      try {
+        debug({ message: `Operation: ${operation.operationName}, query ${JSON.stringify(operation.query)}, variables: ${JSON.stringify(makeVariablesSafe(operation.variables))}` })
+      }
+      finally {
+        return forward(operation)
+      }
+    })
     
     return new ApolloClient({
       link: from([
+        traceLink,
         onError((e: ErrorResponse) => {
           if(e.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors.some(error => error.message === 'jwt expired' || error.message === 'invalid signature')){
+            info({ message: 'Token expired' })
             apolloTokenExpiredHandler.handle()
+          } else {
+            error({ message: JSON.stringify({ graphQLErrors: e.graphQLErrors, networkErrors: e.networkError, operation: e.operation.operationName })})
           }
         }),
         authLink,

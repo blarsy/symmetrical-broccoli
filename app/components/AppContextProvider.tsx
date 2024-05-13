@@ -7,6 +7,7 @@ import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
 import { apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
 import { get, remove, set } from "@/lib/secureStore"
 import { registerForPushNotificationsAsync } from "@/lib/pushNotifications"
+import { debug, info, setOrResetGlobalLogger } from "@/lib/logger"
 
 const SPLASH_DELAY = 3000
 const TOKEN_KEY = 'token'
@@ -32,9 +33,6 @@ interface AppActions {
     resetMessages: () => void
     setMessage: (message: any) => void
     notify: ( data: AppNotification ) => void
-    beginOp: () => void
-    endOp: () => void
-    endOpWithError: (error: any) => void
     onMessageReceived: (msg: any) => void
     setMessageReceived: (fn: (msg: any) => void) => void
     resetMessageReceived: () => void
@@ -72,9 +70,6 @@ export const AppContext = createContext<IAppContext>({
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
-        beginOp: () => {},
-        endOp: () => {},
-        endOpWithError: e => {},
         onMessageReceived: () => {},
         setMessageReceived: () => {},
         resetMessageReceived: () => {},
@@ -90,6 +85,7 @@ const GET_SESSION_DATA = gql`query GetSessionData {
       name
       avatarPublicId
       activated
+      logLevel
     }
   }`
 
@@ -165,6 +161,11 @@ const AppContextProvider = ({ children }: Props) => {
             }
 
             setNewAppState({ token, account })
+
+            await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
+
+            info({ message: `Logged in with session: ${ JSON.stringify(res.data.getSessionData) }` })
+
             return account
         },
         tryRestoreToken: async (): Promise<void> => {
@@ -182,7 +183,10 @@ const AppContextProvider = ({ children }: Props) => {
                     avatarPublicId: sessionRes.data.getSessionData.avatarPublicId,
                     activated: sessionRes.data.getSessionData.activated
                 }})
-                
+
+                await setOrResetGlobalLogger(sessionRes.data.getSessionData.logLevel)
+
+                info({ message: `Restored session: ${ JSON.stringify(sessionRes.data.getSessionData) }` })
             } else {
                 setTimeout(() => setNewAppState({ token: '' }), SPLASH_DELAY)
             }
@@ -200,16 +204,13 @@ const AppContextProvider = ({ children }: Props) => {
         resetMessages: () => {
             setNewAppState({ ...appState, ...{ messages: [] }})
         },
-        notify: setLastNofication,
-        beginOp: () => {
-            setNewAppState({ processing: true })
-        },
-        endOp: () => {
-            setNewAppState({ processing: false })
-        },
-        endOpWithError: e => {
-            setNewAppState({ processing: false })
-            setLastNofication({ error: e })
+        notify: notif => {
+            if(notif.message) {
+                debug({ accountId: appState.account.id, message: `In app notification: ${notif.message}` })
+            } else if(notif.error) {
+                info({ accountId: appState.account.id, message: `In app error: ${JSON.stringify(notif.error)}` })
+            }
+            setLastNofication(notif)
         },
         setMessageReceived: fn => setMessageReceivedCallback(() => fn),
         resetMessageReceived,
