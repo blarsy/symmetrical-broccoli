@@ -78,6 +78,7 @@ const ResourcesList = ({ route, navigation }: RouteProps) => {
     const [hideBanner, setHideBanner] = useState(false)
 
     useEffect(() => {
+      appContext.actions.setNewChatMessage(undefined)
       if(appContext.state.account)
         refetch()
 
