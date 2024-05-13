@@ -82,10 +82,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const [hideBanner, setHideBanner] = useState(false)
 
     useEffect(() => {
-<<<<<<< HEAD
       appContext.actions.setNewChatMessage(undefined)
-=======
->>>>>>> 6a06139 (storybookize resource list)
       if(appContext.state.account)
         refetch()
 
