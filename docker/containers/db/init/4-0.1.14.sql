@@ -41,7 +41,7 @@ BEGIN
 END;
 $BODY$;
 
-ALTER FUNCTION sb.create_client_log(character varying, integer, integer)
+ALTER FUNCTION sb.create_client_log(character varying, integer, character varying, integer)
     OWNER TO sb;
 
 ALTER TABLE IF EXISTS sb.accounts

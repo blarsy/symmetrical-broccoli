@@ -129,6 +129,7 @@ const AppContextProvider = ({ children }: Props) => {
         await remove(TOKEN_KEY)
         setNewAppState({ token: '', account: undefined })
         resetMessageReceived()
+        info({ message: 'logged out' })
     }
 
     const handleLogin = (token: string): ApolloClient<NormalizedCacheObject> => {
