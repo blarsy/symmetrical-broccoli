@@ -8,8 +8,8 @@ import Chat from './Chat'
 import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
-import { appBarsTitleFontSize, initials } from "@/lib/utils"
-import EditResourceContextProvider from "../EditResourceContextProvider"
+import { RouteProps, appBarsTitleFontSize, initials } from "@/lib/utils"
+import EditResourceContextProvider from "../resources/EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { AppContext } from "../AppContextProvider"
@@ -40,7 +40,7 @@ const ProfileIcon = ({ account, size}: { account?: AccountInfo, size: number }) 
     return <Avatar.Text size={size} label={initials(account.name)} />
 }
 
-const DealBoard = ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) => {
+const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
     const [connecting, setConnecting] = useState(false)

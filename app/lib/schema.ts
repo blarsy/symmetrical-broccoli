@@ -50,7 +50,8 @@ export interface Resource {
     canBeDelivered: boolean,
     canBeGifted: boolean,
     canBeExchanged: boolean,
-    created: Date
+    created: Date,
+    deleted?: Date
 }
 
 export interface ConversationData {
@@ -71,12 +72,14 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
     const images = rawRes.resourcesImagesByResourceId && rawRes.resourcesImagesByResourceId.nodes ?
         rawRes.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ publicId: imgData.imageByImageId.publicId} as ImageInfo)) :
         []
+
     return {
         id: rawRes.id, title: rawRes.title, description: rawRes.description, expiration: rawRes.expiration, created: rawRes.created,
         isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
         account: rawRes.accountByAccountId,
+        deleted: rawRes.deleted,
         images
 } as Resource
 }

@@ -8,7 +8,7 @@ import { Modal, Portal, Text, TextInput } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
-import { EditResourceContext } from "../EditResourceContextProvider"
+import { AppContext } from "../AppContextProvider"
 
 interface CategoriesSelectModalProps {
     open: boolean
@@ -51,13 +51,13 @@ interface Props {
 }
 
 const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
-    const editResourceState = useContext(EditResourceContext)
+    const appContext = useContext(AppContext)
     const [ open, setOpen ] = useState(false)
 
     const openModal = () => setOpen(true)
     
-    return <LoadedZone loading={editResourceState.state.categories.loading} error={editResourceState.state.categories.error}>
-        { editResourceState.state.categories.data ? <View style={{ paddingVertical: 10 }}>
+    return <LoadedZone loading={appContext.state.categories.loading} error={appContext.state.categories.error}>
+        { appContext.state.categories.data ? <View style={{ paddingVertical: 10 }}>
             <TouchableOpacity onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <TransparentTextInput label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
@@ -66,7 +66,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
                 </View>
             </TouchableOpacity>
             <Portal>
-                <CategoriesSelectModal categories={editResourceState.state.categories.data} initialCategories={value} open={open} setOpen={setOpen}
+                <CategoriesSelectModal categories={appContext.state.categories.data} initialCategories={value} open={open} setOpen={setOpen}
                     onChange={onChange} />
             </Portal>
         </View> : <></> }

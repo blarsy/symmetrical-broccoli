@@ -1,5 +1,5 @@
 import { createContext, useState } from "react"
-import { Account, AccountInfo } from "@/lib/schema"
+import { Account, AccountInfo, Category } from "@/lib/schema"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import dayjs from "dayjs"
@@ -8,6 +8,7 @@ import { apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/u
 import { get, remove, set } from "@/lib/secureStore"
 import { registerForPushNotificationsAsync } from "@/lib/pushNotifications"
 import { debug, info, setOrResetGlobalLogger } from "@/lib/logger"
+import DataLoadState, { initial } from "@/lib/DataLoadState"
 
 const SPLASH_DELAY = 3000
 const TOKEN_KEY = 'token'
@@ -18,6 +19,8 @@ interface AppState {
     messages: string[]
     processing: boolean
     numberOfUnread: number
+    categories: DataLoadState<Category[]>
+
 }
 
 interface AppNotification {
@@ -38,6 +41,7 @@ interface AppActions {
     resetMessageReceived: () => void
     resetLastNofication: () => void
     setNewChatMessage: (msg: any) => void
+    setCategories: (categories: DataLoadState<Category[]>) => void
 }
 
 export interface IAppContext {
@@ -55,7 +59,8 @@ const emptyState: AppState = {
     token: '', 
     messages: [], 
     numberOfUnread: 0,
-    processing: false
+    processing: false,
+    categories: initial<Category[]>(true, [])
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -74,7 +79,8 @@ export const AppContext = createContext<IAppContext>({
         setMessageReceived: () => {},
         resetMessageReceived: () => {},
         resetLastNofication: () => {},
-        setNewChatMessage: () => {}
+        setNewChatMessage: () => {},
+        setCategories: () => {}
     }
 })
 
@@ -116,14 +122,11 @@ const AppContextProvider = ({ children }: Props) => {
         })
     }
 
-
+    const setNewAppState = (newAppState: any) => {
+        setAppState(prevState => ({ ...prevState, ...newAppState }))
+    }
 
     const resetMessageReceived = () => setMessageReceivedCallback(() => (msg: any) => setNewChatMessage(msg))
-
-    const setNewAppState = (newAppState: any) => {
-        const fullNewAppState = { ...appState, ...newAppState }
-        setAppState(fullNewAppState)
-    }
 
     const logout = async () => {
         await remove(TOKEN_KEY)
@@ -203,13 +206,13 @@ const AppContextProvider = ({ children }: Props) => {
             setNewAppState({ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}: ${message}\n`] })
         },
         resetMessages: () => {
-            setNewAppState({ ...appState, ...{ messages: [] }})
+            setNewAppState({ messages: [] })
         },
         notify: notif => {
             if(notif.message) {
-                debug({ accountId: appState.account.id, message: `In app notification: ${notif.message}` })
+                debug({ accountId: appState.account?.id, message: `In app notification: ${notif.message}` })
             } else if(notif.error) {
-                info({ accountId: appState.account.id, message: `In app error: ${JSON.stringify(notif.error)}` })
+                info({ accountId: appState.account?.id, message: `In app error: ${JSON.stringify(notif.error)}` })
             }
             setLastNofication(notif)
         },
@@ -221,6 +224,9 @@ const AppContextProvider = ({ children }: Props) => {
         },
         setNewChatMessage: (msg: any) => {
             setNewChatMessage(msg)
+        },
+        setCategories: loadState => {
+            setNewAppState({ categories: loadState})
         }
     }
 

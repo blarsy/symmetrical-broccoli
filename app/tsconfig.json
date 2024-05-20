@@ -12,5 +12,7 @@
     "paths": {
       "@/*": ["./*"],
     },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   }
 }

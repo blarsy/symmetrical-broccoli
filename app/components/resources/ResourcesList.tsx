@@ -1,21 +1,21 @@
 import { LoadState, RouteProps, aboveMdWidth } from "@/lib/utils"
-import { EditResourceContext } from "../EditResourceContextProvider"
-import { SmallResourceImage } from "../MainResourceImage"
+import { EditResourceContext } from "./EditResourceContextProvider"
+import { SmallResourceImage } from "./MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
 import ResponsiveListItem from "../ResponsiveListItem"
-import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import { deletedGrayColor, lightPrimaryColor, primaryColor } from "../layout/constants"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import AppendableList, { AddItemButton } from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
 import { AppContext } from "../AppContextProvider"
-import { Banner, IconButton } from "react-native-paper"
+import { Banner, IconButton, Text } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
-import React = require("react")
+import React from "react"
 
-const RESOURCES = gql`query MyResources {
+export const RESOURCES = gql`query MyResources {
     myresources {
       nodes {
         id
@@ -29,6 +29,7 @@ const RESOURCES = gql`query MyResources {
         canBeExchanged
         canBeGifted
         canBeDelivered
+        deleted
         accountByAccountId {
           id
           name
@@ -52,13 +53,13 @@ const RESOURCES = gql`query MyResources {
     }
   }`
 
-const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
+export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
   deleteResource(input: {resourceId: $resourceId}) {
     integer
   }
 }`
 
-const SEND_AGAIN = gql`mutation SendAgain {
+export const SEND_AGAIN = gql`mutation SendAgain {
   sendActivationAgain(input: {}) {
       integer
   }
@@ -91,7 +92,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     }, [route])
 
     const iconButtonsSize = aboveMdWidth() ? 60 : 40
-    
+
     return <>
         <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
             actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
@@ -106,16 +107,14 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
             {t('activate_account', { email: appContext.state.account?.email })}
         </Banner>
         { appContext.state.account ?
-          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, editResourceContext.state.categories.data || [])}
-              onAddRequested={addRequested} onRefreshRequested={() => {
-                refetch()
-              }}
+          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.state.categories.data || [])}
+              onAddRequested={addRequested} onRefreshRequested={refetch}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
               displayItem={(resource, idx) => <ResponsiveListItem onPress={() => viewRequested(resource.id) } key={idx} title={resource.title} 
                   titleNumberOfLines={1}
-                  description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: lightPrimaryColor, borderRadius: 10 }}
+                  description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, borderRadius: 10 }}
                   left={() => <SmallResourceImage resource={resource} />}
-                  right={() => <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  right={() => resource.deleted ? <Text style={{ fontStyle: "italic" }}>{t('deleted')}</Text> : <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                       <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
                           e.stopPropagation()
                           editResourceContext.actions.setResource(resource)
@@ -139,7 +138,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                   resourceId: deletingResource
                 } })
                 await refetch()
-                searchFilterContext.actions.requery(editResourceContext.state.categories.data)
+                searchFilterContext.actions.requery(appContext.state.categories.data)
                 setDeletingResource(0)
               } else {
                 setDeletingResource(0)

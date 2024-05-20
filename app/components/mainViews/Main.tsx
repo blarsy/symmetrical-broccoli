@@ -1,5 +1,5 @@
 import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { t } from '@/i18n'
@@ -8,13 +8,14 @@ import Profile from './Profile'
 import DealBoard from './DealBoard'
 import { Appbar, Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
-import { adaptHeight, appBarsTitleFontSize } from '@/lib/utils'
+import { adaptHeight, appBarsTitleFontSize, getLanguage } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
 import * as Linking from 'expo-linking'
-import { gql, useSubscription } from '@apollo/client'
+import { gql, useLazyQuery, useSubscription } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
-import NewChatMessages from '../NewChatMessages'
+import NewChatMessages from '../chat/NewChatMessages'
 import { debug } from '@/lib/logger'
+import { fromData, fromError } from '@/lib/DataLoadState'
 
 const StackNav = createNativeStackNavigator()
 
@@ -24,6 +25,16 @@ const getViewTitleI18n = (viewName: string) => {
         default: return ''
     }
 }
+
+export const GET_CATEGORIES = gql`query Categories($locale: String) {
+    allResourceCategories(condition: {locale: $locale}) {
+        nodes {
+          code
+          name
+        }
+      }
+  }
+`
 
 const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     messageReceived {
@@ -124,11 +135,25 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 
 export default function Main () {
     const appContext = useContext(AppContext)
+    const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
     useSubscription(MESSAGE_RECEIVED, { onData(options) {
-        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account.id })
+        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account?.id })
         appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
     } })
+
+    const loadCategories = async () => {
+        try {
+            const res = await getCategories({ variables: { locale: getLanguage() }})
+            appContext.actions.setCategories(fromData(res.data.allResourceCategories.nodes))
+        } catch(e) {
+            appContext.actions.setCategories(fromError(e, t('requestError')))
+        }
+    }
+
+    useEffect(() => {
+        loadCategories()
+    }, [])
 
     return <Container style={{ flexDirection: 'column' }}>
         <NavigationContainer linking={{
@@ -156,7 +181,8 @@ export default function Main () {
             }, dark: false
         }}>
             <View style={{ flex: 1,alignItems: 'stretch', alignSelf: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
-                <StackNav.Navigator screenOptions={{ header: (props) => <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
+                <StackNav.Navigator screenOptions={{ header: (props) =>
+                    <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
                         <Appbar.BackAction onPress={() => props.navigation.navigate('main')} />
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
                         <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => {

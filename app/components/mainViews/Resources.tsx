@@ -3,8 +3,8 @@ import { RouteProps } from "@/lib/utils"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import EditResource from "../form/EditResource"
-import ViewResource from "../ViewResource"
-import { ResourcesList } from "../resources/ResourcesList"
+import ViewResource from "../resources/ViewResource"
+import ResourcesList from "../resources/ResourcesList"
 
 const StackNav = createNativeStackNavigator()
 

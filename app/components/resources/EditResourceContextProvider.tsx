@@ -1,13 +1,11 @@
-import { SetStateAction, createContext, useEffect, useState } from "react"
-import { Category, ImageInfo, Resource } from "@/lib/schema"
+import { SetStateAction, createContext, useState } from "react"
+import { ImageInfo, Resource } from "@/lib/schema"
 import React from "react"
 import { uploadImage } from "@/lib/images"
-import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import DataLoadState, { fromData, initial, fromError } from "@/lib/DataLoadState"
-import { getAuthenticatedApolloClient, getLanguage } from "@/lib/utils"
-import { t } from "@/i18n"
+import { gql, useMutation } from "@apollo/client"
+import { getAuthenticatedApolloClient } from "@/lib/utils"
 
-const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
+export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
     createResource(
       input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title}
     ) {
@@ -15,7 +13,7 @@ const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $c
     }
 }`
 
-  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
+export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
     updateResource(
       input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title}
     ) {
@@ -23,19 +21,8 @@ const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $c
     }
 }`
 
-const GET_CATEGORIES = gql`query Categories($locale: String) {
-    allResourceCategories(condition: {locale: $locale}) {
-        nodes {
-          code
-          name
-        }
-      }
-  }
-`
-
 interface EditResourceState {
     editedResource: Resource
-    categories: DataLoadState<Category[]>
     changeCallbacks: (() => void)[]
     imagesToAdd: ImageInfo[]
 }
@@ -50,7 +37,7 @@ interface EditResourceActions {
     reset: () => void
 }
 
-interface EditResourceContext {
+export interface EditResourceContextProps {
     state: EditResourceState,
     actions: EditResourceActions
 }
@@ -64,10 +51,9 @@ const blankResource: Resource = { id: 0, description: '', title: '', images: [],
     canBeDelivered: false, canBeTakenAway: false,
     canBeExchanged: false,  canBeGifted: false, created: new Date() }
 
-export const EditResourceContext = createContext<EditResourceContext>({
+export const EditResourceContext = createContext<EditResourceContextProps>({
     state: { 
         editedResource: blankResource, 
-        categories: initial(true, []),
         changeCallbacks: [],
         imagesToAdd: []
     } as EditResourceState, 
@@ -83,27 +69,13 @@ export const EditResourceContext = createContext<EditResourceContext>({
 })
 
 const EditResourceContextProvider = ({ children }: Props) => {
-    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, imagesToAdd: [], changeCallbacks: [], categories: initial<Category[]>(true, []) } as EditResourceState)
+    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, imagesToAdd: [], changeCallbacks: [] } as EditResourceState)
     const [createResource] = useMutation(CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
-    const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
     const setState = (value: SetStateAction<EditResourceState>) => {
         setEditResourceState(value)
     }
-
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const res = await getCategories({ variables: { locale: getLanguage() }})
-                setState({ ...editResourceState, categories: fromData(res.data.allResourceCategories.nodes) })
-            } catch(e) {
-                setState({ ...editResourceState, categories: fromError(e, t('requestError')) })
-            }
-        }
-
-        load()
-    }, [])
 
     const getResourcWithExpiration = (resource: Resource) => {
         if(typeof(resource.expiration) === 'string')

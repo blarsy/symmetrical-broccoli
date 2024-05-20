@@ -13,6 +13,7 @@ import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissio
 import { ImageResult, manipulateAsync } from "expo-image-manipulator"
 import { IAppContext } from "../components/AppContextProvider"
 import { debug, error, info } from "./logger"
+import Constants from 'expo-constants'
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -83,6 +84,16 @@ export const apolloTokenExpiredHandler = {
   }
 }
 
+const baseErrorString = (e: Error) => `message: ${e.message}, name: ${e.name}, ${e.stack && `, stack: ${e.stack}`}`
+const baseErrorsString = (es: readonly Error[]) => es.map(baseErrorString).join(', ')
+
+const errorStringFromResponse = (e:ErrorResponse) => {
+    const ae = e as ErrorResponse
+    return `ApolloError: operation ${ae.operation.operationName} ${JSON.stringify(ae.operation.variables)}
+      ${ae.graphQLErrors && ae.graphQLErrors.length > 0 && `, graphQLErrors: ${baseErrorsString(ae.graphQLErrors)}`}, 
+      ${ae.networkError && `, networkError: ${baseErrorString(ae.networkError)}`}`
+}
+
 export const getAuthenticatedApolloClient = (token: string) => {
     const httpLink = createHttpLink({ uri: apiUrl })
     const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, connectionParams: { authorization: `Bearer ${token}` } }))
@@ -141,7 +152,7 @@ export const getAuthenticatedApolloClient = (token: string) => {
             info({ message: 'Token expired' })
             apolloTokenExpiredHandler.handle()
           } else {
-            error({ message: JSON.stringify({ graphQLErrors: e.graphQLErrors, networkErrors: e.networkError, operation: e.operation.operationName })})
+            error({ message: errorStringFromResponse(e) })
           }
         }),
         authLink,
@@ -159,11 +170,15 @@ export const getAuthenticatedApolloClient = (token: string) => {
 let language: string | undefined = undefined
 export const getLanguage = (): string => {
   if(!language) {
+      if (Constants.expoConfig?.extra?.storybookEnabled === "true") {
+        return 'fr'
+      }
+
       const supportedLanguages = ['fr', 'en']
       const deviceLocales = getLocales()
     
       // find the first supported language that is also installed on the device
-      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales.some(deviceLocale => deviceLocale.languageCode.toLowerCase() === supportedLanguage))
+      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales.some(deviceLocale => deviceLocale.languageCode?.toLowerCase() === supportedLanguage))
       
       // If the device is not installed with any comptible language, default to the first supported language
       language = firstCompatibleLanguage || supportedLanguages[0]
@@ -225,6 +240,7 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       }
     }
     created
+    deleted
   }
 }`
 

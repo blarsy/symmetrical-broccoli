@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 import { List, IconButton } from "react-native-paper"
-import ListOf from "./ListOf"
+import ListOf from "../ListOf"
 
 interface Props {
     newMessages: any[]

@@ -3,6 +3,8 @@ import { initReactI18next } from "react-i18next"
 import LanguageDetector from 'i18next-browser-languagedetector'
 import RNLanguageDetector from '@os-team/i18next-react-native-language-detector'
 import { Platform } from 'react-native'
+import { storybookFakeLanguageDetector } from "./lib/storiesUtil"
+import Constants from 'expo-constants'
 
 const resources = {
   en: {
@@ -102,7 +104,9 @@ const resources = {
       "cannot_send_to_deleted_account": "Cannot send to deleted account",
       "type_message_here": "Your message here ...",
       "yes": "YES",
-      "no": "NO"
+      "no": "NO",
+      "deleted": "deleted",
+      "resource_deleted": "This resource was deleted on {{deleted}}"
     }
   },
   fr: {
@@ -202,13 +206,25 @@ const resources = {
       "cannot_send_to_deleted_account": "Envoi impossible au compte supprimé",
       "type_message_here": "Votre message ...",
       "yes": "OUI",
-      "no": "NON"
+      "no": "NON",
+      "deleted": "Effecé",
+      "resource_deleted": "Cette ressource a été effacée le {{deleted}}"
     }
   }
 }
 
+const getLanguageDetector = (): LanguageDetector => {
+  if(Constants.expoConfig?.extra?.storybookEnabled === "true") {
+    return storybookFakeLanguageDetector
+  } else if(Platform.OS === "web") {
+    return LanguageDetector
+  } else {
+    return RNLanguageDetector
+  }
+}
+
 i18n
-    .use(Platform.OS === "web" ? LanguageDetector : RNLanguageDetector)
+    .use(getLanguageDetector())
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         compatibilityJSON: 'v3',

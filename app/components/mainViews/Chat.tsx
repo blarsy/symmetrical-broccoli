@@ -1,52 +1,54 @@
-import React, { ReactNode, useContext } from "react"
+import React, { ReactNode, useContext, useEffect } from "react"
 import { View } from "react-native"
-import { GET_RESOURCE, RouteProps, fontSizeMedium } from "@/lib/utils"
-import Conversation from "../Conversation"
-import PastConversations from "../PastConversations"
+import { RouteProps, fontSizeMedium } from "@/lib/utils"
+import Conversation from "../chat/Conversation"
+import PastConversations from "../chat/PastConversations"
 import Images from "@/Images"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { NativeStackHeaderProps, createNativeStackNavigator } from "@react-navigation/native-stack"
-import { Resource, fromServerGraphResource } from "@/lib/schema"
-import { ResourceImage } from "../MainResourceImage"
+import { ResourceImage } from "../resources/MainResourceImage"
 import { Button, Icon, Text } from "react-native-paper"
 import { t } from "@/i18n"
-import { useQuery } from "@apollo/client"
-import { EditResourceContext } from "../EditResourceContextProvider"
 import LoadedZone from "../LoadedZone"
 import { AppContext } from "../AppContextProvider"
+import ConversationContextProvider, { ConversationContext } from "../chat/ConversationContextProvider"
+import dayjs from "dayjs"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
 }
 
-const ChatHeader = (p: ChatHeaderProps) => {
-    const editResourceContext = useContext(EditResourceContext)
-    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number((p.route.params! as any).resourceId) }})
-    let resource: Resource | undefined = undefined
+export const ChatHeader = (p: ChatHeaderProps) => {
+    const appContext = useContext(AppContext)
+    const conversationContext = useContext(ConversationContext)
     const exchangeTypes: string[] = []
     
-    if(data && editResourceContext.state.categories.data) {
-        resource = fromServerGraphResource(data.resourceById, editResourceContext.state.categories.data)
-        
-        if(resource.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
-        if(resource.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
+    if(conversationContext.state.conversation.data && appContext.state.categories.data) {
+        if(conversationContext.state.conversation.data.resource?.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
+        if(conversationContext.state.conversation.data.resource?.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
     }
+
+    const resourceDeleted = conversationContext.state.conversation.data?.resource?.deleted
     
-    return (<LoadedZone loading={loading} error={error} containerStyle={{ flexDirection: 'row', justifyContent:'space-between', alignItems: 'center' }}>
+    return (<LoadedZone loading={conversationContext.state.conversation.loading} error={conversationContext.state.conversation.error} containerStyle={{ flexDirection: 'row', justifyContent:'space-between', alignItems: 'center' }}>
         <Button textColor={primaryColor} icon={p => <Icon size={p.size} source="chevron-left" color={p.color} /> }
             onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }>{t('back_label')}</Button>
-        {resource ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <ResourceImage size={70} resource={resource} />
-            <View style={{ flexDirection: 'column', padding: 6, gap: 2 }}>
-                <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {resource.account!.name || t('name_account_removed')}</Text>
-                <Text variant="headlineMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>
-                <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}>{exchangeTypes.join('/')}</Text>
+        {conversationContext.state.conversation.data?.resource ? <View style={{ flexDirection: 'column' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <ResourceImage size={70} resource={conversationContext.state.conversation.data.resource} />
+                <View style={{ flexDirection: 'column', padding: 6, gap: 2 }}>
+                    <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}><Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.state.conversation.data.resource.account!.name || t('name_account_removed')}</Text>
+                    <Text variant="headlineMedium" style={{ textTransform: 'uppercase', textDecorationLine: resourceDeleted ? 'line-through' : 'none' }}>{conversationContext.state.conversation.data.resource.title}</Text>
+                    <Text variant="headlineMedium" style={{ color: primaryColor, textTransform: 'uppercase' }}>{exchangeTypes.join('/')}</Text>
+                </View>
             </View>
-        </View> : <></>}
+            { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
+        </View>
+        : <></>}
     </LoadedZone>)
 }
 
-const ChatBackground = ({ children }: { children: ReactNode }) => {
+export const ChatBackground = ({ children }: { children: ReactNode }) => {
     return <View style={{ display: 'flex', flex: 1, backgroundColor: '#fff' }}>
     <Images.BackgroundChat fill={lightPrimaryColor} style={{
         position: 'absolute',
@@ -64,24 +66,22 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     if(appContext.state.account) {
         return <ChatBackground>
-            <PastConversations onConversationSelected={(resource, otherAccountId, otherAccountName) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId, otherAccountName })} />
+            <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId })} />
         </ChatBackground>
     } else {
         return <Text style={{ textAlign: 'center', textTransform: 'uppercase', margin:10 }}>{t('connect_to_chat')}</Text>
     }
 }
 
-const ConversationDetail = ({ route, navigation }: RouteProps) => <ChatBackground>
-    <Conversation resourceId={route.params.resourceId} otherAccountId={route.params.otherAccountId} otherAccountName={route.params.otherAccountName} />
-</ChatBackground>
-
 const StackNav = createNativeStackNavigator()
 
 const Chat = ({ route, navigation }: RouteProps) => {
-    return <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
-        <StackNav.Screen name="conversationsList" key="conversationsList" component={ConversationsList} options={{ headerShown: false }} />
-        <StackNav.Screen name="conversation" key="conversation" options={{ header: p => <ChatHeader {...p} goBack={() => p.navigation.navigate('conversationsList')} /> }} component={ConversationDetail} />
-    </StackNav.Navigator>
+    return <ConversationContextProvider>
+        <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
+            <StackNav.Screen name="conversationsList" key="conversationsList" component={ConversationsList} options={{ headerShown: false }} />
+            <StackNav.Screen name="conversation" key="conversation" options={{ header: p => <ChatHeader {...p} goBack={() => p.navigation.navigate('conversationsList')} /> }} component={Conversation} />
+        </StackNav.Navigator>
+    </ConversationContextProvider>
 }
 
 export default Chat

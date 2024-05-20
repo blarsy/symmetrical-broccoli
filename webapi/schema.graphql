@@ -1118,6 +1118,7 @@ type Resource implements Node {
   canBeTakenAway: Boolean!
   canBeExchanged: Boolean!
   canBeGifted: Boolean!
+  deleted: Datetime
 
   """Reads a single `Account` that is related to this `Resource`."""
   accountByAccountId: Account
@@ -1717,6 +1718,8 @@ enum ResourcesOrderBy {
   CAN_BE_EXCHANGED_DESC
   CAN_BE_GIFTED_ASC
   CAN_BE_GIFTED_DESC
+  DELETED_ASC
+  DELETED_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -1761,6 +1764,9 @@ input ResourceCondition {
 
   """Checks for equality with the object’s `canBeGifted` field."""
   canBeGifted: Boolean
+
+  """Checks for equality with the object’s `deleted` field."""
+  deleted: Datetime
 }
 
 """A connection to a list of `AccountsPushToken` values."""

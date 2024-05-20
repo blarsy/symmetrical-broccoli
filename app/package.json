@@ -64,6 +64,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@apollo/react-testing": "^4.0.0",
     "@babel/core": "^7.20.0",
     "@react-native-community/slider": "4.4.2",
     "@storybook/addon-ondevice-actions": "^7.6.18",

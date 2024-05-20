@@ -28,6 +28,8 @@ const levelFromLevelCode = (code?: number): string => {
         case 1: return 'info'
         case 2: return 'warn'
         case 3: return 'error'
+        default:
+            throw new Error(`Unexpected log level ${code}`)
     }
 }
 
@@ -40,7 +42,9 @@ const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: Int, $data: S
   }
   `
 
-let globalLogger
+let globalLogger: {
+    [x: string]: (...args: unknown[]) => void;
+}
 export const setOrResetGlobalLogger = async (levelCode?: number) => {
     const currentLevelCode = await new Number(get(LOG_LEVEL_STORE_KEY))
     if(levelCode && currentLevelCode !== levelCode) {
@@ -88,7 +92,7 @@ export const info = async (logData: ClientLogMessage, includeDeviceInfo: boolean
     logGeneric(globalLogger.info, logData, includeDeviceInfo)
 }
 export const error = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
-    //console.log('error', logData)
+    console.log('error', logData)
     await getOrCreateGlobalLogger()
     logGeneric(globalLogger.error, logData, includeDeviceInfo)
 }

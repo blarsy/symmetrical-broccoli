@@ -2,11 +2,11 @@ import { t } from "@/i18n"
 import { ConversationData, Resource, fromServerGraphConversations } from "@/lib/schema"
 import React, { useContext } from "react"
 import { Image, View } from "react-native"
-import LoadedList from "./LoadedList"
-import ResponsiveListItem from "./ResponsiveListItem"
-import { AppContext } from "./AppContextProvider"
+import LoadedList from "../LoadedList"
+import ResponsiveListItem from "../ResponsiveListItem"
+import { AppContext } from "../AppContextProvider"
 import { Text } from "react-native-paper"
-import { primaryColor } from "./layout/constants"
+import { primaryColor } from "../layout/constants"
 import dayjs from "dayjs"
 import { urlFromPublicId } from "@/lib/images"
 import { gql, useQuery } from "@apollo/client"
@@ -60,7 +60,7 @@ const MY_CONVERSATIONS = gql`query MyConversations {
   }`
 
 interface Props {
-    onConversationSelected: (resource: Resource, otherAccountId: number, otherAccountName: string) => void
+    onConversationSelected: (resource: Resource, otherAccountId: number) => void
 }
 
 const PastConversations = ({ onConversationSelected }: Props) => {
@@ -74,7 +74,9 @@ const PastConversations = ({ onConversationSelected }: Props) => {
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
                     require('@/assets/img/placeholder.png')
                 return <ResponsiveListItem style={{ paddingLeft: 5, borderBottomColor: '#000', borderBottomWidth: 1, borderStyle: 'dashed' }} left={() => <Image style={{ width: 50, height: 50 }} source={imgSource} />} key={idx}
-                    onPress={() => onConversationSelected(item.conversation.resource, item.withUser.id, item.withUser.name)}
+                    onPress={() => {
+                      onConversationSelected(item.conversation.resource, item.withUser.id)
+                    }}
                     title={() => <View style={{ flexDirection: 'column' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>

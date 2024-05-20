@@ -1,21 +1,64 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { ResourcesList } from './ResourcesList'
-import { Resource } from 'i18next'
+import { RESOURCES, ResourcesList } from './ResourcesList'
+
 import React = require('react')
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 
 const meta: Meta<typeof ResourcesList> = {
   component: ResourcesList,
+  decorators: [
+    paperProviderDecorator,
+    appContextDecorator, searchFilterContextDecorator, configDayjsDecorator
+  ]
 }
 
 export default meta
 type Story = StoryObj<typeof ResourcesList>
 
-/*
- *👇 Render functions are a framework specific feature to allow you control on how the component renders.
- * See https://storybook.js.org/docs/api/csf
- * to learn how to use render functions.
- */
-export const Primary: Story = {
-  render: () => <ResourcesList route={{}}  />,
+const initialResourceList = { 
+  myresources: {
+    nodes: [
+      { id: 1, title: 'title', description: 'description' },
+      { id: 2, title: 'title1', description: 'description1' },
+    ]
+  } 
+}
+
+const resourceListWithOneDeleted = { 
+  myresources: {
+    nodes: [
+      { id: 1, title: 'title', description: 'description' },
+      { id: 2, title: 'title1', description: 'description1', deleted: new Date() },
+    ]
+  } 
+}
+
+const initialArgs = {
+  route: {},
+  addRequested: () => console.log('addrequested'),
+  editRequested: () =>  console.log('editrequested'),
+  viewRequested: (id) =>  console.log(`viewrequested, id ${id}`)
+}
+
+export const SimpleView: Story = {
+  name: 'Simple list view',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: RESOURCES, 
+      result: initialResourceList
+    }])
+  ],
+  args: initialArgs
+}
+
+export const WithDeleted: Story = {
+  name: 'List with some deleted',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: RESOURCES, 
+      result: resourceListWithOneDeleted
+    }])
+  ],
+  args: initialArgs
 }

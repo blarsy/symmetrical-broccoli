@@ -1,18 +1,18 @@
 import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, getScreenSize } from "@/lib/utils"
 import React, { useContext, useState } from "react"
-import { Chip, Modal, Portal, Text } from "react-native-paper"
+import { Banner, Chip, Icon, Modal, Portal, Text } from "react-native-paper"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import { t } from "@/i18n"
 import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-native"
 import dayjs from "dayjs"
 import SwiperFlatList from "react-native-swiper-flatlist"
-import PanZoomImage from "./PanZoomImage"
-import { lightPrimaryColor } from "./layout/constants"
+import PanZoomImage from "../PanZoomImage"
+import { lightPrimaryColor } from "../layout/constants"
 import { Props } from "react-native-paper/lib/typescript/components/Chip"
 import { urlFromPublicId } from "@/lib/images"
 import { useQuery } from "@apollo/client"
-import LoadedZone from "./LoadedZone"
-import { EditResourceContext } from "./EditResourceContextProvider"
+import LoadedZone from "../LoadedZone"
+import { AppContext } from "../AppContextProvider"
 
 interface ResourceViewFieldProps {
     title: string,
@@ -76,7 +76,7 @@ const getSwiperData = (resource: Resource): ImgMetadata[] => {
 }
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
-    const editResourceState = useContext(EditResourceContext)
+    const appState = useContext(AppContext)
     const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: route.params.resourceId }})
     const [ focusedImage, setFocusedImage] = useState('')
     
@@ -84,8 +84,8 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     let expiration: { text: string, date: string } | undefined = undefined
     let resource : Resource | undefined = undefined
     
-    if(data && editResourceState.state.categories.data) {
-        resource = fromServerGraphResource(data.resourceById, editResourceState.state.categories.data)
+    if(data && appState.state.categories.data && appState.state.categories.data.length > 0) {
+        resource = fromServerGraphResource(data.resourceById, appState.state.categories.data)
         if(resource.expiration) {
             const dateObj = dayjs(resource.expiration)
             expiration = { text: dateObj.fromNow(), date: dateObj.format(t('dateFormat'))}
@@ -93,10 +93,12 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             expiration = { text: '', date: ''}
         }
     }
-    
     return <ScrollView  style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff'}}>
         <LoadedZone loading={loading} error={error}>
         { resource && <>
+            <Banner icon={p => <Icon size={20} source="trash-can" />} visible={!!resource.deleted}>
+                {t('resource_deleted', { deleted: dayjs(resource.deleted).format(t('dateFormat')) })}
+            </Banner>
             { resource.images && resource.images.length > 0 && <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }
             <ResourceViewField title={t('brought_by_label')}>
                 <Text variant="bodyMedium">{resource.account?.name}</Text>

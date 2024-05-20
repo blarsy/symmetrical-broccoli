@@ -7,7 +7,7 @@ import { t } from "@/i18n"
 import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
-import MainResourceImage from "../MainResourceImage"
+import MainResourceImage from "../resources/MainResourceImage"
 import CategoriesSelect from "../form/CategoriesSelect"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import Images from '@/Images'
@@ -16,9 +16,8 @@ import { ScrollView } from "react-native-gesture-handler"
 import dayjs from "dayjs"
 import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
-import { EditResourceContext } from "../EditResourceContextProvider"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import ViewResource from "../ViewResource"
+import ViewResource from "../resources/ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ConnectionDialog from "../ConnectionDialog"
 
@@ -65,13 +64,14 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
 const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const editResourceContext = useContext(EditResourceContext)
     const [connectingTowardsResource, setConnectingTowardsResource] = useState(undefined as number | undefined)
 
     const debouncedFilters = useDebounce(searchFilterContext.filter, 700)
 
     useEffect(() => {
-        searchFilterContext.actions.requery(editResourceContext.state.categories.data)
+        if(appContext.state.categories.data) {
+            searchFilterContext.actions.requery(appContext.state.categories.data)
+        }
     }, [debouncedFilters])
 
     return <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
@@ -106,7 +106,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || editResourceContext.state.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || appContext.state.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
             displayItem={(res, idx) => {
                 const resource = res as Resource
                 return <ResourceCard 

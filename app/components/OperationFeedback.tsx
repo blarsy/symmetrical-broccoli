@@ -5,7 +5,7 @@ import { View } from "react-native"
 import { Icon, Portal, Snackbar, Text, Tooltip } from "react-native-paper"
 
 interface Props {
-    error: ApolloError | undefined
+    error: Error | undefined
     success?: boolean
     successMessage?: string
     onDismissError: () => void

@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { AppContext } from "../AppContextProvider"
 import * as yup from 'yup'
 import { RouteProps } from "@/lib/utils"
-import { EditResourceContext } from "../EditResourceContextProvider"
+import { EditResourceContext } from "../resources/EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
 import { ScrollView } from "react-native"
 import { Portal } from "react-native-paper"
@@ -43,7 +43,7 @@ export default ({ route, navigation }:RouteProps) => {
         try {
             await editResourceContext.actions.save(values, token)
             setSaveResourcestate(fromData(null))
-            searchFilterContext.actions.requery(editResourceContext.state.categories.data)
+            searchFilterContext.actions.requery(appContext.state.categories.data)
             navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
@@ -83,7 +83,7 @@ export default ({ route, navigation }:RouteProps) => {
                 <Dialog visible={connecting} onDone={async (token) => {
                     setConnecting(false)
                     await createResource(formikState.values, token)
-                    searchFilterContext.actions.requery(editResourceContext.state.categories.data)
+                    searchFilterContext.actions.requery(appContext.state.categories.data)
                 }} onCloseRequested={() => {
                     setConnecting(false)
                 }}/>
