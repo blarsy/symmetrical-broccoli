@@ -489,6 +489,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): MessagesConnection
+  getMinimumClientVersion: String
   getSessionData: SessionDatum
 
   """Reads and enables pagination through a set of `Conversation`."""
@@ -2249,6 +2250,7 @@ type SystemsConnection {
 type System {
   version: String!
   created: Datetime!
+  minimumClientVersion: String
 }
 
 """A `System` edge in the connection."""
@@ -2267,6 +2269,8 @@ enum SystemsOrderBy {
   VERSION_DESC
   CREATED_ASC
   CREATED_DESC
+  MINIMUM_CLIENT_VERSION_ASC
+  MINIMUM_CLIENT_VERSION_DESC
 }
 
 """
@@ -2278,6 +2282,9 @@ input SystemCondition {
 
   """Checks for equality with the object’s `created` field."""
   created: Datetime
+
+  """Checks for equality with the object’s `minimumClientVersion` field."""
+  minimumClientVersion: String
 }
 
 type SessionDatum {

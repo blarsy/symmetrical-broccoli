@@ -1,9 +1,12 @@
+const version = '0.1.14'
+const versionCode = 94
+
 module.exports = {
   "expo": {
     "name": "Tope la",
     "slug": "tope-la",
     "scheme": "topela",
-    "version": "0.1.13",
+    "version": version,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +21,7 @@ module.exports = {
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.topela",
-      "buildNumber": "0.1.13",
+      "buildNumber": version,
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -55,7 +58,7 @@ module.exports = {
         "backgroundColor": "#ff4401"
       },
       "package": "com.topela",
-      "versionCode": 93
+      "versionCode": versionCode
     },
     "web": {
       "favicon": "./assets/favicon.png"

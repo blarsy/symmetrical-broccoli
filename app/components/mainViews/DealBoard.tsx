@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react"
 import { Appbar, Avatar, Icon } from "react-native-paper"
-import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'
@@ -16,8 +15,40 @@ import { AppContext } from "../AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
 import { AccountInfo } from "@/lib/schema"
 import ConnectionDialog from "../ConnectionDialog"
+import { gql, useSubscription } from "@apollo/client"
+import { debug } from "@/lib/logger"
 
 const Tab = createMaterialBottomTabNavigator()
+
+const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
+    messageReceived {
+        event
+        message {
+            id
+            text
+            created
+            received
+            imageByImageId {
+                publicId
+            }
+            participantByParticipantId {
+                id
+                accountByAccountId {
+                    name
+                    id
+                }
+                conversationByConversationId {
+                    id
+                    resourceByResourceId {
+                        id
+                        title
+                    }
+                }
+            }
+        }
+    }
+}`
+
 
 const getViewTitleI18n = (screenName: string): string => {
     switch(screenName) {
@@ -32,12 +63,22 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
+const ConnectedProfileIcon = ({ size }: { size: number }) => {
+    const appContext = useContext(AppContext)
+    useSubscription(MESSAGE_RECEIVED, { onData(options) {
+        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account?.id })
+        appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
+    } })
+    
+    if(appContext.state.account.avatarPublicId)
+        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.state.account.avatarPublicId!) }} />
+
+    return <Avatar.Text size={size} label={initials(appContext.state.account.name)} />
+}
+
 const ProfileIcon = ({ account, size}: { account?: AccountInfo, size: number }) => {
     if(!account) return <Icon source="login-variant" size={size}/>
-    if(account.avatarPublicId)
-        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
-
-    return <Avatar.Text size={size} label={initials(account.name)} />
+    return <ConnectedProfileIcon size={size} />
 }
 
 const DealBoard = ({ route, navigation }: RouteProps) => {

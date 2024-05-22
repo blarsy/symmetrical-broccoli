@@ -1,4 +1,4 @@
-import React = require('react')
+import React  from 'react'
 import { EditResourceContext } from '../components/resources/EditResourceContextProvider'
 import { AppContext } from '@/components/AppContextProvider'
 import { fromData, initial } from './DataLoadState'

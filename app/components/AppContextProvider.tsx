@@ -4,7 +4,7 @@ import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import dayjs from "dayjs"
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
-import { apolloTokenExpiredHandler, getAuthenticatedApolloClient } from "@/lib/utils"
+import { apolloTokenExpiredHandler, errorToString, getAuthenticatedApolloClient } from "@/lib/utils"
 import { get, remove, set } from "@/lib/secureStore"
 import { registerForPushNotificationsAsync } from "@/lib/pushNotifications"
 import { debug, info, setOrResetGlobalLogger } from "@/lib/logger"
@@ -212,7 +212,7 @@ const AppContextProvider = ({ children }: Props) => {
             if(notif.message) {
                 debug({ accountId: appState.account?.id, message: `In app notification: ${notif.message}` })
             } else if(notif.error) {
-                info({ accountId: appState.account?.id, message: `In app error: ${JSON.stringify(notif.error)}` })
+                info({ accountId: appState.account?.id, message: `In app error: ${errorToString(notif.error)}` })
             }
             setLastNofication(notif)
         },

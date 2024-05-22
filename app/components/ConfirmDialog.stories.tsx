@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import ConfirmDialog from './ConfirmDialog'
-import React = require('react')
+import React  from 'react'
 import { paperProviderDecorator } from '@/lib/storiesUtil'
 
 const meta: Meta<typeof ConfirmDialog> = {
@@ -12,11 +12,6 @@ const meta: Meta<typeof ConfirmDialog> = {
 export default meta
 type Story = StoryObj<typeof ConfirmDialog>
 
-/*
- *👇 Render functions are a framework specific feature to allow you control on how the component renders.
- * See https://storybook.js.org/docs/api/csf
- * to learn how to use render functions.
- */
 export const Default: Story = {
   args: {
     question: 'question', title: 'title', visible: true, onResponse: async res => console.log(`Response ${res}`)

@@ -14,6 +14,7 @@ import { ImageResult, manipulateAsync } from "expo-image-manipulator"
 import { IAppContext } from "../components/AppContextProvider"
 import { debug, error, info } from "./logger"
 import Constants from 'expo-constants'
+import { compareVersions } from "compare-versions"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -84,14 +85,14 @@ export const apolloTokenExpiredHandler = {
   }
 }
 
-const baseErrorString = (e: Error) => `message: ${e.message}, name: ${e.name}, ${e.stack && `, stack: ${e.stack}`}`
-const baseErrorsString = (es: readonly Error[]) => es.map(baseErrorString).join(', ')
+export const errorToString = (e: Error) => `message: ${e.message}, name: ${e.name}, ${e.stack && `, stack: ${e.stack}`}`
+const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
 
 const errorStringFromResponse = (e:ErrorResponse) => {
     const ae = e as ErrorResponse
     return `ApolloError: operation ${ae.operation.operationName} ${JSON.stringify(ae.operation.variables)}
-      ${ae.graphQLErrors && ae.graphQLErrors.length > 0 && `, graphQLErrors: ${baseErrorsString(ae.graphQLErrors)}`}, 
-      ${ae.networkError && `, networkError: ${baseErrorString(ae.networkError)}`}`
+      ${ae.graphQLErrors && ae.graphQLErrors.length > 0 && `, graphQLErrors: ${errorsToString(ae.graphQLErrors)}`}, 
+      ${ae.networkError && `, networkError: ${errorToString(ae.networkError)}`}`
 }
 
 export const getAuthenticatedApolloClient = (token: string) => {
@@ -249,4 +250,10 @@ export const initials = (text: string) => {
       return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
 
   return ""
+}
+
+export const versionChecker = (clientVersion: string, serverVersion: string) => {
+  if(!clientVersion) return true
+
+  return compareVersions(clientVersion, serverVersion) >= 0
 }

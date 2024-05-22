@@ -11,7 +11,7 @@ import Container from '../layout/Container'
 import { adaptHeight, appBarsTitleFontSize, getLanguage } from '@/lib/utils'
 import { AppContext } from '../AppContextProvider'
 import * as Linking from 'expo-linking'
-import { gql, useLazyQuery, useSubscription } from '@apollo/client'
+import { gql, useLazyQuery } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../chat/NewChatMessages'
 import { debug } from '@/lib/logger'
@@ -35,35 +35,6 @@ export const GET_CATEGORIES = gql`query Categories($locale: String) {
       }
   }
 `
-
-const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
-    messageReceived {
-        event
-        message {
-            id
-            text
-            created
-            received
-            imageByImageId {
-                publicId
-            }
-            participantByParticipantId {
-                id
-                accountByAccountId {
-                    name
-                    id
-                }
-                conversationByConversationId {
-                    id
-                    resourceByResourceId {
-                        id
-                        title
-                    }
-                }
-            }
-        }
-    }
-}`
 
 const prefix = Linking.createURL('/')
 const getInitialURL = async () => {
@@ -136,11 +107,6 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 export default function Main () {
     const appContext = useContext(AppContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
-
-    useSubscription(MESSAGE_RECEIVED, { onData(options) {
-        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account?.id })
-        appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
-    } })
 
     const loadCategories = async () => {
         try {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React = require('react')
+import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, conversationContextDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Conversation from './Conversation'
 
@@ -14,7 +14,7 @@ const meta: Meta<typeof Conversation> = {
         loading: false,
         error: undefined,
         data: {
-          resource: { id: 3, title: 'title', images: [], description: 'description', categories: [], 
+          resource: { id: 3, title: 'Une super ressource', images: [], description: 'description de la ressource', categories: [], 
             isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
             canBeExchanged: false, created: new Date()},
           otherAccount: { name: 'otherAccountName', id: 2 } ,
@@ -55,13 +55,13 @@ export const CantChatWithDeletedAccount: Story = {
         loading: false,
         error: undefined,
         data: {
-          resource: { id: 3, title: 'title', images: [], description: 'description', categories: [], 
+          resource: { id: 3, title: 'Super ressource', images: [], description: 'description de la ressource', categories: [], 
             isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
             canBeExchanged: false, created: new Date()},
           otherAccount: { name: '', id: 2 } ,
           messages: [
-            { _id: 2, text: 'message 1', user: { _id: 2, name: 'otherAccountName' }, createdAt: new Date() },
-            { _id: 1, text: 'message 2', user: { _id: 1, name: 'me' }, createdAt: new Date() },
+            { _id: 2, text: 'message 1', user: { _id: 2, name: 'Artisan incroyable' }, createdAt: new Date() },
+            { _id: 1, text: 'message 2', user: { _id: 1, name: 'Mon association super' }, createdAt: new Date() },
           ]
         },
       }

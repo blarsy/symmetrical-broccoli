@@ -192,11 +192,37 @@ SELECT r.*
  
 $BODY$;
 
+ALTER TYPE sb.jwt_token
+    RENAME ATTRIBUTE expiration TO exp;
+ALTER TYPE sb.jwt_token
+    ALTER ATTRIBUTE exp SET DATA TYPE integer;
+
+ALTER TABLE IF EXISTS sb.system
+    ADD COLUMN minimum_client_version character varying;
+
+GRANT SELECT ON TABLE sb.system TO anonymous;
+
+GRANT SELECT ON TABLE sb.system TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.get_minimum_client_version(
+	)
+    RETURNS character varying
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+AS $BODY$
+
+SELECT minimum_client_version FROM sb.system;
+
+$BODY$;
+	
+GRANT EXECUTE ON FUNCTION sb.get_minimum_client_version() TO anonymous;
+
 
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.1.14';
+	UPDATE sb.system SET version = '0.1.14', minimum_client_version = '0.1.14';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React = require('react')
+import React  from 'react'
 import { ChatHeader } from './Chat';
 import { paperProviderDecorator, conversationContextDecorator } from '@/lib/storiesUtil';
 import { ConversationState } from '../chat/ConversationContextProvider';
@@ -15,7 +15,7 @@ const meta: Meta<typeof ChatHeader> = {
 export default meta
 type Story = StoryObj<typeof ChatHeader>
 
-const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExchanged: boolean, resourceDeleted: boolean, accountDeleted: boolean, accountName: string = 'other account name', resourceTitle: string = 'resource title' ) => ({
+const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExchanged: boolean, resourceDeleted: boolean, accountDeleted: boolean, accountName: string = 'Mon association trop bien', resourceTitle: string = 'Une super ressource' ) => ({
     conversation: {
         loading,
         data: { 
@@ -31,7 +31,7 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
                     name: accountDeleted ? '' : accountName
                 },
                 deleted: resourceDeleted ? new Date() : null,
-                id: 1, images: [], description: 'resource description', categories: [], isService: false, isProduct: false, created: new Date()
+                id: 1, images: [], description: 'description de la ressource', categories: [], isService: false, isProduct: false, created: new Date()
             },
             otherAccount: {
                 id: 2,

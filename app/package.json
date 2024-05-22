@@ -24,6 +24,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@svgr/webpack": "^8.1.0",
+    "compare-versions": "^6.1.0",
     "dayjs": "^1.11.10",
     "expo": "^50.0.17",
     "expo-dev-client": "^3.3.11",

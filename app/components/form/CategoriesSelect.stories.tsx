@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React = require('react')
+import React  from 'react'
 import CategoriesSelect from './CategoriesSelect';
 import { PaperProvider } from 'react-native-paper';
 import { appContextDecorator } from '@/lib/storiesUtil';

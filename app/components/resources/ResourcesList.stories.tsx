@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import { RESOURCES, ResourcesList } from './ResourcesList'
 
-import React = require('react')
+import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 
 const meta: Meta<typeof ResourcesList> = {
@@ -19,8 +19,8 @@ type Story = StoryObj<typeof ResourcesList>
 const initialResourceList = { 
   myresources: {
     nodes: [
-      { id: 1, title: 'title', description: 'description' },
-      { id: 2, title: 'title1', description: 'description1' },
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource' },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien' },
     ]
   } 
 }
@@ -28,8 +28,8 @@ const initialResourceList = {
 const resourceListWithOneDeleted = { 
   myresources: {
     nodes: [
-      { id: 1, title: 'title', description: 'description' },
-      { id: 2, title: 'title1', description: 'description1', deleted: new Date() },
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource' },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date() }
     ]
   } 
 }

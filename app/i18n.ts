@@ -106,7 +106,9 @@ const resources = {
       "yes": "YES",
       "no": "NO",
       "deleted": "deleted",
-      "resource_deleted": "This resource was deleted on {{deleted}}"
+      "resource_deleted": "This resource was deleted on {{deleted}}",
+      "must_update_app": "Please update the app to benefit from the latest improvements.",
+      "update_button": "Update"
     }
   },
   fr: {
@@ -207,8 +209,10 @@ const resources = {
       "type_message_here": "Votre message ...",
       "yes": "OUI",
       "no": "NON",
-      "deleted": "Effecé",
-      "resource_deleted": "Cette ressource a été effacée le {{deleted}}"
+      "deleted": "Effacé",
+      "resource_deleted": "Cette ressource a été effacée le {{deleted}}",
+      "must_update_app": "Veuillez mettre à jour l'app pour bénéficier des dernières fonctionnalités.",
+      "update_button": "Mettre à jour"
     }
   }
 }

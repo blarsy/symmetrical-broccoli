@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import Splash from './Splash'
-import React = require('react')
+import React  from 'react'
 
 const meta: Meta<typeof Splash> = {
   component: Splash,

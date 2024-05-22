@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React = require('react')
+import React  from 'react'
 import Chat from './Chat';
 import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil';
 import { CONVERSATION_MESSAGES } from '../chat/ConversationContextProvider';
@@ -20,7 +20,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                     participantByParticipantId: {
                         accountByAccountId: {
                             id: 1,
-                            name: 'my account',
+                            name: 'Artisan incroyable',
                             imageByAvatarImageId: {
                                 publicId: ''
                             }
@@ -38,7 +38,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                     participantByParticipantId: {
                         accountByAccountId: {
                             id: 2,
-                            name: 'other account name',
+                            name: 'Mon association trop bien',
                             imageByAvatarImageId: {
                                 publicId: ''
                             }
@@ -48,25 +48,25 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
           ]},
           accountById: {
             id: otherAccountId,
-            name: otherAccountDeleted ? '' : 'other account name'
+            name: otherAccountDeleted ? '' : 'Mon association trop bien'
           },
           resourceById: {
                 accountByAccountId: {
                     email: 'other@other.com',
                     id: 2,
-                    name: otherAccountDeleted ? '' : 'other account name',
+                    name: otherAccountDeleted ? '' : 'Mon association trop bien',
                     imageByAvatarImageId: { publicId: '' }
                 },
                 canBeDelivered: true,
                 canBeExchanged: true,
                 canBeGifted: true,
                 canBeTakenAway: true,
-                description: 'description',
+                description: 'description de ressource',
                 id: resourceId,
                 isProduct: true,
                 isService: true,
                 expiration: null,
-                title: 'title',
+                title: 'Une super ressource',
                 resourcesResourceCategoriesByResourceId: {
                     nodes: [{
                         resourceCategoryCode: 'cat2'

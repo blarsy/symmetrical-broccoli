@@ -30,18 +30,18 @@ const simpleResource = (isDeleted: boolean = false) => ({
         canBeExchanged: true,
         canBeGifted: true,
         canBeTakenAway: true,
-        description: 'description',
+        description: 'description de la ressource',
         id: 1,
         isProduct: true,
         isService: true,
         expiration: new Date(2025,1,1),
-        title: 'title',
+        title: 'Une super ressource',
         created: new Date(2022, 1, 1),
         deleted: isDeleted ? new Date() : null,
         accountByAccountId: {
             email: 'me@me.com',
             id: 12,
-            name: 'account-name',
+            name: 'Artisan incroyable',
             imageByAvatarImageId: { publicId: '' }
         },
         resourcesImagesByResourceId: {
