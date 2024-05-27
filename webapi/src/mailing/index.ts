@@ -2,10 +2,13 @@ import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
-import config from '../config'
+import { getCommonConfig } from '../config'
 import initTranslations from '../i18n'
 
+
 export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string) => {
+    const config = await getCommonConfig()
+
     const msg = {
       to,
       from,
@@ -23,12 +26,14 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
 }
 
 export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string) => {
+    const config = await getCommonConfig()
     await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent)
 }
 
 let partialsPreparePromise: Promise<void> | null = null
 const preparePartials = async () => {
     if(!partialsPreparePromise) {
+        const config = await getCommonConfig()
         partialsPreparePromise = new Promise(async (resolve, reject) => {
             try {
                 const partial = (await readFile(`${config.mailTemplatesLocation}headerPartial.html`)).toString()
@@ -45,10 +50,11 @@ const preparePartials = async () => {
     return partialsPreparePromise
 }
 
-export const sendEmailActivationCode = async (email: string, code: string, lang: string) => {
+export const sendEmailActivationCode = async (email: string, code: string, lang: string, version: string) => {
+    const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('activate_email_subject')
-    const link = `${config.webAppUrl}activate/${code}`
+    const link = `${config.webAppUrl}${version}/activate/${code}`
     const text = t('activate_email_text', { productName: config.productName})
 
     await preparePartials()
@@ -66,10 +72,11 @@ export const sendEmailActivationCode = async (email: string, code: string, lang:
         htmlContent)
 }
 
-export const sendAccountRecoveryMail = async (email: string, code: string, lang: string) => {
+export const sendAccountRecoveryMail = async (email: string, code: string, lang: string, version: string) => {
+    const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('recover_account_subject')
-    const link = `${config.webAppUrl}recover/${code}`
+    const link = `${config.webAppUrl}${version}/recover/${code}`
     const text = t('recover_account_text', { productName: config.productName})
 
     await preparePartials()

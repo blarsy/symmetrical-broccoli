@@ -2,7 +2,7 @@ import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
 import { Message } from "./schema"
 import { ApolloClient, ApolloError, ApolloLink, InMemoryCache, createHttpLink, from, gql, split } from "@apollo/client"
-import { apiUrl, subscriptionsUrl } from "./settings"
+import { apiUrl, clientVersion, subscriptionsUrl } from "./settings"
 import { setContext } from "@apollo/client/link/context"
 import { ErrorResponse, onError } from '@apollo/client/link/error'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
@@ -15,6 +15,7 @@ import { IAppContext } from "../components/AppContextProvider"
 import { debug, error, info } from "./logger"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
+import Application from 'expo-application'
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -252,8 +253,6 @@ export const initials = (text: string) => {
   return ""
 }
 
-export const versionChecker = (clientVersion: string, serverVersion: string) => {
-  if(!clientVersion) return true
-
-  return compareVersions(clientVersion, serverVersion) >= 0
+export const versionChecker = (serverVersion: string) => {
+  return compareVersions(Application?.nativeApplicationVersion || clientVersion, serverVersion) >= 0
 }

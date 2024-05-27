@@ -1,6 +1,8 @@
 import { makeExtendSchemaPlugin, gql, embed } from "graphile-utils"
+import logger from "./logger"
 
 const newMessageTopicFromContext = async (_args: any, context: any, _resolveInfo: any) => {
+  logger.info(`creating message topic graphql:message_account:${context.jwtClaims.account_id}`)
   if (context.jwtClaims.account_id) {
     return `graphql:message_account:${context.jwtClaims.account_id}`
   } else {
@@ -26,12 +28,6 @@ export default makeExtendSchemaPlugin(({ pgSql: sql }) => {
     typeDefs,
     resolvers: {
       MessageSubscriptionPayload: {
-        // This method finds the user from the database based on the event
-        // published by PostgreSQL.
-        //
-        // In a future release, we hope to enable you to replace this entire
-        // method with a small schema directive above, should you so desire. It's
-        // mostly boilerplate.
         async message(
           event,
           _args,
@@ -41,11 +37,13 @@ export default makeExtendSchemaPlugin(({ pgSql: sql }) => {
           const rows = await selectGraphQLResultFromTable(
             sql.fragment`sb.messages`,
             (tableAlias, sqlBuilder) => {
+              console.log(`querying message : ${tableAlias}.id = ${sql.value(event.subject)}`)
               sqlBuilder.where(
                 sql.fragment`${tableAlias}.id = ${sql.value(event.subject)}`
               )
             }
           )
+          logger.info(`Returning from message subscription: ${rows[0]}`)
           return rows[0]
         },
       },

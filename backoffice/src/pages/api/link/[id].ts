@@ -1,9 +1,10 @@
-import config from "@/config"
+
+import { getCommonConfig } from "@/config/index"
 import { respondWithFailure } from "@/server/respond"
 import { NextApiRequest, NextApiResponse } from "next"
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const config = await getCommonConfig()
     if(req.method === 'GET') {
         try {
             const { id } = req.query

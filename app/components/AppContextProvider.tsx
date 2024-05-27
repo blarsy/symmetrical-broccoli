@@ -16,11 +16,11 @@ const TOKEN_KEY = 'token'
 interface AppState {
     token: string
     account?: AccountInfo
+    chatMessagesSubscription?: { unsubscribe: () => void }
     messages: string[]
     processing: boolean
     numberOfUnread: number
     categories: DataLoadState<Category[]>
-
 }
 
 interface AppNotification {
@@ -36,12 +36,12 @@ interface AppActions {
     resetMessages: () => void
     setMessage: (message: any) => void
     notify: ( data: AppNotification ) => void
-    onMessageReceived: (msg: any) => void
-    setMessageReceived: (fn: (msg: any) => void) => void
+    setMessageReceivedHandler: (fn: (msg: any) => void) => void
     resetMessageReceived: () => void
     resetLastNofication: () => void
     setNewChatMessage: (msg: any) => void
     setCategories: (categories: DataLoadState<Category[]>) => void
+    setChatMessageSubscription: (subscription: { unsubscribe: () => void }) => void
 }
 
 export interface IAppContext {
@@ -49,6 +49,7 @@ export interface IAppContext {
     lastNotification?: AppNotification
     newChatMessage: any
     actions: AppActions
+    overrideMessageReceived: ((msg: any) => void)[]
 }
 
 interface Props {
@@ -60,13 +61,15 @@ const emptyState: AppState = {
     messages: [], 
     numberOfUnread: 0,
     processing: false,
-    categories: initial<Category[]>(true, [])
+    categories: initial<Category[]>(true, []),
+    chatMessagesSubscription: undefined
 }
 
 export const AppContext = createContext<IAppContext>({
     state: emptyState, 
     lastNotification: undefined,
     newChatMessage: undefined,
+    overrideMessageReceived: [],
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -75,12 +78,12 @@ export const AppContext = createContext<IAppContext>({
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
-        onMessageReceived: () => {},
-        setMessageReceived: () => {},
+        setMessageReceivedHandler: () => {},
         resetMessageReceived: () => {},
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
-        setCategories: () => {}
+        setCategories: () => {},
+        setChatMessageSubscription: () => {}
     }
 })
 
@@ -99,15 +102,43 @@ const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
     syncPushToken(input: {token: $token}) {
       integer
     }
-  }`  
+  }`
+
+const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
+    messageReceived {
+        event
+        message {
+            id
+            text
+            created
+            received
+            imageByImageId {
+                publicId
+            }
+            participantByParticipantId {
+                id
+                accountByAccountId {
+                    name
+                    id
+                }
+                conversationByConversationId {
+                    id
+                    resourceByResourceId {
+                        id
+                        title
+                    }
+                }
+            }
+        }
+    }
+}`
+
 
 const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
-    // Remember: storing functions with useState is little bit weird, as the 'set' function has an overload that
-    // takes a callback, and executes it immediately, we have to work around that using tricks
-    const [messageReceivedCallback, setMessageReceivedCallback] = useState<(msg: any) => void>(() => {})
     const [lastNotification, setLastNofication] = useState({ message: '' } as AppNotification | undefined)
     const [newChatMessage, setNewChatMessage] = useState(undefined as any)
+    const [overrideMessageReceived, setOverrideMessageReceived] = useState<((msg: any) => void)[]>([])
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
         return new Promise((resolve, reject) => {
@@ -126,16 +157,16 @@ const AppContextProvider = ({ children }: Props) => {
         setAppState(prevState => ({ ...prevState, ...newAppState }))
     }
 
-    const resetMessageReceived = () => setMessageReceivedCallback(() => (msg: any) => setNewChatMessage(msg))
-
     const logout = async () => {
         await remove(TOKEN_KEY)
-        setNewAppState({ token: '', account: undefined })
-        resetMessageReceived()
+        appState.chatMessagesSubscription?.unsubscribe()
+        setNewAppState({ token: '', account: undefined, chatMessageSubscription: undefined })
+        overrideMessageReceived.pop()
+        setOverrideMessageReceived(overrideMessageReceived)
         info({ message: 'logged out' })
     }
 
-    const handleLogin = (token: string): ApolloClient<NormalizedCacheObject> => {
+    const handleLogin = (token: string): {authenticatedClient : ApolloClient<NormalizedCacheObject>, subscription:  { unsubscribe: () => void } } => {
         apolloTokenExpiredHandler.handle = async () => { 
             await logout()
         }
@@ -143,16 +174,23 @@ const AppContextProvider = ({ children }: Props) => {
         registerForPushNotificationsAsync().then(token => {
             authenticatedClient.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
         })
-        resetMessageReceived()
+        const subscription = authenticatedClient.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
+            debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
+            if(overrideMessageReceived.length > 0) {
+                overrideMessageReceived[0](payload.data.messageReceived.message)
+            } else {
+                setNewChatMessage(payload.data.messageReceived.message)
+            }
+        } })
         
-        return authenticatedClient
+        return { authenticatedClient, subscription }
     }
 
     const actions: AppActions = {
         loginComplete: async (token: string): Promise<AccountInfo> => {
             await set(TOKEN_KEY, token)
             
-            const authenticatedClient = handleLogin(token)
+            const { authenticatedClient, subscription } = handleLogin(token)
 
             const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
 
@@ -164,7 +202,7 @@ const AppContextProvider = ({ children }: Props) => {
                 activated: res.data.getSessionData.activated
             }
 
-            setNewAppState({ token, account })
+            setNewAppState({ token, account, chatMessagesSubscription: subscription })
 
             await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
 
@@ -175,12 +213,12 @@ const AppContextProvider = ({ children }: Props) => {
         tryRestoreToken: async (): Promise<void> => {
             const token = await get(TOKEN_KEY)
             if(token) {
-                const authenticatedClient = handleLogin(token)
+                const { authenticatedClient, subscription} = handleLogin(token)
                 
                 const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
 
                 const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
-                setNewAppState({ token:token, account: {
+                setNewAppState({ token:token, chatMessagesSubscription: subscription, account: {
                     id: sessionRes.data.getSessionData.accountId,
                     name: sessionRes.data.getSessionData.name, 
                     email: sessionRes.data.getSessionData.email, 
@@ -216,9 +254,14 @@ const AppContextProvider = ({ children }: Props) => {
             }
             setLastNofication(notif)
         },
-        setMessageReceived: fn => setMessageReceivedCallback(() => fn),
-        resetMessageReceived,
-        onMessageReceived: (msg) => messageReceivedCallback(msg),
+        setMessageReceivedHandler: fn => {
+            overrideMessageReceived.push(fn)
+            setOverrideMessageReceived(overrideMessageReceived)
+        },
+        resetMessageReceived: () => {
+            overrideMessageReceived.pop()
+            setOverrideMessageReceived(overrideMessageReceived)
+        },
         resetLastNofication: () => {
             setLastNofication(undefined)
         },
@@ -227,10 +270,11 @@ const AppContextProvider = ({ children }: Props) => {
         },
         setCategories: loadState => {
             setNewAppState({ categories: loadState})
-        }
+        },
+        setChatMessageSubscription: subscription => setNewAppState({ chatMessagesSubscription: subscription })
     }
 
-    return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, actions}}>
+    return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, actions, overrideMessageReceived}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
         </SafeAreaProvider>

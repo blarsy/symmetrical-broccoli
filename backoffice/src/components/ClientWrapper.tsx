@@ -11,16 +11,18 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useEffect, useState } from 'react'
 import { Theme } from '@emotion/react'
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, from } from '@apollo/client'
-import config from '@/config'
+import getConfig from '@/config/index'
 
 dayjs.extend(relativeTime)
 
 interface Props {
     children: JSX.Element
+    version?: string
 }
 
-export const getApolloClient = () => {
-    const httpLink = createHttpLink({ uri: config.apiUrl })
+export const getApolloClient = (version?: string) => {
+    const config = getConfig(version)
+    const httpLink = createHttpLink({ uri: config.graphqlUrl })
 
     return new ApolloClient({
       link: from([
@@ -35,12 +37,12 @@ export const getApolloClient = () => {
     })
   }
 
-export const ClientWrapper = ({ children }: Props) => {
+export const ClientWrapper = ({ children, version }: Props) => {
     const [theme, setTheme] = useState(undefined as Theme | undefined)
     const dark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
     
     useEffect(() => { setTheme(createTheme(dark)) }, [dark])
-    return <ApolloProvider client={getApolloClient()}>
+    return <ApolloProvider client={getApolloClient(version)}>
         <AppContextProvider>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fr">
                 { theme ? <ThemeProvider theme={theme}>

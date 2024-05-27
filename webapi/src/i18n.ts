@@ -5,7 +5,7 @@ export default (lng: string) => i18n.init({
     resources: {
         en: { translation: {
             "recover_account_subject": "Account recovery",
-            "recover_account_text": "Here is a link to revocer your access on {{productName}}",
+            "recover_account_text": "Here is a link to recover your access on {{productName}}",
             "restore_account_button_label": "Restore",
             "activate_email_subject": "Validate your email address",
             "activate_email_text": "Validate the email address you entered on {{productName}} ",

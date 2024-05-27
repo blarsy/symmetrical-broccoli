@@ -1,6 +1,6 @@
 import createPostgresSubscriber, { PgParsedNotification, Subscriber } from "pg-listen"
 import { sendPushNotification } from "."
-import config from "../config"
+import { getCommonConfig } from "../config"
 import logger from "../logger"
 
 interface NewMessageNotificationPayload {
@@ -34,7 +34,6 @@ export class NotificationsListener {
         
         this.subscriber = createPostgresSubscriber({ connectionString: this.connectionString })
         this.subscriber.events.on('connected', () => {
-            console.log('Connected to database and starting to listen to Postgres notifications...')
             this.subscriber.listenTo('message_created')
         })
         this.subscriber.events.on('notification', this.onNotification)
@@ -45,15 +44,15 @@ export class NotificationsListener {
     async onNotification(notification: PgParsedNotification) {
         if(!notification.payload) throw new Error('Expected payload on notification, got none')
 
-        const messageNotif = toMessageNotification(notification.payload)
-
         try {
+            const messageNotif = toMessageNotification(notification.payload)
             logger.info(`Push notification ${JSON.stringify(messageNotif)}.`)
+            const config = await getCommonConfig()
             await sendPushNotification([ { to: messageNotif.pushToken, body: messageNotif.text, title: messageNotif.sender, data: {
                 url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${messageNotif.otherAccountName}`
             }} ])
         } catch(e) {
-            logger.error(`Error while sending push notification to Expo. Pushtoken: ${messageNotif.pushToken}`, e)
+            logger.error(`Error while sending push notification to Expo.`, e)
         }
     }
 }

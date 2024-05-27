@@ -7,9 +7,9 @@ import { TFunction } from "i18next"
 
 const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
     activateAccount(input: {activationCode: $activationCode}) {
-      string
+        string
     }
-  }`
+}`
 
 interface Props {
     activationId: string

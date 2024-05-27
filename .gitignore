@@ -21,6 +21,7 @@ web-build/
 .env.development
 .env.production
 .env.test
+*.config.json
 /docker/prod/.env
 *.log
 web.zip

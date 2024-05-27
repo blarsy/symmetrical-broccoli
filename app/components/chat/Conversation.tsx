@@ -54,7 +54,7 @@ const Conversation = ({ route }: RouteProps) => {
 
     useEffect(() => {
         navigation.addListener('focus', () => {
-          appContext.actions.setMessageReceived(onMessageReceived)
+          appContext.actions.setMessageReceivedHandler(onMessageReceived)
         })
         navigation.addListener('blur', () => appContext.actions.resetMessageReceived())
         return () => {
@@ -75,8 +75,8 @@ const Conversation = ({ route }: RouteProps) => {
                   messages={conversationContext.state.conversation.data?.messages}
                   alwaysShowSend
                   onSend={onSend}
-                  disableComposer={!conversationContext.state.conversation.data.otherAccount.name}
-                  placeholder={conversationContext.state.conversation.data.otherAccount.name ? t('type_message_here') : t('cannot_send_to_deleted_account')}
+                  disableComposer={!conversationContext.state.conversation.data?.otherAccount.name}
+                  placeholder={conversationContext.state.conversation.data?.otherAccount.name ? t('type_message_here') : t('cannot_send_to_deleted_account')}
                   isLoadingEarlier={conversationContext.state.conversation.loading}
                   user={user}
                   locale={getLanguage()}

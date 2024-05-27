@@ -1,20 +1,38 @@
 import express from "express"
 import postgraphile from "./postgraphile"
-import config from './config'
+import getConfig, { Config, getCommonConfig, getVersions } from './config'
 import cors from 'cors'
 import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./notifications/listener"
-import logger from "./logger"
+import logger, { init } from "./logger"
 import { dailyBackup } from "./db_backup/jobs"
 
-const connectionString = `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
+const getConnectionString = async (config: Config) => {
+    return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
+}
 
-const launchPostgraphileWebApi = () => {
+const launchServer = async () => {
+    const versions = await getVersions()
+    
+    await init()
+    logger.info('Starting server')
+
+    versions.forEach(async version => {
+        const config = await getConfig(version)
+        const connectionString = await getConnectionString(config)
+        launchPostgraphileWebApi(config)
+        launchJobWorker(connectionString, version).catch(e => console.error(e))
+        logger.info(`Job worker launched over database ${config.db} on ${config.host}`)
+        logger.info(`Connecting to notifier ${version}`)
+        launchPushNotificationsSender(connectionString)
+    })
+}
+
+const launchPostgraphileWebApi = (config: Config) => {
+    const app = express()
     const allowedOrigins = JSON.parse(config.webClientUrls!) as string[]
 
-    const app = express()
-    
     app.options('*', cors({ origin(requestOrigin, callback) {
         if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
             callback(null, requestOrigin)
@@ -23,9 +41,36 @@ const launchPostgraphileWebApi = () => {
             callback(new Error('Disallowed'))
         }
     }, }))
-    app.use(postgraphile)
+
+    app.use(postgraphile(config))
+    
+    app.listen(config.apiPort)
+    logger.info(`Express web api server for versions ${config.version} listening on port ${config.apiPort}.`)
+}
+
+const launchPostgraphileWebApis = async () => {
+    const versions = await getVersions()
+    const commonConfig = await getCommonConfig()
+    const app = express()
+    
+    const allowedOrigins = JSON.parse(commonConfig.webClientUrls!) as string[]
+
+    app.options('*', cors({ origin(requestOrigin, callback) {
+        if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
+            callback(null, requestOrigin)
+        } else {
+            logger.error(`${requestOrigin} rejected. Allowed origins are ${allowedOrigins}`, new Error('Disallowed'))
+            callback(new Error('Disallowed'))
+        }
+    }, }))
+
+    versions.forEach(async version => {
+        const config = await getConfig(version)
+        app.use(postgraphile(config))
+    })
+    
     app.listen(3000)
-    console.log('Express web api server listening on port 3000.')
+    logger.info(`Express web api server for versions ${versions.join(', ')} listening on port 3000.`)
 }
 
 const executeJob = async (executor: (payload: any, helpers: JobHelpers) => Promise<void>, payload: any, helpers: JobHelpers, jobName: String) => {
@@ -37,7 +82,7 @@ const executeJob = async (executor: (payload: any, helpers: JobHelpers) => Promi
     }
 }
 
-const launchJobWorker = async () => {
+const launchJobWorker = async (connectionString: string, version: string) => {
     const runner = await run({
         connectionString,
         concurrency: 5,
@@ -48,17 +93,17 @@ const launchJobWorker = async () => {
             mailPasswordRecovery: async (payload: any, helpers) => {
                 executeJob(async (payload, helpers) => {
                     const { email, code, lang } = payload
-                    await sendAccountRecoveryMail(email, code, lang)
+                    await sendAccountRecoveryMail(email, code, lang, version)
                 }, payload, helpers, 'mailPasswordRecovery')
             },
             mailActivation: async (payload: any, helpers: JobHelpers) =>{
                 executeJob(async (payload, helpers) => {
                     const { email, code, lang } = payload
-                    await sendEmailActivationCode(email, code, lang)
+                    await sendEmailActivationCode(email, code, lang, version)
                 }, payload, helpers, 'mailActivation')
             },
             databaseBackup: async (payload: any, helpers) => {
-                executeJob(dailyBackup, payload, helpers, 'databaseBackup')
+                executeJob(dailyBackup, { version }, helpers, 'databaseBackup')
             },
         },
         schema: 'worker'
@@ -70,10 +115,8 @@ const launchJobWorker = async () => {
       await runner.promise
 }
 
-const launchPushNotificationsSender = () => {
-    new NotificationsListener(connectionString, err => console.error(err.message))
+const launchPushNotificationsSender = (connectionString: string) => {
+    new NotificationsListener(connectionString, err => logger.error('Error handling message created notification.' ,err))
 }
 
-launchJobWorker().catch(e => console.error(e))
-launchPostgraphileWebApi()
-launchPushNotificationsSender()
+launchServer()

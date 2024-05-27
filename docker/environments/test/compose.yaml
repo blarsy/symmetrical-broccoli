@@ -16,6 +16,9 @@ services:
       dockerfile: './Dockerfile'
     ports:
       - "3101:3000"
+      - "3102:3001"
+      - "3103:3002"
+      - "3104:3003"
     restart: always
   sb_proxy:
     build:

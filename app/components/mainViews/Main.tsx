@@ -85,8 +85,7 @@ interface ChatMessagesNotificationAreaProps {
 }
 
 const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotificationAreaProps) => {
-    const appContext = useContext(AppContext)
-    const navigation = useNavigation()
+   const navigation = useNavigation()
     return <Portal>
         <Snackbar visible={!!newMessage} onDismiss={onClose} duration={6000}
             style={{ backgroundColor: lightPrimaryColor}}>

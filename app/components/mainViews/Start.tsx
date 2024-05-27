@@ -10,7 +10,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient, versionChecker } from "@/lib/utils"
 import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
-import * as Application from 'expo-application'
 import UpdateApp from "../UpdateApp"
 
 export const theme = {
@@ -37,7 +36,7 @@ const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
     getMinimumClientVersion
 }`
 
-const useVersionCheck = (versionChecker: (clientVersion: string, serverVersion: string) => boolean) => {
+const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => {
     const appContext = useContext(AppContext)
     const [getMinimumClientVersion] = useLazyQuery(GET_MINIMUM_CLIENT_VERSION)
     const [busy, setBusy] = useState(false)
@@ -47,11 +46,11 @@ const useVersionCheck = (versionChecker: (clientVersion: string, serverVersion: 
         try {
             setBusy(true)
             const minimumClientVersionData = await getMinimumClientVersion()
-            if(!versionChecker(Application.nativeApplicationVersion, minimumClientVersionData.data.getMinimumClientVersion)) {
+            if(!versionChecker(minimumClientVersionData.data.getMinimumClientVersion)) {
                 setOutdated(true)
             }
         } catch(e) {
-            appContext.actions.notify({ error: e })
+            appContext.actions.notify({ error: e as Error })
             setOutdated(false)
         } finally {
             setBusy(false)

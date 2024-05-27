@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Appbar, Avatar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -13,42 +13,11 @@ import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { AppContext } from "../AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
-import { AccountInfo } from "@/lib/schema"
 import ConnectionDialog from "../ConnectionDialog"
-import { gql, useSubscription } from "@apollo/client"
+import { gql, useApolloClient } from "@apollo/client"
 import { debug } from "@/lib/logger"
 
 const Tab = createMaterialBottomTabNavigator()
-
-const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
-    messageReceived {
-        event
-        message {
-            id
-            text
-            created
-            received
-            imageByImageId {
-                publicId
-            }
-            participantByParticipantId {
-                id
-                accountByAccountId {
-                    name
-                    id
-                }
-                conversationByConversationId {
-                    id
-                    resourceByResourceId {
-                        id
-                        title
-                    }
-                }
-            }
-        }
-    }
-}`
-
 
 const getViewTitleI18n = (screenName: string): string => {
     switch(screenName) {
@@ -63,21 +32,34 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
+// const useChatMessageSubscription = () => {
+//     const appContext = useContext(AppContext)
+//     const apolloClient = useApolloClient()
+
+//     useEffect(() => {
+//         if(appContext.state.account) {
+//             const subscription = apolloClient.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
+//                 debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}`, accountId: appContext.state.account?.id })
+//                 appContext.actions.onMessageReceived(payload.data.messageReceived.message)
+//             } })
+//             appContext.actions.setChatMessageSubscription(subscription)
+//         }
+//     }, [appContext.state.account])
+// }
+
 const ConnectedProfileIcon = ({ size }: { size: number }) => {
     const appContext = useContext(AppContext)
-    useSubscription(MESSAGE_RECEIVED, { onData(options) {
-        debug({ message: `Received in-app chat message notification: ${options.data.data.messageReceived.message}`, accountId: appContext.state.account?.id })
-        appContext.actions.onMessageReceived(options.data.data.messageReceived.message)
-    } })
-    
-    if(appContext.state.account.avatarPublicId)
-        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.state.account.avatarPublicId!) }} />
 
-    return <Avatar.Text size={size} label={initials(appContext.state.account.name)} />
+    
+    if(appContext.state.account!.avatarPublicId)
+        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.state.account!.avatarPublicId!) }} />
+
+    return <Avatar.Text size={size} label={initials(appContext.state.account!.name)} />
 }
 
-const ProfileIcon = ({ account, size}: { account?: AccountInfo, size: number }) => {
-    if(!account) return <Icon source="login-variant" size={size}/>
+const ProfileIcon = ({ size}: { size: number }) => {
+    const appContext = useContext(AppContext)
+    if(!appContext.state.account) return <Icon source="login-variant" size={size}/>
     return <ConnectedProfileIcon size={size} />
 }
 
@@ -88,13 +70,15 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
 
     const profileButtonSize = appBarsTitleFontSize * 1.5
 
+    //useChatMessageSubscription()
+
     return <EditResourceContextProvider>
         <SearchFilterContextProvider>
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
                     <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
-                        icon={p => <ProfileIcon account={appContext.state.account} size={p.size} />} 
+                        icon={p => <ProfileIcon size={p.size} />} 
                         size={ appContext.state.account ? profileButtonSize : appBarsTitleFontSize }
                         centered
                         borderless

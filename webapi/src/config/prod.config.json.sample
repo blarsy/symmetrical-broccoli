@@ -1,0 +1,32 @@
+{
+    "dbPassword": "yourdbpassword",
+    "googlePrivateKey": "{\"privateKey\":\"-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n\"}",
+    "googleServiceAccount": "symbro@symbro.iam.gserviceaccount.com",
+    "host": "sb_db",
+    "jwtSecret": "yoursecret",
+    "jwtType": "sb.jwt_token",
+    "logPath": "/app/logs/",
+    "mailApiKey": "yoursendgridkey",
+    "mailPath": "./mails/",
+    "mailTemplatesLocation": "./src/mailing/templates/",
+    "noreplyEmail": "noreply@tope-la.com",
+    "port": 5432,
+    "production": true,
+    "productName": "Tope-là",
+    "pushNotificationsUrlPrefix": "topela://",
+    "remoteBackupFolderName": "backups",
+    "user": "sb",
+    "webAppUrl": "=https://www.tope-la.com/webapp/",
+    "webClientUrls": "[\"http://localhost:19006\", \"https://www.tope-la.com\"]",
+    "websiteUrl": "https://www.tope-la.com/",
+    "versions": {
+        "default": {
+            "db": "sb_db",
+            "apiPort": 3000
+        },
+        "v0_2": {
+            "db": "sb_db_0_2",
+            "apiPort": 3001
+        }
+    }
+}

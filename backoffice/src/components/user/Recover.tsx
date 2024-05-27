@@ -26,9 +26,9 @@ const Recover = ({ recoveryId }: Props) => {
 
     useEffect(() => {
         const load = async () => {
-                const t = await i18n()
-                setUiState({ loading: false, t })
-            }
+            const t = await i18n()
+            setUiState({ loading: false, t })
+        }
         load()
     }, [])
 

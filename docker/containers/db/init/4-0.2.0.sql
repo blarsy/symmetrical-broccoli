@@ -217,12 +217,12 @@ SELECT minimum_client_version FROM sb.system;
 $BODY$;
 	
 GRANT EXECUTE ON FUNCTION sb.get_minimum_client_version() TO anonymous;
-
+GRANT EXECUTE ON FUNCTION sb.get_minimum_client_version() TO identified_account;
 
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.1.14', minimum_client_version = '0.1.14';
+	UPDATE sb.system SET version = '0.2.0', minimum_client_version = '0.2.0';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

@@ -1,17 +1,17 @@
 import { GoogleAuth } from 'google-auth-library'
 import { drive, drive_v3 } from '@googleapis/drive'
 import { Readable } from 'stream'
-import settings from '../config'
+import { getCommonConfig } from '../config'
 
 let service: drive_v3.Drive
 export const connectDrive = async (): Promise<drive_v3.Drive> => {
-
+    const config = await getCommonConfig()
     if(!service) {
         const auth = new GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/drive',
             credentials: {
-                client_email: settings.googleServiceAccount,
-                private_key: settings.googlePrivateKey
+                client_email: config.googleServiceAccount,
+                private_key: config.googlePrivateKey
             }
         })
     

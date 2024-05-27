@@ -1,5 +1,5 @@
-const version = '0.1.14'
-const versionCode = 94
+const version = '0.2.0'
+const versionCode = 95
 
 module.exports = {
   "expo": {

@@ -5,7 +5,6 @@ import * as Device from 'expo-device'
 import { get, set } from './secureStore'
 import uuid from 'react-native-uuid'
 
-const client = new ApolloClient({ uri: apiUrl, cache: new InMemoryCache() })
 const LOG_LEVEL_STORE_KEY = 'loglevel'
 const activityId = uuid.v4()
 
@@ -45,7 +44,10 @@ const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: Int, $data: S
 let globalLogger: {
     [x: string]: (...args: unknown[]) => void;
 }
+
 export const setOrResetGlobalLogger = async (levelCode?: number) => {
+    const client = new ApolloClient({ uri: apiUrl, cache: new InMemoryCache() })
+
     const currentLevelCode = await new Number(get(LOG_LEVEL_STORE_KEY))
     if(levelCode && currentLevelCode !== levelCode) {
         await set(LOG_LEVEL_STORE_KEY, levelCode.toString())

@@ -1,42 +1,45 @@
 import { createLogger, format, transports, LogCallback } from "winston"
-let logger: {
+import { getCommonConfig } from "./config"
+
+const logger: {
+    initialized: boolean
     error: (message: string, err: any) => void
     info: (message: string) => void
-} | undefined = undefined
-
-if(!logger) {
-    const winstonLogger = createLogger({
-        level: 'info',
-        format: format.combine(
-            format.timestamp(),
-            format.json()
-        ),
-        transports: [
-            new transports.File({ filename: process.env.LOG_PATH + 'error.log', level: 'error' }),
-            new transports.File({ filename: process.env.LOG_PATH + 'combined.log' }),
-        ],
-    })
-    logger = {
-        error: (message: string, error: any, cb?: LogCallback) => {
-            winstonLogger.error(`${message} ${parseError(error)}`, cb)
-        },
-        info: (message: string, cb?: LogCallback) => {
-            winstonLogger.info(message, cb)
-        }
-    }
+} = {
+    initialized: false,
+    error: () => { throw new Error('Logger still uninitialized, please first call "init"') },
+    info: () => { throw new Error('Logger still uninitialized, please first call "init"') }
 }
 
+export const init = async () => {
+    const config = await getCommonConfig()
+    if(!logger.initialized) {
+        const winstonLogger = createLogger({
+            level: 'info',
+            format: format.combine(
+                format.timestamp(),
+                format.json()
+            ),
+            transports: [
+                new transports.File({ filename: config.logPath + 'error.log', level: 'error' }),
+                new transports.File({ filename: config.logPath + 'combined.log' }),
+            ],
+        })
+        logger.error =  (message: string, error: any, cb?: LogCallback) => {
+            const content = `${message} ${parseError(error)}`
+            if(!config.production) console.log(content)
+            winstonLogger.error(content, cb)
+        }
+        logger.info = (message: string, cb?: LogCallback) => {
+            if(!config.production) console.log(message)
+            winstonLogger.info(message, cb)
+        }
+        logger.initialized = true
+    }
+}
 
 const parseError = (e: any) => {
     return `name: ${e.name}\nmessage: ${e.message}\nstack: ${e.stack}`
 }
 
-export const logData = (context: string, resultOrError: object, isError?: boolean) => {
-    if(isError) {
-      logger!.error(context, resultOrError)
-    } else {
-      logger!.info(`${context}. ${JSON.stringify(resultOrError)}`)
-    }
-  }
-
-export default logger!
+export default logger
