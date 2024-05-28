@@ -6,7 +6,7 @@ import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./notifications/listener"
 import logger, { init } from "./logger"
-import { dailyBackup } from "./db_jobs/backup"
+import { dailyBackup } from "./db_jobs/jobs"
 import { cleanOldClientLogsJob } from "./db_jobs/maintenance"
 
 const getConnectionString = async (config: Config) => {

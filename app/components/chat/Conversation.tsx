@@ -80,6 +80,9 @@ const Conversation = ({ route }: RouteProps) => {
                   isLoadingEarlier={conversationContext.state.conversation.loading}
                   user={user}
                   locale={getLanguage()}
+                  loadEarlier={!!conversationContext.state.conversation.data?.endCursor}
+                  infiniteScroll={true}
+                  onLoadEarlier={conversationContext.actions.loadEarlier}
                   renderSend={p => <Send {...p} containerStyle={{
                       justifyContent: 'center',
                       alignItems: 'center',

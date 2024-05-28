@@ -41,21 +41,19 @@ const defaultResourceCategories = [
 ]
 
 const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContext.Provider value={{
-    newChatMessage: '', state: { messages: [], categories: fromData(defaultResourceCategories), numberOfUnread: 0, processing: false, token: '', account },
+    newChatMessage: '', overrideMessageReceived: [], state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, processing: false, token: '', account },
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
         accountUpdated: () => Promise.resolve(),
         logout: () => Promise.resolve(),
-        resetMessages: () => {},
-        setMessage: () => {},
         notify: () => {},
-        onMessageReceived: () => {},
-        setMessageReceived: () => {},
+        setMessageReceivedHandler: () => {},
         resetMessageReceived: () => {},
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
-        setCategories: () => {}
+        setCategories: () => {},
+        setChatMessageSubscription: () => {}
     }
 }}>
     <StoryElement />
@@ -76,7 +74,7 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
     return (StoryElement: React.ElementType) => 
     <ConversationContext.Provider value={{ 
         state: initialConversationData,
-        actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {} }
+        actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {}, loadEarlier: async () => {} }
     }}>
         <StoryElement />
     </ConversationContext.Provider>

@@ -36,7 +36,6 @@ const EditResourceFields = ({formikState, processing}: Props) => {
                 try {
                     await editResourceContext.actions.addImage(img, values)
                 } catch(e) {
-                    appContext.actions.setMessage((e as Error).stack!)
                     appContext.actions.notify({ error: e as Error })
                 }
             }}

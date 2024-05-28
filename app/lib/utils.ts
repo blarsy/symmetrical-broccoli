@@ -204,7 +204,6 @@ export const pickImage = async (success: ((img: ImageResult)=> void), height: nu
         success(img)
     }
   } catch(e) {
-    appContext.actions.setMessage((e as Error).stack!)
     appContext.actions.notify({ error: e as Error})
   }
 }             

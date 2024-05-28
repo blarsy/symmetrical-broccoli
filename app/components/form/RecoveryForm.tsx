@@ -31,7 +31,7 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
             await requestRecovery({ variables: { email: values.email }})
             setRecoveryRequested(true)
         } catch(e: any) {
-            appContext.actions.setMessage(e)
+            appContext.actions.notify({ error: e })
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (

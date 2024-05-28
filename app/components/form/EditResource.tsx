@@ -43,11 +43,11 @@ export default ({ route, navigation }:RouteProps) => {
         try {
             await editResourceContext.actions.save(values, token)
             setSaveResourcestate(fromData(null))
-            searchFilterContext.actions.requery(appContext.state.categories.data)
+            searchFilterContext.actions.requery(appContext.state.categories.data!)
             navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
-            appContext.actions.setMessage(e)
+            appContext.actions.notify({ error: e })
         }
     }
 
@@ -83,7 +83,7 @@ export default ({ route, navigation }:RouteProps) => {
                 <Dialog visible={connecting} onDone={async (token) => {
                     setConnecting(false)
                     await createResource(formikState.values, token)
-                    searchFilterContext.actions.requery(appContext.state.categories.data)
+                    searchFilterContext.actions.requery(appContext.state.categories.data!)
                 }} onCloseRequested={() => {
                     setConnecting(false)
                 }}/>

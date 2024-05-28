@@ -2,7 +2,6 @@ import { createContext, useState } from "react"
 import { Account, AccountInfo, Category } from "@/lib/schema"
 import React from "react"
 import { SafeAreaProvider } from "react-native-safe-area-context"
-import dayjs from "dayjs"
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
 import { apolloTokenExpiredHandler, errorToString, getAuthenticatedApolloClient } from "@/lib/utils"
 import { get, remove, set } from "@/lib/secureStore"
@@ -17,7 +16,6 @@ interface AppState {
     token: string
     account?: AccountInfo
     chatMessagesSubscription?: { unsubscribe: () => void }
-    messages: string[]
     processing: boolean
     numberOfUnread: number
     categories: DataLoadState<Category[]>
@@ -33,8 +31,6 @@ interface AppActions {
     logout: () => Promise<void>
     tryRestoreToken: () => Promise<void>
     accountUpdated: (account: Account) => Promise<void>
-    resetMessages: () => void
-    setMessage: (message: any) => void
     notify: ( data: AppNotification ) => void
     setMessageReceivedHandler: (fn: (msg: any) => void) => void
     resetMessageReceived: () => void
@@ -58,7 +54,6 @@ interface Props {
 
 const emptyState: AppState = { 
     token: '', 
-    messages: [], 
     numberOfUnread: 0,
     processing: false,
     categories: initial<Category[]>(true, []),
@@ -75,8 +70,6 @@ export const AppContext = createContext<IAppContext>({
         tryRestoreToken: () => Promise.resolve(),
         accountUpdated: () => Promise.resolve(),
         logout: () => Promise.resolve(),
-        resetMessages: () => {},
-        setMessage: () => {},
         notify: () => {},
         setMessageReceivedHandler: () => {},
         resetMessageReceived: () => {},
@@ -237,15 +230,6 @@ const AppContextProvider = ({ children }: Props) => {
             setNewAppState({ account: updatedAccount })
         },
         logout,
-        setMessage: (messageObj: any) => {
-            let message: string
-            if(messageObj instanceof Error) message = (messageObj as Error).stack!
-            else message = messageObj as string
-            setNewAppState({ messages: [...appState.messages, `${dayjs(new Date()).format('DD/MM/YYYY HH:mm:ss')}: ${message}\n`] })
-        },
-        resetMessages: () => {
-            setNewAppState({ messages: [] })
-        },
         notify: notif => {
             if(notif.message) {
                 debug({ accountId: appState.account?.id, message: `In app notification: ${notif.message}` })
