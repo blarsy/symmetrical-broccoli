@@ -1,12 +1,13 @@
 import express from "express"
 import postgraphile from "./postgraphile"
-import getConfig, { Config, getCommonConfig, getVersions } from './config'
+import getConfig, { Config, getVersions } from './config'
 import cors from 'cors'
 import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./notifications/listener"
 import logger, { init } from "./logger"
-import { dailyBackup } from "./db_backup/jobs"
+import { dailyBackup } from "./db_jobs/backup"
+import { cleanOldClientLogsJob } from "./db_jobs/maintenance"
 
 const getConnectionString = async (config: Config) => {
     return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
@@ -48,31 +49,6 @@ const launchPostgraphileWebApi = (config: Config) => {
     logger.info(`Express web api server for versions ${config.version} listening on port ${config.apiPort}.`)
 }
 
-const launchPostgraphileWebApis = async () => {
-    const versions = await getVersions()
-    const commonConfig = await getCommonConfig()
-    const app = express()
-    
-    const allowedOrigins = JSON.parse(commonConfig.webClientUrls!) as string[]
-
-    app.options('*', cors({ origin(requestOrigin, callback) {
-        if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
-            callback(null, requestOrigin)
-        } else {
-            logger.error(`${requestOrigin} rejected. Allowed origins are ${allowedOrigins}`, new Error('Disallowed'))
-            callback(new Error('Disallowed'))
-        }
-    }, }))
-
-    versions.forEach(async version => {
-        const config = await getConfig(version)
-        app.use(postgraphile(config))
-    })
-    
-    app.listen(3000)
-    logger.info(`Express web api server for versions ${versions.join(', ')} listening on port 3000.`)
-}
-
 const executeJob = async (executor: (payload: any, helpers: JobHelpers) => Promise<void>, payload: any, helpers: JobHelpers, jobName: String) => {
     try {
         await executor(payload, helpers)
@@ -88,7 +64,7 @@ const launchJobWorker = async (connectionString: string, version: string) => {
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
-        crontab: '0 0 * * * databaseBackup',
+        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs',
         taskList : {
             mailPasswordRecovery: async (payload: any, helpers) => {
                 executeJob(async (payload, helpers) => {
@@ -105,6 +81,10 @@ const launchJobWorker = async (connectionString: string, version: string) => {
             databaseBackup: async (payload: any, helpers) => {
                 executeJob(dailyBackup, { version }, helpers, 'databaseBackup')
             },
+            cleanOldClientLogs: async (payload: any, helpers) => {
+                const daysOfLogToKeep = 7
+                executeJob(cleanOldClientLogsJob, { daysOfLogToKeep, connectionString }, helpers, 'cleanOldClientLogs')
+            }
         },
         schema: 'worker'
       })
