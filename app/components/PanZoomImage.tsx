@@ -10,7 +10,7 @@ interface Props {
 const PanZoomImage = ({ uri }: Props) => {
     const dims = Dimensions.get("window")
     const size = Math.min(dims.height, dims.width)
-    return <GestureHandlerRootView style={{ width: size, height: size, borderColor: 'red', borderWidth: 1 }}>
+    return <GestureHandlerRootView style={{ width: size, height: size }}>
         <ImageZoom
             uri={uri}
             minScale={0.5}

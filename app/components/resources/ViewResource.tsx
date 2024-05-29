@@ -49,15 +49,15 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
     }
 
     if(hasOnlyOneImage) {
-        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1 }} onPress={() => onImagePress(urlFromPublicId(resource.images[0].publicId!))}>
+        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1, alignItems: 'center', marginBottom: 10 }} onPress={() => onImagePress(urlFromPublicId(resource.images[0].publicId!))}>
             <Image style={{ flexGrow: 1 }} source={{ uri: urlFromPublicId(resource.images[0].publicId!)} }
                 width={imgSize} height={imgSize} /> 
         </TouchableOpacity>
     }
 
-    return <View style={{ flex: 1, flexDirection: 'column', marginBottom: 10 }}>
-        <SwiperFlatList data={getSwiperData(resource)} 
-            renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
+    return <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', marginBottom: 10 }}>
+        <SwiperFlatList style={{ width: imgSize }} data={getSwiperData(resource)}
+            renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity style={{ width: imgSize }} onPress={() => onImagePress(item.source)}>
                 <Image key={item.idx} source={{ uri: item.source}} width={imgSize} height={imgSize} 
                     style={{ width: imgSize, height: imgSize }} />
         </TouchableOpacity>} />
