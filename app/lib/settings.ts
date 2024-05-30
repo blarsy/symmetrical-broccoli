@@ -1,12 +1,7 @@
-import { EXPO_PUBLIC_API_URL, EXPO_PUBLIC_DIAGNOSTIC, EXPO_PUBLIC_BASE_URL, 
-    EXPO_PUBLIC_CLOUDINARY_CLOUD, EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-    EXPO_PUBLIC_CLOUDINARY_REST_URL, EXPO_PUBLIC_SUBSCRIPTION_URL, EXPO_PUBLIC_CLIENT_VERSION } from 'react-native-dotenv'
+import Constants from 'expo-constants'
 
-export const apiUrl = process.env.EXPO_PUBLIC_API_URL || EXPO_PUBLIC_API_URL
-export const subscriptionsUrl = process.env.EXPO_PUBLIC_SUBSCRIPTION_URL || EXPO_PUBLIC_SUBSCRIPTION_URL
-export const baseUrl = process.env.EXPO_PUBLIC_BASE_URL || EXPO_PUBLIC_BASE_URL
-export const diagnostic = process.env.EXPO_PUBLIC_DIAGNOSTIC || EXPO_PUBLIC_DIAGNOSTIC
-export const cloudinaryCloud = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD || EXPO_PUBLIC_CLOUDINARY_CLOUD
-export const cloudinaryUploadPreset = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET || EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-export const cloudinaryRestUrl = process.env.EXPO_PUBLIC_CLOUDINARY_REST_URL || EXPO_PUBLIC_CLOUDINARY_REST_URL
-export const clientVersion = process.env.EXPO_PUBLIC_CLIENT_VERSION || EXPO_PUBLIC_CLIENT_VERSION
+export const apiUrl = Constants.expoConfig!.extra!.appSettings.apiUrl
+export const subscriptionsUrl = Constants.expoConfig!.extra!.appSettings.subscriptionsUrl
+export const cloudinaryCloud = Constants.expoConfig!.extra!.appSettings.cloudinaryCloud
+export const cloudinaryUploadPreset = Constants.expoConfig!.extra!.appSettings.cloudinaryUploadPreset
+export const cloudinaryRestUrl = Constants.expoConfig!.extra!.appSettings.cloudinaryRestUrl

@@ -1,5 +1,25 @@
-const version = '0.2.1'
-const versionCode = 96
+const version = '0.2.4'
+const versionCode = 99
+
+let appSettings
+if(process.env.TARGET_ENV) {
+  if(process.env.TARGET_ENV.toLowerCase() === 'test') {
+    //console.log('Building for test env.')
+    appSettings = require('./lib/config/test.config.json')
+  } else if(process.env.TARGET_ENV.toLowerCase() === 'prod') {
+    //console.log('Building for production env.')
+    appSettings = require('./lib/config/prod.config.json')
+  } else if(process.env.TARGET_ENV.toLowerCase() === 'dev') {
+    //console.log(`Building for development env.`)
+    appSettings = require('./lib/config/dev.config.json')
+  } else {
+    //console.log(`Could not interpret TARGET ENV value ${process.env.TARGET_ENV}, then building for development env.`)
+    appSettings = require('./lib/config/dev.config.json')
+  }
+} else {
+    //console.log(`No value for TARGET ENV, then building for production env.`)
+    appSettings = require('./lib/config/prod.config.json')
+}
 
 module.exports = {
   "expo": {
@@ -67,7 +87,8 @@ module.exports = {
       "eas": {
         "projectId": "484b7ec5-78c2-47e0-bc80-4f9182b4916a"
       },
-      "storybookEnabled": process.env.STORYBOOK_ENABLED
+      "storybookEnabled": process.env.STORYBOOK_ENABLED,
+      "appSettings": appSettings
     },
     "plugins": [
       "expo-localization",
