@@ -1,6 +1,6 @@
 import React from 'react'
 import AppContextProvider from '@/components/AppContextProvider'
-import Start from '@/components/mainViews/Start'
+import Start, { theme } from '@/components/mainViews/Start'
 import { AppRegistry, StatusBar } from 'react-native'
 import { primaryColor } from './components/layout/constants'
 import { en, fr, registerTranslation } from 'react-native-paper-dates'
@@ -10,6 +10,7 @@ import dayjs from 'dayjs'
 import Constants from 'expo-constants'
 import { getLanguage } from './lib/utils'
 import './lib/logger'
+import { PaperProvider } from 'react-native-paper'
 
 
 function App() {
@@ -19,12 +20,14 @@ function App() {
   registerTranslation('en', en)
   registerTranslation('fr', fr)
 
-  return <AppContextProvider>
-      <>
-        <StatusBar backgroundColor={primaryColor}/>
-        <Start/>
-      </>
-  </AppContextProvider>
+  return <PaperProvider theme={theme}>
+      <AppContextProvider>
+        <>
+          <StatusBar backgroundColor={primaryColor}/>
+          <Start/>
+        </>
+      </AppContextProvider>
+    </ PaperProvider>
 }
 
 let AppEntryPoint

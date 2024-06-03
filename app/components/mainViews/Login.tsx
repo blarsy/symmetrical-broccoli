@@ -20,7 +20,7 @@ interface ConnectProps {
 }
 
 interface Props {
-    onDone?: (token: string, account: AccountInfo) => Promise<void>
+    onDone?: (token: string, account: AccountInfo) => void
     infoTextI18n?: string,
     infoSubtextI18n?: string
 }

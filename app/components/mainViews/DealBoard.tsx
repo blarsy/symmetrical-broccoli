@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useState } from "react"
 import { Appbar, Avatar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -13,9 +13,6 @@ import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 import { AppContext } from "../AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
-import ConnectionDialog from "../ConnectionDialog"
-import { gql, useApolloClient } from "@apollo/client"
-import { debug } from "@/lib/logger"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -32,24 +29,10 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
-// const useChatMessageSubscription = () => {
-//     const appContext = useContext(AppContext)
-//     const apolloClient = useApolloClient()
-
-//     useEffect(() => {
-//         if(appContext.state.account) {
-//             const subscription = apolloClient.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
-//                 debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}`, accountId: appContext.state.account?.id })
-//                 appContext.actions.onMessageReceived(payload.data.messageReceived.message)
-//             } })
-//             appContext.actions.setChatMessageSubscription(subscription)
-//         }
-//     }, [appContext.state.account])
-// }
-
-const ConnectedProfileIcon = ({ size }: { size: number }) => {
+const ProfileIcon = ({ size}: { size: number }) => {
     const appContext = useContext(AppContext)
 
+    if(!appContext.state.account) return <Icon source="login-variant" size={size}/>
     
     if(appContext.state.account!.avatarPublicId)
         return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.state.account!.avatarPublicId!) }} />
@@ -57,20 +40,11 @@ const ConnectedProfileIcon = ({ size }: { size: number }) => {
     return <Avatar.Text size={size} label={initials(appContext.state.account!.name)} />
 }
 
-const ProfileIcon = ({ size}: { size: number }) => {
-    const appContext = useContext(AppContext)
-    if(!appContext.state.account) return <Icon source="login-variant" size={size}/>
-    return <ConnectedProfileIcon size={size} />
-}
-
 const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
-    const [connecting, setConnecting] = useState(false)
 
     const profileButtonSize = appBarsTitleFontSize * 1.5
-
-    //useChatMessageSubscription()
 
     return <EditResourceContextProvider>
         <SearchFilterContextProvider>
@@ -86,7 +60,9 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                             if(appContext.state.account) {
                                 navigation.navigate('profile')
                             } else {
-                                setConnecting(true)
+                                appContext.actions.ensureConnected('', '', () => {
+                                    
+                                })
                             }
                         }} />
                 </Appbar.Header>
@@ -104,7 +80,6 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                     <Tab.Screen name="resource" component={Resources} options={{ title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }} />
                     <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <Images.Chat fill={p.color} />}} />
                 </Tab.Navigator>
-                <ConnectionDialog visible={connecting} onCloseRequested={() => setConnecting(false)} onDone={async () => setConnecting(false)} />
             </View>
         </SearchFilterContextProvider>
     </EditResourceContextProvider>

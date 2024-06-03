@@ -44,7 +44,6 @@ const resources = {
       "back": "Back",
       "add_buttonLabel": "Add",
       "Atleast3chars": "At least 3 characters",
-      "nameOrEmail_label": "Name or email",
       "forgotPassword_label": "Forgot password ?",
       "recoveryRequested_message": "A mail has been sent to your address. Please follow the instructions it provides to restore access to your account.",
       "newResource_viewTitle": "Create resource",
@@ -108,7 +107,8 @@ const resources = {
       "deleted": "deleted",
       "resource_deleted": "This resource was deleted on {{deleted}}",
       "must_update_app": "Please update the app to benefit from the latest improvements.",
-      "update_button": "Update"
+      "update_button": "Update",
+      "available_resources": "Available resources"
     }
   },
   fr: {
@@ -148,7 +148,6 @@ const resources = {
       "back": "Retour",
       "add_buttonLabel": "Ajouter",
       "Atleast3chars": "Au moins 3 caractères",
-      "nameOrEmail_label": "Nom ou email",
       "forgotPassword_label": "Mot de passe oublié ?",
       "recoveryRequested_message": "Un email a été envoyé à votre adresse. Veuillez suivre les instructions qui s'y trouvent pour rétablir l'accès à votre compte.",
       "newResource_viewTitle": "Créer ressource",
@@ -212,7 +211,8 @@ const resources = {
       "deleted": "Effacé",
       "resource_deleted": "Cette ressource a été effacée le {{deleted}}",
       "must_update_app": "Veuillez mettre à jour l'app pour bénéficier des dernières fonctionnalités.",
-      "update_button": "Mettre à jour"
+      "update_button": "Mettre à jour",
+      "available_resources": "Ressources disponibles"
     }
   }
 }

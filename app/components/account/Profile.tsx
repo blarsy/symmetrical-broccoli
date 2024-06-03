@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, aboveMdWidth, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
@@ -10,7 +10,6 @@ import { AppContext } from "../AppContextProvider"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { primaryColor } from "../layout/constants"
-import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { gql, useMutation } from "@apollo/client"
 
 const DELETE_ACCOUNT = gql`mutation DeleteAccount {
@@ -19,7 +18,7 @@ const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     }
 }`
 
-export default function Profile ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) {
+export default function Profile ({ route, navigation }: RouteProps) {
     const [changingPassword, setChangingPassword] = useState(false)
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [confirmedAccountDelete, setConfirmedAccountDelete] = useState(false)

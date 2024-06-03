@@ -19,7 +19,7 @@ import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvid
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../resources/ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
-import ConnectionDialog from "../ConnectionDialog"
+import ViewAccount from "./ViewAccount"
 
 const StackNav = createNativeStackNavigator()
 
@@ -39,7 +39,7 @@ interface ResourceCartProps {
     onChatOpen: (resource: Resource) => void
 }
 
-const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
+export const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
     const appContext = useContext(AppContext)
     return <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 10, 
         paddingHorizontal: 8, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
@@ -64,7 +64,6 @@ const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
 const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const [connectingTowardsResource, setConnectingTowardsResource] = useState(undefined as number | undefined)
 
     const debouncedFilters = useDebounce(searchFilterContext.filter, 700)
 
@@ -112,33 +111,18 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 return <ResourceCard 
                     key={idx} resource={resource} 
                     onChatOpen={() => {
-                        if(appContext.state.account) {
+                        appContext.actions.ensureConnected('introduce_yourself', '', (token, account) => {
                             navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {
                                     resourceId: resource.id,
-                                    otherAccountId: appContext.state.account.id,
-                                    otherAccountName: appContext.state.account.name
+                                    otherAccountId: account.id
                                 }
                             })
-                        } else {
-                            setConnectingTowardsResource(resource.id)
-                        }
+                        })
                     }}
                     onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
                 }} />
-        <ConnectionDialog onCloseRequested={() => setConnectingTowardsResource(undefined)} visible={!!connectingTowardsResource} infoTextI18n="introduce_yourself"
-            onDone={async (token, account) => {
-                setConnectingTowardsResource(undefined)
-                navigation.navigate('chat', {
-                    screen: 'conversation',
-                    params: {
-                        resourceId: connectingTowardsResource,
-                        otherAccountId: account.id,
-                        otherAccountName: account.name
-                    }
-                })
-            }} />
     </ScrollView>
 }
 
@@ -146,5 +130,6 @@ export default function Search ({ route, navigation }: RouteProps) {
     return <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
         <StackNav.Screen name="searchResults" component={SearchResults} options={{ headerShown: false }} />
         <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
+        <StackNav.Screen name="viewAccount" key="viewAccount" options={{ header: SimpleBackHeader }} component={ViewAccount} />
     </StackNav.Navigator>
 }

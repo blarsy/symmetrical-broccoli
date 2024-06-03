@@ -8,44 +8,57 @@ import { CONVERSATION_MESSAGES } from '../chat/ConversationContextProvider';
 const makeConversationData = (resourceId: number, otherAccountId: number, resourceDeleted: boolean, otherAccountDeleted: boolean) => (
     {
         conversationMessages: {
-            nodes: [
+            pageInfo: {
+                hasNextPage: true,
+                endCursor: "WyJuYXR1cmFsIiwyNV0=",
+                hasPreviousPage: false,
+                startCursor: 'WyJuYXR1cmFsIiwxXQ=='
+            },
+            edges: [
                 {
-                    id: 1,
-                    text: 'message 1',
-                    created: new Date(),
-                    received: null,
-                    imageByImageId: {
-                        publicId: ''
-                    },
-                    participantByParticipantId: {
-                        accountByAccountId: {
-                            id: 1,
-                            name: 'Artisan incroyable',
-                            imageByAvatarImageId: {
-                                publicId: ''
+                    node: {
+                        id: 1,
+                        text: 'message 1',
+                        created: new Date(),
+                        received: null,
+                        imageByImageId: {
+                            publicId: ''
+                        },
+                        participantByParticipantId: {
+                            accountByAccountId: {
+                                id: 1,
+                                name: 'Artisan incroyable',
+                                imageByAvatarImageId: {
+                                    publicId: ''
+                                }
                             }
                         }
-                    }
+                    }, 
+                    cursor: 'jlkjm'
                 },
-                {
-                    id: 2,
-                    text: 'message 2',
-                    created: new Date(),
-                    received: null,
-                    imageByImageId: {
-                        publicId: ''
-                    },
-                    participantByParticipantId: {
-                        accountByAccountId: {
-                            id: 2,
-                            name: 'Mon association trop bien',
-                            imageByAvatarImageId: {
-                                publicId: ''
+                {             
+                    node: {
+                        id: 2,
+                        text: 'message 2',
+                        created: new Date(),
+                        received: null,
+                        imageByImageId: {
+                            publicId: ''
+                        },
+                        participantByParticipantId: {
+                            accountByAccountId: {
+                                id: 1,
+                                name: 'Artisan incroyable',
+                                imageByAvatarImageId: {
+                                    publicId: ''
+                                }
                             }
                         }
-                    }
+                    },
+                    cursor: 'jlkjm'  
                 },
-          ]},
+            ]
+        },
           accountById: {
             id: otherAccountId,
             name: otherAccountDeleted ? '' : 'Mon association trop bien'
@@ -111,11 +124,12 @@ export const SingleConversation: Story = {
     args: argsForSingleConversationViews,
     decorators: [
       apolloClientMocksDecorator([
-          { 
+          {
               query: CONVERSATION_MESSAGES,
               variables: {
                   resourceId: defaultResourceId,
-                  otherAccountId: defaultOtherAccountId
+                  otherAccountId: defaultOtherAccountId,
+                  first: 25
               },
               result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, false)
           }
@@ -132,7 +146,8 @@ export const SingleConversation: Story = {
                 query: CONVERSATION_MESSAGES,
                 variables: {
                     resourceId: defaultResourceId,
-                    otherAccountId: defaultOtherAccountId
+                    otherAccountId: defaultOtherAccountId,
+                    first: 25
                 },
                 result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, true)
             }
@@ -149,7 +164,8 @@ export const SingleConversationAboutDeletedResource: Story = {
                 query: CONVERSATION_MESSAGES,
                 variables: {
                     resourceId: defaultResourceId,
-                    otherAccountId: defaultOtherAccountId
+                    otherAccountId: defaultOtherAccountId,
+                    first: 25
                 },
                 result: makeConversationData(defaultResourceId, defaultOtherAccountId, true, false)
             }

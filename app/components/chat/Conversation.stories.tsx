@@ -21,7 +21,8 @@ const meta: Meta<typeof Conversation> = {
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'otherAccountName' }, createdAt: new Date() },
             { _id: 1, text: 'message 2', user: { _id: 1, name: 'me' }, createdAt: new Date() },
-          ]
+          ],
+          endCursor: ''
         },
       }
     }),
@@ -62,7 +63,8 @@ export const CantChatWithDeletedAccount: Story = {
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'Artisan incroyable' }, createdAt: new Date() },
             { _id: 1, text: 'message 2', user: { _id: 1, name: 'Mon association super' }, createdAt: new Date() },
-          ]
+          ],
+          endCursor: ''
         },
       }
     })

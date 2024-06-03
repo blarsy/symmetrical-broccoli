@@ -4,11 +4,10 @@ import { IconButton, Modal, Portal } from "react-native-paper"
 import Login from "./mainViews/Login"
 import { primaryColor } from "./layout/constants"
 import { AccountInfo } from "@/lib/schema"
-import { View } from "react-native"
 
 interface Props {
     visible: boolean
-    onDone?: (token: string, account: AccountInfo) => Promise<void>
+    onDone?: (token: string, account: AccountInfo) => void
     infoTextI18n?: string
     infoSubtextI18n?: string
     onCloseRequested: () => void

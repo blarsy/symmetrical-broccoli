@@ -14,6 +14,7 @@ import { t } from "@/i18n"
 import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
+import ResourceCard from "./ResourceCard"
 
 export const RESOURCES = gql`query MyResources {
     myresources {
@@ -91,8 +92,6 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
       return () => editResourceContext.actions.removeChangeCallback()
     }, [route])
 
-    const iconButtonsSize = aboveMdWidth() ? 60 : 40
-
     return <>
         <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
             actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
@@ -110,21 +109,12 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
           <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.state.categories.data || [])}
               onAddRequested={addRequested} onRefreshRequested={refetch}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
-              displayItem={(resource, idx) => <ResponsiveListItem onPress={() => viewRequested(resource.id) } key={idx} title={resource.title} 
-                  titleNumberOfLines={1}
-                  description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, borderRadius: 10 }}
-                  left={() => <SmallResourceImage resource={resource} />}
-                  right={() => resource.deleted ? <Text style={{ fontStyle: "italic" }}>{t('deleted')}</Text> : <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                      <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
-                          e.stopPropagation()
-                          editResourceContext.actions.setResource(resource)
-                          editRequested()
-                      }} />
-                      <IconButton style={{ alignSelf: 'center', margin: 0 }} iconColor={primaryColor} size={iconButtonsSize} icon="close-circle-outline" onPress={e => {
-                          e.stopPropagation()
-                          setDeletingResource(resource.id)
-                      }} />
-                  </View>}
+              displayItem={(resource, idx) => <ResourceCard resource={resource}
+                viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
+                editRequested={() => {
+                  editResourceContext.actions.setResource(resource)
+                  editRequested()
+                }}
               />}
           /> :
           <View style={{ flexDirection: 'row', margin: 10 }}>

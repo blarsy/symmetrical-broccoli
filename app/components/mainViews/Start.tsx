@@ -11,6 +11,7 @@ import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloCli
 import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
+import ConnectionDialog from "../ConnectionDialog"
 
 export const theme = {
     fonts: configureFonts({ config: { 
@@ -90,28 +91,28 @@ const ApolloWrapped = () => {
     }
 
     if(outdated) {
-        return <PaperProvider theme={theme}>
-            <UpdateApp />
-        </PaperProvider>
+        return <UpdateApp />
     }
 
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
-            <PaperProvider theme={theme}>
-                <Main />
-                <Portal>
-                    <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
-                        <ActivityIndicator size="large" />
-                    </Modal>
-                </Portal>
-                <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appContext.actions.resetLastNofication()} />
-                <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appContext.actions.resetLastNofication()} />
-            </PaperProvider>
+            <Main />
+            <Portal>
+                <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
+                    <ActivityIndicator size="large" />
+                </Modal>
+            </Portal>
+            <ConnectionDialog onCloseRequested={() => appContext.actions.closeConnectingDialog()} visible={!!appContext.connecting}
+                infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
+                onDone={(token, account) => {
+                    appContext.actions.closeConnectingDialog()
+                    appContext.connecting?.onConnected(token, account)
+                }} />
+            <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appContext.actions.resetLastNofication()} />
+            <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appContext.actions.resetLastNofication()} />
         </GestureHandlerRootView>
     } else {
-        <PaperProvider>
-            <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
-        </PaperProvider>
+        <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
     }
 }
 

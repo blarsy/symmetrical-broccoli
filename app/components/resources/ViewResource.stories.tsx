@@ -21,7 +21,7 @@ const initialArgs = {
   route: { params: { resourceId: 1 }},
   addRequested: () => console.log('addrequested'),
   editRequested: () =>  console.log('editrequested'),
-  viewRequested: (id) =>  console.log(`viewrequested, id ${id}`)
+  viewRequested: (id: number) =>  console.log(`viewrequested, id ${id}`)
 }
 
 const threeImages = [        

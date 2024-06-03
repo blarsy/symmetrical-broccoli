@@ -38,12 +38,15 @@ interface AppActions {
     setNewChatMessage: (msg: any) => void
     setCategories: (categories: DataLoadState<Category[]>) => void
     setChatMessageSubscription: (subscription: { unsubscribe: () => void }) => void
+    ensureConnected: (message: string, subMessage: string, onConnected: (token: string, account: Account) => void) => void
+    closeConnectingDialog: () => void
 }
 
 export interface IAppContext {
     state: AppState,
     lastNotification?: AppNotification
     newChatMessage: any
+    connecting: { message: string, subMessage: string, onConnected: (token: string, account: Account) => void } | undefined
     actions: AppActions
     overrideMessageReceived: ((msg: any) => void)[]
 }
@@ -64,6 +67,7 @@ export const AppContext = createContext<IAppContext>({
     state: emptyState, 
     lastNotification: undefined,
     newChatMessage: undefined,
+    connecting: undefined,
     overrideMessageReceived: [],
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
@@ -76,7 +80,9 @@ export const AppContext = createContext<IAppContext>({
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
         setCategories: () => {},
-        setChatMessageSubscription: () => {}
+        setChatMessageSubscription: () => {},
+        ensureConnected: () => {},
+        closeConnectingDialog: () => {}
     }
 })
 
@@ -131,6 +137,7 @@ const AppContextProvider = ({ children }: Props) => {
     const [appState, setAppState] = useState(emptyState)
     const [lastNotification, setLastNofication] = useState({ message: '' } as AppNotification | undefined)
     const [newChatMessage, setNewChatMessage] = useState(undefined as any)
+    const [connecting, setConnecting] = useState(undefined as { message: string, subMessage: string, onConnected: (token: string, account: Account) => void } | undefined)
     const [overrideMessageReceived, setOverrideMessageReceived] = useState<((msg: any) => void)[]>([])
 
     async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
@@ -179,30 +186,32 @@ const AppContextProvider = ({ children }: Props) => {
         return { authenticatedClient, subscription }
     }
 
+    const loginComplete = async (token: string): Promise<AccountInfo> => {
+        await set(TOKEN_KEY, token)
+        
+        const { authenticatedClient, subscription } = handleLogin(token)
+
+        const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
+
+        const account = {
+            id: res.data.getSessionData.accountId, 
+            name: res.data.getSessionData.name, 
+            email: res.data.getSessionData.email, 
+            avatarPublicId: res.data.getSessionData.avatarPublicId,
+            activated: res.data.getSessionData.activated
+        }
+
+        setNewAppState({ token, account, chatMessagesSubscription: subscription })
+
+        await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
+
+        info({ message: `Logged in with session: ${ JSON.stringify(res.data.getSessionData) }` })
+
+        return account
+    }
+
     const actions: AppActions = {
-        loginComplete: async (token: string): Promise<AccountInfo> => {
-            await set(TOKEN_KEY, token)
-            
-            const { authenticatedClient, subscription } = handleLogin(token)
-
-            const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
-
-            const account = {
-                id: res.data.getSessionData.accountId, 
-                name: res.data.getSessionData.name, 
-                email: res.data.getSessionData.email, 
-                avatarPublicId: res.data.getSessionData.avatarPublicId,
-                activated: res.data.getSessionData.activated
-            }
-
-            setNewAppState({ token, account, chatMessagesSubscription: subscription })
-
-            await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
-
-            info({ message: `Logged in with session: ${ JSON.stringify(res.data.getSessionData) }` })
-
-            return account
-        },
+        loginComplete,
         tryRestoreToken: async (): Promise<void> => {
             const token = await get(TOKEN_KEY)
             if(token) {
@@ -255,10 +264,20 @@ const AppContextProvider = ({ children }: Props) => {
         setCategories: loadState => {
             setNewAppState({ categories: loadState})
         },
-        setChatMessageSubscription: subscription => setNewAppState({ chatMessagesSubscription: subscription })
+        setChatMessageSubscription: subscription => setNewAppState({ chatMessagesSubscription: subscription }),
+        ensureConnected: (message: string, subMessage: string, onConnected: (token: string, account: Account) => void) => {
+            if(appState.account) {
+                onConnected(appState.token, appState.account)
+            } else {
+                setConnecting({ message, subMessage, onConnected: (token, account) => {
+                    onConnected(token, account)
+                } })
+            }
+        },
+        closeConnectingDialog: () => setConnecting(undefined)
     }
 
-    return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, actions, overrideMessageReceived}}>
+    return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, connecting, actions, overrideMessageReceived}}>
         <SafeAreaProvider style={{ flex: 1 }}>
             {children}
         </SafeAreaProvider>
