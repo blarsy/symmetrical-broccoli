@@ -1,5 +1,5 @@
-const version = '0.2.4'
-const versionCode = 99
+const version = '0.2.5'
+const versionCode = 100
 
 let appSettings
 if(process.env.TARGET_ENV) {

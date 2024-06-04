@@ -9,7 +9,6 @@ import Logo from './img/LOGO-TOPE LA.svg'
 import smartphone from './img/IPHONE.png'
 import Googleplay from './img/google-play.svg'
 import AppStore from './img/app-store.svg'
-import LetsConnect from './img/CONNECTONS NOUS.svg'
 import { useRef, useState } from "react"
 import Step1 from "@/components/explainSteps/Step1"
 import Arrow from './img/fleche.svg'
@@ -25,6 +24,9 @@ import { Swiper as SwiperType } from "swiper"
 import { Autoplay } from 'swiper/modules'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
+import { Button } from "@mui/material"
+import QuestionIcon from "@mui/icons-material/QuestionMark"
+import QAIcon from "@mui/icons-material/QuestionAnswer"
 
 const PresentationCarousel = ({ theme }: { theme: Theme }) => {
     const swiperRef = useRef<SwiperType>()
@@ -121,7 +123,10 @@ const Page = () => {
                             padding: '2.5rem 1.5rem'
                         }
                     }}>La <b>solidarit&#233;</b>, on y croit dur comme fer. La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
-                    <Link href="https://forms.gle/VhgXtnRToprjWYeU8" style={{ alignSelf: 'center', height: '100px' }}><LetsConnect height="100%" /></Link>
+                    <Button variant="outlined" startIcon={<QuestionIcon/>} endIcon={<QAIcon/>} target="_blank"
+                        href="https://foggy-neptune-444.notion.site/Foire-aux-questions-ebb4a58584b8449d836d91ab37995e9a" 
+                        style={{ color: '#fff', borderColor: '#ccc', alignSelf: 'center', justifyContent: 'center', 
+                        marginTop: '2rem', fontFamily: fonts.title.style.fontFamily, fontSize: '1.7rem', borderRadius: '1rem' }}>Foire aux questions</Button>
                 </Stack>
                 <Box sx={theme => ({
                     [theme.breakpoints.down('lg')]: {

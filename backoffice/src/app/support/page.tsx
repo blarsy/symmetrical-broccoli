@@ -6,7 +6,7 @@ const Support = () => {
     return <ClientLayout title="Support">
         <>
             <Typography variant="subtitle1">Pour tout problème ou remarque lors de l&quot;utilisation de nos produits:</Typography>
-            <Typography variant="subtitle2" fontSize="2.5rem"><a href="mailto://hello@tope-la.com">hello@tope-la.com</a></Typography>
+            <Typography variant="subtitle2" fontSize="2.5rem"><a href="mailto://topela.hello@gmail.com">topela.hello@gmail.com</a></Typography>
             <Box padding="2rem">
                 <Typography variant="subtitle1">Pour acc&#xE9;l&#xE9;rer la prise en charge d&#x27;un probl&#xE8;me technique, veuillez, si possible, inclure:</Typography>
                 <Typography variant="body1">
