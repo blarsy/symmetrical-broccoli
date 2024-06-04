@@ -1,20 +1,17 @@
 import { LoadState, RouteProps, aboveMdWidth } from "@/lib/utils"
 import { EditResourceContext } from "./EditResourceContextProvider"
-import { SmallResourceImage } from "./MainResourceImage"
 import ConfirmDialog from "../ConfirmDialog"
-import ResponsiveListItem from "../ResponsiveListItem"
-import { deletedGrayColor, lightPrimaryColor, primaryColor } from "../layout/constants"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import AppendableList, { AddItemButton } from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
-import { AppContext } from "../AppContextProvider"
-import { Banner, IconButton, Text } from "react-native-paper"
+import { Banner } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 export const RESOURCES = gql`query MyResources {
     myresources {
@@ -75,6 +72,7 @@ interface ResourceListProps {
 
 export const ResourcesList = ({ route, addRequested, viewRequested, editRequested }: ResourceListProps) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
@@ -84,8 +82,8 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const [hideBanner, setHideBanner] = useState(false)
 
     useEffect(() => {
-      appContext.actions.setNewChatMessage(undefined)
-      if(appContext.state.account)
+      appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: undefined })
+      if(appContext.account)
         refetch()
 
       editResourceContext.actions.setChangeCallback(refetch)
@@ -93,20 +91,20 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     }, [route])
 
     return <>
-        <Banner visible={!!appContext.state.account && !appContext.state.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
+        <Banner visible={!!appContext.account && !appContext.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
             actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
                 try {
                     await sendAgain()
                 } catch(e) {
-                    appContext.actions.notify({ error: e as Error, message: t('error_sending_again') })
+                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
                 }
             } }, { label: t('hide_button'), onPress: () => {
                 setHideBanner(true)  
             }} ]}>
-            {t('activate_account', { email: appContext.state.account?.email })}
+            {t('activate_account', { email: appContext.account?.email })}
         </Banner>
-        { appContext.state.account ?
-          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.state.categories.data || [])}
+        { appContext.account ?
+          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.categories.data || [])}
               onAddRequested={addRequested} onRefreshRequested={refetch}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
               displayItem={(resource, idx) => <ResourceCard resource={resource}
@@ -128,7 +126,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                   resourceId: deletingResource
                 } })
                 await refetch()
-                searchFilterContext.actions.requery(appContext.state.categories.data!)
+                searchFilterContext.actions.requery(appContext.categories.data!)
                 setDeletingResource(0)
               } else {
                 setDeletingResource(0)

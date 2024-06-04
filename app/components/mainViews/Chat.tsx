@@ -10,9 +10,9 @@ import { ResourceImage } from "../resources/MainResourceImage"
 import { Button, Icon, Text } from "react-native-paper"
 import { t } from "@/i18n"
 import LoadedZone from "../LoadedZone"
-import { AppContext } from "../AppContextProvider"
 import ConversationContextProvider, { ConversationContext } from "../chat/ConversationContextProvider"
 import dayjs from "dayjs"
+import { AppContext } from "../AppStateContext"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -23,7 +23,7 @@ export const ChatHeader = (p: ChatHeaderProps) => {
     const conversationContext = useContext(ConversationContext)
     const exchangeTypes: string[] = []
     
-    if(conversationContext.state.conversation.data && appContext.state.categories.data) {
+    if(conversationContext.state.conversation.data && appContext.categories.data) {
         if(conversationContext.state.conversation.data.resource?.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
         if(conversationContext.state.conversation.data.resource?.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
     }
@@ -64,7 +64,7 @@ export const ChatBackground = ({ children }: { children: ReactNode }) => {
 
 const ConversationsList = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
-    if(appContext.state.account) {
+    if(appContext.account) {
         return <ChatBackground>
             <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId })} />
         </ChatBackground>

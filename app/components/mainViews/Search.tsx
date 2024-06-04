@@ -2,10 +2,9 @@ import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
 import { IconButton, Text, TextInput } from "react-native-paper"
-import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
 import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
-import { RouteProps } from "@/lib/utils"
+import { RouteProps, ensureConnected } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
 import MainResourceImage from "../resources/MainResourceImage"
 import CategoriesSelect from "../form/CategoriesSelect"
@@ -20,6 +19,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../resources/ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewAccount from "./ViewAccount"
+import { AppContext, AppDispatchContext } from "../AppStateContext"
 
 const StackNav = createNativeStackNavigator()
 
@@ -55,7 +55,7 @@ export const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProp
                     { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
                 </View>
             </View>
-            { (!appContext.state.account || resource.account!.id != appContext.state.account.id) && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
+            { (!appContext.account || resource.account!.id != appContext.account.id) && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
                 onPress={() => onChatOpen(resource)}/> }
         </View>
     </TouchableOpacity>
@@ -63,13 +63,14 @@ export const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProp
 
 const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const searchFilterContext = useContext(SearchFilterContext)
 
     const debouncedFilters = useDebounce(searchFilterContext.filter, 700)
 
     useEffect(() => {
-        if(appContext.state.categories.data) {
-            searchFilterContext.actions.requery(appContext.state.categories.data)
+        if(appContext.categories.data) {
+            searchFilterContext.actions.requery(appContext.categories.data)
         }
     }, [debouncedFilters])
 
@@ -105,13 +106,13 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || appContext.state.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || appContext.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
             displayItem={(res, idx) => {
                 const resource = res as Resource
                 return <ResourceCard 
                     key={idx} resource={resource} 
                     onChatOpen={() => {
-                        appContext.actions.ensureConnected('introduce_yourself', '', (token, account) => {
+                        ensureConnected(appContext, appDispatch, 'introduce_yourself', '', (token, account) => {
                             navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {

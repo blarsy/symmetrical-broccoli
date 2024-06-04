@@ -1,17 +1,17 @@
 import { useContext, useEffect, useState } from "react"
 import Main from "./Main"
-import { AppContext } from "@/components/AppContextProvider"
 import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
-import { ActivityIndicator, Modal, PaperProvider, Portal, configureFonts } from 'react-native-paper'
+import { configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient, versionChecker } from "@/lib/utils"
+import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient, tryRestoreToken, versionChecker } from "@/lib/utils"
 import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
 import ConnectionDialog from "../ConnectionDialog"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 export const theme = {
     fonts: configureFonts({ config: { 
@@ -39,6 +39,7 @@ const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
 
 const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [getMinimumClientVersion] = useLazyQuery(GET_MINIMUM_CLIENT_VERSION)
     const [busy, setBusy] = useState(false)
     const [outdated, setOutdated] = useState(false)
@@ -51,7 +52,7 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
                 setOutdated(true)
             }
         } catch(e) {
-            appContext.actions.notify({ error: e as Error })
+            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error } })
             setOutdated(false)
         } finally {
             setBusy(false)
@@ -68,6 +69,7 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
 const ApolloWrapped = () => {
     const { t } = i18n
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [startingUp, setStartingUp] = useState(true)
     const { checkingVersion, outdated } = useVersionCheck(versionChecker)
     const [fontsLoaded, fontError] = useFonts({
@@ -77,7 +79,7 @@ const ApolloWrapped = () => {
     
     const load = async () => {
         try {
-            await appContext.actions.tryRestoreToken()
+            await tryRestoreToken(appContext, appDispatch)
          } finally {
             setStartingUp(false)
          }
@@ -97,19 +99,16 @@ const ApolloWrapped = () => {
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
             <Main />
-            <Portal>
-                <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
-                    <ActivityIndicator size="large" />
-                </Modal>
-            </Portal>
-            <ConnectionDialog onCloseRequested={() => appContext.actions.closeConnectingDialog()} visible={!!appContext.connecting}
+            <ConnectionDialog onCloseRequested={() => appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: undefined })} visible={!!appContext.connecting}
                 infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
                 onDone={(token, account) => {
-                    appContext.actions.closeConnectingDialog()
+                    if(token){
+                        appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: undefined })
+                    }
                     appContext.connecting?.onConnected(token, account)
                 }} />
-            <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appContext.actions.resetLastNofication()} />
-            <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appContext.actions.resetLastNofication()} />
+            <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+            <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
         </GestureHandlerRootView>
     } else {
         <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
@@ -118,7 +117,7 @@ const ApolloWrapped = () => {
 
 export default () => {
     const appContext = useContext(AppContext)
-    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.state.token)}>
+    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.token)}>
         <ApolloWrapped />
     </ApolloProvider>
 }

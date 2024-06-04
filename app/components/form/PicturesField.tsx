@@ -5,10 +5,10 @@ import { IconButton, Text } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { t } from "@/i18n"
 import Images from "@/Images"
-import { AppContext } from "../AppContextProvider"
 import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
 import { pickImage } from "@/lib/utils"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 interface Props {
     images: ImageInfo[]
@@ -17,7 +17,7 @@ interface Props {
 }
 
 const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Props) => {
-    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     return <View style={{ flex: 1, alignItems: 'stretch', flexDirection: 'column' }}>
         { images && images.length > 0 &&
             <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
@@ -31,10 +31,14 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
         }
         <TouchableOpacity onPress={async () => {
             pickImage(img => {
-                onImageSelected({ 
-                    path: img.uri
-                })
-            }, 400, appContext)
+                try {
+                    onImageSelected({ 
+                        path: img.uri
+                    })
+                } catch (e) {
+                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error}})
+                }
+            }, 400)
         }}>
             <View style={{ flex: 1, backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 15 }}>
                 <Images.Photos style={{ height: 100, width: '100%', marginBottom: 15 }} fill="#fff" />

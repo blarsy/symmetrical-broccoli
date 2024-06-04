@@ -16,7 +16,6 @@ interface AppState {
     token: string
     account?: AccountInfo
     chatMessagesSubscription?: { unsubscribe: () => void }
-    processing: boolean
     numberOfUnread: number
     categories: DataLoadState<Category[]>
 }
@@ -58,7 +57,6 @@ interface Props {
 const emptyState: AppState = { 
     token: '', 
     numberOfUnread: 0,
-    processing: false,
     categories: initial<Category[]>(true, []),
     chatMessagesSubscription: undefined
 }

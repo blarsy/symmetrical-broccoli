@@ -8,14 +8,14 @@ import Profile from '../account/Profile'
 import DealBoard from './DealBoard'
 import { Appbar, Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
-import { adaptHeight, appBarsTitleFontSize, getLanguage } from '@/lib/utils'
-import { AppContext } from '../AppContextProvider'
+import { adaptHeight, appBarsTitleFontSize, getLanguage, logout } from '@/lib/utils'
 import * as Linking from 'expo-linking'
 import { gql, useLazyQuery } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../chat/NewChatMessages'
 import { debug } from '@/lib/logger'
 import { fromData, fromError } from '@/lib/DataLoadState'
+import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppStateContext'
 
 const StackNav = createNativeStackNavigator()
 
@@ -105,14 +105,15 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 
 export default function Main () {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
     const loadCategories = async () => {
         try {
             const res = await getCategories({ variables: { locale: getLanguage() }})
-            appContext.actions.setCategories(fromData(res.data.allResourceCategories.nodes))
+            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
-            appContext.actions.setCategories(fromError(e, t('requestError')))
+            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e, t('requestError')) })
         }
     }
 
@@ -150,8 +151,8 @@ export default function Main () {
                     <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
                         <Appbar.BackAction onPress={() => props.navigation.navigate('main')} />
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
-                        <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={() => {
-                            appContext.actions.logout()
+                        <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={ async () => {
+                            await logout(appContext, appDispatch)
                             props.navigation.reset({ routes: [
                                 {name: 'main'}
                             ], index: 0 })
@@ -160,7 +161,7 @@ export default function Main () {
                     <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />
                     <StackNav.Screen name="profile" component={Profile} key="profile"  />
                 </StackNav.Navigator>
-                <ChatMessagesNotificationArea onClose={() => appContext.actions.setNewChatMessage(undefined)} newMessage={appContext.newChatMessage} />
+                <ChatMessagesNotificationArea onClose={() => appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: undefined })} newMessage={appContext.newChatMessage} />
             </View>
         </NavigationContainer>
     </Container>

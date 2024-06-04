@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "cross-env TARGET_ENV=dev expo start",
+    "test": "cross-env TARGET_ENV=test expo start",
+    "prod": "cross-env TARGET_ENV=prod expo start",
     "android": "expo run:android",
     "pack": "eas build --platform=android --profile=production --local",
     "ios": "expo run:ios",
@@ -46,7 +48,6 @@
     "react-dom": "^18.2.0",
     "react-i18next": "^14.1.1",
     "react-native": "^0.73.4",
-    "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-gifted-chat": "^2.4.0",
     "react-native-logs": "^5.1.0",

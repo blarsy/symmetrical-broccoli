@@ -3,12 +3,12 @@ import i18n, { t } from "i18next"
 import React, { useContext } from "react"
 import * as yup from 'yup'
 import { View } from "react-native"
-import { AppContext } from "@/components/AppContextProvider"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
-import { isValidPassword } from "@/lib/utils"
+import { isValidPassword, loginComplete } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
 import { AccountInfo } from "@/lib/schema"
+import { AppContext, AppDispatchContext } from "../AppStateContext"
 
 interface Props {
     toggleRegistering: () => void
@@ -23,6 +23,7 @@ const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: Str
 
 const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [registerAccount, { data, loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')),
@@ -39,7 +40,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
             password: values.password,
             language: i18n.language.substring(0, 2).toLowerCase() } })
         if(res.data) {
-            const account = await appContext.actions.loginComplete(res.data.registerAccount.jwtToken)
+            const account = await loginComplete(appContext, appDispatch, res.data.registerAccount.jwtToken)
             onAccountRegistered && onAccountRegistered(res.data.registerAccount.jwtToken, account)
         }
     }}>

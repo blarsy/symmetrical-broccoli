@@ -7,12 +7,12 @@ import Chat from './Chat'
 import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
-import { RouteProps, appBarsTitleFontSize, initials } from "@/lib/utils"
+import { RouteProps, appBarsTitleFontSize, ensureConnected, initials } from "@/lib/utils"
 import EditResourceContextProvider from "../resources/EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
-import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
-import { AppContext } from "../AppContextProvider"
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { urlFromPublicId } from "@/lib/images"
+import { AppContext, AppDispatchContext } from "../AppStateContext"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -32,16 +32,17 @@ const getViewTitleI18n = (screenName: string): string => {
 const ProfileIcon = ({ size}: { size: number }) => {
     const appContext = useContext(AppContext)
 
-    if(!appContext.state.account) return <Icon source="login-variant" size={size}/>
+    if(!appContext.account) return <Icon source="login-variant" size={size}/>
     
-    if(appContext.state.account!.avatarPublicId)
-        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.state.account!.avatarPublicId!) }} />
+    if(appContext.account!.avatarPublicId)
+        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.account!.avatarPublicId!) }} />
 
-    return <Avatar.Text size={size} label={initials(appContext.state.account!.name)} />
+    return <Avatar.Text size={size} label={initials(appContext.account!.name)} />
 }
 
 const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
 
     const profileButtonSize = appBarsTitleFontSize * 1.5
@@ -51,18 +52,16 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
-                    <Appbar.Action style={{ backgroundColor: appContext.state.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
+                    <Appbar.Action style={{ backgroundColor: appContext.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
                         icon={p => <ProfileIcon size={p.size} />} 
-                        size={ appContext.state.account ? profileButtonSize : appBarsTitleFontSize }
+                        size={ appContext.account ? profileButtonSize : appBarsTitleFontSize }
                         centered
                         borderless
                         onPress={() => { 
-                            if(appContext.state.account) {
+                            if(appContext.account) {
                                 navigation.navigate('profile')
                             } else {
-                                appContext.actions.ensureConnected('', '', () => {
-                                    
-                                })
+                                ensureConnected(appContext, appDispatch, '', '', () => {})
                             }
                         }} />
                 </Appbar.Header>

@@ -6,10 +6,10 @@ import PicturesField from "./PicturesField"
 import { Category, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
-import { AppContext } from "../AppContextProvider"
 import CategoriesSelect from "./CategoriesSelect"
 import { aboveMdWidth } from "@/lib/utils"
 import { View } from "react-native"
+import { AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 interface Props {
     formikState: FormikProps<Resource>
@@ -19,7 +19,7 @@ interface Props {
 const Hr = () => <View style={{ backgroundColor: '#343434', height: 1, transform: 'scaleY(0.5)' }}></View>
 
 const EditResourceFields = ({formikState, processing}: Props) => {
-    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const { handleChange, handleBlur, values, setFieldValue, setTouched, resetForm, handleSubmit } = formikState
     const editResourceContext = useContext(EditResourceContext)
 
@@ -36,7 +36,7 @@ const EditResourceFields = ({formikState, processing}: Props) => {
                 try {
                     await editResourceContext.actions.addImage(img, values)
                 } catch(e) {
-                    appContext.actions.notify({ error: e as Error })
+                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error } })
                 }
             }}
             onImageDeleteRequested={img => {

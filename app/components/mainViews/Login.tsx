@@ -9,8 +9,8 @@ import { Text } from "react-native-paper"
 import RecoveryForm from "../form/RecoveryForm"
 import { aboveMdWidth, getAuthenticatedApolloClient, mdScreenWidth } from "@/lib/utils"
 import { ApolloProvider } from "@apollo/client"
-import { AppContext } from "../AppContextProvider"
 import { AccountInfo } from "@/lib/schema"
+import { AppContext } from "../AppStateContext"
 
 interface ConnectProps {
     children: JSX.Element,
@@ -27,7 +27,7 @@ interface Props {
 
 const ConnectContainer = ({ children, titleI18n, infoTextI18n, infoSubtextI18n }: ConnectProps) => {
     const appContext = useContext(AppContext)
-    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.state.token)}>
+    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.token)}>
         <PrimaryColoredView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', margin: 10, 
                 alignSelf: 'stretch', gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>

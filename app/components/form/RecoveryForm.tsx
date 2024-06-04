@@ -3,11 +3,11 @@ import { t } from "i18next"
 import { View } from "react-native"
 import React, { useContext, useState } from "react"
 import * as yup from "yup"
-import { AppContext } from "@/components/AppContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
+import { AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 const REQUEST_RECOVERY = gql`mutation RequestAccountRecovery($email: String) {
     requestAccountRecovery(input: {email: $email}) {
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const RecoveryForm = ({ toggleRecovering }: Props) => {
-    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [recoveryRequested, setRecoveryRequested] = useState(false)
     const [requestRecovery, { loading, error, reset }] = useMutation(REQUEST_RECOVERY)
 
@@ -31,7 +31,7 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
             await requestRecovery({ variables: { email: values.email }})
             setRecoveryRequested(true)
         } catch(e: any) {
-            appContext.actions.notify({ error: e })
+            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e }})
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (

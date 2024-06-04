@@ -10,7 +10,7 @@ import { adaptToWidth } from "@/lib/utils"
 import { ResourceCard } from "../mainViews/Search"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
-import { AppContext } from "../AppContextProvider"
+import { AppContext } from "../AppStateContext"
 
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
@@ -71,7 +71,7 @@ export const Account = ({ id }: Props) => {
                             <LoadedList loading={false} data={data.accountById.resourcesByAccountId.nodes} 
                                 contentContainerStyle={{ gap: 10 }}
                                 displayItem={(rawRes: any) => {
-                                        const resource = fromServerGraphResource(rawRes, appContext.state.categories.data!)
+                                        const resource = fromServerGraphResource(rawRes, appContext.categories.data!)
                                         return <ResourceCard resource={resource} onPress={() => {}} onChatOpen={() => {}} />
                                     }
                                 }

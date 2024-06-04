@@ -1,6 +1,5 @@
 import React  from 'react'
 import { EditResourceContext } from '../components/resources/EditResourceContextProvider'
-import { AppContext } from '@/components/AppContextProvider'
 import { fromData, initial } from './DataLoadState'
 import { AccountInfo, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
@@ -14,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
 import { theme } from '@/components/mainViews/Start'
+import { AppStateContext } from '@/components/AppStateContext'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -40,8 +40,8 @@ const defaultResourceCategories = [
     { code: 'cat4', name: 'category 4' }
 ]
 
-const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContext.Provider value={{
-    newChatMessage: '', overrideMessageReceived: [], state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, processing: false, token: '', account },
+const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppStateContext value={{
+    newChatMessage: '', overrideMessageReceived: [], state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, token: '', account },
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -57,7 +57,7 @@ const makeAppContextProvider = (StoryElement: React.ElementType, account: Accoun
     }
 }}>
     <StoryElement />
-</AppContext.Provider>
+</AppStateContext>
 
 export const searchFilterContextDecorator = (StoryElement: React.ElementType) => makeSeachFilterContextProvider(StoryElement)
 

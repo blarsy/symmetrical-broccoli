@@ -4,12 +4,12 @@ import React, { useContext } from "react"
 import { Image, View } from "react-native"
 import LoadedList from "../LoadedList"
 import ResponsiveListItem from "../ResponsiveListItem"
-import { AppContext } from "../AppContextProvider"
 import { Text } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import dayjs from "dayjs"
 import { urlFromPublicId } from "@/lib/images"
 import { gql, useQuery } from "@apollo/client"
+import { AppContext } from "../AppStateContext"
 
 const MY_CONVERSATIONS = gql`query MyConversations {
     myConversations {
@@ -68,7 +68,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
     const {data, loading, error} = useQuery(MY_CONVERSATIONS)
 
     return <View style={{ flex: 1 }}>
-        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.state.account!.id) : [] as ConversationData[]} error={error} noDataLabel={t('noConversationLoaded_label')}
+        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} error={error} noDataLabel={t('noConversationLoaded_label')}
             displayItem={(item, idx) => {
                 const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) ?
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 

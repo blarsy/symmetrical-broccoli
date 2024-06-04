@@ -2,15 +2,15 @@ import React, { useContext, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { RouteProps, aboveMdWidth, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, aboveMdWidth, logout, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
-import { AppContext } from "../AppContextProvider"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { primaryColor } from "../layout/constants"
 import { gql, useMutation } from "@apollo/client"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     deleteAccount(input: {}) {
@@ -25,12 +25,13 @@ export default function Profile ({ route, navigation }: RouteProps) {
     const [deleting, setDeleting] = useState(initial<null>(false, null))
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     return <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
         <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10, 
             alignSelf: "stretch", gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {
-                    if(success) appContext.actions.notify({ message: t('password_changed_message') })
+                    if(success) appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('password_changed_message') } })
                     setChangingPassword(false)
                 }}/> : 
                 <View>
@@ -60,7 +61,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                             setDeleting(beginOperation())
                             try {
                                 await deleteAccount()
-                                await appContext.actions.logout()
+                                await logout(appContext, appDispatch)
                                 navigation.reset({ routes: [
                                     {name: 'main'}
                                 ], index: 0 })

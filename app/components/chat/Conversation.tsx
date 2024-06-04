@@ -3,7 +3,6 @@ import { View } from "react-native"
 import { GiftedChat, IMessage, Send } from "react-native-gifted-chat"
 import { Icon, IconButton } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
-import { AppContext } from "../AppContextProvider"
 import { gql, useMutation } from "@apollo/client"
 import { RouteProps, getLanguage, pickImage } from "@/lib/utils"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
@@ -13,6 +12,7 @@ import { ConversationContext, asIMessage } from "./ConversationContextProvider"
 import LoadedZone from "../LoadedZone"
 import { ChatBackground } from "../mainViews/Chat"
 import { useNavigation } from "@react-navigation/native"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
@@ -24,15 +24,16 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
 
 const Conversation = ({ route }: RouteProps) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const conversationContext = useContext(ConversationContext)
     const navigation = useNavigation()
     const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
 
     useEffect(() => {
-      if(appContext.state.categories.data) {
-          conversationContext.actions.load(route.params?.resourceId, route.params?.otherAccountId, appContext.state.categories.data)
+      if(appContext.categories.data) {
+          conversationContext.actions.load(route.params?.resourceId, route.params?.otherAccountId, appContext.categories.data)
       }
-    }, [route.params, appContext.state.categories.data])
+    }, [route.params, appContext.categories.data])
 
     const onSend = useCallback(async (newMessages = [] as IMessage[], imagePublicId?: string) => {
         await Promise.all(newMessages.map(message => createMessage({ variables: { 
@@ -54,18 +55,18 @@ const Conversation = ({ route }: RouteProps) => {
 
     useEffect(() => {
         navigation.addListener('focus', () => {
-          appContext.actions.setMessageReceivedHandler(onMessageReceived)
+          appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: onMessageReceived }})
         })
-        navigation.addListener('blur', () => appContext.actions.resetMessageReceived())
+        navigation.addListener('blur', () => appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: undefined } }))
         return () => {
-            appContext.actions.resetMessageReceived()
+          appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: undefined } })
         }
     }, [])
 
     const user = {
-      _id: appContext.state.account?.id!,
-      name: appContext.state.account?.name,
-      avatar: appContext.state.account?.avatarPublicId ? urlFromPublicId(appContext.state.account.avatarPublicId) : undefined
+      _id: appContext.account?.id!,
+      name: appContext.account?.name,
+      avatar: appContext.account?.avatarPublicId ? urlFromPublicId(appContext.account.avatarPublicId) : undefined
     }
 
     return <ChatBackground>
@@ -91,15 +92,19 @@ const Conversation = ({ route }: RouteProps) => {
                   </Send>}
                   renderActions={p => <View style={{ flexDirection: 'row' }}>
                       <IconButton size={35} icon="image" disabled={!conversationContext.state.conversation.data?.otherAccount.name} iconColor={conversationContext.state.conversation.data?.otherAccount.name ? primaryColor : '#777'} style={{ margin: 0 }} onPress={() => pickImage(async img => {
-                        const uploadRes = await uploadImage(img.uri)
-                        onSend([{
-                          _id: 0,
-                          text: '',
-                          user,
-                          image: urlFromPublicId(uploadRes),
-                          createdAt: new Date()
-                        }], uploadRes)
-                      }, 400, appContext)} />
+                        try {
+                          const uploadRes = await uploadImage(img.uri)
+                          onSend([{
+                            _id: 0,
+                            text: '',
+                            user,
+                            image: urlFromPublicId(uploadRes),
+                            createdAt: new Date()
+                          }], uploadRes)
+                        } catch (e) {
+                          appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+                        }
+                      }, 400)} />
                   </View>}
               />
               <OperationFeedback error={conversationContext.state.conversation.error || createError} onDismissError={reset} />

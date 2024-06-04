@@ -11,8 +11,8 @@ import { lightPrimaryColor } from "../layout/constants"
 import { urlFromPublicId } from "@/lib/images"
 import { useQuery } from "@apollo/client"
 import LoadedZone from "../LoadedZone"
-import { AppContext } from "../AppContextProvider"
 import ViewField from "../ViewField"
+import { AppContext } from "../AppStateContext"
 
 interface ImgMetadata { 
     source: string
@@ -70,8 +70,8 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     let expiration: { text: string, date: string } | undefined = undefined
     let resource : Resource | undefined = undefined
     
-    if(data && appState.state.categories.data && appState.state.categories.data.length > 0) {
-        resource = fromServerGraphResource(data.resourceById, appState.state.categories.data)
+    if(data && appState.categories.data && appState.categories.data.length > 0) {
+        resource = fromServerGraphResource(data.resourceById, appState.categories.data)
         if(resource.expiration) {
             const dateObj = dayjs(resource.expiration)
             expiration = { text: dateObj.fromNow(), date: dateObj.format(t('dateFormat'))}
