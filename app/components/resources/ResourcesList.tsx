@@ -138,7 +138,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                   resourceId: deletingResource
                 } })
                 await refetch()
-                searchFilterContext.actions.requery(appContext.state.categories.data)
+                searchFilterContext.actions.requery(appContext.state.categories.data!)
                 setDeletingResource(0)
               } else {
                 setDeletingResource(0)
@@ -149,7 +149,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
 
 const ResourcesListNavigationComponent = ({ route, navigation }: RouteProps) => {
   return <ResourcesList route={route} 
-    addRequested={ () => () => navigation.navigate('newResource') }
+    addRequested={ () => navigation.navigate('newResource') }
     viewRequested={ resourceId => navigation.navigate('viewResource', { resourceId: resourceId })} 
     editRequested={ () => navigation.navigate('editResource') }/>
 }

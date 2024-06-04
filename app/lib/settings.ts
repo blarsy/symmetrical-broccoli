@@ -5,3 +5,4 @@ export const subscriptionsUrl = Constants.expoConfig!.extra!.appSettings.subscri
 export const cloudinaryCloud = Constants.expoConfig!.extra!.appSettings.cloudinaryCloud
 export const cloudinaryUploadPreset = Constants.expoConfig!.extra!.appSettings.cloudinaryUploadPreset
 export const cloudinaryRestUrl = Constants.expoConfig!.extra!.appSettings.cloudinaryRestUrl
+export const clientVersion = Constants.expoConfig!.extra!.appSettings.clientVersion
