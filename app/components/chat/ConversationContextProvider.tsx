@@ -1,7 +1,7 @@
 import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
 import { urlFromPublicId } from "@/lib/images"
 import { gql, useLazyQuery } from "@apollo/client"
-import { createContext, useState } from "react"
+import { createContext, useContext, useState } from "react"
 import React from "react"
 import { Category, Resource, fromServerGraphResource } from "@/lib/schema"
 import { IMessage } from "react-native-gifted-chat"

@@ -7,30 +7,11 @@ import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { ActivityIndicator, Modal, PaperProvider, Portal, configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { fontSizeLarge, fontSizeMedium, fontSizeSmall, getAuthenticatedApolloClient, versionChecker } from "@/lib/utils"
+import { getAuthenticatedApolloClient, getTheme, versionChecker } from "@/lib/utils"
 import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
 
-export const theme = {
-    fonts: configureFonts({ config: { 
-        bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-        bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-        bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-        displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-        displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-        displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-        headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-        headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-        headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-        labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-        labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-        labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-        titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-        titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-        titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
-    } })
-}
 
 const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
     getMinimumClientVersion
@@ -90,14 +71,14 @@ const ApolloWrapped = () => {
     }
 
     if(outdated) {
-        return <PaperProvider theme={theme}>
+        return <PaperProvider theme={getTheme()}>
             <UpdateApp />
         </PaperProvider>
     }
 
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
-            <PaperProvider theme={theme}>
+            <PaperProvider theme={getTheme()}>
                 <Main />
                 <Portal>
                     <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>

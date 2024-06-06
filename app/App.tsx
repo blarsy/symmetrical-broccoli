@@ -6,6 +6,7 @@ import { primaryColor } from './components/layout/constants'
 import { en, fr, registerTranslation } from 'react-native-paper-dates'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
+import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import Constants from 'expo-constants'
 import { errorToString, getLanguage } from './lib/utils'
@@ -28,6 +29,7 @@ if(typeof ErrorUtils != 'undefined') {
 function App() {
   dayjs.extend(relativeTime)
   dayjs.locale(getLanguage())
+  dayjs.extend(utc)
   
   registerTranslation('en', en)
   registerTranslation('fr', fr)

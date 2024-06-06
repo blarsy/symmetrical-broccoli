@@ -5,7 +5,7 @@ import { fromData, initial } from './DataLoadState'
 import { AccountInfo, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
 import { PaperProvider } from 'react-native-paper'
-import { MockedProvider } from "@apollo/react-testing"
+import { MockedProvider, MockedResponse } from "@apollo/react-testing"
 import { DocumentNode } from 'graphql'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
@@ -13,7 +13,7 @@ import dayjs from 'dayjs'
 import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
-import { theme } from '@/components/mainViews/Start'
+import { getTheme } from './utils'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -41,7 +41,9 @@ const defaultResourceCategories = [
 ]
 
 const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContext.Provider value={{
-    newChatMessage: '', state: { messages: [], categories: fromData(defaultResourceCategories), numberOfUnread: 0, processing: false, token: '', account },
+    newChatMessage: '', state: { messages: [], categories: fromData(defaultResourceCategories), 
+        numberOfUnread: 0, processing: false, token: '', account, chatMessagesSubscription: undefined,
+        lastConversationChangeTimestamp: 0 }, overrideMessageReceived: [],
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -50,12 +52,12 @@ const makeAppContextProvider = (StoryElement: React.ElementType, account: Accoun
         resetMessages: () => {},
         setMessage: () => {},
         notify: () => {},
-        onMessageReceived: () => {},
-        setMessageReceived: () => {},
+        setMessageReceivedHandler: () => {},
         resetMessageReceived: () => {},
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
-        setCategories: () => {}
+        setCategories: () => {},
+        setChatMessageSubscription: () => {}
     }
 }}>
     <StoryElement />
@@ -82,7 +84,7 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
     </ConversationContext.Provider>
 }
 
-export const paperProviderDecorator = (StoryElement: React.ElementType) => <PaperProvider theme={theme}>
+export const paperProviderDecorator = (StoryElement: React.ElementType) => <PaperProvider theme={getTheme()}>
     <StoryElement />
 </PaperProvider>
 
@@ -96,7 +98,7 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
 (Story: React.ElementType) => <MockedProvider mocks={
     ops.map(op => ({
         delay: 2000,
-        request: { query: op.query, variables: op.variables || undefined },
+        request: { query: op.query, variables: op.variables },
         result: { data: op.result }
     }))
   }>

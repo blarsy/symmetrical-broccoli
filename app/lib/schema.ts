@@ -131,5 +131,8 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                 avatarImageUrl: otherParticipant.accountByAccountId.imageByAvatarImageId ? urlFromPublicId(otherParticipant.accountByAccountId.imageByAvatarImageId.publicId) : undefined
             }
         })
+    }).sort((a, b) => {
+        if(a.conversation.lastMessageTime < b.conversation.lastMessageTime) return 1
+        return -1
     })
 }

@@ -1,4 +1,3 @@
-import { ApolloError } from "@apollo/client"
 import { t } from "i18next"
 import React from "react"
 import { View } from "react-native"

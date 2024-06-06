@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { paperProviderDecorator } from '@/lib/storiesUtil'
 import LoadedZone from './LoadedZone'
 import { Text } from 'react-native-paper'
 
