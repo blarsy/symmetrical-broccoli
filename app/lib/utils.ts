@@ -341,6 +341,7 @@ const handleLogin = (appState: IAppState, appDispatch: React.Dispatch<{type: App
           appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
       }
   } })
+  appDispatch({ type: AppReducerActionType.SetChatMessagesSubscription, payload: subscription })
   
   return { authenticatedClient, subscription }
 }

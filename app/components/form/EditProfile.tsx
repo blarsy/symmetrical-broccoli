@@ -51,7 +51,7 @@ export default function EditProfile () {
 
         setNewEmailMustBeActivated(emailHasChanged)
 
-        appDispatch({ type: AppReducerActionType.UpdateAccount, payload: { account: currentAccount } })
+        appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
 
     return <Formik initialValues={initialValues} validationSchema={yup.object().shape({

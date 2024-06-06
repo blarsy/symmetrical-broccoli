@@ -52,19 +52,19 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.Logout:
           return {...previousState, ...{ token: '', account: undefined, chatMessageSubscription: undefined, overrideMessageReceived: [] }}
         case AppReducerActionType.UpdateAccount:
-          return { ...previousState, ...{ account: action.payload.account } }
+          return { ...previousState, ...{ account: action.payload } }
         case AppReducerActionType.DisplayNotification:
           return { ...previousState, ...{ lastNotification: { error: action.payload.error, message: action.payload.message } } }
         case AppReducerActionType.ClearNotification:
           return { ...previousState, ...{ lastNotification: undefined } }
         case AppReducerActionType.SetCategoriesState:
-          return { ...previousState, ...{ categories: action.payload.categories } }
+          return { ...previousState, ...{ categories: action.payload } }
         case AppReducerActionType.SetMessageReceivedHandler:
           return { ...previousState, ...{ messageReceivedHandler: action.payload.messageReceivedHandler } }
         case AppReducerActionType.SetNewChatMessage:
-          return { ...previousState, ...{ newChatMessage: action.payload.newChatMessage } }
+          return { ...previousState, ...{ newChatMessage: action.payload } }
         case AppReducerActionType.SetChatMessagesSubscription:
-          return { ...previousState, ...{ chatMessagesSubscription: action.payload.chatMessagesSubscription } }
+          return { ...previousState, ...{ chatMessagesSubscription: action.payload } }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload.connecting } }
         default:
