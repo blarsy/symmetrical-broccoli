@@ -10,7 +10,7 @@ import RecoveryForm from "../form/RecoveryForm"
 import { aboveMdWidth, getAuthenticatedApolloClient, mdScreenWidth } from "@/lib/utils"
 import { ApolloProvider } from "@apollo/client"
 import { AccountInfo } from "@/lib/schema"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 interface ConnectProps {
     children: JSX.Element,

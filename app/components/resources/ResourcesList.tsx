@@ -11,7 +11,7 @@ import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 export const RESOURCES = gql`query MyResources {
     myresources {

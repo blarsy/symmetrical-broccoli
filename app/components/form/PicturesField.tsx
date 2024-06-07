@@ -8,7 +8,7 @@ import Images from "@/Images"
 import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
 import { pickImage } from "@/lib/utils"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 interface Props {
     images: ImageInfo[]

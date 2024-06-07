@@ -9,7 +9,7 @@ import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
 import { Avatar, Banner } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String, $avatarPublicId: String) {
     updateAccount(input: {email: $email, name: $name, avatarPublicId: $avatarPublicId}) {

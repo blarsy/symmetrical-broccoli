@@ -12,8 +12,7 @@ import dayjs from 'dayjs'
 import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
-import { theme } from '@/components/mainViews/Start'
-import { AppStateContext } from '@/components/AppStateContext'
+import { getTheme } from './utils'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -41,7 +40,9 @@ const defaultResourceCategories = [
 ]
 
 const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppStateContext value={{
-    newChatMessage: '', overrideMessageReceived: [], state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, token: '', account },
+    newChatMessage: '', overrideMessageReceived: [], 
+    state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, token: '', account, chatMessagesSubscription: undefined,
+    lastConversationChangeTimestamp: 0 },
     actions: {
         loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
         tryRestoreToken: () => Promise.resolve(),
@@ -49,9 +50,12 @@ const makeAppContextProvider = (StoryElement: React.ElementType, account: Accoun
         logout: () => Promise.resolve(),
         notify: () => {},
         setMessageReceivedHandler: () => {},
+        setMessageReceivedHandler: () => {},
         resetMessageReceived: () => {},
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
+        setCategories: () => {},
+        setChatMessageSubscription: () => {}
         setCategories: () => {},
         setChatMessageSubscription: () => {}
     }
@@ -80,7 +84,7 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
     </ConversationContext.Provider>
 }
 
-export const paperProviderDecorator = (StoryElement: React.ElementType) => <PaperProvider theme={theme}>
+export const paperProviderDecorator = (StoryElement: React.ElementType) => <PaperProvider theme={getTheme()}>
     <StoryElement />
 </PaperProvider>
 
@@ -94,7 +98,7 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
 (Story: React.ElementType) => <MockedProvider mocks={
     ops.map(op => ({
         delay: 2000,
-        request: { query: op.query, variables: op.variables || undefined },
+        request: { query: op.query, variables: op.variables },
         result: { data: op.result }
     }))
   }>

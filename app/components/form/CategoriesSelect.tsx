@@ -8,7 +8,7 @@ import { Modal, Portal, Text, TextInput } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 interface CategoriesSelectModalProps {
     open: boolean

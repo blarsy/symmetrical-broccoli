@@ -8,14 +8,16 @@ import Profile from '../account/Profile'
 import DealBoard from './DealBoard'
 import { Appbar, Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
-import { adaptHeight, appBarsTitleFontSize, getLanguage, logout } from '@/lib/utils'
+import { adaptHeight, appBarsTitleFontSize, getLanguage } from '@/lib/utils'
 import * as Linking from 'expo-linking'
 import { gql, useLazyQuery } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../chat/NewChatMessages'
 import { debug } from '@/lib/logger'
 import { fromData, fromError } from '@/lib/DataLoadState'
-import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppStateContext'
+import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppContextProvider'
+import ConnectionDialog from '../ConnectionDialog'
+import useUserConnectionFunctions from '@/lib/useUserConnectionFunctions'
 
 const StackNav = createNativeStackNavigator()
 
@@ -107,6 +109,7 @@ export default function Main () {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
+    const { logout } = useUserConnectionFunctions()
 
     const loadCategories = async () => {
         try {
@@ -152,7 +155,7 @@ export default function Main () {
                         <Appbar.BackAction onPress={() => props.navigation.navigate('main')} />
                         <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
                         <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={ async () => {
-                            await logout(appContext, appDispatch)
+                            await logout()
                             props.navigation.reset({ routes: [
                                 {name: 'main'}
                             ], index: 0 })
@@ -164,5 +167,10 @@ export default function Main () {
                 <ChatMessagesNotificationArea onClose={() => appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: undefined })} newMessage={appContext.newChatMessage} />
             </View>
         </NavigationContainer>
+        <ConnectionDialog onCloseRequested={() => appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: undefined })} visible={!!appContext.connecting}
+                infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
+                onDone={(token, account) => {
+                    appContext.connecting?.onConnected(token, account)
+                }} />
     </Container>
 }

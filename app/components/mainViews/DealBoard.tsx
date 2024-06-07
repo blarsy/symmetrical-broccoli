@@ -7,12 +7,13 @@ import Chat from './Chat'
 import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
-import { RouteProps, appBarsTitleFontSize, ensureConnected, initials } from "@/lib/utils"
+import { RouteProps, appBarsTitleFontSize, initials } from "@/lib/utils"
 import EditResourceContextProvider from "../resources/EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { urlFromPublicId } from "@/lib/images"
-import { AppContext, AppDispatchContext } from "../AppStateContext"
+import { AppContext, AppDispatchContext } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -44,7 +45,8 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
-
+    const { ensureConnected } = useUserConnectionFunctions()
+    
     const profileButtonSize = appBarsTitleFontSize * 1.5
 
     return <EditResourceContextProvider>
@@ -61,7 +63,7 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                             if(appContext.account) {
                                 navigation.navigate('profile')
                             } else {
-                                ensureConnected(appContext, appDispatch, '', '', () => {})
+                                ensureConnected('', '', () => {})
                             }
                         }} />
                 </Appbar.Header>

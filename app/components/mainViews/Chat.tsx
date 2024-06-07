@@ -12,7 +12,7 @@ import { t } from "@/i18n"
 import LoadedZone from "../LoadedZone"
 import ConversationContextProvider, { ConversationContext } from "../chat/ConversationContextProvider"
 import dayjs from "dayjs"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void

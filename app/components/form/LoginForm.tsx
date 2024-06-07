@@ -1,16 +1,16 @@
 import { Formik, ErrorMessage } from "formik"
 import { t } from "i18next"
 import { View } from "react-native"
-import React, { useContext, useState } from "react"
+import React, { useState } from "react"
 import * as yup from "yup"
 import { Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
-import { aboveMdWidth, loginComplete } from "@/lib/utils"
+import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { AccountInfo } from "@/lib/schema"
-import { AppContext, AppDispatchContext } from "../AppStateContext"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 interface Props {
     toggleRegistering: () => void,
@@ -25,10 +25,9 @@ const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
 }`
 
 const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
-    const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
     const [authenticate, {loading}] = useMutation(GET_JWT)
     const [authError, setAuthError] = useState(undefined as Error|undefined)
+    const { loginComplete } = useUserConnectionFunctions()
 
     return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
@@ -37,7 +36,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
         try {
             const res = await authenticate({variables: { email: values.email, password: values.password }})
             if(res.data && res.data.authenticate.jwtToken) {
-                const account = await loginComplete(appContext, appDispatch, res.data.authenticate.jwtToken)
+                const account = await loginComplete(res.data.authenticate.jwtToken)
                 onDone && onDone(res.data.authenticate.jwtToken, account)
             } else {
                 setAuthError(new Error('Authentication failed'))
@@ -46,8 +45,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
             setAuthError(e as Error)
         }
     }}>
-    {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View>
+    {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
             <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />

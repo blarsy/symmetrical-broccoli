@@ -7,7 +7,7 @@ import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 const REQUEST_RECOVERY = gql`mutation RequestAccountRecovery($email: String) {
     requestAccountRecovery(input: {email: $email}) {

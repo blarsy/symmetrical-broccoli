@@ -18,6 +18,7 @@ export interface IAppState {
     newChatMessage: any
     connecting: { message: string, subMessage: string, onConnected: (token: string, account?: Account) => void } | undefined
     messageReceivedHandler: ((msg: any) => void) | undefined
+    lastConversationChangeTimestamp: number
 }
 
 const initialAppState = { 
@@ -42,13 +43,14 @@ export enum AppReducerActionType {
   SetMessageReceivedHandler,
   SetNewChatMessage,
   SetChatMessagesSubscription,
-  SetConnectingStatus
+  SetConnectingStatus,
+  SetConversationsStale
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
     switch(action.type) {
         case AppReducerActionType.CompleteLogin:
-          return {...previousState, ...{ account: action.payload, token: action.payload.token, chatMessagesSubscription: action.payload.subscription  }}
+          return {...previousState, ...{ account: action.payload.account, token: action.payload.token, chatMessagesSubscription: action.payload.subscription, connecting: undefined  }}
         case AppReducerActionType.Logout:
           return {...previousState, ...{ token: '', account: undefined, chatMessageSubscription: undefined, overrideMessageReceived: [] }}
         case AppReducerActionType.UpdateAccount:
@@ -66,7 +68,9 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.SetChatMessagesSubscription:
           return { ...previousState, ...{ chatMessagesSubscription: action.payload } }
         case AppReducerActionType.SetConnectingStatus:
-          return { ...previousState, ...{ connecting: action.payload.connecting } }
+          return { ...previousState, ...{ connecting: action.payload } }
+        case AppReducerActionType.SetConversationsStale:
+          return { ...previousState, ...{ lastConversationChangeTimestamp: new Date().valueOf() } }
         default:
           throw new Error(`Unexpected reducer action type ${action.type}`)
     }
@@ -75,7 +79,7 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
 export const AppContext = createContext<IAppState>(initialAppState)
 export const AppDispatchContext = createContext((() => {}) as Dispatch<{ type: AppReducerActionType, payload: any }>)
 
-export function AppStateContext({ children } : { children: JSX.Element }) {
+export function AppContextProvider({ children } : { children: JSX.Element }) {
     const [appState, dispatch] = useReducer<(previousState: IAppState, action: { type: AppReducerActionType, payload: any }) => IAppState>(appReducer, initialAppState)
   
     return (
@@ -85,4 +89,4 @@ export function AppStateContext({ children } : { children: JSX.Element }) {
         </AppDispatchContext.Provider>
       </AppContext.Provider>
     )
-  }
+}

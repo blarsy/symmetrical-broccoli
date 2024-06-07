@@ -3,7 +3,7 @@ import { Formik } from "formik"
 import { t } from "i18next"
 import React, { useContext, useEffect, useState } from "react"
 import * as yup from 'yup'
-import { RouteProps, ensureConnected } from "@/lib/utils"
+import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
 import { ScrollView } from "react-native"
@@ -11,7 +11,8 @@ import { Portal } from "react-native-paper"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { Resource } from "@/lib/schema"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
@@ -19,6 +20,7 @@ export default ({ route, navigation }:RouteProps) => {
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
+    const { ensureConnected } = useUserConnectionFunctions()
 
     useEffect(() => {
         if(route.params && route.params.isNew){
@@ -55,7 +57,7 @@ export default ({ route, navigation }:RouteProps) => {
                 return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
             })
         })} onSubmit={async (values) => {
-            ensureConnected(appContext, appDispatch, 'connect_to_create_ressource', 'resource_is_free', () => {
+            ensureConnected('connect_to_create_ressource', 'resource_is_free', () => {
                 createResource(values)
             })
         }}>

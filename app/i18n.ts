@@ -3,7 +3,6 @@ import { initReactI18next } from "react-i18next"
 import LanguageDetector from 'i18next-browser-languagedetector'
 import RNLanguageDetector from '@os-team/i18next-react-native-language-detector'
 import { Platform } from 'react-native'
-import { storybookFakeLanguageDetector } from "./lib/storiesUtil"
 import Constants from 'expo-constants'
 
 const resources = {
@@ -55,6 +54,7 @@ const resources = {
       "description_label": "Description",
       "noDate": "No date selected",
       "dateFormat": "MM/DD/YYYY",
+      "shortDateFormat": "MM/DD",
       "dateTimeFormat": "MM/DD/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Add pictures",
@@ -159,6 +159,7 @@ const resources = {
       "description_label": "Description",
       "noDate": "Aucune date sélectionnée",
       "dateFormat": "DD/MM/YYYY",
+      "shortDateFormat": "DD/MM",
       "dateTimeFormat": "DD/MM/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Ajouter des photos",
@@ -219,7 +220,7 @@ const resources = {
 
 const getLanguageDetector = (): LanguageDetector => {
   if(Constants.expoConfig?.extra?.storybookEnabled === "true") {
-    return storybookFakeLanguageDetector
+    return require("./lib/storiesUtil").storybookFakeLanguageDetector
   } else if(Platform.OS === "web") {
     return LanguageDetector
   } else {

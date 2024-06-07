@@ -12,7 +12,7 @@ import { urlFromPublicId } from "@/lib/images"
 import { useQuery } from "@apollo/client"
 import LoadedZone from "../LoadedZone"
 import ViewField from "../ViewField"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 interface ImgMetadata { 
     source: string

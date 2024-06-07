@@ -10,9 +10,9 @@
     "pack": "eas build --platform=android --profile=production --local",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "storybook": "cross-env STORYBOOK_ENABLED='true' expo start",
-    "storybook:ios": "cross-env STORYBOOK_ENABLED='true' expo start --ios",
-    "storybook:android": "cross-env STORYBOOK_ENABLED='true' expo start --android"
+    "storybook": "cross-env STORYBOOK_ENABLED='true' expo start -c",
+    "storybook:ios": "cross-env STORYBOOK_ENABLED='true' expo start --ios -c",
+    "storybook:android": "cross-env STORYBOOK_ENABLED='true' expo start --android -c"
   },
   "dependencies": {
     "@apollo/client": "^3.9.11",

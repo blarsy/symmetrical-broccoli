@@ -10,7 +10,7 @@ import { adaptToWidth } from "@/lib/utils"
 import { ResourceCard } from "../mainViews/Search"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {

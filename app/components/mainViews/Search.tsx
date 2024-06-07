@@ -4,7 +4,7 @@ import { Resource } from "@/lib/schema"
 import { IconButton, Text, TextInput } from "react-native-paper"
 import { t } from "@/i18n"
 import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
-import { RouteProps, ensureConnected } from "@/lib/utils"
+import { RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
 import MainResourceImage from "../resources/MainResourceImage"
 import CategoriesSelect from "../form/CategoriesSelect"
@@ -19,7 +19,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import ViewResource from "../resources/ViewResource"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewAccount from "./ViewAccount"
-import { AppContext, AppDispatchContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 const StackNav = createNativeStackNavigator()
 
@@ -63,8 +64,8 @@ export const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProp
 
 const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
     const searchFilterContext = useContext(SearchFilterContext)
+    const { ensureConnected } = useUserConnectionFunctions()
 
     const debouncedFilters = useDebounce(searchFilterContext.filter, 700)
 
@@ -87,8 +88,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderStyle: 'dashed'
+                    borderBottomWidth: StyleSheet.hairlineWidth
                 }} />
             <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
@@ -96,8 +96,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderStyle: 'dashed'
+                    borderBottomWidth: StyleSheet.hairlineWidth
                 }} />
             <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
@@ -112,7 +111,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 return <ResourceCard 
                     key={idx} resource={resource} 
                     onChatOpen={() => {
-                        ensureConnected(appContext, appDispatch, 'introduce_yourself', '', (token, account) => {
+                        ensureConnected('introduce_yourself', '', (token, account) => {
                             navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {

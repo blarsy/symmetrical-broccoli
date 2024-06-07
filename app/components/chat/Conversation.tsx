@@ -12,7 +12,7 @@ import { ConversationContext, asIMessage } from "./ConversationContextProvider"
 import LoadedZone from "../LoadedZone"
 import { ChatBackground } from "../mainViews/Chat"
 import { useNavigation } from "@react-navigation/native"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
@@ -22,11 +22,20 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
     }
   }`
 
+export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: Int!, $resourceId: Int!) {
+  setParticipantRead(
+    input: {resourceId: $resourceId, otherAccountId: $otherAccountId}
+  ) {
+    integer
+  }
+}`
+
 const Conversation = ({ route }: RouteProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const conversationContext = useContext(ConversationContext)
     const navigation = useNavigation()
+    const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
     const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
 
     useEffect(() => {
@@ -51,6 +60,7 @@ const Conversation = ({ route }: RouteProps) => {
         GiftedChat.append(messages, [receivedMsg])
         return [receivedMsg, ...messages]
       })
+      appDispatch({ type: AppReducerActionType.SetConversationsStale, payload: undefined })
     }
 
     useEffect(() => {
@@ -62,6 +72,16 @@ const Conversation = ({ route }: RouteProps) => {
           appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: undefined } })
         }
     }, [])
+
+    useEffect(() => {
+      if(conversationContext.state.conversation.data?.messages) {
+        setParticipantRead({ variables: { 
+          resourceId: conversationContext.state.conversation.data?.resource?.id, 
+          otherAccountId: conversationContext.state.conversation.data?.otherAccount.id
+         } })
+         appDispatch({ type: AppReducerActionType.SetConversationsStale, payload: undefined })
+      }
+    }, [conversationContext.state.conversation.data?.messages])
 
     const user = {
       _id: appContext.account?.id!,

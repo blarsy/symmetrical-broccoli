@@ -9,7 +9,7 @@ import Icons from "@expo/vector-icons/FontAwesome"
 import CategoriesSelect from "./CategoriesSelect"
 import { aboveMdWidth } from "@/lib/utils"
 import { View } from "react-native"
-import { AppDispatchContext, AppReducerActionType } from "../AppStateContext"
+import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 interface Props {
     formikState: FormikProps<Resource>

@@ -7,7 +7,7 @@ import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from
 import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { AppContext } from "../AppStateContext"
+import { AppContext } from "../AppContextProvider"
 
 interface Props {
     onDone:  (success: boolean) => void

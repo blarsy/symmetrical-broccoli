@@ -15,8 +15,11 @@ import { debug, error, info, setOrResetGlobalLogger } from "./logger"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
 import Application from 'expo-application'
+import dayjs from "dayjs"
+import { t } from "@/i18n"
+import { configureFonts } from "react-native-paper"
 import { get, remove, set } from "./secureStore"
-import { AppReducerActionType, IAppState } from "@/components/AppStateContext"
+import { AppReducerActionType, IAppState } from "@/components/AppContextProvider"
 import { registerForPushNotificationsAsync } from "./pushNotifications"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
@@ -33,7 +36,7 @@ export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdS
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
 export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
 
-export const fontSizeLarge =  aboveMdWidth() ? 24 : 20
+export const fontSizeLarge = aboveMdWidth() ? 24 : 20
 export const fontSizeMedium = aboveMdWidth() ? 20 : 16
 export const fontSizeSmall = aboveMdWidth() ? 18 : 14
 
@@ -42,6 +45,26 @@ export enum ScreenSize {
     md,
     lg
 }
+
+export const getTheme = () => ({
+  fonts: configureFonts({ config: { 
+      bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
+  } })
+})
 
 export const getScreenSize = (): ScreenSize => {
     if(aboveMdWidth()){
@@ -257,165 +280,20 @@ export const versionChecker = (serverVersion: string) => {
   return true
 }
 
-const TOKEN_KEY = 'token'
-export const logout = async (appState: IAppState, appDispatch: React.Dispatch<{ type: AppReducerActionType, payload: any }>) => {
-  await remove(TOKEN_KEY)
-  appState.chatMessagesSubscription?.unsubscribe()
-  appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
-  info({ message: 'logged out' })
-}
-
-export const encureConnected = (appState: IAppState, appDispatch: React.Dispatch<{ type: AppReducerActionType, payload: any }>, message: string, subMessage: string, onConnected: (token: string, account: Account) => void) :  Promise<boolean> => {
-  return new Promise(( resolve, reject ) => {
-    if(appState.account) {
-        onConnected(appState.token, appState.account)
-        resolve(true)
-    }
-
-    appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: { message, subMessage, onConnected: (token: string, account: Account) => {
-      onConnected(token, account)
-      resolve(true)
-    }}})
-  })
-}
-
-const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
-  syncPushToken(input: {token: $token}) {
-    integer
-  }
-}`
-
-const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
-  messageReceived {
-      event
-      message {
-          id
-          text
-          created
-          received
-          imageByImageId {
-              publicId
-          }
-          participantByParticipantId {
-              id
-              accountByAccountId {
-                  name
-                  id
-              }
-              conversationByConversationId {
-                  id
-                  resourceByResourceId {
-                      id
-                      title
-                  }
-              }
-          }
-      }
-  }
-}`
-
-const GET_SESSION_DATA = gql`query GetSessionData {
-  getSessionData {
-    accountId
-    email
-    name
-    avatarPublicId
-    activated
-    logLevel
-  }
-}`
-
-const handleLogin = (appState: IAppState, appDispatch: React.Dispatch<{type: AppReducerActionType,payload: any}>, token: string): {authenticatedClient : ApolloClient<NormalizedCacheObject>, subscription:  { unsubscribe: () => void } } => {
-  apolloTokenExpiredHandler.handle = async () => { 
-      await logout(appState, appDispatch)
-  }
-  const authenticatedClient = getAuthenticatedApolloClient(token)
-  registerForPushNotificationsAsync().then(token => {
-      authenticatedClient.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
-  })
-  const subscription = authenticatedClient.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
-      debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
-      if(appState.messageReceivedHandler) {
-        appState.messageReceivedHandler(payload.data.messageReceived.message)
-      } else {
-          appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
-      }
-  } })
-  appDispatch({ type: AppReducerActionType.SetChatMessagesSubscription, payload: subscription })
+export const userFriendlyChatTime = (time: Date) => {
+  const djTime = dayjs.utc(time)
+  const millisecondsEllapsed = Math.abs(djTime.diff())
+  const epoch = time.valueOf()
   
-  return { authenticatedClient, subscription }
-}
-
-const SPLASH_DELAY = 3000
-async function executeWithinMinimumDelay<T>(promise: Promise<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-      setTimeout(async () => {
-          try {
-              const val = await promise
-              resolve(val)
-          } catch (e) {
-              reject(e)
-          }
-      }, SPLASH_DELAY)
-  })
-}
-
-export const tryRestoreToken = async (appState: IAppState, appDispatch: React.Dispatch<{type: AppReducerActionType,payload: any}>): Promise<void> => {
-  const token = await get(TOKEN_KEY)
-  if(token) {
-      const { authenticatedClient, subscription} = handleLogin(appState, appDispatch, token)
-      
-      const getSessionPromise = authenticatedClient.query({ query: GET_SESSION_DATA })
-
-      const sessionRes = await executeWithinMinimumDelay(getSessionPromise)
-      appDispatch({ type: AppReducerActionType.CompleteLogin, payload: {token:token, chatMessagesSubscription: subscription, account: {
-        id: sessionRes.data.getSessionData.accountId,
-        name: sessionRes.data.getSessionData.name, 
-        email: sessionRes.data.getSessionData.email, 
-        avatarPublicId: sessionRes.data.getSessionData.avatarPublicId,
-        activated: sessionRes.data.getSessionData.activated
-      }} })
-
-      await setOrResetGlobalLogger(sessionRes.data.getSessionData.logLevel)
-
-      info({ message: `Restored session: ${ JSON.stringify(sessionRes.data.getSessionData) }` })
+  if(millisecondsEllapsed < 10 * 60 * 1000)
+    return djTime.local().fromNow()
+  else if (millisecondsEllapsed < Math.abs(djTime.startOf('day').diff(djTime))) {
+    return djTime.local().format('HH:mm')
+  } else if (epoch > dayjs().startOf('day').valueOf() - (6 * 24 * 60 * 60 * 1000)) {
+    return djTime.local().format('ddd')
+  } else if(epoch > dayjs().startOf('day').valueOf() - (364 * 24 * 60 * 60 * 1000)) {
+    return djTime.local().format(t('shortDateFormat'))
   } else {
-      setTimeout(() => appDispatch({ type: AppReducerActionType.CompleteLogin, payload: { token: '', account: undefined, chatMessagesSubscription: undefined } }), SPLASH_DELAY)
-  }
-}
-
-export const loginComplete = async (appState: IAppState, appDispatch: React.Dispatch<{type: AppReducerActionType,payload: any}>, token: string): Promise<AccountInfo> => {
-  await set(TOKEN_KEY, token)
-  
-  const { authenticatedClient, subscription } = handleLogin(appState, appDispatch, token)
-
-  const res = await authenticatedClient.query({ query: GET_SESSION_DATA })
-
-  const account = {
-    id: res.data.getSessionData.accountId, 
-    name: res.data.getSessionData.name, 
-    email: res.data.getSessionData.email, 
-    avatarPublicId: res.data.getSessionData.avatarPublicId,
-    activated: res.data.getSessionData.activated
-  }
-
-  appDispatch({ type: AppReducerActionType.CompleteLogin, payload: { token, account, chatMessagesSubscription: subscription } })
-
-  await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
-
-  info({ message: `Logged in with session: ${ JSON.stringify(res.data.getSessionData) }` })
-
-  return account
-}
-
-export const ensureConnected = (appState: IAppState, appDispatch: React.Dispatch<{type: AppReducerActionType,payload: any}>, message: string, subMessage: string, onConnected: (token: string, account: Account) => void) => {
-  if(appState.account) {
-      onConnected(appState.token, appState.account)
-  } else {
-      appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: { message, subMessage, onConnected: (token: string, account: Account) => {
-        if(token) {
-          onConnected(token, account)
-        }
-    } } })
+    return djTime.local().format('MMM YY')
   }
 }

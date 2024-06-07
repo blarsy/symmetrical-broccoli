@@ -1,17 +1,18 @@
 import React from 'react'
-import Start, { theme } from '@/components/mainViews/Start'
+import Start from '@/components/mainViews/Start'
 import { AppRegistry, StatusBar } from 'react-native'
 import { primaryColor } from './components/layout/constants'
 import { en, fr, registerTranslation } from 'react-native-paper-dates'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
+import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import Constants from 'expo-constants'
-import { errorToString, getLanguage } from './lib/utils'
+import { errorToString, getLanguage, getTheme } from './lib/utils'
 import './lib/logger'
-import { PaperProvider } from 'react-native-paper'
+import { PaperProvider, Provider } from 'react-native-paper'
 import { error } from './lib/logger'
-import { AppStateContext } from './components/AppStateContext'
+import { AppContextProvider } from './components/AppContextProvider'
 
 if(typeof ErrorUtils != 'undefined') {
   // ErrorUtils is not defined on web
@@ -26,22 +27,24 @@ if(typeof ErrorUtils != 'undefined') {
   })
 }
 
+const theme = getTheme()
 
 function App() {
   dayjs.extend(relativeTime)
   dayjs.locale(getLanguage())
+  dayjs.extend(utc)
   
   registerTranslation('en', en)
   registerTranslation('fr', fr)
 
-  return <PaperProvider theme={theme}>
-      <AppStateContext>
-        <>
-          <StatusBar backgroundColor={primaryColor}/>
-          <Start/>
-        </>
-      </AppStateContext>
-    </ PaperProvider>
+  return <AppContextProvider>
+    <Provider theme={theme}>
+      <>
+        <StatusBar backgroundColor={primaryColor}/>
+        <Start/>
+      </>
+    </ Provider>
+  </AppContextProvider>
 }
 
 let AppEntryPoint
