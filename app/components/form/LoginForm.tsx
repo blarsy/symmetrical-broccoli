@@ -9,13 +9,12 @@ import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from
 import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
-import { AccountInfo } from "@/lib/schema"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 interface Props {
     toggleRegistering: () => void,
     toggleRecovering: () => void,
-    onDone?: (token: string, account: AccountInfo) => void
+    onDone?: () => void
 }
 
 const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
@@ -27,7 +26,7 @@ const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
 const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
     const [authenticate, {loading}] = useMutation(GET_JWT)
     const [authError, setAuthError] = useState(undefined as Error|undefined)
-    const { loginComplete } = useUserConnectionFunctions()
+    const { login } = useUserConnectionFunctions()
 
     return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
         email: yup.string().email(t('invalid_email')).required(t('field_required')),
@@ -36,8 +35,8 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
         try {
             const res = await authenticate({variables: { email: values.email, password: values.password }})
             if(res.data && res.data.authenticate.jwtToken) {
-                const account = await loginComplete(res.data.authenticate.jwtToken)
-                onDone && onDone(res.data.authenticate.jwtToken, account)
+                await login(res.data.authenticate.jwtToken)
+                onDone && onDone()
             } else {
                 setAuthError(new Error('Authentication failed'))
             }

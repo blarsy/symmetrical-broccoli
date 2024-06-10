@@ -72,7 +72,7 @@ GRANT EXECUTE ON FUNCTION sb.set_participant_read(integer, integer) TO sb;
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.2.6', minimum_client_version = '0.2.5';
+	UPDATE sb.system SET version = '0.2.6', minimum_client_version = '0.2.6';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

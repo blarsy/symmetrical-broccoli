@@ -22,7 +22,7 @@ const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: Str
   }`
 
 const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
-    const { loginComplete } = useUserConnectionFunctions()
+    const { login } = useUserConnectionFunctions()
     const [registerAccount, { data, loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
     return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
         name: yup.string().required(t('field_required')),
@@ -39,7 +39,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
             password: values.password,
             language: i18n.language.substring(0, 2).toLowerCase() } })
         if(res.data) {
-            const account = await loginComplete(res.data.registerAccount.jwtToken)
+            const account = await login(res.data.registerAccount.jwtToken)
             onAccountRegistered && onAccountRegistered(res.data.registerAccount.jwtToken, account)
         }
     }}>

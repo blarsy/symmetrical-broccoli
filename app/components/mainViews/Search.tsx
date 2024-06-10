@@ -1,18 +1,15 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
-import { IconButton, Text, TextInput } from "react-native-paper"
+import { TextInput } from "react-native-paper"
 import { t } from "@/i18n"
-import { GestureResponderEvent, StyleSheet, TouchableOpacity, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
-import MainResourceImage from "../resources/MainResourceImage"
 import CategoriesSelect from "../form/CategoriesSelect"
-import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import Images from '@/Images'
 import { CheckboxGroup } from "../layout/lib"
 import { ScrollView } from "react-native-gesture-handler"
-import dayjs from "dayjs"
 import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
@@ -21,6 +18,7 @@ import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewAccount from "./ViewAccount"
 import { AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import FoundResourceCard from "../resources/FoundResourceCard"
 
 const StackNav = createNativeStackNavigator()
 
@@ -32,34 +30,6 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
     return <View>
         <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
     </View>
-}
-
-interface ResourceCartProps {
-    onPress: ((event: GestureResponderEvent) => void) | undefined,
-    resource: Resource
-    onChatOpen: (resource: Resource) => void
-}
-
-export const ResourceCard = ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
-    const appContext = useContext(AppContext)
-    return <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 10, 
-        paddingHorizontal: 8, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
-        borderRadius: 15 }} onPress={onPress}>
-        <MainResourceImage resource={resource} />
-        <View style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <Text variant="displaySmall" style={{ color: primaryColor, alignSelf: 'flex-end', fontSize: 10 }}>{`${t('published_at')} ${dayjs(resource.created).format(t('dateFormat'))}`}</Text>
-            <View style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <Text variant="displayLarge">{resource.title}</Text>
-                <Text variant="displaySmall" style={{ color: primaryColor, fontSize: 10 }}>{`${t('brought_by_label')} ${resource.account?.name}`}</Text>
-                <View style={{ flexDirection: 'row', gap: 12 }}>
-                    { resource.canBeGifted && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeGifted_label')}</Text>}
-                    { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
-                </View>
-            </View>
-            { (!appContext.account || resource.account!.id != appContext.account.id) && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
-                onPress={() => onChatOpen(resource)}/> }
-        </View>
-    </TouchableOpacity>
 }
 
 const SearchResults = ({ route, navigation }: RouteProps) => {
@@ -108,17 +78,17 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
         <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || appContext.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
             displayItem={(res, idx) => {
                 const resource = res as Resource
-                return <ResourceCard 
+                return <FoundResourceCard
                     key={idx} resource={resource} 
                     onChatOpen={() => {
-                        ensureConnected('introduce_yourself', '', (token, account) => {
-                            navigation.navigate('chat', {
+                        ensureConnected('introduce_yourself', '', () => {
+                            setTimeout(() => navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {
                                     resourceId: resource.id,
-                                    otherAccountId: account.id
+                                    otherAccountId: appContext.account!.id
                                 }
-                            })
+                            }))
                         })
                     }}
                     onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />

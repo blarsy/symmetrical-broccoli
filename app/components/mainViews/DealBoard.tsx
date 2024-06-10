@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { Appbar, Avatar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -12,8 +12,10 @@ import EditResourceContextProvider from "../resources/EditResourceContextProvide
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { urlFromPublicId } from "@/lib/images"
-import { AppContext, AppDispatchContext } from "../AppContextProvider"
+import { AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import Animated, { useAnimatedStyle, withDelay, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
+import { useSharedValue } from 'react-native-reanimated'
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -31,9 +33,23 @@ const getViewTitleI18n = (screenName: string): string => {
 }
 
 const ProfileIcon = ({ size}: { size: number }) => {
+    const scale = useSharedValue(1)
+    const rotate = useSharedValue(0)
+    const tx = useSharedValue(0)
+    const animatedStyles = useAnimatedStyle(() => ({
+        transform: [{ scale: (scale.value)}, { rotate: `${rotate.value}deg` }, { translateX: tx.value }],
+      }))
     const appContext = useContext(AppContext)
 
-    if(!appContext.account) return <Icon source="login-variant" size={size}/>
+    useEffect(() => {
+        tx.value = withRepeat(withSequence(withTiming(5, { duration: 250 }), withTiming(-5, { duration: 500 }), withTiming(0, { duration: 250 })), 10)
+        scale.value = withRepeat(withSequence(withSpring(1.3, { duration: 500 }), withSpring(1, { duration: 500 })), 10),
+        rotate.value = withRepeat(withSequence(withTiming(10, { duration: 250 }), withTiming(-10, { duration: 500 }), withTiming(0, { duration: 250 })), 10)
+    }, [])
+
+    if(!appContext.account) return <Animated.View style={animatedStyles}>
+        <Icon source="login" size={size}/>
+    </Animated.View>
     
     if(appContext.account!.avatarPublicId)
         return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.account!.avatarPublicId!) }} />
@@ -43,7 +59,6 @@ const ProfileIcon = ({ size}: { size: number }) => {
 
 const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
     const { ensureConnected } = useUserConnectionFunctions()
     

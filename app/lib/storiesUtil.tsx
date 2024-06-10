@@ -4,7 +4,7 @@ import { fromData, initial } from './DataLoadState'
 import { AccountInfo, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
 import { PaperProvider } from 'react-native-paper'
-import { MockedProvider } from "@apollo/react-testing"
+import { MockedProvider, MockedResponse } from "@apollo/react-testing"
 import { DocumentNode } from 'graphql'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
@@ -13,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
 import { getTheme } from './utils'
+import { AppContextProvider } from '@/components/AppContextProvider'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -39,29 +40,12 @@ const defaultResourceCategories = [
     { code: 'cat4', name: 'category 4' }
 ]
 
-const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppStateContext value={{
-    newChatMessage: '', overrideMessageReceived: [], 
-    state: { categories: fromData(defaultResourceCategories), numberOfUnread: 0, token: '', account, chatMessagesSubscription: undefined,
-    lastConversationChangeTimestamp: 0 },
-    actions: {
-        loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
-        tryRestoreToken: () => Promise.resolve(),
-        accountUpdated: () => Promise.resolve(),
-        logout: () => Promise.resolve(),
-        notify: () => {},
-        setMessageReceivedHandler: () => {},
-        setMessageReceivedHandler: () => {},
-        resetMessageReceived: () => {},
-        resetLastNofication: () => {},
-        setNewChatMessage: () => {},
-        setCategories: () => {},
-        setChatMessageSubscription: () => {}
-        setCategories: () => {},
-        setChatMessageSubscription: () => {}
-    }
-}}>
+const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContextProvider initialState={{
+    newChatMessage: '', categories: fromData(defaultResourceCategories), numberOfUnread: 0,token: '', account, 
+    chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
+    messageReceivedHandler: undefined, lastNotification: undefined }}>
     <StoryElement />
-</AppStateContext>
+</AppContextProvider>
 
 export const searchFilterContextDecorator = (StoryElement: React.ElementType) => makeSeachFilterContextProvider(StoryElement)
 
@@ -100,7 +84,7 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
         delay: 2000,
         request: { query: op.query, variables: op.variables },
         result: { data: op.result }
-    }))
+    } as MockedResponse<any, any>))
   }>
     <Story />
   </MockedProvider>
@@ -115,10 +99,3 @@ export const navigationContainerDecorator = (initialState: any = undefined ) => 
     <NavigationContainer initialState={initialState}>
         <Story />
     </NavigationContainer>
-
-export const storybookFakeLanguageDetector = {
-    type: 'languageDetector',
-    detect: function() {
-      return 'fr'
-    }
-  }

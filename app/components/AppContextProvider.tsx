@@ -1,7 +1,9 @@
 import React, { Dispatch } from 'react'
 import { createContext, useReducer } from "react"
-import { Account, AccountInfo, Category } from '../lib/schema'
+import { AccountInfo, Category } from '../lib/schema'
 import DataLoadState, { initial } from '../lib/DataLoadState'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { getApolloClient } from '@/lib/apolloClient'
 
 interface AppNotification {
     message?: string
@@ -9,32 +11,34 @@ interface AppNotification {
 }
 
 export interface IAppState {
-    token: string
     account?: AccountInfo
+    apolloClient: ApolloClient<NormalizedCacheObject>
     chatMessagesSubscription?: { unsubscribe: () => void }
     numberOfUnread: number
     categories: DataLoadState<Category[]>
     lastNotification?: AppNotification
     newChatMessage: any
-    connecting: { message: string, subMessage: string, onConnected: (token: string, account?: Account) => void } | undefined
+    connecting: { message: string, subMessage: string, onConnected: () => void } | undefined
     messageReceivedHandler: ((msg: any) => void) | undefined
     lastConversationChangeTimestamp: number
 }
 
 const initialAppState = { 
-    token: '', 
     numberOfUnread: 0,
+    apolloClient: getApolloClient(''),
     categories: initial<Category[]>(true, []),
     chatMessagesSubscription: undefined,
     connecting: undefined,
     newChatMessage: undefined,
     messageReceivedHandler: undefined,
     account: undefined,
-    lastNotification: undefined
+    lastNotification: undefined,
+    lastConversationChangeTimestamp: new Date().valueOf()
 } as IAppState
 
 export enum AppReducerActionType {
-  CompleteLogin,
+  SetAuthToken,
+  Login,
   Logout,
   UpdateAccount,
   DisplayNotification,
@@ -42,15 +46,16 @@ export enum AppReducerActionType {
   SetCategoriesState,
   SetMessageReceivedHandler,
   SetNewChatMessage,
-  SetChatMessagesSubscription,
   SetConnectingStatus,
   SetConversationsStale
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
     switch(action.type) {
-        case AppReducerActionType.CompleteLogin:
-          return {...previousState, ...{ account: action.payload.account, token: action.payload.token, chatMessagesSubscription: action.payload.subscription, connecting: undefined  }}
+        case AppReducerActionType.SetAuthToken:
+          return {...previousState, ...{ token: action.payload }}
+        case AppReducerActionType.Login:
+          return {...previousState, ...{ account: action.payload.account, chatMessagesSubscription: action.payload.subscription, connecting: undefined, apolloClient: action.payload.apolloClient }}
         case AppReducerActionType.Logout:
           return {...previousState, ...{ token: '', account: undefined, chatMessageSubscription: undefined, overrideMessageReceived: [] }}
         case AppReducerActionType.UpdateAccount:
@@ -65,8 +70,6 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
           return { ...previousState, ...{ messageReceivedHandler: action.payload.messageReceivedHandler } }
         case AppReducerActionType.SetNewChatMessage:
           return { ...previousState, ...{ newChatMessage: action.payload } }
-        case AppReducerActionType.SetChatMessagesSubscription:
-          return { ...previousState, ...{ chatMessagesSubscription: action.payload } }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload } }
         case AppReducerActionType.SetConversationsStale:
@@ -79,8 +82,17 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
 export const AppContext = createContext<IAppState>(initialAppState)
 export const AppDispatchContext = createContext((() => {}) as Dispatch<{ type: AppReducerActionType, payload: any }>)
 
-export function AppContextProvider({ children } : { children: JSX.Element }) {
-    const [appState, dispatch] = useReducer<(previousState: IAppState, action: { type: AppReducerActionType, payload: any }) => IAppState>(appReducer, initialAppState)
+interface Props {
+  children: JSX.Element
+  initialState?: IAppState
+  reducer?: (previousState: IAppState, action: {
+      type: AppReducerActionType;
+      payload: any;
+  }) => IAppState
+}
+
+export function AppContextProvider({ children, initialState, reducer } : Props) {
+    const [appState, dispatch] = useReducer<(previousState: IAppState, action: { type: AppReducerActionType, payload: any }) => IAppState>(reducer || appReducer, initialState || initialAppState)
   
     return (
       <AppContext.Provider value={appState}>

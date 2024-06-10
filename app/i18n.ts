@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import RNLanguageDetector from '@os-team/i18next-react-native-language-detector'
 import { Platform } from 'react-native'
 import Constants from 'expo-constants'
+import { storybookFakeLanguageDetector } from "./lib/storybookFakeLanguageDetector"
 
 const resources = {
   en: {
@@ -220,7 +221,7 @@ const resources = {
 
 const getLanguageDetector = (): LanguageDetector => {
   if(Constants.expoConfig?.extra?.storybookEnabled === "true") {
-    return require("./lib/storiesUtil").storybookFakeLanguageDetector
+    return storybookFakeLanguageDetector
   } else if(Platform.OS === "web") {
     return LanguageDetector
   } else {

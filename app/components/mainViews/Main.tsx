@@ -169,8 +169,8 @@ export default function Main () {
         </NavigationContainer>
         <ConnectionDialog onCloseRequested={() => appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: undefined })} visible={!!appContext.connecting}
                 infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
-                onDone={(token, account) => {
-                    appContext.connecting?.onConnected(token, account)
+                onDone={() => {
+                    appContext.connecting?.onConnected()
                 }} />
     </Container>
 }

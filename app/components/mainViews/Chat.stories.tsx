@@ -4,21 +4,23 @@ import React  from 'react'
 import Chat from './Chat';
 import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil';
 import { CONVERSATION_MESSAGES } from '../chat/ConversationContextProvider';
+import { SET_PARTICIPANT_READ } from '../chat/Conversation';
 
-const makeConversationData = (resourceId: number, otherAccountId: number, resourceDeleted: boolean, otherAccountDeleted: boolean) => (
+let msgCounter = 1
+const makeConversationData = (resourceId: number, otherAccountId: number, resourceDeleted: boolean, otherAccountDeleted: boolean, endOfMessages : boolean = false) => (
     {
         conversationMessages: {
             pageInfo: {
                 hasNextPage: true,
-                endCursor: "WyJuYXR1cmFsIiwyNV0=",
+                endCursor: !endOfMessages && "WyJuYXR1cmFsIiwyNV0=",
                 hasPreviousPage: false,
                 startCursor: 'WyJuYXR1cmFsIiwxXQ=='
             },
             edges: [
                 {
                     node: {
-                        id: 1,
-                        text: 'message 1',
+                        id: msgCounter,
+                        text: `message ${msgCounter++}`,
                         created: new Date(),
                         received: null,
                         imageByImageId: {
@@ -38,8 +40,8 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 },
                 {             
                     node: {
-                        id: 2,
-                        text: 'message 2',
+                        id: msgCounter,
+                        text: `message ${msgCounter++}`,
                         created: new Date(),
                         received: null,
                         imageByImageId: {
@@ -93,14 +95,30 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 created: new Date(),
                 deleted: resourceDeleted ? new Date() : null
           }
-    }
-)
+        }
+    )
+    
+const defaultResourceId = 1
+const defaultOtherAccountId = 2
 
 const meta: Meta<typeof Chat> = {
   component: Chat,
   decorators: [
     paperProviderDecorator,
     appContextDecorator,
+    apolloClientMocksDecorator([{
+        query: SET_PARTICIPANT_READ,
+        variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+        result: {
+            setParticipantRead: { integer: 1 }
+        }
+    }, {
+        query: SET_PARTICIPANT_READ,
+        variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+        result: {
+            setParticipantRead: { integer: 1 }
+        }
+    }]),
     navigationContainerDecorator({ routes: [
         { name: 'conversation', params: { resourceId: 1, otherAccountId: 2 } }
     ], index: 0 })
@@ -110,8 +128,6 @@ const meta: Meta<typeof Chat> = {
 export default meta
 type Story = StoryObj<typeof Chat>
 
-const defaultResourceId = 1
-const defaultOtherAccountId = 2
 
 const argsForSingleConversationViews = {
     route: {
@@ -132,7 +148,17 @@ export const SingleConversation: Story = {
                   first: 25
               },
               result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, false)
-          }
+          },
+          {
+            query: CONVERSATION_MESSAGES,
+            variables: {
+                resourceId: defaultResourceId,
+                otherAccountId: defaultOtherAccountId,
+                after: 'WyJuYXR1cmFsIiwyNV0=',
+                first: 25
+            },
+            result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, false, true)
+        }
       ])
     ]
   }
@@ -150,7 +176,16 @@ export const SingleConversation: Story = {
                     first: 25
                 },
                 result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, true)
-            }
+            },
+            { 
+                query: CONVERSATION_MESSAGES,
+                variables: {
+                    resourceId: defaultResourceId,
+                    otherAccountId: defaultOtherAccountId,
+                    first: 25
+                },
+                result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, true)
+            },
         ])
     ]
 }

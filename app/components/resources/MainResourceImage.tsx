@@ -28,7 +28,7 @@ interface ResourceImageProps {
 }
 
 export const ResourceImage = ({ resource, size }: ResourceImageProps) => {
-    if(resource.images && resource.images.length > 0) {
+    if(resource.images && resource.images.length > 0 && resource.images[0].publicId) {
         const imgData = resource.images[0]
         return <Image source={{ uri: urlFromPublicId(imgData.publicId!) }} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
     }

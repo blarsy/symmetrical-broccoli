@@ -7,10 +7,10 @@ import { t } from "@/i18n"
 import { Avatar, Text } from "react-native-paper"
 import { urlFromPublicId } from "@/lib/images"
 import { adaptToWidth } from "@/lib/utils"
-import { ResourceCard } from "../mainViews/Search"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
 import { AppContext } from "../AppContextProvider"
+import FoundResourceCard from "../resources/FoundResourceCard"
 
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
@@ -72,7 +72,7 @@ export const Account = ({ id }: Props) => {
                                 contentContainerStyle={{ gap: 10 }}
                                 displayItem={(rawRes: any) => {
                                         const resource = fromServerGraphResource(rawRes, appContext.categories.data!)
-                                        return <ResourceCard resource={resource} onPress={() => {}} onChatOpen={() => {}} />
+                                        return <FoundResourceCard resource={resource} onPress={() => {}} onChatOpen={() => {}} />
                                     }
                                 }
                             />

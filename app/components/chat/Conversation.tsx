@@ -10,9 +10,9 @@ import OperationFeedback from "../OperationFeedback"
 import { t } from "i18next"
 import { ConversationContext, asIMessage } from "./ConversationContextProvider"
 import LoadedZone from "../LoadedZone"
-import { ChatBackground } from "../mainViews/Chat"
 import { useNavigation } from "@react-navigation/native"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import ChatBackground from "./ChatBackground"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
@@ -74,7 +74,7 @@ const Conversation = ({ route }: RouteProps) => {
     }, [])
 
     useEffect(() => {
-      if(conversationContext.state.conversation.data?.messages) {
+      if(conversationContext.state.conversation.data?.resource) {
         setParticipantRead({ variables: { 
           resourceId: conversationContext.state.conversation.data?.resource?.id, 
           otherAccountId: conversationContext.state.conversation.data?.otherAccount.id
@@ -104,6 +104,9 @@ const Conversation = ({ route }: RouteProps) => {
                   loadEarlier={!!conversationContext.state.conversation.data?.endCursor}
                   infiniteScroll={true}
                   onLoadEarlier={conversationContext.actions.loadEarlier}
+                  renderLoadEarlier={p => <View style={{ alignItems: 'center' }}>
+                    <IconButton icon="arrow-up" style={{ margin: 0, padding: 0 }} onPress={p.onLoadEarlier} mode="contained" />
+                  </View>}
                   renderSend={p => <Send {...p} containerStyle={{
                       justifyContent: 'center',
                       alignItems: 'center',

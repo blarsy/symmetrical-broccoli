@@ -5,14 +5,17 @@ import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { getAuthenticatedApolloClient, versionChecker } from "@/lib/utils"
+import { getTheme, versionChecker } from "@/lib/utils"
 import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import secureStore, { ISecureStore } from "@/lib/secureStore"
+import { getApolloClient } from "@/lib/apolloClient"
+import { Provider } from "react-native-paper"
 
-const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
+export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
     getMinimumClientVersion
 }`
 
@@ -44,21 +47,31 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
     return { checkingVersion: busy, outdated }
 }
 
-const ApolloWrapped = () => {
+const SPLASH_DELAY = 3000
+async function executeWithinMinimumDelay(promise: Promise<void>): Promise<any> {
+    return Promise.all([promise, new Promise(resolve => setTimeout(resolve, SPLASH_DELAY)) ])
+}
+
+interface Props {
+    overrideSecureStore?: ISecureStore,
+    overrideVersionChecker?: (serverVersion: string) => boolean
+}
+
+export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker }: Props) => {
     const { t } = i18n
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const [startingUp, setStartingUp] = useState(true)
-    const { checkingVersion, outdated } = useVersionCheck(versionChecker)
+    const { checkingVersion, outdated } = useVersionCheck(overrideVersionChecker || versionChecker)
     const [fontsLoaded, fontError] = useFonts({
         'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
         'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
     })
-    const { tryRestoreToken } = useUserConnectionFunctions()
+    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore)
     
     const load = async () => {
         try {
-            await tryRestoreToken()
+            await executeWithinMinimumDelay(tryRestoreToken())
          } finally {
             setStartingUp(false)
          }
@@ -67,6 +80,7 @@ const ApolloWrapped = () => {
     useEffect(() => {
         load()
     }, [])
+
     if(startingUp || !fontsLoaded || checkingVersion) {
         return <Splash />
     }
@@ -86,9 +100,14 @@ const ApolloWrapped = () => {
     }
 }
 
+const theme = getTheme()
+const unauthenticatedClient = getApolloClient('')
 export default () => {
     const appContext = useContext(AppContext)
-    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.token)}>
-        <ApolloWrapped />
+
+    return <ApolloProvider client={appContext.apolloClient}>
+        <Provider theme={theme}>
+            <StartApolloWrapped />
+        </Provider>
     </ApolloProvider>
 }

@@ -3,7 +3,7 @@ module.exports = function(api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      'react-native-reanimated/plugin',[
+      [
         'module-resolver',
         {
           root: ['.'],
@@ -12,7 +12,9 @@ module.exports = function(api) {
             'react-native-vector-icons': '@expo/vector-icons',
           },
         },
-      ]
+      ],
+      // warning: the following plugin has to come last
+      'react-native-reanimated/plugin'
     ],
   };
 };
