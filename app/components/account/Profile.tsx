@@ -41,7 +41,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setDeletingAccount(true)}>{t('delete_account_button')}<Icon size={20} source="account-remove"/></Button>
                 </View>}
             <Portal>
-                <Dialog visible={deletingAccount} style={{ backgroundColor: '#fff', borderColor: 'red', borderWidth: 3 }}>
+                <Dialog visible={deletingAccount} style={{ backgroundColor: '#fff' }}>
                     <Dialog.Title><Text variant="titleLarge">{t('delete_account_title')}</Text></Dialog.Title>
                     <Dialog.Content style={{ display: 'flex', gap: 15 }}>
                         <Text variant="bodyMedium">{t('delete_account_explanation')}</Text>

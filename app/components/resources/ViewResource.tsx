@@ -22,6 +22,7 @@ interface ImgMetadata {
 const ResourceInfoChip = (p: any) => <Chip style={{ backgroundColor: lightPrimaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
 
 const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImagePress: (imgSource: string) => void}) => {
+    const [swipedToEnd, setSwipedToEnd] = useState(false)
     const windowDimension = Dimensions.get('window')
     const hasOnlyOneImage = resource.images && resource.images.length === 1
     const smallestDimension = Math.min(windowDimension.height, windowDimension.width)
@@ -42,11 +43,12 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
         </TouchableOpacity>
     }
 
-    return <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', marginBottom: 10 }}>
-        <SwiperFlatList style={{ width: imgSize }} showPagination data={getSwiperData(resource)}
-            renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
+    return <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', flexDirection:"row", marginBottom: 10 }}>
+        <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}></View>
+        <SwiperFlatList style={{ width: imgSize, flexGrow: 0, flexShrink: 0 }} data={getSwiperData(resource)} onEndReached={() => setSwipedToEnd(true)} renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
                 <Image key={item.idx} source={{ uri: item.source}} width={imgSize} height={imgSize} />
         </TouchableOpacity>} />
+        <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}>{ !swipedToEnd && <Icon source="gesture-swipe-right" size={40}/>}</View>
     </View>
 }
 

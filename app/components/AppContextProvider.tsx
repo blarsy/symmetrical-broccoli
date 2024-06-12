@@ -12,7 +12,7 @@ interface AppNotification {
 
 export interface IAppState {
     account?: AccountInfo
-    apolloClient: ApolloClient<NormalizedCacheObject>
+    apolloClient?: ApolloClient<NormalizedCacheObject>
     chatMessagesSubscription?: { unsubscribe: () => void }
     numberOfUnread: number
     categories: DataLoadState<Category[]>

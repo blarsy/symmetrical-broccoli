@@ -1,9 +1,9 @@
 import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/AppContextProvider"
-import { useContext, useEffect, useState } from "react"
+import { useContext } from "react"
 import { setOrResetGlobalLogger, info, debug } from "./logger"
 import { ISecureStore } from "./secureStore"
 import { apolloTokenExpiredHandler } from "./utils"
-import { gql, useApolloClient } from "@apollo/client"
+import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
 import { registerForPushNotificationsAsync } from "./pushNotifications"
 import secureStore from "./secureStore"
 import { getApolloClient } from "./apolloClient"
@@ -54,7 +54,7 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     }
 }`
 
-export default (overrideSecureStore?: ISecureStore) => {
+export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>) => {
     const appDispatch = useContext(AppDispatchContext)
     const appState = useContext(AppContext)
     const { get, set, remove } = overrideSecureStore || secureStore
@@ -62,7 +62,7 @@ export default (overrideSecureStore?: ISecureStore) => {
     const TOKEN_KEY = 'token'
 
     const completeLogin = async (token: string) => {
-        const client = getApolloClient(token)
+        const client = clientGetter ? clientGetter(token) : getApolloClient(token)
 
         const res = await client.query({ query: GET_SESSION_DATA })
     
@@ -92,7 +92,7 @@ export default (overrideSecureStore?: ISecureStore) => {
         } })
         appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, chatMessagesSubscription: subscription} })
 
-        info({ message: `Logged in with session: ${ JSON.stringify(account) }` })
+        info({ message: `Logged in with session: ${JSON.stringify(account)}` })
     }
 
     const logout = async () => {

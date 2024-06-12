@@ -179,7 +179,7 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
 
 export const initials = (text: string) => {
   if(text)
-      return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
+      return text.split(' ').map(word => word[0]?.toLocaleUpperCase()).slice(0, 2).join('')
 
   return ""
 }

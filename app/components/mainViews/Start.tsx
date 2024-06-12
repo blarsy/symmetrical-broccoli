@@ -6,13 +6,12 @@ import Splash from "./Splash"
 import { useFonts } from 'expo-font'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { getTheme, versionChecker } from "@/lib/utils"
-import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
+import { ApolloClient, ApolloProvider, NormalizedCacheObject, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import secureStore, { ISecureStore } from "@/lib/secureStore"
-import { getApolloClient } from "@/lib/apolloClient"
 import { Provider } from "react-native-paper"
 
 export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
@@ -53,11 +52,12 @@ async function executeWithinMinimumDelay(promise: Promise<void>): Promise<any> {
 }
 
 interface Props {
-    overrideSecureStore?: ISecureStore,
+    overrideSecureStore?: ISecureStore
     overrideVersionChecker?: (serverVersion: string) => boolean
+    clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>
 }
 
-export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker }: Props) => {
+export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker, clientGetter }: Props) => {
     const { t } = i18n
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
@@ -67,7 +67,7 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
         'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
         'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
     })
-    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore)
+    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore, clientGetter)
     
     const load = async () => {
         try {
@@ -101,11 +101,10 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
 }
 
 const theme = getTheme()
-const unauthenticatedClient = getApolloClient('')
 export default () => {
     const appContext = useContext(AppContext)
 
-    return <ApolloProvider client={appContext.apolloClient}>
+    return <ApolloProvider client={appContext.apolloClient!}>
         <Provider theme={theme}>
             <StartApolloWrapped />
         </Provider>

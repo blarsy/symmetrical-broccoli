@@ -6,13 +6,14 @@ import { GET_MINIMUM_CLIENT_VERSION, StartApolloWrapped } from './Start'
 import { GET_CATEGORIES } from './Main'
 import { SUGGESTED_RESOURCES } from '../SearchFilterContextProvider'
 import { ISecureStore } from '@/lib/secureStore'
-import { GET_SESSION_DATA, MESSAGE_RECEIVED } from '@/lib/useUserConnectionFunctions'
+import { GET_SESSION_DATA } from '@/lib/useUserConnectionFunctions'
+import { createMockClient } from 'mock-apollo-client'
 
 const meta: Meta<typeof StartApolloWrapped> = {
   component: StartApolloWrapped,
   decorators: [
     paperProviderDecorator,
-    appContextDecorator,
+    (Story) => appContextDecorator(Story, true),
     configDayjsDecorator,
     apolloClientMocksDecorator([])
   ]
@@ -107,26 +108,27 @@ export const Outdated: Story = {
   export const RestoreSession: Story = {
     name: 'Restores session',
     decorators: [
-      apolloClientMocksDecorator([ ...simpleStartApolloQueries, {
-        query: GET_SESSION_DATA,
-        variables: {},
-        result: {
-            getSessionData: {
-                accountId: 1,
-                email: 'me@me.com',
-                name: 'Super artisan',
-                avatarPublicId: undefined,
-                activated: new Date(),
-                logLevel: 2
-              }
-        }
-      }])
+      apolloClientMocksDecorator(simpleStartApolloQueries)
     ],
     args: {
       overrideSecureStore: {
         get: (key: string) => Promise.resolve('usertoken'),
         set: async(key: string, value: string) => {},
         remove: async () => {}
-      } as ISecureStore
+      } as ISecureStore,
+      clientGetter: token => {
+        const client = createMockClient()
+        client.setRequestHandler(GET_SESSION_DATA, () => Promise.resolve({ data:{
+          getSessionData: {
+              accountId: 1,
+              email: 'me@me.com',
+              name: 'Super artisan',
+              avatarPublicId: '',
+              activated: new Date(),
+              logLevel: 2
+          }
+        }}))
+        return client
+      }
     }
   }

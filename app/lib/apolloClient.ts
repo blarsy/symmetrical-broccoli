@@ -7,7 +7,6 @@ import { createClient } from "graphql-ws"
 import { debug, info, error } from "./logger"
 import { apiUrl, subscriptionsUrl } from "./settings"
 import { errorToString, apolloTokenExpiredHandler } from "./utils"
-import { IAppState } from "@/components/AppContextProvider"
 
 const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
 

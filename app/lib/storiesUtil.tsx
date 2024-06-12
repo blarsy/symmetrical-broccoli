@@ -31,7 +31,7 @@ const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceCon
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
+export const appContextDecorator = (StoryElement: React.ElementType, noAccount: boolean = false) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
 
 const defaultResourceCategories = [
     { code: 'cat1', name: 'category 1' },
@@ -40,10 +40,10 @@ const defaultResourceCategories = [
     { code: 'cat4', name: 'category 4' }
 ]
 
-const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContextProvider initialState={{
-    newChatMessage: '', categories: fromData(defaultResourceCategories), numberOfUnread: 0,token: '', account, 
+const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
+    newChatMessage: '', categories: fromData(defaultResourceCategories), numberOfUnread: 0, account, 
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
-    messageReceivedHandler: undefined, lastNotification: undefined }}>
+    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined }}>
     <StoryElement />
 </AppContextProvider>
 
