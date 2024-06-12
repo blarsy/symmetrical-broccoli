@@ -21,6 +21,7 @@ interface AppState {
     processing: boolean
     numberOfUnread: number
     categories: DataLoadState<Category[]>
+    lastConversationChangeTimestamp: number
 }
 
 interface AppNotification {
@@ -42,6 +43,7 @@ interface AppActions {
     setNewChatMessage: (msg: any) => void
     setCategories: (categories: DataLoadState<Category[]>) => void
     setChatMessageSubscription: (subscription: { unsubscribe: () => void }) => void
+    setConversationsStale: () => void
 }
 
 export interface IAppContext {
@@ -62,7 +64,8 @@ const emptyState: AppState = {
     numberOfUnread: 0,
     processing: false,
     categories: initial<Category[]>(true, []),
-    chatMessagesSubscription: undefined
+    chatMessagesSubscription: undefined,
+    lastConversationChangeTimestamp: 0
 }
 
 export const AppContext = createContext<IAppContext>({
@@ -83,7 +86,8 @@ export const AppContext = createContext<IAppContext>({
         resetLastNofication: () => {},
         setNewChatMessage: () => {},
         setCategories: () => {},
-        setChatMessageSubscription: () => {}
+        setChatMessageSubscription: () => {},
+        setConversationsStale: () => {}
     }
 })
 
@@ -255,7 +259,10 @@ const AppContextProvider = ({ children }: Props) => {
             setLastNofication(notif)
         },
         setMessageReceivedHandler: fn => {
-            overrideMessageReceived.push(fn)
+            overrideMessageReceived.push(msg => {
+                fn(msg)
+                setNewAppState({ lastConversationChangeTimestamp: new Date().valueOf() })
+            })
             setOverrideMessageReceived(overrideMessageReceived)
         },
         resetMessageReceived: () => {
@@ -271,7 +278,10 @@ const AppContextProvider = ({ children }: Props) => {
         setCategories: loadState => {
             setNewAppState({ categories: loadState})
         },
-        setChatMessageSubscription: subscription => setNewAppState({ chatMessagesSubscription: subscription })
+        setChatMessageSubscription: subscription => setNewAppState({ chatMessagesSubscription: subscription }),
+        setConversationsStale: () => {
+            setNewAppState({ lastConversationChangeTimestamp: new Date().valueOf() })
+        }
     }
 
     return <AppContext.Provider value={{ state: appState, lastNotification, newChatMessage, actions, overrideMessageReceived}}>

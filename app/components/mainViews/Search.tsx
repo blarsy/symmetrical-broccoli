@@ -87,8 +87,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderStyle: 'dashed'
+                    borderBottomWidth: StyleSheet.hairlineWidth
                 }} />
             <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
@@ -96,8 +95,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     options: values as any as SearchOptions })} />
                 <View style={{
                     borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderStyle: 'dashed'
+                    borderBottomWidth: StyleSheet.hairlineWidth
                 }} />
             <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
                 onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 

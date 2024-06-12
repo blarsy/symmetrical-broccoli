@@ -22,10 +22,19 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
     }
   }`
 
+export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: Int!, $resourceId: Int!) {
+  setParticipantRead(
+    input: {resourceId: $resourceId, otherAccountId: $otherAccountId}
+  ) {
+    integer
+  }
+}`
+
 const Conversation = ({ route }: RouteProps) => {
     const appContext = useContext(AppContext)
     const conversationContext = useContext(ConversationContext)
     const navigation = useNavigation()
+    const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
     const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
 
     useEffect(() => {
@@ -61,6 +70,16 @@ const Conversation = ({ route }: RouteProps) => {
             appContext.actions.resetMessageReceived()
         }
     }, [])
+
+    useEffect(() => {
+      if(conversationContext.state.conversation.data?.messages) {
+        setParticipantRead({ variables: { 
+          resourceId: conversationContext.state.conversation.data?.resource?.id, 
+          otherAccountId: conversationContext.state.conversation.data?.otherAccount.id
+         } })
+         appContext.actions.setConversationsStale()
+      }
+    }, [conversationContext.state.conversation.data?.messages])
 
     const user = {
       _id: appContext.state.account?.id!,

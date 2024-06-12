@@ -16,6 +16,9 @@ import { debug, error, info } from "./logger"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
 import Application from 'expo-application'
+import dayjs from "dayjs"
+import { t } from "@/i18n"
+import { configureFonts } from "react-native-paper"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -31,7 +34,7 @@ export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdS
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
 export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
 
-export const fontSizeLarge =  aboveMdWidth() ? 24 : 20
+export const fontSizeLarge = aboveMdWidth() ? 24 : 20
 export const fontSizeMedium = aboveMdWidth() ? 20 : 16
 export const fontSizeSmall = aboveMdWidth() ? 18 : 14
 
@@ -40,6 +43,26 @@ export enum ScreenSize {
     md,
     lg
 }
+
+export const getTheme = () => ({
+  fonts: configureFonts({ config: { 
+      bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
+  } })
+})
 
 export const getScreenSize = (): ScreenSize => {
     if(aboveMdWidth()){
@@ -254,8 +277,27 @@ export const initials = (text: string) => {
 }
 
 export const versionChecker = (serverVersion: string) => {
+  console.log(Application?.nativeApplicationVersion, clientVersion, serverVersion)
   if(Application?.nativeApplicationVersion || clientVersion)
     return compareVersions(Application?.nativeApplicationVersion || clientVersion, serverVersion) >= 0
   
   return true
+}
+
+export const userFriendlyChatTime = (time: Date) => {
+  const djTime = dayjs.utc(time)
+  const millisecondsEllapsed = Math.abs(djTime.diff())
+  const epoch = time.valueOf()
+  
+  if(millisecondsEllapsed < 10 * 60 * 1000)
+    return djTime.local().fromNow()
+  else if (millisecondsEllapsed < Math.abs(djTime.startOf('day').diff(djTime))) {
+    return djTime.local().format('HH:mm')
+  } else if (epoch > dayjs().startOf('day').valueOf() - (6 * 24 * 60 * 60 * 1000)) {
+    return djTime.local().format('ddd')
+  } else if(epoch > dayjs().startOf('day').valueOf() - (364 * 24 * 60 * 60 * 1000)) {
+    return djTime.local().format(t('shortDateFormat'))
+  } else {
+    return djTime.local().format('MMM YY')
+  }
 }
