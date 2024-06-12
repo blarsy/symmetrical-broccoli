@@ -21,10 +21,36 @@ const initialArgs = {
   route: { params: { resourceId: 1 }},
   addRequested: () => console.log('addrequested'),
   editRequested: () =>  console.log('editrequested'),
-  viewRequested: (id) =>  console.log(`viewrequested, id ${id}`)
+  viewRequested: (id: number) =>  console.log(`viewrequested, id ${id}`)
 }
 
-const simpleResource = (isDeleted: boolean = false) => ({
+const threeImages = [        
+  { 
+    imageByImageId: {
+      publicId: 'cwhkuoqezdqyrot6hoez'
+    }
+  },
+  { 
+    imageByImageId: {
+      publicId: 'pwb8arnohwpjahnebyxj'
+    }
+  },
+  { 
+    imageByImageId: {
+      publicId: 'occysgyx6m8kk5y51myu'
+    }
+  }
+]
+
+const oneImage = [
+  { 
+    imageByImageId: {
+      publicId: 'cwhkuoqezdqyrot6hoez'
+    }
+  }
+]
+
+const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true) => ({
     resourceById: {
         canBeDelivered: true,
         canBeExchanged: true,
@@ -45,7 +71,7 @@ const simpleResource = (isDeleted: boolean = false) => ({
             imageByAvatarImageId: { publicId: '' }
         },
         resourcesImagesByResourceId: {
-            nodes: []
+            nodes: threeImage ? threeImages : oneImage
         },
         resourcesResourceCategoriesByResourceId: {
             nodes: [{
@@ -59,18 +85,32 @@ const simpleResource = (isDeleted: boolean = false) => ({
 })
 
 export const SimpleView: Story = {
-    name: 'Simple view',
-    decorators: [
-      apolloClientMocksDecorator([ { 
-        query: GET_RESOURCE,
-        variables: {
-          id: 1
-        },
-        result: simpleResource(false)
-      }])
-    ],
-    args: initialArgs
-  }
+  name: 'Simple view',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: GET_RESOURCE,
+      variables: {
+        id: 1
+      },
+      result: simpleResource(false)
+    }])
+  ],
+  args: initialArgs
+}
+
+export const SingleImageView: Story = {
+  name: 'Single image view',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: GET_RESOURCE,
+      variables: {
+        id: 1
+      },
+      result: simpleResource(false, false)
+    }])
+  ],
+  args: initialArgs
+}
 
 export const DeletedView: Story = {
     name: 'View deleted resource',

@@ -56,8 +56,8 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
 
     const openModal = () => setOpen(true)
     
-    return <LoadedZone loading={appContext.state.categories.loading} error={appContext.state.categories.error}>
-        { appContext.state.categories.data ? <View style={{ paddingVertical: 10 }}>
+    return <LoadedZone loading={appContext.categories.loading} error={appContext.categories.error}>
+        { appContext.categories.data ? <View style={{ paddingVertical: 10 }}>
             <TouchableOpacity onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <TransparentTextInput label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
@@ -66,7 +66,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
                 </View>
             </TouchableOpacity>
             <Portal>
-                <CategoriesSelectModal categories={appContext.state.categories.data} initialCategories={value} open={open} setOpen={setOpen}
+                <CategoriesSelectModal categories={appContext.categories.data} initialCategories={value} open={open} setOpen={setOpen}
                     onChange={onChange} />
             </Portal>
         </View> : <></> }

@@ -1,6 +1,6 @@
 {
     "dbPassword": "yourdbpassword",
-    "googlePrivateKey": "{\"privateKey\":\"-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n\"}",
+    "googlePrivateKey": "-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n",
     "googleServiceAccount": "symbro@symbro.iam.gserviceaccount.com",
     "host": "sb_db_test",
     "jwtSecret": "yoursecret",
@@ -16,7 +16,7 @@
     "pushNotificationsUrlPrefix": "exp://192.168.68.104:8081/--/",
     "remoteBackupFolderName": "backups_test",
     "user": "sb",
-    "webAppUrl": "=https://test.tope-la.com/webapp/",
+    "webAppUrl": "https://test.tope-la.com/webapp/",
     "webClientUrls": "[\"http://localhost:19006\", \"https://test.tope-la.com\"]",
     "websiteUrl": "https://test.tope-la.com/",
     "versions": {

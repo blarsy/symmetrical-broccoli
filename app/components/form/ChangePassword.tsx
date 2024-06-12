@@ -1,13 +1,13 @@
 import { Formik, ErrorMessage } from "formik"
-import React, { useContext, useState } from "react"
+import React, { useContext } from "react"
 import * as yup from 'yup'
-import { AppContext } from "@/components/AppContextProvider"
 import { isValidPassword } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
 import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
+import { AppContext } from "../AppContextProvider"
 
 interface Props {
     onDone:  (success: boolean) => void
@@ -24,7 +24,7 @@ export default function ChangePassword ({ onDone }: Props) {
     const [changePassword, { loading: changing, error, reset }] = useMutation(CHANGE_PASSWORD)
 
     let initialValues = { password: '', newPassword: '', passwordRepeat: ''}
-    if(appContext.state.account) initialValues = { 
+    if(appContext.account) initialValues = { 
         password: '', 
         newPassword: '',
         passwordRepeat: ''

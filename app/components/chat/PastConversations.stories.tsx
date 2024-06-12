@@ -80,7 +80,7 @@ export const SimpleView: Story = {
   name: 'Simple conversation list',
   args: {
     onConversationSelected(resource, otherAccountId) {
-        //console.log(resource, otherAccountId)
+        console.log(resource, otherAccountId)
     },
   }
 }

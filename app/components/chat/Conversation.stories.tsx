@@ -2,13 +2,18 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, conversationContextDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
-import Conversation from './Conversation'
+import Conversation, { SET_PARTICIPANT_READ } from './Conversation'
 
 const meta: Meta<typeof Conversation> = {
   component: Conversation,
   decorators: [
     paperProviderDecorator,
     appContextDecorator,
+    apolloClientMocksDecorator([{
+      query: SET_PARTICIPANT_READ,
+      variables: { otherAccountId: 2, resourceId: 3 },
+      result: { setParticipantRead: { integer: 1 }}
+    }]),
     conversationContextDecorator({
       conversation: {
         loading: false,
@@ -21,7 +26,8 @@ const meta: Meta<typeof Conversation> = {
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'otherAccountName' }, createdAt: new Date() },
             { _id: 1, text: 'message 2', user: { _id: 1, name: 'me' }, createdAt: new Date() },
-          ]
+          ],
+          endCursor: ''
         },
       }
     }),
@@ -34,13 +40,11 @@ type Story = StoryObj<typeof Conversation>
 
 export const SimpleView: Story = {
   name: 'Simple conversation',
-  decorators: [
-    apolloClientMocksDecorator([])
-  ],
+  decorators: [],
   args: {
     route: {
       params: {
-        resourceId: 1,
+        resourceId: 3,
         otherAccountId: 2
       }
     }
@@ -49,7 +53,6 @@ export const SimpleView: Story = {
 
 export const CantChatWithDeletedAccount: Story = {
   name: 'Cannot chat with deleted account', decorators: [
-    apolloClientMocksDecorator([]),
     conversationContextDecorator({
       conversation: {
         loading: false,
@@ -62,7 +65,8 @@ export const CantChatWithDeletedAccount: Story = {
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'Artisan incroyable' }, createdAt: new Date() },
             { _id: 1, text: 'message 2', user: { _id: 1, name: 'Mon association super' }, createdAt: new Date() },
-          ]
+          ],
+          endCursor: ''
         },
       }
     })
@@ -70,7 +74,7 @@ export const CantChatWithDeletedAccount: Story = {
   args: {
     route: {
       params: {
-        resourceId: 1,
+        resourceId: 3,
         otherAccountId: 2
       }
     }

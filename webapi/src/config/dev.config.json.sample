@@ -1,6 +1,6 @@
 {
     "dbPassword": "yourdbpassword",
-    "googlePrivateKey": "{\"privateKey\":\"-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n\"}",
+    "googlePrivateKey": "-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n",
     "googleServiceAccount": "symbro@symbro.iam.gserviceaccount.com",
     "host": "localhost",
     "jwtSecret": "yoursecret",
@@ -16,7 +16,7 @@
     "pushNotificationsUrlPrefix": "exp://192.168.0.66:8081/--/",
     "remoteBackupFolderName": "backups_test",
     "user": "sb",
-    "webAppUrl": "=http://localhost:3001/webapp/",
+    "webAppUrl": "http://localhost:3001/webapp/",
     "webClientUrls": "[\"http://localhost:19006\", \"http://localhost:3001\"]",
     "websiteUrl": "http://localhost:3001/",
     "versions": {

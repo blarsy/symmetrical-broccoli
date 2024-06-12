@@ -1,7 +1,6 @@
 import { Formik, ErrorMessage } from "formik"
 import React, { useContext, useState } from "react"
 import * as yup from 'yup'
-import { AppContext } from "@/components/AppContextProvider"
 import { aboveMdWidth, adaptToWidth, initials, pickImage } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
@@ -10,6 +9,7 @@ import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
 import { Avatar, Banner } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String, $avatarPublicId: String) {
     updateAccount(input: {email: $email, name: $name, avatarPublicId: $avatarPublicId}) {
@@ -19,15 +19,16 @@ const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String,
 
 export default function EditProfile () {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [updateAccount, { loading: updating, error, reset }] = useMutation(UPDATE_ACCOUNT)
     const [newEmailMustBeActivated, setNewEmailMustBeActivated] = useState(false)
     const [success, setSuccess] = useState(false)
     
     let initialValues = { email: '', name: '', avatarPublicId: ''}
-    if(appContext.state.account) initialValues = { 
-        email: appContext.state.account.email, 
-        name: appContext.state.account.name,
-        avatarPublicId: appContext.state.account.avatarPublicId
+    if(appContext.account) initialValues = { 
+        email: appContext.account.email, 
+        name: appContext.account.name,
+        avatarPublicId: appContext.account.avatarPublicId
     }
 
     const update = async (values: {
@@ -35,7 +36,7 @@ export default function EditProfile () {
         name: string;
         avatarPublicId: string;
     }) => {
-        const currentAccount = appContext.state.account!
+        const currentAccount = appContext.account!
         let emailHasChanged = false
 
         if(currentAccount.email != values.email.toLowerCase()){
@@ -50,7 +51,7 @@ export default function EditProfile () {
 
         setNewEmailMustBeActivated(emailHasChanged)
 
-        appContext.actions.accountUpdated(currentAccount)
+        appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
 
     return <Formik initialValues={initialValues} validationSchema={yup.object().shape({
@@ -67,10 +68,14 @@ export default function EditProfile () {
                     <Avatar.Text label={initials(values.name)} size={adaptToWidth(150, 250, 300)} />}
             </View>
             <WhiteButton style={{ alignSelf: 'center', marginVertical: 10}} onPress={() => pickImage(async img => {
-                const avatarPublicId = await uploadImage(img.uri)
-                setFieldValue('avatarPublicId', avatarPublicId)
-                update({ ...values, ...{ avatarPublicId }})
-            }, 200, appContext)}>
+                try {
+                    const avatarPublicId = await uploadImage(img.uri)
+                    setFieldValue('avatarPublicId', avatarPublicId)
+                    update({ ...values, ...{ avatarPublicId }})
+                } catch (e) {
+                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+                }
+            }, 200)}>
                 {t('modify_logo')}
             </WhiteButton>
             <OrangeTextInput style={{ flex: 1 }} label={<StyledLabel label={t('organization_name_label')} color="#fff"/>} textContentType="name" value={values.name}

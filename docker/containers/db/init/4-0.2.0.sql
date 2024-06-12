@@ -115,7 +115,7 @@ begin
 	END IF;
 	
 	--Detect attempt to update a resource already deleted
-	IF (SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND deleted IS NOT NULL) THEN
+	IF EXISTS(SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND deleted IS NOT NULL) THEN
 		RETURN -1;
 	END IF;
 

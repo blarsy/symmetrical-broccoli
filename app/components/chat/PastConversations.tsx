@@ -4,12 +4,12 @@ import React, { useContext, useEffect } from "react"
 import { Image, View } from "react-native"
 import LoadedList from "../LoadedList"
 import ResponsiveListItem from "../ResponsiveListItem"
-import { AppContext } from "../AppContextProvider"
 import { Icon, Text } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import { urlFromPublicId } from "@/lib/images"
 import { gql, useQuery } from "@apollo/client"
 import { userFriendlyChatTime } from "@/lib/utils"
+import { AppContext } from "../AppContextProvider"
 
 export const MY_CONVERSATIONS = gql`query MyConversations {
     myConversations {
@@ -69,10 +69,10 @@ const PastConversations = ({ onConversationSelected }: Props) => {
 
     useEffect(() => {
       refetch()
-    }, [ appContext.state.lastConversationChangeTimestamp ])
+    }, [ appContext.lastConversationChangeTimestamp ])
 
     return <View style={{ flex: 1 }}>
-        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.state.account!.id) : [] as ConversationData[]} error={error} noDataLabel={t('noConversationLoaded_label')}
+        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} error={error} noDataLabel={t('noConversationLoaded_label')}
             displayItem={(item, idx) => {
                 const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) && item.conversation.resource.images[0].publicId ?
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 

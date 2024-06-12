@@ -1,5 +1,4 @@
 import React from 'react'
-import AppContextProvider from '@/components/AppContextProvider'
 import Start from '@/components/mainViews/Start'
 import { AppRegistry, StatusBar } from 'react-native'
 import { primaryColor } from './components/layout/constants'
@@ -12,6 +11,7 @@ import Constants from 'expo-constants'
 import { errorToString, getLanguage } from './lib/utils'
 import './lib/logger'
 import { error } from './lib/logger'
+import { AppContextProvider } from './components/AppContextProvider'
 
 if(typeof ErrorUtils != 'undefined') {
   // ErrorUtils is not defined on web

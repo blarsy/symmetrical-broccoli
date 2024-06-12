@@ -1,6 +1,5 @@
 import React  from 'react'
 import { EditResourceContext } from '../components/resources/EditResourceContextProvider'
-import { AppContext } from '@/components/AppContextProvider'
 import { fromData, initial } from './DataLoadState'
 import { AccountInfo, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
@@ -14,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
 import { getTheme } from './utils'
+import { AppContextProvider } from '@/components/AppContextProvider'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -31,7 +31,7 @@ const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceCon
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
+export const appContextDecorator = (StoryElement: React.ElementType, noAccount: boolean = false) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
 
 const defaultResourceCategories = [
     { code: 'cat1', name: 'category 1' },
@@ -40,28 +40,12 @@ const defaultResourceCategories = [
     { code: 'cat4', name: 'category 4' }
 ]
 
-const makeAppContextProvider = (StoryElement: React.ElementType, account: AccountInfo) => <AppContext.Provider value={{
-    newChatMessage: '', state: { messages: [], categories: fromData(defaultResourceCategories), 
-        numberOfUnread: 0, processing: false, token: '', account, chatMessagesSubscription: undefined,
-        lastConversationChangeTimestamp: 0 }, overrideMessageReceived: [],
-    actions: {
-        loginComplete: async () => { return { activated: new Date(), avatarPublicId: '', email: '', id: 0, name: '' } },
-        tryRestoreToken: () => Promise.resolve(),
-        accountUpdated: () => Promise.resolve(),
-        logout: () => Promise.resolve(),
-        resetMessages: () => {},
-        setMessage: () => {},
-        notify: () => {},
-        setMessageReceivedHandler: () => {},
-        resetMessageReceived: () => {},
-        resetLastNofication: () => {},
-        setNewChatMessage: () => {},
-        setCategories: () => {},
-        setChatMessageSubscription: () => {}
-    }
-}}>
+const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
+    newChatMessage: '', categories: fromData(defaultResourceCategories), numberOfUnread: 0, account, 
+    chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
+    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined }}>
     <StoryElement />
-</AppContext.Provider>
+</AppContextProvider>
 
 export const searchFilterContextDecorator = (StoryElement: React.ElementType) => makeSeachFilterContextProvider(StoryElement)
 
@@ -78,7 +62,7 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
     return (StoryElement: React.ElementType) => 
     <ConversationContext.Provider value={{ 
         state: initialConversationData,
-        actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {} }
+        actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {}, loadEarlier: async () => {} }
     }}>
         <StoryElement />
     </ConversationContext.Provider>
@@ -100,7 +84,7 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
         delay: 2000,
         request: { query: op.query, variables: op.variables },
         result: { data: op.result }
-    }))
+    } as MockedResponse<any, any>))
   }>
     <Story />
   </MockedProvider>
@@ -115,10 +99,3 @@ export const navigationContainerDecorator = (initialState: any = undefined ) => 
     <NavigationContainer initialState={initialState}>
         <Story />
     </NavigationContainer>
-
-export const storybookFakeLanguageDetector = {
-    type: 'languageDetector',
-    detect: function() {
-      return 'fr'
-    }
-  }

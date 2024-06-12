@@ -1,24 +1,25 @@
 import { useContext, useEffect, useState } from "react"
 import Main from "./Main"
-import { AppContext } from "@/components/AppContextProvider"
 import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
 import { useFonts } from 'expo-font'
-import { ActivityIndicator, Modal, PaperProvider, Portal, configureFonts } from 'react-native-paper'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { getAuthenticatedApolloClient, getTheme, versionChecker } from "@/lib/utils"
-import { ApolloProvider, gql, useLazyQuery } from "@apollo/client"
+import { getTheme, versionChecker } from "@/lib/utils"
+import { ApolloClient, ApolloProvider, NormalizedCacheObject, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import secureStore, { ISecureStore } from "@/lib/secureStore"
+import { Provider } from "react-native-paper"
 
-
-const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
+export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
     getMinimumClientVersion
 }`
 
 const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => {
-    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [getMinimumClientVersion] = useLazyQuery(GET_MINIMUM_CLIENT_VERSION)
     const [busy, setBusy] = useState(false)
     const [outdated, setOutdated] = useState(false)
@@ -31,7 +32,7 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
                 setOutdated(true)
             }
         } catch(e) {
-            appContext.actions.notify({ error: e as Error })
+            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error } })
             setOutdated(false)
         } finally {
             setBusy(false)
@@ -45,19 +46,32 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
     return { checkingVersion: busy, outdated }
 }
 
-const ApolloWrapped = () => {
+const SPLASH_DELAY = 3000
+async function executeWithinMinimumDelay(promise: Promise<void>): Promise<any> {
+    return Promise.all([promise, new Promise(resolve => setTimeout(resolve, SPLASH_DELAY)) ])
+}
+
+interface Props {
+    overrideSecureStore?: ISecureStore
+    overrideVersionChecker?: (serverVersion: string) => boolean
+    clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>
+}
+
+export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker, clientGetter }: Props) => {
     const { t } = i18n
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const [startingUp, setStartingUp] = useState(true)
-    const { checkingVersion, outdated } = useVersionCheck(versionChecker)
+    const { checkingVersion, outdated } = useVersionCheck(overrideVersionChecker || versionChecker)
     const [fontsLoaded, fontError] = useFonts({
         'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
         'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
     })
+    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore, clientGetter)
     
     const load = async () => {
         try {
-            await appContext.actions.tryRestoreToken()
+            await executeWithinMinimumDelay(tryRestoreToken())
          } finally {
             setStartingUp(false)
          }
@@ -66,39 +80,33 @@ const ApolloWrapped = () => {
     useEffect(() => {
         load()
     }, [])
+
     if(startingUp || !fontsLoaded || checkingVersion) {
         return <Splash />
     }
 
     if(outdated) {
-        return <PaperProvider theme={getTheme()}>
-            <UpdateApp />
-        </PaperProvider>
+        return <UpdateApp />
     }
 
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
-            <PaperProvider theme={getTheme()}>
-                <Main />
-                <Portal>
-                    <Modal visible={appContext.state.processing} contentContainerStyle={{ shadowOpacity: 0}}>
-                        <ActivityIndicator size="large" />
-                    </Modal>
-                </Portal>
-                <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appContext.actions.resetLastNofication()} />
-                <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appContext.actions.resetLastNofication()} />
-            </PaperProvider>
+            <Main />
+            <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+            <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
         </GestureHandlerRootView>
     } else {
-        <PaperProvider>
-            <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
-        </PaperProvider>
+        <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
     }
 }
 
+const theme = getTheme()
 export default () => {
     const appContext = useContext(AppContext)
-    return <ApolloProvider client={getAuthenticatedApolloClient(appContext.state.token)}>
-        <ApolloWrapped />
+
+    return <ApolloProvider client={appContext.apolloClient!}>
+        <Provider theme={theme}>
+            <StartApolloWrapped />
+        </Provider>
     </ApolloProvider>
 }

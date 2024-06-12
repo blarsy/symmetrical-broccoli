@@ -3,5 +3,6 @@
     "subscriptionsUrl": "ws://localhost:3000/graphql",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
-    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/"
+    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
+    "clientVersion": "0.2.4"
 }

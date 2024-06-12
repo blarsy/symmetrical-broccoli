@@ -6,6 +6,7 @@ import { getCommonConfig } from '../config'
 let service: drive_v3.Drive
 export const connectDrive = async (): Promise<drive_v3.Drive> => {
     const config = await getCommonConfig()
+
     if(!service) {
         const auth = new GoogleAuth({
             scopes: 'https://www.googleapis.com/auth/drive',

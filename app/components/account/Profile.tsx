@@ -2,16 +2,16 @@ import React, { useContext, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, aboveMdWidth, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
-import { AppContext } from "../AppContextProvider"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { primaryColor } from "../layout/constants"
-import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { gql, useMutation } from "@apollo/client"
+import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     deleteAccount(input: {}) {
@@ -19,19 +19,20 @@ const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     }
 }`
 
-export default function Profile ({ route, navigation }: { route: any, navigation: NavigationHelpers<ParamListBase>}) {
+export default function Profile ({ route, navigation }: RouteProps) {
     const [changingPassword, setChangingPassword] = useState(false)
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [confirmedAccountDelete, setConfirmedAccountDelete] = useState(false)
     const [deleting, setDeleting] = useState(initial<null>(false, null))
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
-    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
+    const { logout } = useUserConnectionFunctions()
     return <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
         <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10, 
             alignSelf: "stretch", gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {
-                    if(success) appContext.actions.notify({ message: t('password_changed_message') })
+                    if(success) appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('password_changed_message') } })
                     setChangingPassword(false)
                 }}/> : 
                 <View>
@@ -40,7 +41,7 @@ export default function Profile ({ route, navigation }: { route: any, navigation
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setDeletingAccount(true)}>{t('delete_account_button')}<Icon size={20} source="account-remove"/></Button>
                 </View>}
             <Portal>
-                <Dialog visible={deletingAccount} style={{ backgroundColor: '#fff', borderColor: 'red', borderWidth: 3 }}>
+                <Dialog visible={deletingAccount} style={{ backgroundColor: '#fff' }}>
                     <Dialog.Title><Text variant="titleLarge">{t('delete_account_title')}</Text></Dialog.Title>
                     <Dialog.Content style={{ display: 'flex', gap: 15 }}>
                         <Text variant="bodyMedium">{t('delete_account_explanation')}</Text>
@@ -61,7 +62,7 @@ export default function Profile ({ route, navigation }: { route: any, navigation
                             setDeleting(beginOperation())
                             try {
                                 await deleteAccount()
-                                await appContext.actions.logout()
+                                await logout()
                                 navigation.reset({ routes: [
                                     {name: 'main'}
                                 ], index: 0 })

@@ -3,7 +3,7 @@
   "include": [
       "**/*.ts",
       "**/*.tsx"
-  ],
+, "components/AppContextProvider.tsx.bak"  ],
   "compilerOptions": {
     "jsx": "react",
     "types": ["node"],

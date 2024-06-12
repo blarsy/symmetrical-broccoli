@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import RNLanguageDetector from '@os-team/i18next-react-native-language-detector'
 import { Platform } from 'react-native'
 import Constants from 'expo-constants'
+import { storybookFakeLanguageDetector } from "./lib/storybookFakeLanguageDetector"
 
 const resources = {
   en: {
@@ -43,7 +44,6 @@ const resources = {
       "back": "Back",
       "add_buttonLabel": "Add",
       "Atleast3chars": "At least 3 characters",
-      "nameOrEmail_label": "Name or email",
       "forgotPassword_label": "Forgot password ?",
       "recoveryRequested_message": "A mail has been sent to your address. Please follow the instructions it provides to restore access to your account.",
       "newResource_viewTitle": "Create resource",
@@ -98,7 +98,7 @@ const resources = {
       "introduce_yourself": "Introduce yourself",
       "delete_account_button": "Delete my account",
       "delete_account_title": "Account removal",
-      "delete_account_explanation": "Deleting your account will erase all information we have about you.\nWherever you interracted with other accounts, yours will be displayed as \"Deleted account\".\nYou will not be able to connect anymore, and Tope-là will not be able to retrieve your information.",
+      "delete_account_explanation": "Deleting your account will erase all information we have about you.\nYou will not be able to connect anymore, and Tope-là will not be able to retrieve your information.",
       "delete_account_confirmation": "This will completely erase your data, and cannot be undone.\nDo you confirm that is what you want ?",
       "name_account_removed": "Deleted account",
       "cannot_send_to_deleted_account": "Cannot send to deleted account",
@@ -108,7 +108,8 @@ const resources = {
       "deleted": "deleted",
       "resource_deleted": "This resource was deleted on {{deleted}}",
       "must_update_app": "Please update the app to benefit from the latest improvements.",
-      "update_button": "Update"
+      "update_button": "Update",
+      "available_resources": "Available resources"
     }
   },
   fr: {
@@ -148,7 +149,6 @@ const resources = {
       "back": "Retour",
       "add_buttonLabel": "Ajouter",
       "Atleast3chars": "Au moins 3 caractères",
-      "nameOrEmail_label": "Nom ou email",
       "forgotPassword_label": "Mot de passe oublié ?",
       "recoveryRequested_message": "Un email a été envoyé à votre adresse. Veuillez suivre les instructions qui s'y trouvent pour rétablir l'accès à votre compte.",
       "newResource_viewTitle": "Créer ressource",
@@ -203,7 +203,7 @@ const resources = {
       "introduce_yourself": "Présentez vous",
       "delete_account_button": "Effacer mon compte",
       "delete_account_title": "Effacement du compte",
-      "delete_account_explanation": "Effacer votre compte éliminera toute les informations que nous détenons de vous.\nLà où vous avez interragi avec d'autres comptes, sera affiché la mention \"compte supprimé\".\nIl ne vous sera plus possible de vous reconnecter, et Tope-là ne sera plus en mesure de retrouver vos informations.",
+      "delete_account_explanation": "Effacer votre compte éliminera toute les informations que nous détenons de vous.\nIl ne vous sera plus possible de vous reconnecter, et Tope-là ne sera plus en mesure de retrouver vos informations.",
       "delete_account_confirmation": "Cet action va effacer complètement vos données, et elles seront totalement irrécupérables.\nVeuillez confirmer une dernière fois",
       "name_account_removed": "Compte supprimé",
       "cannot_send_to_deleted_account": "Envoi impossible au compte supprimé",
@@ -213,14 +213,15 @@ const resources = {
       "deleted": "Effacé",
       "resource_deleted": "Cette ressource a été effacée le {{deleted}}",
       "must_update_app": "Veuillez mettre à jour l'app pour bénéficier des dernières fonctionnalités.",
-      "update_button": "Mettre à jour"
+      "update_button": "Mettre à jour",
+      "available_resources": "Ressources disponibles"
     }
   }
 }
 
 const getLanguageDetector = (): LanguageDetector => {
   if(Constants.expoConfig?.extra?.storybookEnabled === "true") {
-    return require("./lib/storiesUtil").storybookFakeLanguageDetector
+    return storybookFakeLanguageDetector
   } else if(Platform.OS === "web") {
     return LanguageDetector
   } else {

@@ -16,25 +16,26 @@ const getConfig = async(): Promise<Config> => {
 }
 
 export interface RawConfig {
-    dbPassword: string,
-    googleServiceAccount: string,
-    googlePrivateKey: string,
-    host: string,
-    jwtSecret: string,
-    jwtType: string,
-    logPath: string,
-    mailPath: string,
-    mailTemplatesLocation: string,
-    port: number,
-    user: string,
-    mailApiKey: string,
-    noreplyEmail: string,
-    production: boolean,
-    productName: string,
-    pushNotificationsUrlPrefix: string,
-    remoteBackupFolderName: string,
-    websiteUrl: string,
-    webAppUrl: string,
+    backupCommand: string
+    dbPassword: string
+    googleServiceAccount: string
+    googlePrivateKey: string
+    host: string
+    jwtSecret: string
+    jwtType: string
+    logPath: string
+    mailPath: string
+    mailTemplatesLocation: string
+    port: number
+    user: string
+    mailApiKey: string
+    noreplyEmail: string
+    production: boolean
+    productName: string
+    pushNotificationsUrlPrefix: string
+    remoteBackupFolderName: string
+    websiteUrl: string
+    webAppUrl: string
     webClientUrls: string
     versions: {[version: string]: VersionSpecificRawConfig}
 }

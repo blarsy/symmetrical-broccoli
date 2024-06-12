@@ -1,18 +1,18 @@
-import React, { ReactNode, useContext, useEffect } from "react"
+import React, { useContext } from "react"
 import { View } from "react-native"
 import { RouteProps, fontSizeMedium } from "@/lib/utils"
 import Conversation from "../chat/Conversation"
 import PastConversations from "../chat/PastConversations"
-import Images from "@/Images"
-import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import { primaryColor } from "../layout/constants"
 import { NativeStackHeaderProps, createNativeStackNavigator } from "@react-navigation/native-stack"
 import { ResourceImage } from "../resources/MainResourceImage"
 import { Button, Icon, Text } from "react-native-paper"
 import { t } from "@/i18n"
 import LoadedZone from "../LoadedZone"
-import { AppContext } from "../AppContextProvider"
 import ConversationContextProvider, { ConversationContext } from "../chat/ConversationContextProvider"
 import dayjs from "dayjs"
+import { AppContext } from "../AppContextProvider"
+import ChatBackground from "../chat/ChatBackground"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -23,7 +23,7 @@ export const ChatHeader = (p: ChatHeaderProps) => {
     const conversationContext = useContext(ConversationContext)
     const exchangeTypes: string[] = []
     
-    if(conversationContext.state.conversation.data && appContext.state.categories.data) {
+    if(conversationContext.state.conversation.data && appContext.categories.data) {
         if(conversationContext.state.conversation.data.resource?.canBeGifted) exchangeTypes.push(t('canBeGifted_label'))
         if(conversationContext.state.conversation.data.resource?.canBeExchanged) exchangeTypes.push(t('canBeExchanged_label'))
     }
@@ -48,23 +48,9 @@ export const ChatHeader = (p: ChatHeaderProps) => {
     </LoadedZone>)
 }
 
-export const ChatBackground = ({ children }: { children: ReactNode }) => {
-    return <View style={{ display: 'flex', flex: 1, backgroundColor: '#fff' }}>
-    <Images.BackgroundChat fill={lightPrimaryColor} style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-      }}
-    />
-    { children }
-</View>
-}
-
 const ConversationsList = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
-    if(appContext.state.account) {
+    if(appContext.account) {
         return <ChatBackground>
             <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId })} />
         </ChatBackground>

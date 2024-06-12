@@ -1,18 +1,11 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
 import { Message } from "./schema"
-import { ApolloClient, ApolloError, ApolloLink, InMemoryCache, createHttpLink, from, gql, split } from "@apollo/client"
-import { apiUrl, clientVersion, subscriptionsUrl } from "./settings"
-import { setContext } from "@apollo/client/link/context"
-import { ErrorResponse, onError } from '@apollo/client/link/error'
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
-import { createClient } from 'graphql-ws'
-import { getMainDefinition } from "@apollo/client/utilities"
+import { ApolloError, gql } from "@apollo/client"
+import { clientVersion } from "./settings"
 import { getLocales } from "expo-localization"
 import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
 import { ImageResult, manipulateAsync } from "expo-image-manipulator"
-import { IAppContext } from "../components/AppContextProvider"
-import { debug, error, info } from "./logger"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
 import Application from 'expo-application'
@@ -110,87 +103,7 @@ export const apolloTokenExpiredHandler = {
 }
 
 export const errorToString = (e: Error) => `message: ${e.message}, name: ${e.name}, ${e.stack && `, stack: ${e.stack}`}`
-const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
 
-const errorStringFromResponse = (e:ErrorResponse) => {
-    const ae = e as ErrorResponse
-    return `ApolloError: operation ${ae.operation.operationName} ${JSON.stringify(ae.operation.variables)}
-      ${ae.graphQLErrors && ae.graphQLErrors.length > 0 && `, graphQLErrors: ${errorsToString(ae.graphQLErrors)}`}, 
-      ${ae.networkError && `, networkError: ${errorToString(ae.networkError)}`}`
-}
-
-export const getAuthenticatedApolloClient = (token: string) => {
-    const httpLink = createHttpLink({ uri: apiUrl })
-    const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, connectionParams: { authorization: `Bearer ${token}` } }))
-    
-    const authLink = setContext(async (_, { headers }) => {
-      if(token) {
-        // return the headers to the context so httpLink can read them
-        return {
-          headers: {
-            ...headers,
-            authorization: `Bearer ${token}`,
-          }
-        }
-      } else {
-        return headers
-      }
-    })
-
-    const splitLink = split(
-      ({ query }) => {
-        const definition = getMainDefinition(query)
-        return (
-          definition.kind === 'OperationDefinition' &&
-          definition.operation === 'subscription'
-        )
-      },
-      wsLink,
-      httpLink,
-    )
-
-    const makeVariablesSafe = (vars: Record<string, any>) => {
-      const sanitizedVars = { ...vars }
-      Object.getOwnPropertyNames(vars).forEach(propName => {
-        if(['password', 'Password'].includes(propName) ) {
-          sanitizedVars[propName] = '<undisclosed>'
-        }
-      })
-
-      return sanitizedVars
-    }
-
-    const traceLink = new ApolloLink((operation, forward) => {
-      try {
-        debug({ message: `Operation: ${operation.operationName}, query ${JSON.stringify(operation.query)}, variables: ${JSON.stringify(makeVariablesSafe(operation.variables))}` })
-      }
-      finally {
-        return forward(operation)
-      }
-    })
-    
-    return new ApolloClient({
-      link: from([
-        traceLink,
-        onError((e: ErrorResponse) => {
-          if(e.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors.some(error => error.message === 'jwt expired' || error.message === 'invalid signature')){
-            info({ message: 'Token expired' })
-            apolloTokenExpiredHandler.handle()
-          } else {
-            error({ message: errorStringFromResponse(e) })
-          }
-        }),
-        authLink,
-        splitLink
-      ]),
-      cache: new InMemoryCache(),
-      defaultOptions: {
-        watchQuery: {
-          fetchPolicy: 'cache-and-network'
-        }
-      }
-    })
-  }
 
 let language: string | undefined = undefined
 export const getLanguage = (): string => {
@@ -211,8 +124,7 @@ export const getLanguage = (): string => {
   return language
 }
 
-export const pickImage = async (success: ((img: ImageResult)=> void), height: number, appContext: IAppContext) => {
-  try {
+export const pickImage = async (success: ((img: ImageResult)=> void), height: number) => {
     await requestMediaLibraryPermissionsAsync(true)
     let result = await launchImageLibraryAsync({
         mediaTypes: MediaTypeOptions.Images,
@@ -226,10 +138,6 @@ export const pickImage = async (success: ((img: ImageResult)=> void), height: nu
 
         success(img)
     }
-  } catch(e) {
-    appContext.actions.setMessage((e as Error).stack!)
-    appContext.actions.notify({ error: e as Error})
-  }
 }             
 
 export const GET_RESOURCE = gql`query GetResource($id: Int!) {
@@ -271,13 +179,12 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
 
 export const initials = (text: string) => {
   if(text)
-      return text.split(' ').map(word => word[0].toLocaleUpperCase()).slice(0, 2).join()
+      return text.split(' ').map(word => word[0]?.toLocaleUpperCase()).slice(0, 2).join('')
 
   return ""
 }
 
 export const versionChecker = (serverVersion: string) => {
-  console.log(Application?.nativeApplicationVersion, clientVersion, serverVersion)
   if(Application?.nativeApplicationVersion || clientVersion)
     return compareVersions(Application?.nativeApplicationVersion || clientVersion, serverVersion) >= 0
   

@@ -2,7 +2,6 @@ import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadStat
 import { Formik } from "formik"
 import { t } from "i18next"
 import React, { useContext, useEffect, useState } from "react"
-import { AppContext } from "../AppContextProvider"
 import * as yup from 'yup'
 import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
@@ -10,27 +9,18 @@ import EditResourceFields from "./EditResourceFields"
 import { ScrollView } from "react-native"
 import { Portal } from "react-native-paper"
 import { ErrorSnackbar } from "../OperationFeedback"
-import ConnectionDialog from "../ConnectionDialog"
-import { AccountInfo, Resource } from "@/lib/schema"
+import { Resource } from "@/lib/schema"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
-
-interface DialogProps {
-    onDone: (token: string, account: AccountInfo) => Promise<void>
-    visible: boolean
-    onCloseRequested: () => void
-}
-
-const Dialog = ({ onDone, visible, onCloseRequested}: DialogProps) => 
-    <ConnectionDialog visible={visible} infoTextI18n="connect_to_create_ressource" 
-        infoSubtextI18n="resource_is_free" onDone={onDone} onCloseRequested={onCloseRequested}/>
-
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
-    const [connecting, setConnecting] = useState(false)
+    const { ensureConnected } = useUserConnectionFunctions()
 
     useEffect(() => {
         if(route.params && route.params.isNew){
@@ -43,11 +33,11 @@ export default ({ route, navigation }:RouteProps) => {
         try {
             await editResourceContext.actions.save(values, token)
             setSaveResourcestate(fromData(null))
-            searchFilterContext.actions.requery(appContext.state.categories.data)
+            searchFilterContext.actions.requery(appContext.categories.data!)
             navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
-            appContext.actions.setMessage(e)
+            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e } })
         }
     }
 
@@ -67,12 +57,9 @@ export default ({ route, navigation }:RouteProps) => {
                 return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
             })
         })} onSubmit={async (values) => {
-            if(!appContext.state.account) {
-                setConnecting(true)
-                return 
-            }
-
-            createResource(values)
+            ensureConnected('connect_to_create_ressource', 'resource_is_free', () => {
+                createResource(values)
+            })
         }}>
         {formikState => {
             return <ScrollView style={{ margin: 10 }}>
@@ -80,13 +67,6 @@ export default ({ route, navigation }:RouteProps) => {
                 <Portal>
                     <ErrorSnackbar error={saveResourceState.error} message={saveResourceState.error && t('requestError')} onDismissError={() => setSaveResourcestate(initial<null>(false, null))} />
                 </Portal>
-                <Dialog visible={connecting} onDone={async (token) => {
-                    setConnecting(false)
-                    await createResource(formikState.values, token)
-                    searchFilterContext.actions.requery(appContext.state.categories.data)
-                }} onCloseRequested={() => {
-                    setConnecting(false)
-                }}/>
             </ScrollView>
         }}
         </Formik>

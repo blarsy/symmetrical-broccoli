@@ -37,7 +37,7 @@ interface Props {
 
 const blankSearchFilter: SearchFilterState = { categories: [], options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }
 
-const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: String, $isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
+export const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: String, $isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
     suggestedResources(
       searchTerm: $searchTerm
       canBeDelivered: $canBeDelivered
