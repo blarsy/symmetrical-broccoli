@@ -92,7 +92,7 @@ export const SearchFilterContext = createContext<SearchFilterContext>({
 const SearchFilterContextProvider = ({ children }: Props) => {
     const [searchFilterState, setSearchFilterState] = useState(blankSearchFilter)
     const [searchResults, setSearchResults] = useState(initial(true, [] as Resource[]))
-    const [getSuggestedResources, { data, loading, error }] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
+    const [getSuggestedResources] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
         categoryCodes: searchFilterState.categories.map(cat => cat.code.toString()),
         searchTerm: searchFilterState.search,
         ...searchFilterState.options

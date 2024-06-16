@@ -11,7 +11,7 @@ const meta: Meta<typeof CategoriesSelect> = {
     (Story) => <PaperProvider>
         <Story/>
     </PaperProvider>,
-    appContextDecorator
+    appContextDecorator()
   ]
 }
 

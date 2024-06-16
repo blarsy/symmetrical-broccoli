@@ -10,7 +10,7 @@ import { adaptToWidth } from "@/lib/utils"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
 import { AppContext } from "../AppContextProvider"
-import FoundResourceCard from "../resources/FoundResourceCard"
+import AccountResourceCard from "../resources/AccountResourceCard"
 
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
@@ -19,6 +19,7 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
     name
     resourcesByAccountId(orderBy: CREATED_DESC) {
       nodes {
+        id
         canBeGifted
         canBeExchanged
         title
@@ -33,6 +34,9 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
           nodes {
             resourceCategoryCode
           }
+        }
+        accountByAccountId {
+          id
         }
       }
     }
@@ -72,7 +76,7 @@ export const Account = ({ id }: Props) => {
                                 contentContainerStyle={{ gap: 10 }}
                                 displayItem={(rawRes: any) => {
                                         const resource = fromServerGraphResource(rawRes, appContext.categories.data!)
-                                        return <FoundResourceCard resource={resource} onPress={() => {}} onChatOpen={() => {}} />
+                                        return <AccountResourceCard key={rawRes.id} resource={resource} onPress={() => {}} onChatOpen={() => {}} />
                                     }
                                 }
                             />

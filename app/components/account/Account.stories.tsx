@@ -4,13 +4,14 @@ import React  from 'react'
 import { apolloClientMocksDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Account, { GET_ACCOUNT } from './Account'
 
+const accountId = 1
 const meta: Meta<typeof Account> = {
   component: Account,
   decorators: [
     paperProviderDecorator, apolloClientMocksDecorator([{
         query: GET_ACCOUNT,
         variables: {
-            id: 1
+            id: accountId
         },
         result: {
             accountById: {
@@ -33,6 +34,9 @@ const meta: Meta<typeof Account> = {
                                 nodes: [{
                                     resourceCategoryCode: 'cat1'
                                 }]
+                            },
+                            accountByAccountId: {
+                                id: accountId
                             }
                         }, {
                             canBeExchanged: false,
@@ -47,6 +51,9 @@ const meta: Meta<typeof Account> = {
                             },
                             resourcesResourceCategoriesByResourceId: {
                                 nodes: []
+                            },
+                            accountByAccountId: {
+                                id: accountId
                             }
                         }, {
                             canBeExchanged: true,
@@ -75,6 +82,9 @@ const meta: Meta<typeof Account> = {
                             },
                             resourcesResourceCategoriesByResourceId: {
                                 nodes: []
+                            },
+                            accountByAccountId: {
+                                id: accountId
                             }
                         }, {
                             canBeExchanged: true,
@@ -89,6 +99,9 @@ const meta: Meta<typeof Account> = {
                             },
                             resourcesResourceCategoriesByResourceId: {
                                 nodes: []
+                            },
+                            accountByAccountId: {
+                                id: accountId
                             }
                         }, {
                             canBeExchanged: true,
@@ -103,6 +116,9 @@ const meta: Meta<typeof Account> = {
                             },
                             resourcesResourceCategoriesByResourceId: {
                                 nodes: []
+                            },
+                            accountByAccountId: {
+                                id: accountId
                             }
                         }
                     ]

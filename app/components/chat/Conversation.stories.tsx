@@ -8,7 +8,7 @@ const meta: Meta<typeof Conversation> = {
   component: Conversation,
   decorators: [
     paperProviderDecorator,
-    appContextDecorator,
+    appContextDecorator(),
     apolloClientMocksDecorator([{
       query: SET_PARTICIPANT_READ,
       variables: { otherAccountId: 2, resourceId: 3 },
@@ -21,7 +21,7 @@ const meta: Meta<typeof Conversation> = {
         data: {
           resource: { id: 3, title: 'Une super ressource', images: [], description: 'description de la ressource', categories: [], 
             isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
-            canBeExchanged: false, created: new Date()},
+            canBeExchanged: false, created: new Date(), deleted: null},
           otherAccount: { name: 'otherAccountName', id: 2 } ,
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'otherAccountName' }, createdAt: new Date() },
@@ -60,7 +60,7 @@ export const CantChatWithDeletedAccount: Story = {
         data: {
           resource: { id: 3, title: 'Super ressource', images: [], description: 'description de la ressource', categories: [], 
             isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
-            canBeExchanged: false, created: new Date()},
+            canBeExchanged: false, created: new Date(), deleted: null},
           otherAccount: { name: '', id: 2 } ,
           messages: [
             { _id: 2, text: 'message 1', user: { _id: 2, name: 'Artisan incroyable' }, createdAt: new Date() },

@@ -105,20 +105,7 @@ const meta: Meta<typeof Chat> = {
   component: Chat,
   decorators: [
     paperProviderDecorator,
-    appContextDecorator,
-    apolloClientMocksDecorator([{
-        query: SET_PARTICIPANT_READ,
-        variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
-        result: {
-            setParticipantRead: { integer: 1 }
-        }
-    }, {
-        query: SET_PARTICIPANT_READ,
-        variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
-        result: {
-            setParticipantRead: { integer: 1 }
-        }
-    }]),
+    appContextDecorator(),
     navigationContainerDecorator({ routes: [
         { name: 'conversation', params: { resourceId: 1, otherAccountId: 2 } }
     ], index: 0 })
@@ -158,6 +145,18 @@ export const SingleConversation: Story = {
                 first: 25
             },
             result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, false, true)
+        },{
+            query: SET_PARTICIPANT_READ,
+            variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+            result: {
+                setParticipantRead: { integer: 1 }
+            }
+        }, {
+            query: SET_PARTICIPANT_READ,
+            variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+            result: {
+                setParticipantRead: { integer: 1 }
+            }
         }
       ])
     ]
@@ -185,7 +184,19 @@ export const SingleConversation: Story = {
                     first: 25
                 },
                 result: makeConversationData(defaultResourceId, defaultOtherAccountId, false, true)
-            },
+            },{
+                query: SET_PARTICIPANT_READ,
+                variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+                result: {
+                    setParticipantRead: { integer: 1 }
+                }
+            }, {
+                query: SET_PARTICIPANT_READ,
+                variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+                result: {
+                    setParticipantRead: { integer: 1 }
+                }
+            }
         ])
     ]
 }

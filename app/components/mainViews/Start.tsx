@@ -3,9 +3,8 @@ import Main from "./Main"
 import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
-import { useFonts } from 'expo-font'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { getTheme, versionChecker } from "@/lib/utils"
+import { getTheme, useCustomFonts, versionChecker } from "@/lib/utils"
 import { ApolloClient, ApolloProvider, NormalizedCacheObject, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
@@ -63,10 +62,7 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     const appDispatch = useContext(AppDispatchContext)
     const [startingUp, setStartingUp] = useState(true)
     const { checkingVersion, outdated } = useVersionCheck(overrideVersionChecker || versionChecker)
-    const [fontsLoaded, fontError] = useFonts({
-        'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
-        'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
-    })
+    const [fontsLoaded, fontError] = useCustomFonts()
     const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore, clientGetter)
     
     const load = async () => {

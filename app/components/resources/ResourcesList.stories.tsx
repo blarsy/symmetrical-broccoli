@@ -9,7 +9,7 @@ const meta: Meta<typeof ResourcesList> = {
   component: ResourcesList,
   decorators: [
     paperProviderDecorator,
-    appContextDecorator, searchFilterContextDecorator, configDayjsDecorator
+    appContextDecorator(), searchFilterContextDecorator(), configDayjsDecorator
   ]
 }
 

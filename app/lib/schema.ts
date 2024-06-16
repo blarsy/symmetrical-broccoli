@@ -51,7 +51,7 @@ export interface Resource {
     canBeGifted: boolean,
     canBeExchanged: boolean,
     created: Date,
-    deleted?: Date
+    deleted: Date | null
 }
 
 export interface ConversationData {
@@ -83,8 +83,6 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         images
 } as Resource
 }
-
-
 
 export const fromServerGraphResources = (data: any[], categories: Category[]): Resource[] => {
     return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories))
@@ -121,7 +119,8 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                     isProduct: false,
                     isService: false,
                     categories: [],
-                    created: new Date()
+                    created: new Date(),
+                    deleted: null
                 }
             },
             withUser: {

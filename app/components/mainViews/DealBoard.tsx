@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Appbar, Avatar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
@@ -14,7 +14,7 @@ import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navig
 import { urlFromPublicId } from "@/lib/images"
 import { AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import Animated, { useAnimatedStyle, withDelay, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
+import Animated, { useAnimatedStyle, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
 import { useSharedValue } from 'react-native-reanimated'
 
 const Tab = createMaterialBottomTabNavigator()
@@ -48,7 +48,7 @@ const ProfileIcon = ({ size}: { size: number }) => {
     }, [])
 
     if(!appContext.account) return <Animated.View style={animatedStyles}>
-        <Icon source="login" size={size}/>
+        <Icon source="account-question-outline" size={size}/>
     </Animated.View>
     
     if(appContext.account!.avatarPublicId)

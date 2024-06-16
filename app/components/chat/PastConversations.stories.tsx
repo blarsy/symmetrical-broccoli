@@ -56,7 +56,7 @@ const meta: Meta<typeof PastConversations> = {
   component: PastConversations,
   decorators: [
     paperProviderDecorator,
-    appContextDecorator,
+    appContextDecorator(),
     configDayjsDecorator,
     apolloClientMocksDecorator([{
         query: MY_CONVERSATIONS,

@@ -17,6 +17,6 @@ type Story = StoryObj<typeof Profile>
 export const Simple: Story = {
     name: 'Simple profile view',
     decorators: [
-      appContextDecorator
+      appContextDecorator()
     ]
 }

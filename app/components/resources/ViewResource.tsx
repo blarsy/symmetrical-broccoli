@@ -90,7 +90,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             { resource.images && resource.images.length > 0 && 
                 <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }
             <ViewField title={t('brought_by_label')}>
-                <Button mode="text" icon={() => <Icon source="information" size={20} color="#000" />} ><Text variant="bodyMedium">{resource.account?.name}</Text></Button>
+                <Button mode="outlined" labelStyle={{ marginVertical: 5 }} icon={() => 
+                    <Icon source="cellphone-information" size={25} color="#000" />} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })}>
+                    <Text variant="bodyMedium">{resource.account?.name}</Text>
+                </Button>
             </ViewField>
             <ViewField title={t('title_label')}>
                 <Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>

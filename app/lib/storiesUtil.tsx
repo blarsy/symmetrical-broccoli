@@ -1,25 +1,29 @@
 import React  from 'react'
 import { EditResourceContext } from '../components/resources/EditResourceContextProvider'
-import { fromData, initial } from './DataLoadState'
+import DataLoadState, { fromData, initial } from './DataLoadState'
 import { AccountInfo, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
-import { PaperProvider } from 'react-native-paper'
+import { PaperProvider, Text } from 'react-native-paper'
 import { MockedProvider, MockedResponse } from "@apollo/react-testing"
 import { DocumentNode } from 'graphql'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
 import { IMessage } from 'react-native-gifted-chat'
-import { getTheme } from './utils'
+import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
 
 const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
-    { editedResource: undefined, changeCallbacks: [], imagesToAdd: [] }, actions: {
+    { editedResource: { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
+            canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
+            isService: false, deleted: null }, changeCallbacks: [], imagesToAdd: []}, actions: {
             setResource: () => {},
             setChangeCallback: () => {},
             removeChangeCallback: () => {},
@@ -31,7 +35,7 @@ const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceCon
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (StoryElement: React.ElementType, noAccount: boolean = false) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
+export const appContextDecorator = (noAccount: boolean = false) => (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: '' })
 
 const defaultResourceCategories = [
     { code: 'cat1', name: 'category 1' },
@@ -47,14 +51,12 @@ const makeAppContextProvider = (StoryElement: React.ElementType, account?: Accou
     <StoryElement />
 </AppContextProvider>
 
-export const searchFilterContextDecorator = (StoryElement: React.ElementType) => makeSeachFilterContextProvider(StoryElement)
-
-const makeSeachFilterContextProvider = (StoryElement: React.ElementType) => <SearchFilterContext.Provider value={{ 
+export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]> = initial<Resource[]>(true, [])) => (StoryElement: React.ElementType) => <SearchFilterContext.Provider value={{ 
     filter: { categories: [], options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
     actions: {
         requery: async() => {},
         setSearchFilter: () => {}
-    }, results: initial<Resource[]>(true, []) }}>
+    }, results: resources }}>
     <StoryElement />
 </SearchFilterContext.Provider>
 
@@ -72,7 +74,7 @@ export const paperProviderDecorator = (StoryElement: React.ElementType) => <Pape
     <StoryElement />
 </PaperProvider>
 
-interface GraphQlOp {
+export interface GraphQlOp {
     query: DocumentNode,
     result: any,
     variables?: Record<string, any>
@@ -92,10 +94,26 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
 export const configDayjsDecorator = (Story: React.ElementType) => {
     dayjs.extend(relativeTime)
     dayjs.locale('fr')
+    dayjs.extend(utc)
     return <Story />
+}
+
+export const fontsLoaderDecorator = (Story: React.ElementType) => {
+    const [fontsLoaded, fontError] = useCustomFonts()
+
+    if(!fontsLoaded) {
+        return <Text>Loading fonts for Storybook ...</Text>
+    }
+    
+    return <Story/>
 }
 
 export const navigationContainerDecorator = (initialState: any = undefined ) => (Story: React.ElementType) =>
     <NavigationContainer initialState={initialState}>
         <Story />
     </NavigationContainer>
+
+export const gestureHandlerDecorator = (Story: React.ElementType) =>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+        <Story />
+    </GestureHandlerRootView>

@@ -75,8 +75,11 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
             </View>
         </AccordionItem>
 
-        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} loading={searchFilterContext.results.loading || appContext.categories.loading} error={searchFilterContext.results.error} data={searchFilterContext.results.data}
+        <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} 
+            loading={searchFilterContext.results.loading || appContext.categories.loading} 
+            error={searchFilterContext.results.error} data={searchFilterContext.results.data}
             displayItem={(res, idx) => {
+                
                 const resource = res as Resource
                 return <FoundResourceCard
                     key={idx} resource={resource} 
@@ -96,7 +99,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
     </ScrollView>
 }
 
-export default function Search ({ route, navigation }: RouteProps) {
+export default function Search({ route, navigation }: RouteProps) {
     return <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
         <StackNav.Screen name="searchResults" component={SearchResults} options={{ headerShown: false }} />
         <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />

@@ -10,7 +10,7 @@ const meta: Meta<typeof ViewResource> = {
   decorators: [
     paperProviderDecorator,
     configDayjsDecorator,
-    appContextDecorator
+    appContextDecorator()
   ]
 }
 

@@ -12,6 +12,7 @@ import Application from 'expo-application'
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { configureFonts } from "react-native-paper"
+import { useFonts } from 'expo-font'
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -208,3 +209,8 @@ export const userFriendlyChatTime = (time: Date) => {
     return djTime.local().format('MMM YY')
   }
 }
+
+export const useCustomFonts = () => useFonts({
+  'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
+  'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
+})
