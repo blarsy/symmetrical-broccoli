@@ -38,6 +38,7 @@ web_test.zip
 /webapi/build
 /build
 /build.zip
+/webapi/backup*.sql
 
 /app/ios
 /app/android
