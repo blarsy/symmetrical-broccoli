@@ -29,7 +29,9 @@ export const dailyBackup = async (payload: { version: string }) => {
         })
     })
 
-    await copyBackupToDrive(backupFilename, backupFilePath)
-    
-    return rm(`${backupFilePath}`)
+    try {
+        await copyBackupToDrive(backupFilename, backupFilePath)
+    } finally {
+        return rm(`${backupFilePath}`)
+    }
 }
