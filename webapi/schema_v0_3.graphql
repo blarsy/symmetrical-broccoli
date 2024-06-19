@@ -46,6 +46,35 @@ type Query implements Node {
     condition: AccountCondition
   ): AccountsConnection
 
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  allAccountsLinks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection
+
   """Reads and enables pagination through a set of `AccountsPushToken`."""
   allAccountsPushTokens(
     """Only read the first `n` values of the set."""
@@ -219,6 +248,35 @@ type Query implements Node {
     """
     condition: ImageCondition
   ): ImagesConnection
+
+  """Reads and enables pagination through a set of `LinkType`."""
+  allLinkTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `LinkType`."""
+    orderBy: [LinkTypesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LinkTypeCondition
+  ): LinkTypesConnection
 
   """Reads and enables pagination through a set of `Message`."""
   allMessages(
@@ -455,11 +513,13 @@ type Query implements Node {
   ): UnreadMessagesConnection
   accountById(id: Int!): Account
   accountByEmail(email: String!): Account
+  accountsLinkById(id: Int!): AccountsLink
   accountsPushTokenByAccountIdAndToken(accountId: Int!, token: String!): AccountsPushToken
   conversationById(id: Int!): Conversation
   emailActivationByAccountIdAndActivationCodeAndEmail(accountId: Int!, activationCode: String!, email: String!): EmailActivation
   imageById(id: Int!): Image
   imageByPublicId(publicId: String!): Image
+  linkTypeById(id: Int!): LinkType
   messageById(id: Int!): Message
   participantById(id: Int!): Participant
   resourceCategoryByLocaleAndCode(locale: String!, code: Int!): ResourceCategory
@@ -570,6 +630,14 @@ type Query implements Node {
     nodeId: ID!
   ): Account
 
+  """Reads a single `AccountsLink` using its globally unique `ID`."""
+  accountsLink(
+    """
+    The globally unique `ID` to be used in selecting a single `AccountsLink`.
+    """
+    nodeId: ID!
+  ): AccountsLink
+
   """Reads a single `AccountsPushToken` using its globally unique `ID`."""
   accountsPushToken(
     """
@@ -599,6 +667,12 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Image`."""
     nodeId: ID!
   ): Image
+
+  """Reads a single `LinkType` using its globally unique `ID`."""
+  linkType(
+    """The globally unique `ID` to be used in selecting a single `LinkType`."""
+    nodeId: ID!
+  ): LinkType
 
   """Reads a single `Message` using its globally unique `ID`."""
   message(
@@ -696,35 +770,6 @@ type Account implements Node {
     condition: ResourceCondition
   ): ResourcesConnection!
 
-  """Reads and enables pagination through a set of `Participant`."""
-  participantsByAccountId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Participant`."""
-    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParticipantCondition
-  ): ParticipantsConnection!
-
   """Reads and enables pagination through a set of `AccountsPushToken`."""
   accountsPushTokensByAccountId(
     """Only read the first `n` values of the set."""
@@ -782,6 +827,64 @@ type Account implements Node {
     """
     condition: ClientLogCondition
   ): ClientLogsConnection!
+
+  """Reads and enables pagination through a set of `Participant`."""
+  participantsByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection!
+
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  accountsLinksByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection!
 }
 
 """
@@ -1918,6 +2021,126 @@ input ClientLogCondition {
   activityId: String
 }
 
+"""A connection to a list of `AccountsLink` values."""
+type AccountsLinksConnection {
+  """A list of `AccountsLink` objects."""
+  nodes: [AccountsLink!]!
+
+  """
+  A list of edges which contains the `AccountsLink` and cursor to aid in pagination.
+  """
+  edges: [AccountsLinksEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AccountsLink` you could get from the connection."""
+  totalCount: Int!
+}
+
+type AccountsLink implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  url: String!
+  label: String
+  linkTypeId: Int!
+  accountId: Int!
+
+  """Reads a single `LinkType` that is related to this `AccountsLink`."""
+  linkTypeByLinkTypeId: LinkType
+
+  """Reads a single `Account` that is related to this `AccountsLink`."""
+  accountByAccountId: Account
+}
+
+type LinkType implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  accountsLinksByLinkTypeId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection!
+}
+
+"""Methods to use when ordering `AccountsLink`."""
+enum AccountsLinksOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  URL_ASC
+  URL_DESC
+  LABEL_ASC
+  LABEL_DESC
+  LINK_TYPE_ID_ASC
+  LINK_TYPE_ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `AccountsLink` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input AccountsLinkCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `url` field."""
+  url: String
+
+  """Checks for equality with the object’s `label` field."""
+  label: String
+
+  """Checks for equality with the object’s `linkTypeId` field."""
+  linkTypeId: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+}
+
+"""A `AccountsLink` edge in the connection."""
+type AccountsLinksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AccountsLink` at the end of the edge."""
+  node: AccountsLink!
+}
+
 """A `Account` edge in the connection."""
 type AccountsEdge {
   """A cursor for use in pagination."""
@@ -2162,6 +2385,55 @@ input ImageCondition {
 
   """Checks for equality with the object’s `created` field."""
   created: Datetime
+}
+
+"""A connection to a list of `LinkType` values."""
+type LinkTypesConnection {
+  """A list of `LinkType` objects."""
+  nodes: [LinkType!]!
+
+  """
+  A list of edges which contains the `LinkType` and cursor to aid in pagination.
+  """
+  edges: [LinkTypesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LinkType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LinkType` edge in the connection."""
+type LinkTypesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LinkType` at the end of the edge."""
+  node: LinkType!
+}
+
+"""Methods to use when ordering `LinkType`."""
+enum LinkTypesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `LinkType` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LinkTypeCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
 }
 
 """A connection to a list of `ResourceCategory` values."""
@@ -2409,6 +2681,12 @@ type Mutation {
     """
     input: SendActivationAgainInput!
   ): SendActivationAgainPayload
+  setParticipantRead(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetParticipantReadInput!
+  ): SetParticipantReadPayload
   syncPushToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -2921,6 +3199,32 @@ input SendActivationAgainInput {
   clientMutationId: String
 }
 
+"""The output of our `setParticipantRead` mutation."""
+type SetParticipantReadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `setParticipantRead` mutation."""
+input SetParticipantReadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+  otherAccountId: Int
+}
+
 """The output of our `syncPushToken` mutation."""
 type SyncPushTokenPayload {
   """
@@ -2971,6 +3275,14 @@ input UpdateAccountInput {
   name: String
   email: String
   avatarPublicId: String
+  links: [AccountLinkInput]
+}
+
+"""An input for mutations affecting `AccountLink`"""
+input AccountLinkInput {
+  url: String
+  label: String
+  linkTypeId: Int
 }
 
 """The output of our `updateResource` mutation."""

@@ -8,7 +8,6 @@ import { registerForPushNotificationsAsync } from "./pushNotifications"
 import secureStore from "./secureStore"
 import { getApolloClient } from "./apolloClient"
 
-
 export const GET_SESSION_DATA = gql`query GetSessionData {
     getSessionData {
       accountId

@@ -9,7 +9,7 @@ import queryMocks from '@/lib/queryMocks'
 const meta: Meta<typeof DealBoard> = {
   component: DealBoard,
   decorators: [
-    fontsLoaderDecorator, paperProviderDecorator, appContextDecorator(), configDayjsDecorator,
+    paperProviderDecorator, appContextDecorator(), configDayjsDecorator,
     navigationContainerDecorator(), gestureHandlerDecorator
   ]
 }

@@ -8,6 +8,20 @@ export interface Account {
     avatarImageUrl?: string
 }
 
+export enum LinkTypes {
+    facebook = 1,
+    instagram = 2,
+    twitter = 3,
+    web = 4
+}
+
+export interface Link {
+    id: number
+    url: string
+    label: string
+    type: LinkTypes
+}
+
 export interface AccountInfo {
     name: string
     id: number
@@ -134,4 +148,17 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
         if(a.conversation.lastMessageTime < b.conversation.lastMessageTime) return 1
         return -1
     })
+}
+
+export const getIconForLink = (type: LinkTypes) => {
+    switch(type) {
+        case LinkTypes.facebook:
+            return 'facebook'
+        case LinkTypes.instagram:
+            return 'instagram'
+        case LinkTypes.twitter:
+            return 'twitter'
+        default:
+            return 'web'
+    }
 }

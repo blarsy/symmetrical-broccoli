@@ -5,10 +5,161 @@ import { apolloClientMocksDecorator, paperProviderDecorator } from '@/lib/storie
 import Account, { GET_ACCOUNT } from './Account'
 
 const accountId = 1
-const meta: Meta<typeof Account> = {
-  component: Account,
-  decorators: [
-    paperProviderDecorator, apolloClientMocksDecorator([{
+
+const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false, noLogo: boolean = false) => {
+    let links = [] as any[]
+
+    if(!noLinks) {
+        links = [{
+            id: 1,
+            url: 'http://blablabla',
+            label: '',
+            linkTypeByLinkTypeId: {
+                id: 4
+            }
+        },{
+            id: 2,
+            url: 'http://facebook.com/toptop',
+            label: 'Mon Facebook Toptop',
+            linkTypeByLinkTypeId: {
+                id: 1
+            }
+        },{
+            id: 3,
+            url: 'http://coucou.be',
+            label: 'Très long texte de lien 0987654',
+            linkTypeByLinkTypeId: {
+                id: 3
+            }
+        },{
+            id: 4,
+            url: 'http://ma-trestres-longueadresse.internet.com/0987654321065432109876543210987654321',
+            label: '',
+            linkTypeByLinkTypeId: {
+                id: 2
+            }
+        }]
+    }
+
+    let resources = [] as any[]
+
+    if(!noResource) {
+        resources = [
+            {
+                id: 1,
+                canBeExchanged: true,
+                canBeGifted: false,
+                title: 'Ressource 1',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: 'pwb8arnohwpjahnebyxj'
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: [{
+                        resourceCategoryCode: 'cat1'
+                    }]
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }, {
+                id: 2,
+                canBeExchanged: false,
+                canBeGifted: true,
+                title: 'Ressource 2',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: ''
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: []
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }, {
+                id: 3,
+                canBeExchanged: true,
+                canBeGifted: true,
+                title: 'Ressource 3',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: ''
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: []
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }, {
+                id: 4,
+                canBeExchanged: true,
+                canBeGifted: true,
+                title: 'Ressource 4',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: ''
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: []
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }, {
+                id: 5,
+                canBeExchanged: true,
+                canBeGifted: true,
+                title: 'Ressource 5',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: 'pwb8arnohwpjahnebyxj'
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: []
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }, {
+                id: 6,
+                canBeExchanged: true,
+                canBeGifted: true,
+                title: 'Ressource 6',
+                resourcesImagesByResourceId: {
+                    nodes: [{
+                        imageByImageId: {
+                            publicId: ''
+                        }
+                    }]
+                },
+                resourcesResourceCategoriesByResourceId: {
+                    nodes: []
+                },
+                accountByAccountId: {
+                    id: accountId
+                }
+            }
+        ]
+    }
+
+    return {
         query: GET_ACCOUNT,
         variables: {
             id: accountId
@@ -18,117 +169,23 @@ const meta: Meta<typeof Account> = {
                 email: 'me@me.com',
                 name: 'Artisan trop super',
                 resourcesByAccountId: {
-                    nodes: [
-                        {
-                            canBeExchanged: true,
-                            canBeGifted: false,
-                            title: 'Ressource 1',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: 'pwb8arnohwpjahnebyxj'
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: [{
-                                    resourceCategoryCode: 'cat1'
-                                }]
-                            },
-                            accountByAccountId: {
-                                id: accountId
-                            }
-                        }, {
-                            canBeExchanged: false,
-                            canBeGifted: true,
-                            title: 'Ressource 2',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: ''
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: []
-                            },
-                            accountByAccountId: {
-                                id: accountId
-                            }
-                        }, {
-                            canBeExchanged: true,
-                            canBeGifted: true,
-                            title: 'Ressource 3',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: ''
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: []
-                            }
-                        }, {
-                            canBeExchanged: true,
-                            canBeGifted: true,
-                            title: 'Ressource 4',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: ''
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: []
-                            },
-                            accountByAccountId: {
-                                id: accountId
-                            }
-                        }, {
-                            canBeExchanged: true,
-                            canBeGifted: true,
-                            title: 'Ressource 5',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: 'pwb8arnohwpjahnebyxj'
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: []
-                            },
-                            accountByAccountId: {
-                                id: accountId
-                            }
-                        }, {
-                            canBeExchanged: true,
-                            canBeGifted: true,
-                            title: 'Ressource 6',
-                            resourcesImagesByResourceId: {
-                                nodes: [{
-                                    imageByImageId: {
-                                        publicId: ''
-                                    }
-                                }]
-                            },
-                            resourcesResourceCategoriesByResourceId: {
-                                nodes: []
-                            },
-                            accountByAccountId: {
-                                id: accountId
-                            }
-                        }
-                    ]
+                    nodes: resources
                 },
                 imageByAvatarImageId: {
-                    publicId: 'occysgyx6m8kk5y51myu'
+                    publicId: noLogo ? '' : 'occysgyx6m8kk5y51myu'
+                },
+                accountsLinksByAccountId: {
+                    nodes: links
                 }
             }
         }
-    }])
+    }
+}
+
+const meta: Meta<typeof Account> = {
+  component: Account,
+  decorators: [
+    paperProviderDecorator
   ]
 }
 
@@ -137,5 +194,12 @@ type Story = StoryObj<typeof Account>
 
 export const Simple: Story = {
     name: 'Simple Account view',
+    decorators: [apolloClientMocksDecorator([makeGetAccountOp()])],
+    args: { id: 1 }
+}
+
+export const NoLinksNoResourceNoLogo: Story = {
+    name: 'Minimum data account view',
+    decorators: [apolloClientMocksDecorator([makeGetAccountOp(true, true, true)])],
     args: { id: 1 }
 }

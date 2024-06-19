@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Container = ({ children, style }:Props) => {
-    return <View style={{ flex: 1, flexDirection: 'column', borderWidth: 12, borderColor: 'green' }}>
+    return <View style={{ flex: 1, flexDirection: 'column' }}>
         <View style={{ flex: 1, backgroundColor: primaryColor, alignItems: 'center', justifyContent: 'center' , ...(style as Object) }}>
             {children}
         </View>

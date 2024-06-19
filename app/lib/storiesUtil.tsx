@@ -70,9 +70,17 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
     </ConversationContext.Provider>
 }
 
-export const paperProviderDecorator = (StoryElement: React.ElementType) => <PaperProvider theme={getTheme()}>
-    <StoryElement />
-</PaperProvider>
+export const paperProviderDecorator = (StoryElement: React.ElementType) => {
+    const [fontsLoaded, fontError] = useCustomFonts()
+
+    if(!fontsLoaded) {
+        return <Text>Loading fonts for Storybook ...</Text>
+    }
+    
+    return <PaperProvider theme={getTheme()}>
+        <StoryElement />
+    </PaperProvider>
+}
 
 export interface GraphQlOp {
     query: DocumentNode,
@@ -96,16 +104,6 @@ export const configDayjsDecorator = (Story: React.ElementType) => {
     dayjs.locale('fr')
     dayjs.extend(utc)
     return <Story />
-}
-
-export const fontsLoaderDecorator = (Story: React.ElementType) => {
-    const [fontsLoaded, fontError] = useCustomFonts()
-
-    if(!fontsLoaded) {
-        return <Text>Loading fonts for Storybook ...</Text>
-    }
-    
-    return <Story/>
 }
 
 export const navigationContainerDecorator = (initialState: any = undefined ) => (Story: React.ElementType) =>

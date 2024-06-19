@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { ScrollView } from "react-native"
 import LoadedZone from "../LoadedZone"
 import { gql, useQuery } from "@apollo/client"
@@ -7,11 +7,12 @@ import { t } from "@/i18n"
 import { Avatar, Text } from "react-native-paper"
 import { urlFromPublicId } from "@/lib/images"
 import { adaptToWidth } from "@/lib/utils"
-import { Resource, fromServerGraphResource } from "@/lib/schema"
+import { Link, Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
-import { AppContext } from "../AppContextProvider"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import AccountResourceCard from "../resources/AccountResourceCard"
-
+import LinkList from "./LinkList"
+import EditLinkModal from "./EditLinkModal"
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
   accountById(id: $id) {
@@ -43,6 +44,16 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
     imageByAvatarImageId {
       publicId
     }
+    accountsLinksByAccountId {
+      nodes {
+        id
+        url
+        label
+        linkTypeByLinkTypeId {
+          id
+        }
+      }
+    }
   }
 }`
 
@@ -52,7 +63,7 @@ interface Props {
     chatOpenRequested: (resource: Resource) => void
 }
 
-export const Account = ({ id }: Props) => {
+export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id } })
     const appContext = useContext(AppContext)
 
@@ -67,16 +78,28 @@ export const Account = ({ id }: Props) => {
                     </ViewField>
                     { data.accountById.imageByAvatarImageId?.publicId &&
                         <ViewField title="Logo">
-                            <Avatar.Image source={{ uri: urlFromPublicId(data.accountById.imageByAvatarImageId.publicId)}} size={adaptToWidth(150, 250, 300)} />
+                            <Avatar.Image style={{ marginVertical: 10 }} source={{ uri: urlFromPublicId(data.accountById.imageByAvatarImageId.publicId)}} size={adaptToWidth(150, 250, 300)} />
                         </ViewField>
+                    }
+                    { data.accountById.accountsLinksByAccountId.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&
+                      <ViewField title={t('links')} titleOnOwnLine>
+                        <LinkList values={ data.accountById.accountsLinksByAccountId.nodes.map((link: any) => ({
+                          id: link.id,
+                          label: link.label,
+                          url: link.url,
+                          type: link.linkTypeByLinkTypeId.id
+                        } as Link)) } />
+                      </ViewField>
                     }
                     { data.accountById.resourcesByAccountId.nodes && 
                         <ViewField title={t('available_resources')} titleOnOwnLine>
-                            <LoadedList loading={false} data={data.accountById.resourcesByAccountId.nodes} 
+                            <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={data.accountById.resourcesByAccountId.nodes} 
                                 contentContainerStyle={{ gap: 10 }}
                                 displayItem={(rawRes: any) => {
                                         const resource = fromServerGraphResource(rawRes, appContext.categories.data!)
-                                        return <AccountResourceCard key={rawRes.id} resource={resource} onPress={() => {}} onChatOpen={() => {}} />
+                                        return <AccountResourceCard key={rawRes.id} resource={resource} 
+                                          onPress={() => viewResourceRequested(resource)} 
+                                          onChatOpen={() => chatOpenRequested(resource) } />
                                     }
                                 }
                             />

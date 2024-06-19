@@ -8,7 +8,6 @@ import PrimaryColoredView from "@/components/layout/PrimaryColoredView"
 import { Text } from "react-native-paper"
 import RecoveryForm from "../form/RecoveryForm"
 import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
-import { AccountInfo } from "@/lib/schema"
 
 interface ConnectProps {
     children: JSX.Element,

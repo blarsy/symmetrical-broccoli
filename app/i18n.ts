@@ -109,7 +109,16 @@ const resources = {
       "resource_deleted": "This resource was deleted on {{deleted}}",
       "must_update_app": "Please update the app to benefit from the latest improvements.",
       "update_button": "Update",
-      "available_resources": "Available resources"
+      "available_resources": "Available resources",
+      "links": "Links",
+      "no_available_resource": "No resource available at this time.",
+      "no_link": "No link",
+      "link_dialog_title": "My account link",
+      "url_label": "Address (https://...)",
+      "link_label_label": "Label",
+      "link_label_too_long": "Please provide a shorter label",
+      "not_a_valid_url": "Invalid URL format",
+      "link_button_default_label": "link..."
     }
   },
   fr: {
@@ -214,7 +223,16 @@ const resources = {
       "resource_deleted": "Cette ressource a été effacée le {{deleted}}",
       "must_update_app": "Veuillez mettre à jour l'app pour bénéficier des dernières fonctionnalités.",
       "update_button": "Mettre à jour",
-      "available_resources": "Ressources disponibles"
+      "available_resources": "Ressources disponibles",
+      "links": "Liens",
+      "no_available_resource": "Pas de ressource disponible pour le moment.",
+      "no_link": "Aucun lien",
+      "link_dialog_title": "Lien de mon compte",
+      "url_label": "Adresse (https://...)",
+      "link_label_label": "Texte",
+      "link_label_too_long": "Ce texte est trop long",
+      "not_a_valid_url": "Format d'adresse invalide",
+      "link_button_default_label": "lien..."
     }
   }
 }

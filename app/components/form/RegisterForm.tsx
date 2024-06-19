@@ -7,19 +7,20 @@ import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from
 import { gql, useMutation } from "@apollo/client"
 import { isValidPassword, } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
-import { AccountInfo } from "@/lib/schema"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 interface Props {
     toggleRegistering: () => void
-    onAccountRegistered?: (token: string, account: AccountInfo) => void
+    onAccountRegistered?: () => void
 }
 
 const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
-    registerAccount(input: {email: $email, name: $name, password: $password, language: $language}) {
+    registerAccount(
+      input: {email: $email, name: $name, password: $password, language: $language}
+    ) {
       jwtToken
     }
-  }`
+}`
 
 const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
     const { login } = useUserConnectionFunctions()
@@ -39,8 +40,8 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
             password: values.password,
             language: i18n.language.substring(0, 2).toLowerCase() } })
         if(res.data) {
-            const account = await login(res.data.registerAccount.jwtToken)
-            onAccountRegistered && onAccountRegistered(res.data.registerAccount.jwtToken, account)
+            await login(res.data.registerAccount.jwtToken)
+            onAccountRegistered && onAccountRegistered()
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
