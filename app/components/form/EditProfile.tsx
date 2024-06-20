@@ -4,7 +4,7 @@ import * as yup from 'yup'
 import { aboveMdWidth, adaptToWidth, fontSizeSmall, initials, pickImage } from "@/lib/utils"
 import { t } from '@/i18n'
 import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from "@/components/layout/lib"
-import { View } from "react-native"
+import { Linking, View } from "react-native"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
 import { Avatar, Banner, Button, Icon, IconButton, Portal, Text } from "react-native-paper"
@@ -49,7 +49,8 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
     <ListOf data={links} noDataLabel={t('no_link')} noDataLabelStyle={{ color: '#fff' }}
         displayItem={(link, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' }}>
         <Icon color="#fff" source={getIconForLink(link.type)} size={25}/>
-        <Button style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" mode="text">{ link.label || t('link_button_default_label') }</Button>
+        <Button style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" 
+            mode="text" onPress={() => Linking.openURL(link.url)}>{ link.label || t('link_button_default_label') }</Button>
         <IconButton iconColor="#fff" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
         <IconButton iconColor="#fff" icon="delete" onPress={() => deleteLinkRequested(link)} />
     </View>} />

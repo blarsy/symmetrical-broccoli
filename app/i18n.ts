@@ -118,7 +118,14 @@ const resources = {
       "link_label_label": "Label",
       "link_label_too_long": "Please provide a shorter label",
       "not_a_valid_url": "Invalid URL format",
-      "link_button_default_label": "link..."
+      "link_button_default_label": "link...",
+      "send_a_message": "Tell us !",
+      "support_info": "System info",
+      "support_title": "Help & support",
+      "support_intro_text": "Tope-là is still young, so we expect issues, despite our efforts to make it work flawlessly.\nHelp us improve the life of change makers by giving us info about anything that feel wrong with Tope-là !",
+      "support_mail_subject": "User message",
+      "support_message_label": "Your message",
+      "send_buttonCaption": "Send"
     }
   },
   fr: {
@@ -232,7 +239,14 @@ const resources = {
       "link_label_label": "Texte",
       "link_label_too_long": "Ce texte est trop long",
       "not_a_valid_url": "Format d'adresse invalide",
-      "link_button_default_label": "lien..."
+      "link_button_default_label": "lien...",
+      "send_a_message": "Dites-nous !",
+      "support_info": "Infos système",
+      "support_title": "Aide & support",
+      "support_intro_text": "Tope-là est encore jeune, donc nous nous attendons à des soucis, malgré nos efforts pour la rendre impeccable.\nAidez-nous à améliorer la vie des créateurs de sens en nous donnant des infos à propos de quoi que ce soit qui n'a pas l'air normal dans Tope-là !",
+      "support_mail_subject": "Message utilisateur",
+      "support_message_label": "Votre message",
+      "send_buttonCaption": "Envoyer"
     }
   }
 }

@@ -6,7 +6,7 @@ import uuid from 'react-native-uuid'
 import secureStore from '@/lib/secureStore'
 
 const LOG_LEVEL_STORE_KEY = 'loglevel'
-const activityId = uuid.v4()
+export const activityId = uuid.v4()
 
 export interface ClientLogMessage {
     accountId?: number

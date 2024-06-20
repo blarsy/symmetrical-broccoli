@@ -1,7 +1,6 @@
 import React from "react"
 import { ActivityIndicator, Dimensions, ScrollView, StyleProp, View, ViewStyle } from "react-native"
 import ListOf from "./ListOf"
-import { t } from "@/i18n"
 import { StateError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "./OperationFeedback"
 
