@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, ScrollView, View } from "react-native"
@@ -10,7 +10,7 @@ import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadStat
 import { ErrorSnackbar } from "../OperationFeedback"
 import { primaryColor } from "../layout/constants"
 import { gql, useMutation } from "@apollo/client"
-import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 const DELETE_ACCOUNT = gql`mutation DeleteAccount {
@@ -26,7 +26,15 @@ export default function Profile ({ route, navigation }: RouteProps) {
     const [deleting, setDeleting] = useState(initial<null>(false, null))
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
     const appDispatch = useContext(AppDispatchContext)
+    const appContext = useContext(AppContext)
     const { logout } = useUserConnectionFunctions()
+
+    useEffect(() => {
+        if(!appContext.account) {
+            navigation.navigate('main')
+        }
+    })
+
     return <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
         <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10, 
             alignSelf: "stretch", gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
@@ -36,7 +44,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                     setChangingPassword(false)
                 }}/> : 
                 <View>
-                    <EditProfile />
+                    { appContext.account && <EditProfile /> }
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setChangingPassword(true)}>{t('change_password_label')}<Icon size={20} source="chevron-right"/></Button>
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setDeletingAccount(true)}>{t('delete_account_button')}<Icon size={20} source="account-remove"/></Button>
                 </View>}
