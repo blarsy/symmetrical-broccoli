@@ -5,9 +5,11 @@ const logger: {
     initialized: boolean
     error: (message: string, err: any) => void
     info: (message: string) => void
+    warn: (message: string) => void
 } = {
     initialized: false,
     error: () => { throw new Error('Logger still uninitialized, please first call "init"') },
+    warn: () => { throw new Error('Logger still uninitialized, please first call "init"') },
     info: () => { throw new Error('Logger still uninitialized, please first call "init"') }
 }
 
@@ -33,6 +35,10 @@ export const init = async () => {
         logger.info = (message: string, cb?: LogCallback) => {
             if(!config.production) console.log(message)
             winstonLogger.info(message, cb)
+        }
+        logger.warn = (message: string, cb?: LogCallback) => {
+            if(!config.production) console.log(message)
+            winstonLogger.warn(message, cb)
         }
         logger.initialized = true
     }

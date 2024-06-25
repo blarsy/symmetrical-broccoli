@@ -1,6 +1,6 @@
 import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
-import Handlebars from 'handlebars'
+import Handlebars, { template } from 'handlebars'
 import { recordMail } from './recordMail'
 import { getCommonConfig } from '../config'
 import initTranslations from '../i18n'
@@ -92,4 +92,30 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
     await sendNoReplyMail(email, heading, 
         `${text}${link}`, 
         htmlContent)
+}
+
+export const sendMessagesSummaryMail = async (email: string, messages: string, lang: string) => {
+    const config = await getCommonConfig()
+    const t = await initTranslations(lang)
+
+    await preparePartials()
+    const source = await readFile(`${config.mailTemplatesLocation}chetMessagesSummary.html`)
+    const template = Handlebars.compile(source.toString())
+    const heading = t('chat_messages_summary_subject', { productName: config.productName})
+
+    const data = {
+        messages,
+        productName : config.productName,
+        heading,
+        header: {
+            logoUrl: `${config.websiteUrl}logo.jpeg`
+        },
+        footer: {
+            mailSettingsInstructions: t('mail_settings_instructions', { productName: config.productName})
+        }
+    }
+
+    const htmlContent = template(data)
+
+    await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent )
 }

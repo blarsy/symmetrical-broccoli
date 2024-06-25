@@ -4,12 +4,14 @@ import getConfig, { Config, getVersions } from './config'
 import cors from 'cors'
 import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
-import { NotificationsListener } from "./notifications/listener"
+import { NotificationsListener } from "./broadcast/listener"
 import logger, { init } from "./logger"
 import { dailyBackup } from "./db_jobs/jobs"
-import { cleanOldClientLogsJob } from "./db_jobs/maintenance"
+import { handleMessageCreated } from "./broadcast/event"
+import { runAndLog } from "./db_jobs/utils"
+import { sendSummaries } from "./db_jobs/delayedNotifications"
 
-const getConnectionString = async (config: Config) => {
+const getConnectionString = (config: Config) => {
     return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
 }
 
@@ -21,12 +23,12 @@ const launchServer = async () => {
 
     versions.forEach(async version => {
         const config = await getConfig(version)
-        const connectionString = await getConnectionString(config)
+        const connectionString = getConnectionString(config)
         launchPostgraphileWebApi(config)
         launchJobWorker(connectionString, version).catch(e => console.error(e))
         logger.info(`Job worker launched over database ${config.db} on ${config.host}`)
         logger.info(`Connecting to notifier ${version}`)
-        launchPushNotificationsSender(connectionString)
+        launchPushNotificationsSender(connectionString, config)
     })
 }
 
@@ -49,7 +51,7 @@ const launchPostgraphileWebApi = (config: Config) => {
     logger.info(`Express web api server for versions ${config.version} listening on port ${config.apiPort}.`)
 }
 
-const executeJob = async (executor: (payload: any, helpers: JobHelpers) => Promise<void>, payload: any, helpers: JobHelpers, jobName: String) => {
+const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Promise<void>, jobName: String, payload?: any, helpers?: JobHelpers) => {
     try {
         await executor(payload, helpers)
         logger.info(`Successfully executed job ${jobName}, with payload ${JSON.stringify(payload)}`)
@@ -64,26 +66,32 @@ const launchJobWorker = async (connectionString: string, version: string) => {
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
-        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs',
+        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries',
         taskList : {
-            mailPasswordRecovery: async (payload: any, helpers) => {
-                executeJob(async (payload, helpers) => {
+            mailPasswordRecovery: async () => {
+                executeJob(async (payload) => {
                     const { email, code, lang } = payload
                     await sendAccountRecoveryMail(email, code, lang, version)
-                }, payload, helpers, 'mailPasswordRecovery')
+                }, 'mailPasswordRecovery')
             },
-            mailActivation: async (payload: any, helpers: JobHelpers) =>{
-                executeJob(async (payload, helpers) => {
+            mailActivation: async () =>{
+                executeJob(async (payload) => {
                     const { email, code, lang } = payload
                     await sendEmailActivationCode(email, code, lang, version)
-                }, payload, helpers, 'mailActivation')
+                }, 'mailActivation')
             },
-            databaseBackup: async (payload: any, helpers) => {
-                executeJob(dailyBackup, { version }, helpers, 'databaseBackup')
+            databaseBackup: async () => {
+                executeJob(dailyBackup, 'databaseBackup', { version })
             },
             cleanOldClientLogs: async (payload: any, helpers) => {
                 const daysOfLogToKeep = 7
-                executeJob(cleanOldClientLogsJob, { daysOfLogToKeep, connectionString }, helpers, 'cleanOldClientLogs')
+                executeJob(async () => {
+                    await runAndLog(`DELETE FROM sb.client_logs
+                        WHERE created < to_timestamp(extract(epoch from now() - interval '${daysOfLogToKeep} day'));`, connectionString, 'Running client logs cleanup')
+                }, 'cleanOldClientLogs')
+            },
+            sendSummaries: async () => {
+                executeJob(() => sendSummaries(connectionString), 'sendSummaries')
             }
         },
         schema: 'worker'
@@ -95,8 +103,14 @@ const launchJobWorker = async (connectionString: string, version: string) => {
       await runner.promise
 }
 
-const launchPushNotificationsSender = (connectionString: string) => {
-    new NotificationsListener(connectionString, err => logger.error('Error handling message created notification.' ,err))
+const launchPushNotificationsSender = (connectionString: string, config: Config) => {
+    new NotificationsListener(connectionString, 
+        err => logger.error('Error handling message created notification.' ,err),
+        config,
+        [
+            { channel: 'message_created', handler: handleMessageCreated },
+            //{ channel: 'resource_created', handler: handleResourceChange },
+        ])
 }
 
 launchServer()
