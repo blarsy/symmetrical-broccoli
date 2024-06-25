@@ -6,7 +6,7 @@ import { lightPrimaryColor } from "./layout/constants"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from 'yup'
 import { apiUrl, clientVersion, subscriptionsUrl } from "@/lib/settings"
-import Application from 'expo-application'
+import { nativeApplicationVersion } from 'expo-application'
 import { Dimensions } from "react-native"
 import { AppContext } from "./AppContextProvider"
 import { activityId } from "@/lib/logger"
@@ -26,7 +26,7 @@ export default ({ visible, onDismiss }: Props) => {
         const windowDims = Dimensions.get('window')
         const screenDims = Dimensions.get('screen')
         supportInfo = {
-            apiUrl, subscriptionsUrl, clientVersion: Application?.nativeApplicationVersion || clientVersion,
+            apiUrl, subscriptionsUrl, clientVersion: nativeApplicationVersion || clientVersion,
             windowWidth: windowDims.width.toFixed(1), windowHeight: windowDims.height.toFixed(1), screenWidth: screenDims.width.toFixed(1),
             screenHeight: screenDims.height.toFixed(1), account: appContext.account?.id, logActivityId: activityId
         }

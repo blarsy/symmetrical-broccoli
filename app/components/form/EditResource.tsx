@@ -28,10 +28,10 @@ export default ({ route, navigation }:RouteProps) => {
         }
     }, [])
 
-    const createResource = async (values: Resource, token?: string) => {
+    const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
         try {
-            await editResourceContext.actions.save(values, token)
+            await editResourceContext.actions.save(values)
             setSaveResourcestate(fromData(null))
             searchFilterContext.actions.requery(appContext.categories.data!)
             navigation.goBack()

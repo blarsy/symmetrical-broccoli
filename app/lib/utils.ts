@@ -8,7 +8,7 @@ import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissio
 import { ImageResult, manipulateAsync } from "expo-image-manipulator"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
-import Application from 'expo-application'
+import { nativeApplicationVersion } from 'expo-application'
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { configureFonts } from "react-native-paper"
@@ -186,8 +186,8 @@ export const initials = (text: string) => {
 }
 
 export const versionChecker = (serverVersion: string) => {
-  if(Application?.nativeApplicationVersion || clientVersion)
-    return compareVersions(Application?.nativeApplicationVersion || clientVersion, serverVersion) >= 0
+  if(nativeApplicationVersion || clientVersion)
+    return compareVersions(nativeApplicationVersion || clientVersion, serverVersion) >= 0
   
   return true
 }

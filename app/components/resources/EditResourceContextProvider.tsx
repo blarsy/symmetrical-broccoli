@@ -33,7 +33,7 @@ interface EditResourceActions {
     removeChangeCallback: () => void
     addImage: (img: ImageInfo, resource: Resource) => Promise<void>
     deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
-    save: (resource: Resource, token?: string) => Promise<void>
+    save: (resource: Resource) => Promise<void>
     reset: () => void
 }
 
@@ -49,7 +49,7 @@ interface Props {
 const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: undefined,
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
-    canBeExchanged: false,  canBeGifted: false, created: new Date() }
+    canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null }
 
 export const EditResourceContext = createContext<EditResourceContextProps>({
     state: { 
@@ -114,7 +114,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
             setState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...getResourcWithExpiration(resource), ...{ images: updatedImages } } })
         },
-        save: async (resource: Resource, token?: string) => {
+        save: async (resource: Resource) => {
             if(editResourceState.editedResource.id) {
                 if(editResourceState.imagesToAdd.length > 0) {
                     const newPublicIds = await Promise.all(editResourceState.imagesToAdd.map(async img => { 
@@ -159,11 +159,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     imagesPublicIds
                 }
 
-                if(!token) {
-                    await createResource({ variables })
-                } else {
-                    await createResource({ variables, client: getAuthenticatedApolloClient(token) })
-                }
+                await createResource({ variables })
 
                 resource.images = imagesPublicIds.map(pId => ({ publicId: pId }))
                 setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
