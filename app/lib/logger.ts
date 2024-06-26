@@ -93,7 +93,7 @@ export const info = async (logData: ClientLogMessage, includeDeviceInfo: boolean
     logGeneric(globalLogger.info, logData, includeDeviceInfo)
 }
 export const error = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
-    console.log('error', logData)
+    //console.log('error', logData)
     await getOrCreateGlobalLogger()
     logGeneric(globalLogger.error, logData, includeDeviceInfo)
 }

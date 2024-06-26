@@ -1,6 +1,6 @@
 import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
-import Handlebars, { template } from 'handlebars'
+import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
 import { getCommonConfig } from '../config'
 import initTranslations from '../i18n'
@@ -36,10 +36,17 @@ const preparePartials = async () => {
         const config = await getCommonConfig()
         partialsPreparePromise = new Promise(async (resolve, reject) => {
             try {
-                const partial = (await readFile(`${config.mailTemplatesLocation}headerPartial.html`)).toString()
+                const partials = await Promise.all([
+                    readFile(`${config.mailTemplatesLocation}headerPartial.html`, { encoding: 'ascii' }),
+                    readFile(`${config.mailTemplatesLocation}mailSettingsPartial.html`, { encoding: 'ascii' })
+                ])
                 Handlebars.registerPartial(
                     "headerPartial", 
-                    partial
+                    partials[0]
+                )
+                Handlebars.registerPartial(
+                    "mailSettingsPartial", 
+                    partials[1]
                 )
                 resolve()
             } catch(e) {
@@ -99,8 +106,9 @@ export const sendMessagesSummaryMail = async (email: string, messages: string, l
     const t = await initTranslations(lang)
 
     await preparePartials()
-    const source = await readFile(`${config.mailTemplatesLocation}chetMessagesSummary.html`)
-    const template = Handlebars.compile(source.toString())
+    const source = await readFile(`${config.mailTemplatesLocation}chatMessagesSummary.html`, { encoding: 'ascii' })
+
+    const template = Handlebars.compile(source)
     const heading = t('chat_messages_summary_subject', { productName: config.productName})
 
     const data = {

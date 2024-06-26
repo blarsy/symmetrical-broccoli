@@ -123,33 +123,28 @@
                           <![endif]-->
                           <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width:600px;" align="center">
                             <tr>
-                              <td role="modules-container" style="padding: 0px 0px 0px 0px; color: #000000; text-align: left;" bgcolor="#ffffff" width="100%" align="left">
-                                
-    <table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%"
-           style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
-      <tr>
-        <td role="module-content">
-          <p></p>
-        </td>
-      </tr>
-    </table>
-        
-    {{>headerPartial header=header}}
-
-    <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
-      <tr>
-        <td style="padding:45px 45px 45px 45px;line-height:22px;text-align:inherit;"
-            height="100%"
-            valign="top"
-            bgcolor="">
-            <div style="text-align: center;"><strong><span style="color:#3E3E3E;"><span style="font-size:20px;">{{heading}}</span></span></strong></div>
-        </td>
-      </tr>
-    </table>
-  
-  {{messages}}
-
-  {{>mailSettingsPartial footer=footer}}
+                              <td role="modules-container" style="padding: 0px 0px 0px 0px; color: #000000; text-align: left;" bgcolor="#ffffff" width="100%" align="left"> 
+                                <table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%"
+                                      style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
+                                  <tr>
+                                    <td role="module-content">
+                                      <p></p>
+                                    </td>
+                                  </tr>
+                                </table>
+                                {{>headerPartial header=header}}
+                                <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+                                  <tr>
+                                    <td style="padding:45px 45px 45px 45px;line-height:22px;text-align:inherit;"
+                                        height="100%"
+                                        valign="top"
+                                        bgcolor="">
+                                        <div style="text-align: center;"><strong><span style="color:#3E3E3E;"><span style="font-size:20px;">{{heading}}</span></span></strong></div>
+                                    </td>
+                                  </tr>
+                                </table>
+                                {{{messages}}}
+                                {{>mailSettingsPartial footer=footer}}
                               </td>
                             </tr>
                           </table>
