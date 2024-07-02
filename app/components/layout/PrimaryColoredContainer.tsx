@@ -4,7 +4,7 @@ import Container from "./Container"
 import { StyleProp, View, ViewStyle } from "react-native"
 
 interface Props {
-    children: JSX.Element,
+    children: React.ReactNode,
     style?: StyleProp<ViewStyle>
 }
 

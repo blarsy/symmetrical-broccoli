@@ -69,7 +69,7 @@ export const getScreenSize = (): ScreenSize => {
     }
 }
 
-export const adaptToWidth = (sm: number, md: number, lg: number):number => {
+export function adaptToWidth<T> (sm: T, md: T, lg: T):T {
   switch(getScreenSize()) {
     case ScreenSize.sm: return sm
     case ScreenSize.md: return md

@@ -1,17 +1,22 @@
 import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
-import { ActivityIndicator, ScrollView, View } from "react-native"
-import { RouteProps, aboveMdWidth, mdScreenWidth } from "@/lib/utils"
+import { ActivityIndicator, DimensionValue, ScrollView, View } from "react-native"
+import { RouteProps, aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
-import { primaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { gql, useMutation } from "@apollo/client"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import PublicInfo from "./PublicInfo"
+import Preferences from "./Preferences"
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
+
+const Tab = createMaterialBottomTabNavigator()
 
 const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     deleteAccount(input: {}) {
@@ -35,9 +40,8 @@ export default function Profile ({ route, navigation }: RouteProps) {
         }
     })
 
-    return <PrimaryColoredContainer style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <ScrollView style={{ flex: 1, flexDirection: 'column', margin: 10, 
-            alignSelf: "stretch", gap: 30, maxWidth: aboveMdWidth() ? mdScreenWidth : 'auto' }}>
+    const Main = () => (<ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: 'center' }}>
+        <View style={{ gap: 30, width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth), margin: 10 }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {
                     if(success) appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('password_changed_message') } })
@@ -86,6 +90,16 @@ export default function Profile ({ route, navigation }: RouteProps) {
                     </Dialog.Actions>
                 </Dialog>
             </Portal>
-        </ScrollView>
+        </View>
+    </ScrollView>)
+
+    return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch' }}>
+        <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
+            theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
+            activeColor={ primaryColor } style={{ backgroundColor: 'transparent' }}>
+            <Tab.Screen name="main" options={{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }} component={Main} />
+            <Tab.Screen name="publicInfo" options={{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }} component={PublicInfo} />
+            <Tab.Screen name="preferences" options={{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }} component={Preferences} />
+        </Tab.Navigator>
     </PrimaryColoredContainer>
 }

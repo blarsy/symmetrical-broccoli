@@ -101,18 +101,18 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
         htmlContent)
 }
 
-export const sendMessagesSummaryMail = async (email: string, messages: string, lang: string) => {
+export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
 
     await preparePartials()
-    const source = await readFile(`${config.mailTemplatesLocation}chatMessagesSummary.html`, { encoding: 'ascii' })
+    const source = await readFile(`${config.mailTemplatesLocation}notificationsSummary.html`, { encoding: 'ascii' })
 
     const template = Handlebars.compile(source)
-    const heading = t('chat_messages_summary_subject', { productName: config.productName})
+    const heading = t(headingI18nCode, { productName: config.productName})
 
     const data = {
-        messages,
+        content,
         productName : config.productName,
         heading,
         header: {

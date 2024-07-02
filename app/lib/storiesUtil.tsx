@@ -88,16 +88,16 @@ export interface GraphQlOp {
     variables?: Record<string, any>
 }
 
-export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
-(Story: React.ElementType) => <MockedProvider mocks={
-    ops.map(op => ({
-        delay: 2000,
-        request: { query: op.query, variables: op.variables },
-        result: { data: op.result }
-    } as MockedResponse<any, any>))
-  }>
-    <Story />
-  </MockedProvider>
+export const apolloClientMocksDecorator = (ops: GraphQlOp[]) => 
+    (Story: React.ElementType) => <MockedProvider mocks={
+        ops.map(op => ({
+            delay: 2000,
+            request: { query: op.query, variables: op.variables },
+            result: { data: op.result }
+        } as MockedResponse<any, any>))
+    }>
+        <Story />
+</MockedProvider>
 
 export const configDayjsDecorator = (Story: React.ElementType) => {
     dayjs.extend(relativeTime)
@@ -107,7 +107,7 @@ export const configDayjsDecorator = (Story: React.ElementType) => {
 }
 
 export const navigationContainerDecorator = (initialState: any = undefined ) => (Story: React.ElementType) =>
-    <NavigationContainer initialState={initialState}>
+    <NavigationContainer initialState={initialState || { routes: []}}>
         <Story />
     </NavigationContainer>
 

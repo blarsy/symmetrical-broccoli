@@ -62,7 +62,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <TransparentTextInput label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
                         value={( value.map(cat => cat.name).join(', '))} right={<TextInput.Icon color="#000" onPress={openModal} size={26} icon="chevron-right"/>} 
-                        style={{ margin: 0, flex: 1 }} />
+                        style={{ margin: 0, flex: 1, backgroundColor: 'transparent' }}/>
                 </View>
             </TouchableOpacity>
             <Portal>

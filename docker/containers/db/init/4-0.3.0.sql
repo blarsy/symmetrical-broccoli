@@ -90,8 +90,7 @@ DROP FUNCTION IF EXISTS sb.update_account(character varying, character varying, 
 CREATE OR REPLACE FUNCTION sb.update_account(
 	name character varying,
 	email character varying,
-	avatar_public_id character varying,
-	links sb.account_link[])
+	avatar_public_id character varying)
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
@@ -129,6 +128,22 @@ BEGIN
 	)
 	WHERE id = sb.current_account_id();
 	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.update_account(character varying, character varying, character varying)
+    OWNER TO sb;
+
+CREATE OR REPLACE FUNCTION sb.update_account_public_info(
+	links sb.account_link[])
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+BEGIN
 	DELETE FROM sb.accounts_links
 	WHERE account_id = sb.current_account_id();
 	
@@ -140,41 +155,10 @@ BEGIN
 end;
 $BODY$;
 
-ALTER FUNCTION sb.update_account(character varying, character varying, character varying, sb.account_link[])
+ALTER FUNCTION sb.update_account_public_info(sb.account_link[])
     OWNER TO sb;
 
 -- Broadcaster
-CREATE SEQUENCE IF NOT EXISTS sb.events_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-
-ALTER SEQUENCE sb.events_id_seq
-    OWNER TO sb;
-
-GRANT USAGE ON SEQUENCE sb.events_id_seq TO identified_account;
-
-GRANT ALL ON SEQUENCE sb.events_id_seq TO sb;
-
-CREATE TABLE sb.events
-(
-    id integer NOT NULL DEFAULT nextval('events_id_seq'::regclass),
-    type integer NOT NULL,
-    linked_item_id integer NOT NULL,
-    created timestamp without time zone NOT NULL DEFAULT now(),
-	processed timestamp without time zone NULL,
-    CONSTRAINT events_pk PRIMARY KEY (id)
-);
-
-ALTER TABLE IF EXISTS sb.events
-    OWNER to sb;
-
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE sb.events TO sb;
-
-GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE sb.events TO identified_account;
-
 CREATE SEQUENCE IF NOT EXISTS sb.broadcast_prefs_id_seq
     INCREMENT 1
     START 1
@@ -212,38 +196,9 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE sb.broadcast_prefs TO sb;
 
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE sb.broadcast_prefs TO identified_account;
 
-
-CREATE OR REPLACE FUNCTION sb.create_event(
-	event_type INTEGER,
-	linked_item_id INTEGER)
-    RETURNS boolean
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
-DECLARE days_summary INTEGER;
-BEGIN
-
-	SELECT days_between_summaries INTO days_summary FROM sb.broadcast_prefs bp
-	WHERE bp.account_id = sb.current_account_id() AND bp.event_type = create_event.event_type;
-
-	IF days_summary IS NOT NULL THEN
-		INSERT INTO sb.events (type, linked_item_id)
-		VALUES (create_event.event_type, create_event.linked_item_id);
-		RETURN true;
-	ELSE
-		RETURN false;
-	END IF;
-
-END;
-$BODY$;
-
-ALTER FUNCTION sb.create_event(integer, integer)
-    OWNER TO sb;
-
-GRANT EXECUTE ON FUNCTION sb.activate_account(character varying) TO identified_account;
-
-GRANT EXECUTE ON FUNCTION sb.activate_account(character varying) TO anonymous;
+INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+SELECT 2, a.id, 1
+FROM sb.accounts a;
 
 CREATE OR REPLACE FUNCTION sb.create_message(
 	resource_id integer,
@@ -265,6 +220,7 @@ DECLARE destinator_participant_id INTEGER;
 DECLARE destinator_id INTEGER;
 DECLARE destinator_name TEXT;
 DECLARE target_push_token TEXT;
+DECLARE days_summary INTEGER;
 
 BEGIN
 	SELECT c.id FROM sb.conversations c
@@ -326,7 +282,10 @@ BEGIN
 		'subject', created_message_id
 	)::text);
 	
-	IF NOT (sb.create_event(1, created_message_id)) THEN
+	SELECT days_between_summaries INTO days_summary FROM sb.broadcast_prefs bp
+	WHERE bp.account_id = sb.current_account_id() AND bp.event_type = 1;
+
+	IF days_summary IS NULL THEN
 		IF target_push_token IS NOT NULL THEN
 			-- Emit notification for push notification handling
 			PERFORM pg_notify('message_created', json_build_object(
@@ -363,6 +322,7 @@ CREATE OR REPLACE FUNCTION sb.create_resource(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 declare inserted_id integer;
+DECLARE days_summary INTEGER;
 begin
 	INSERT INTO sb.resources(
 	title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted)
@@ -382,19 +342,125 @@ begin
 	INSERT INTO sb.resources_images (resource_id, image_id)
 	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
 	
-	IF NOT (sb.create_event(2, inserted_id)) THEN
+	SELECT days_between_summaries INTO days_summary FROM sb.broadcast_prefs bp
+	WHERE bp.account_id = sb.current_account_id() AND bp.event_type = 2;
+
+	IF days_summary IS NULL THEN
 		-- Emit notification for push notification handling
 		PERFORM pg_notify('resource_created', json_build_object(
 			'resource_id', inserted_id,
 			'title', create_resource.title,
-			'account_id', sb.current_account_id(),
-			'account_name', (SELECT name FROM sb.accounts WHERE id = sb.current_account_id())
+			'account_name', (SELECT name FROM sb.accounts WHERE id = sb.current_account_id()),
+			'push_token', (SELECT token FROM sb.accounts_push_tokens apt WHERE 
+				NOT EXISTS (SELECT bp.id FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id)
+				AND account_id != sb.current_account_id())
 		)::text);
 	END IF;
 	
 	RETURN inserted_id;
 end;
 $BODY$;
+
+ALTER TABLE sb.resources
+    ALTER COLUMN expiration TYPE timestamp with time zone ;
+
+ALTER TABLE sb.resources
+    ALTER COLUMN created TYPE timestamp with time zone ;
+
+ALTER TABLE sb.resources
+    ALTER COLUMN deleted TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.accounts
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.accounts_push_tokens
+    ALTER COLUMN last_time_used TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.broadcast_prefs
+    ALTER COLUMN last_summary_sent TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.broadcast_prefs
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.client_logs
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.conversations
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.email_activations
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.email_activations
+    ALTER COLUMN activated TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.images
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.messages
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.messages
+    ALTER COLUMN received TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.participants
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.resource_categories
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.resources_images
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.resources_resource_categories
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.system
+    ALTER COLUMN created TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.unread_messages
+    ALTER COLUMN created TYPE timestamp with time zone ;
+
+CREATE TYPE sb.broadcast_pref_type AS
+(
+	event_type integer,
+	days_between_summaries integer
+);
+
+ALTER TYPE sb.broadcast_pref_type
+    OWNER TO sb;
+
+GRANT USAGE ON TYPE sb.broadcast_pref_type TO PUBLIC;
+
+GRANT USAGE ON TYPE sb.broadcast_pref_type TO anonymous;
+
+GRANT USAGE ON TYPE sb.broadcast_pref_type TO identified_account;
+
+GRANT USAGE ON TYPE sb.broadcast_pref_type TO sb;
+
+CREATE OR REPLACE FUNCTION sb.update_account_broadcast_prefs(
+	prefs broadcast_pref_type[])
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+BEGIN
+	DELETE FROM sb.broadcast_prefs
+	WHERE account_id = sb.current_account_id();
+	
+	INSERT INTO sb.broadcast_prefs(event_type, account_id, days_between_summaries)
+	SELECT p.event_type, sb.current_account_id(), p.days_between_summaries
+	FROM UNNEST(prefs) p;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.update_account_broadcast_prefs(broadcast_pref_type[])
+    OWNER TO sb;
+
 
 DO
 $body$

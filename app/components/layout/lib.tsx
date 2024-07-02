@@ -65,15 +65,18 @@ interface CheckboxGroupProps {
         [name: string]: string
     }
     values: { [name: string]: boolean }
-    onChanged: (values: { [name: string]: boolean }) => void
+    onChanged: (values: { [name: string]: boolean }, oldValues: { [name: string]: boolean }) => void
+    selectedColor?: ColorValue
+    color?: ColorValue
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
-    <Text variant="labelSmall" style={{ marginLeft: 16 }}>{props.title}</Text>
+    <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text>
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        { Object.entries(props.options).map((p, idx) => <OptionSelect key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
+        { Object.entries(props.options).map((p, idx) => <OptionSelect selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
+            const oldValues = {...props.values}
             props.values[p[0]] = newValue
-            props.onChanged(props.values)
+            props.onChanged(props.values, oldValues)
         }}/>) }
     </View>
 </View>

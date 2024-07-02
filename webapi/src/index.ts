@@ -7,9 +7,15 @@ import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./broadcast/listener"
 import logger, { init } from "./logger"
 import { dailyBackup } from "./db_jobs/jobs"
-import { handleMessageCreated } from "./broadcast/event"
+import { handleMessageCreated, handleResourceChange } from "./broadcast/event"
 import { runAndLog } from "./db_jobs/utils"
 import { sendSummaries } from "./db_jobs/delayedNotifications"
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import dayjs from "dayjs"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const getConnectionString = (config: Config) => {
     return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
@@ -83,7 +89,7 @@ const launchJobWorker = async (connectionString: string, version: string) => {
             databaseBackup: async () => {
                 executeJob(dailyBackup, 'databaseBackup', { version })
             },
-            cleanOldClientLogs: async (payload: any, helpers) => {
+            cleanOldClientLogs: async () => {
                 const daysOfLogToKeep = 7
                 executeJob(async () => {
                     await runAndLog(`DELETE FROM sb.client_logs
@@ -104,12 +110,12 @@ const launchJobWorker = async (connectionString: string, version: string) => {
 }
 
 const launchPushNotificationsSender = (connectionString: string, config: Config) => {
-    new NotificationsListener(connectionString, 
+    new NotificationsListener(connectionString,
         err => logger.error('Error handling message created notification.' ,err),
         config,
         [
             { channel: 'message_created', handler: handleMessageCreated },
-            //{ channel: 'resource_created', handler: handleResourceChange },
+            { channel: 'resource_created', handler: handleResourceChange },
         ])
 }
 

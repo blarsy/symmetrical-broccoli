@@ -125,7 +125,19 @@ const resources = {
       "support_intro_text": "Tope-là is still young, so we expect issues, despite our efforts to make it work flawlessly.\nHelp us improve the life of change makers by giving us info about anything that feel wrong with Tope-là !",
       "support_mail_subject": "User message",
       "support_message_label": "Your message",
-      "send_buttonCaption": "Send"
+      "send_buttonCaption": "Send",
+      "main_profile_label": "Main",
+      "publicInfo_profile_label": "Public",
+      "preferences_profile_label": "Preferences",
+      "min_1_day_message": "At least 1 day",
+      "max_30_days_message": "At most 30 days",
+      "newResources_broadcast_prefs_title": "New resources for me",
+      "chat_broadcast_prefs_title": "New chat messages",
+      "number_of_days_between_summaries": "Email summary frequency (days)",
+      "option_realtime": "Realtime in app",
+      "option_regularSummary": "Email summaries",
+      "notifications_settings_title": "Notification settings",
+      "publicInfo_settings_title": "Your activity's promotional links"
     }
   },
   fr: {
@@ -246,7 +258,19 @@ const resources = {
       "support_intro_text": "Tope-là est encore jeune, donc nous nous attendons à des soucis, malgré nos efforts pour la rendre impeccable.\nAidez-nous à améliorer la vie des créateurs de sens en nous donnant des infos à propos de quoi que ce soit qui n'a pas l'air normal dans Tope-là !",
       "support_mail_subject": "Message utilisateur",
       "support_message_label": "Votre message",
-      "send_buttonCaption": "Envoyer"
+      "send_buttonCaption": "Envoyer",
+      "main_profile_label": "Principal",
+      "publicInfo_profile_label": "Public",
+      "preferences_profile_label": "Preférences",
+      "min_1_day_message": "Au moins 1 jour",
+      "max_30_days_message": "Au plus 30 jours",
+      "newResources_broadcast_prefs_title": "Nouvelles ressources pour moi",
+      "chat_broadcast_prefs_title": "Messages chat reçus",
+      "number_of_days_between_summaries": "Fréquence emails de résumé (jours)",
+      "option_realtime": "Temps réél dans l'app",
+      "option_regularSummary": "Résumés par email",
+      "notifications_settings_title": "Paramètres de notification",
+      "publicInfo_settings_title": "Liens de promotion de votre activité"
     }
   }
 }

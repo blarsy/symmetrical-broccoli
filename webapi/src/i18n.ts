@@ -17,7 +17,13 @@ const resources = {
         "sender_column_title": "Sender",
         "resource_title_column_title": "Resource",
         "sent_date_column_title": "Time received",
-        "message_text_column_title": "Message"
+        "message_text_column_title": "Message",
+        "new_resources_summary_subject": "New resources were created in {{productName}}",
+        "creator_column_title": "Creator",
+        "created_date_column_title": "Time",
+        "multiple_new_things_summary_subject": "Things happened on {{productName}}",
+        "newResources_mail_section_title": "Resources recently created",
+        "chatMessages_mail_section_title": "Chat messages received"
         
     }},
     fr: { translation: {
@@ -35,7 +41,13 @@ const resources = {
         "sender_column_title": "Envoyeur",
         "resource_title_column_title": "Ressource concernée",
         "sent_date_column_title": "Heure d'envoi",
-        "message_text_column_title": "Message"
+        "message_text_column_title": "Message",
+        "new_resources_summary_subject": "Des nouvelles resources ont été créées dans {{productName}}",
+        "creator_column_title": "Créateur",
+        "created_date_column_title": "Heure",
+        "multiple_new_things_summary_subject": "Des choses se sont passées sur {{productName}}",
+        "newResources_mail_section_title": "Ressources récemment créées",
+        "chatMessages_mail_section_title": "Messages reçus"
     }}
 }
 

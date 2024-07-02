@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
 import Profile from './Profile'
-import { apolloClientMocksDecorator, appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
-import { GET_ACCOUNT_INFO } from '../form/EditProfile'
+import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { GET_ACCOUNT_INFO } from './PublicInfo'
+import { GET_PREFERENCES } from './Preferences'
 
 const meta: Meta<typeof Profile> = {
   component: Profile,
   decorators: [
-    paperProviderDecorator, apolloClientMocksDecorator([{
+    paperProviderDecorator, gestureHandlerDecorator, navigationContainerDecorator(), apolloClientMocksDecorator([{
       query: GET_ACCOUNT_INFO,
       variables: { id: 1 },
       result: {
@@ -28,6 +29,32 @@ const meta: Meta<typeof Profile> = {
               linkTypeByLinkTypeId: {
                 id: 1
               }
+            }]
+          }
+        }
+      }
+    }, {
+      query: GET_PREFERENCES,
+      variables: {id: 1},
+      result: {
+        accountById: {
+          broadcastPrefsByAccountId: {
+            nodes: [{
+              eventType: 1,
+              id: 1,
+              daysBetweenSummaries: -1
+            },{
+              eventType: 2,
+              id: 2,
+              daysBetweenSummaries: 3
+            },{
+              eventType: 1,
+              id: 3,
+              daysBetweenSummaries: -1
+            },{
+              eventType: 2,
+              id: 4,
+              daysBetweenSummaries: 4
             }]
           }
         }
