@@ -37,7 +37,6 @@ export default makeExtendSchemaPlugin(({ pgSql: sql }) => {
           const rows = await selectGraphQLResultFromTable(
             sql.fragment`sb.messages`,
             (tableAlias, sqlBuilder) => {
-              console.log(`querying message : ${tableAlias}.id = ${sql.value(event.subject)}`)
               sqlBuilder.where(
                 sql.fragment`${tableAlias}.id = ${sql.value(event.subject)}`
               )

@@ -3,7 +3,6 @@ import { ImageInfo, Resource } from "@/lib/schema"
 import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
-import { getAuthenticatedApolloClient } from "@/lib/utils"
 
 export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
     createResource(

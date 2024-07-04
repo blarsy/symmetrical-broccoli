@@ -7,9 +7,8 @@ import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
 import { NotificationsListener } from "./broadcast/listener"
 import logger, { init } from "./logger"
 import { dailyBackup } from "./db_jobs/jobs"
-import { handleMessageCreated, handleResourceChange } from "./broadcast/event"
 import { runAndLog } from "./db_jobs/utils"
-import { sendSummaries } from "./db_jobs/delayedNotifications"
+import { sendSummaries } from "./broadcast/delayedNotifications"
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import dayjs from "dayjs"
@@ -20,6 +19,8 @@ dayjs.extend(timezone)
 const getConnectionString = (config: Config) => {
     return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
 }
+
+let notificationsListeners: NotificationsListener[] = []
 
 const launchServer = async () => {
     const versions = await getVersions()
@@ -34,7 +35,7 @@ const launchServer = async () => {
         launchJobWorker(connectionString, version).catch(e => console.error(e))
         logger.info(`Job worker launched over database ${config.db} on ${config.host}`)
         logger.info(`Connecting to notifier ${version}`)
-        launchPushNotificationsSender(connectionString, config)
+        notificationsListeners.push(await launchPushNotificationsSender(connectionString, config))
     })
 }
 
@@ -109,14 +110,13 @@ const launchJobWorker = async (connectionString: string, version: string) => {
       await runner.promise
 }
 
-const launchPushNotificationsSender = (connectionString: string, config: Config) => {
-    new NotificationsListener(connectionString,
+const launchPushNotificationsSender = async (connectionString: string, config: Config) => {
+    const listener = new NotificationsListener(connectionString,
         err => logger.error('Error handling message created notification.' ,err),
-        config,
-        [
-            { channel: 'message_created', handler: handleMessageCreated },
-            { channel: 'resource_created', handler: handleResourceChange },
-        ])
+        config)
+    
+    await listener.connect()
+    return listener
 }
 
 launchServer()

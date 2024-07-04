@@ -1,5 +1,5 @@
 import { sendNotificationsSummaryMail } from "../mailing"
-import { runAndLog } from "./utils"
+import { runAndLog } from "../db_jobs/utils"
 import initTranslations from '../i18n'
 import { TFunction } from "i18next"
 import dayjs from "dayjs"
@@ -118,7 +118,8 @@ const getChatMessageSummaryData = async (connectionString: string): Promise<Chat
         INNER JOIN sb.resources r ON r.id = c.resource_id
         INNER JOIN sb.broadcast_prefs bp ON bp.account_id = destinator.account_id AND bp.event_type = 1
         WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW())
-        AND um.created > NOW() - interval '1 day' * bp.days_between_summaries`, connectionString, 'Running delayed notifier')
+        AND um.created > NOW() - interval '1 day' * bp.days_between_summaries
+        AND ad.email IS NOT NULL`, connectionString, 'Running delayed notifier')
 
     const emails = {} as ChatMessageSummaryData
 
@@ -256,7 +257,8 @@ const getNewResourcsSummaryData = async (connectionString: string): Promise<NewR
         r.created > NOW() - interval '1 day' * bp.days_between_summaries AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
-        author.id <> notified.id
+        author.id <> notified.id AND
+        notified.email IS NOT NULL
     ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, connectionString, `Querying new resources to notify`)
 
     const resourcesSummaryData = {} as NewResourcesSummaryData

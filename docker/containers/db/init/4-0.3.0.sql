@@ -361,6 +361,8 @@ begin
 end;
 $BODY$;
 
+DROP VIEW sb.active_accounts;
+
 ALTER TABLE sb.resources
     ALTER COLUMN expiration TYPE timestamp with time zone ;
 
@@ -420,6 +422,32 @@ ALTER TABLE sb.system
 	
 ALTER TABLE sb.unread_messages
     ALTER COLUMN created TYPE timestamp with time zone ;
+
+
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+ALTER TABLE sb.active_accounts
+    OWNER TO sb;
+
+GRANT SELECT ON TABLE sb.active_accounts TO anonymous;
+GRANT SELECT ON TABLE sb.active_accounts TO identified_account;
+GRANT ALL ON TABLE sb.active_accounts TO sb;
+
+
 
 CREATE TYPE sb.broadcast_pref_type AS
 (

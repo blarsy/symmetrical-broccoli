@@ -66,7 +66,7 @@ export default () => {
         if(data) setLinks(data.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
             id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
         } as Link)))
-    }, [])
+    }, [data])
     
     return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: 'center' }}>
         <LoadedZone loading={loading} error={error} loadIndicatorColor="#fff" 
@@ -76,7 +76,11 @@ export default () => {
                 deleteLinkRequested={link => setLinks(links.filter(l => l.id != link.id))}
                 editLinkRequested={setEditedLink}
                 newLinkRequested={() => { setEditedLink({ id: 0, label: '', type: 4, url: '' }) }} />
-            <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => updateAccount({ variables: { links } })} loading={updating}>
+            <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}
+                onPress={async() => {
+                    await updateAccount({ variables: { links: links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })) } })
+                    setSuccess(true)
+                }} loading={updating}>
                 {t('save_label')}
             </WhiteButton>
             <OperationFeedback error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
