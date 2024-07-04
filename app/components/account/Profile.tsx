@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
-import { ActivityIndicator, DimensionValue, ScrollView, View } from "react-native"
+import { ActivityIndicator, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
 import { RouteProps, aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
@@ -40,7 +40,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         }
     })
 
-    const Main = () => (<ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: 'center' }}>
+    const Main = () => (<ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <View style={{ gap: 30, width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth), margin: 10 }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {

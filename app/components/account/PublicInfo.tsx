@@ -7,7 +7,7 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
 import ListOf from "../ListOf"
 import { Button, Icon, IconButton, Text } from "react-native-paper"
-import { DimensionValue, Linking, View } from "react-native"
+import { DimensionValue, FlexAlignType, Linking, View } from "react-native"
 import { aboveMdWidth, adaptToWidth, fontSizeSmall, mdScreenWidth } from "@/lib/utils"
 import { WhiteButton } from "../layout/lib"
 import { t } from "i18next"
@@ -68,9 +68,9 @@ export default () => {
         } as Link)))
     }, [data])
     
-    return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: 'center' }}>
+    return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <LoadedZone loading={loading} error={error} loadIndicatorColor="#fff" 
-            containerStyle={{ paddingTop: 10, flex: 1, justifyContent: 'center', width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth) }} >
+            containerStyle={{ paddingTop: 10, paddingHorizontal: 10, flex: 1, justifyContent: 'center', width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth) }} >
             <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10 }}>{t('publicInfo_settings_title')}</Text>
             <LinksEdit links={links}
                 deleteLinkRequested={link => setLinks(links.filter(l => l.id != link.id))}

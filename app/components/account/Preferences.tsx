@@ -3,7 +3,7 @@ import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
-import { DimensionValue, View } from "react-native"
+import { DimensionValue, FlexAlignType, View } from "react-native"
 import { CheckboxGroup, OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "../layout/lib"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from 'yup'
@@ -65,7 +65,7 @@ export default () => {
         pref2 = data.accountById.broadcastPrefsByAccountId.nodes.find((broadcastPref: any) => broadcastPref.eventType === 2)
     }
 
-    return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: 'center' }}>
+    return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <LoadedZone loading={loading} error={error} loadIndicatorColor="#fff" containerStyle={{ paddingTop: 10, flex: 1, 
             width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth) }}>
             <Formik initialValues={{ chatMessageDaysSummary: (pref1 && pref1.daysBetweenSummaries != -1) ? pref1.daysBetweenSummaries: undefined, 
