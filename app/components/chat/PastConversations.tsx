@@ -77,8 +77,8 @@ const PastConversations = ({ onConversationSelected }: Props) => {
                 const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) && item.conversation.resource.images[0].publicId ?
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
                     require('@/assets/img/placeholder.png')
-                return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#000', borderBottomWidth: 1 }} 
-                    left={() => <Image style={{ width: 50, height: 50 }} source={imgSource} />} key={idx}
+                return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
+                    left={() => <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={imgSource} />} key={idx}
                     onPress={() => {
                       onConversationSelected(item.conversation.resource, item.withUser.id)
                     }}
@@ -86,9 +86,9 @@ const PastConversations = ({ onConversationSelected }: Props) => {
                     title={() => <View style={{ flexDirection: 'column' }}>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>
-                            <Text variant="bodySmall" style={{ color: '#000', fontWeight: 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyChatTime(item.conversation.lastMessageTime) }</Text>
+                            <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyChatTime(item.conversation.lastMessageTime) }</Text>
                         </View>
-                        <Text variant="bodyMedium" style={{ fontWeight: 'normal' }}>{item.conversation.resource.title}</Text>
+                        <Text variant="bodyMedium" style={{ fontWeight: 'normal', textTransform: 'uppercase' }}>{item.conversation.resource.title}</Text>
                     </View>} description={<Text style={{ fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{item.conversation.lastMessageExcerpt}</Text>} />
             }} />
     </View>

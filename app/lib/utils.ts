@@ -22,7 +22,7 @@ export interface RouteProps {
 }
 
 export const mdScreenWidth = 600
-export const appBarsTitleFontSize = 32
+export const appBarsTitleFontSize = 36
 
 export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdScreenWidth
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth

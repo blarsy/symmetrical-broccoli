@@ -96,7 +96,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
     return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch' }}>
         <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
             theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
-            activeColor={ primaryColor } style={{ backgroundColor: 'transparent' }}>
+            activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }}>
             <Tab.Screen name="main" options={{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }} component={Main} />
             <Tab.Screen name="publicInfo" options={{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }} component={PublicInfo} />
             <Tab.Screen name="preferences" options={{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }} component={Preferences} />

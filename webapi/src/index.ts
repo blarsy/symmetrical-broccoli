@@ -75,17 +75,17 @@ const launchJobWorker = async (connectionString: string, version: string) => {
         noHandleSignals: false,
         crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries',
         taskList : {
-            mailPasswordRecovery: async () => {
+            mailPasswordRecovery: async (payload: any) => {
                 executeJob(async (payload) => {
                     const { email, code, lang } = payload
                     await sendAccountRecoveryMail(email, code, lang, version)
-                }, 'mailPasswordRecovery')
+                }, 'mailPasswordRecovery', payload)
             },
-            mailActivation: async () =>{
+            mailActivation: async (payload: any) =>{
                 executeJob(async (payload) => {
                     const { email, code, lang } = payload
                     await sendEmailActivationCode(email, code, lang, version)
-                }, 'mailActivation')
+                }, 'mailActivation', payload)
             },
             databaseBackup: async () => {
                 executeJob(dailyBackup, 'databaseBackup', { version })

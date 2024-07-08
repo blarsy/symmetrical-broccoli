@@ -12,7 +12,7 @@ import { uploadImage, urlFromPublicId } from "@/lib/images"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import { AccountInfo } from "@/lib/schema"
 
-const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String, $avatarPublicId: String, $links: [AccountLinkInput]) {
+const UPDATE_ACCOUNT = gql`mutation UpdateAccount($email: String, $name: String, $avatarPublicId: String) {
     updateAccount(
       input: {email: $email, name: $name, avatarPublicId: $avatarPublicId}
     ) {

@@ -151,11 +151,11 @@ const ConversationContextProvider = ({ children }: Props) => {
     
     const actions: ConversationActions = {
         load: async (resourceId: number, otherAccountId: number, categories: Category[]) => {
+          
           const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
 
           if(res.data) {
             const loadedMessages = asIMessages(res.data.conversationMessages.edges)
-
             setConversationState(prevValue => ({ ...prevValue, ...{ 
               conversation: fromData({ 
                 messages: loadedMessages,

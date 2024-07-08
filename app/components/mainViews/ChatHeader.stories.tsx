@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import { ChatHeader } from './Chat';
-import { paperProviderDecorator, conversationContextDecorator } from '@/lib/storiesUtil';
-import { ConversationState } from '../chat/ConversationContextProvider';
+import { ChatHeader } from './Chat'
+import { paperProviderDecorator, conversationContextDecorator, gestureHandlerDecorator } from '@/lib/storiesUtil'
+import { ConversationState } from '../chat/ConversationContextProvider'
 
 const meta: Meta<typeof ChatHeader> = {
   component: ChatHeader,
   decorators: [
-    paperProviderDecorator
+    paperProviderDecorator, gestureHandlerDecorator
   ]
 }
 
@@ -37,7 +37,8 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
                 id: 2,
                 name: accountName
             },
-            messages: []
+            messages: [],
+            endCursor: ''
         }
     }
 } as ConversationState)

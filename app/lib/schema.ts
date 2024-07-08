@@ -106,6 +106,7 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
     return data.map((rawConversation: any) => {
         const meAsParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id === loggedInAccountId)
         const otherParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id != loggedInAccountId)
+
         return ({
             conversation: {
                 hasUnread: meAsParticipant.unreadMessagesByParticipantId.totalCount > 0,

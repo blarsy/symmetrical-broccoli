@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
 import Chat from './Chat';
-import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil';
+import { apolloClientMocksDecorator, appContextDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil';
 import { CONVERSATION_MESSAGES } from '../chat/ConversationContextProvider';
 import { SET_PARTICIPANT_READ } from '../chat/Conversation';
 
@@ -19,9 +19,30 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
             edges: [
                 {
                     node: {
-                        id: msgCounter,
-                        text: `message ${msgCounter++}`,
-                        created: new Date(),
+                        id: ++msgCounter,
+                        text: `message ${msgCounter}`,
+                        created: new Date(new Date().valueOf() - msgCounter * 1000 * 60 * 60 * 24),
+                        received: null,
+                        imageByImageId: {
+                            publicId: ''
+                        },
+                        participantByParticipantId: {
+                            accountByAccountId: {
+                                id: 1,
+                                name: 'Artisan incroyable',
+                                imageByAvatarImageId: {
+                                    publicId: ''
+                                }
+                            }
+                        }
+                    }, 
+                    cursor: 'jlkjm'
+                },
+                {
+                    node: {
+                        id: ++msgCounter,
+                        text: `message ${msgCounter}`,
+                        created: new Date(new Date().valueOf() - msgCounter * 1000 * 60 * 60 * 24),
                         received: null,
                         imageByImageId: {
                             publicId: ''
@@ -40,9 +61,9 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 },
                 {             
                     node: {
-                        id: msgCounter,
-                        text: `message ${msgCounter++}`,
-                        created: new Date(),
+                        id: msgCounter + 10,
+                        text: `Message très très très très très très très très très très très très très très très très très très très très très long ${msgCounter}`,
+                        created: new Date(new Date().valueOf() - msgCounter * 1000 * 60 * 60 * 24),
                         received: null,
                         imageByImageId: {
                             publicId: ''
@@ -51,6 +72,27 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                             accountByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
+                                imageByAvatarImageId: {
+                                    publicId: ''
+                                }
+                            }
+                        }
+                    },
+                    cursor: 'jlkjm'  
+                },
+                {             
+                    node: {
+                        id: ++msgCounter,
+                        text: `Réponse très très très très très très très très très très très très très très très très très très très très très longue ${msgCounter}`,
+                        created: new Date(new Date().valueOf() - msgCounter * 1000 * 60 * 60 * 24),
+                        received: null,
+                        imageByImageId: {
+                            publicId: ''
+                        },
+                        participantByParticipantId: {
+                            accountByAccountId: {
+                                id: otherAccountId,
+                                name: 'Nouveau pote potentiel',
                                 imageByAvatarImageId: {
                                     publicId: ''
                                 }
@@ -106,6 +148,7 @@ const meta: Meta<typeof Chat> = {
   decorators: [
     paperProviderDecorator,
     appContextDecorator(),
+    gestureHandlerDecorator,
     navigationContainerDecorator({ routes: [
         { name: 'conversation', params: { resourceId: 1, otherAccountId: 2 } }
     ], index: 0 })
@@ -114,7 +157,6 @@ const meta: Meta<typeof Chat> = {
 
 export default meta
 type Story = StoryObj<typeof Chat>
-
 
 const argsForSingleConversationViews = {
     route: {

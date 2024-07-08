@@ -5,7 +5,7 @@ import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, 
 import PastConversations, { MY_CONVERSATIONS } from './PastConversations'
 
 const fromNow = (milliseconds: number) => new Date(new Date().valueOf() - milliseconds)
-const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string) => (                    {
+const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string, hasUnread: boolean = true) => (                    {
     created: new Date(),
     messageByLastMessage: {
         text,
@@ -14,7 +14,7 @@ const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string
     participantsByConversationId: {
         nodes: [
             {
-                unreadMessagesByParticipantId: { totalCount: 2 },
+                unreadMessagesByParticipantId: { totalCount: hasUnread ? 2 : 0 },
                 accountByAccountId: {
                     id: 1,
                     name: 'account 1',
@@ -62,11 +62,11 @@ const meta: Meta<typeof PastConversations> = {
         query: MY_CONVERSATIONS,
         result: { myConversations: {
             nodes: [
-                makeAConversation(11 * 60 * 1000, 'il y a 11 minutes'),
-                makeAConversation(400 * 24 * 60 * 60 * 1000, 'il y a plus d\'un an'),
+                makeAConversation(11 * 60 * 1000, 'Message d\'il y a 11 minutes'),
+                makeAConversation(400 * 24 * 60 * 60 * 1000, 'Message d\'il y a plus d\'un an', false),
                 makeAConversation(3000, 'reçu il y a 3 secondes'),
-                makeAConversation(24 * 60 * 60 * 1000, 'hier, même heure'),
-                makeAConversation(12 * 24 * 60 * 60 * 1000, 'Il y a 12 jours'),
+                makeAConversation(24 * 60 * 60 * 1000, 'reçu hier, même heure', false),
+                makeAConversation(12 * 24 * 60 * 60 * 1000, 'Message d\'il y a 12 jours'),
             ]
         } } 
     }])

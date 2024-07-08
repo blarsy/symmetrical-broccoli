@@ -7,16 +7,16 @@ import Chat from './Chat'
 import { t } from "@/i18n"
 import Images from '@/Images'
 import Resources from "./Resources"
-import { RouteProps, appBarsTitleFontSize, initials } from "@/lib/utils"
+import { RouteProps, appBarsTitleFontSize } from "@/lib/utils"
 import EditResourceContextProvider from "../resources/EditResourceContextProvider"
 import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
-import { urlFromPublicId } from "@/lib/images"
 import { AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import Animated, { useAnimatedStyle, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
 import { useSharedValue } from 'react-native-reanimated'
 import SupportModal from "../SupportModal"
+import AccountAvatar from "./AccountAvatar"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -51,30 +51,28 @@ const ProfileIcon = ({ size}: { size: number }) => {
     if(!appContext.account) return <Animated.View style={animatedStyles}>
         <Icon source="account-question-outline" size={size}/>
     </Animated.View>
-    
-    if(appContext.account!.avatarPublicId)
-        return <Avatar.Image size={size} source={{ uri:urlFromPublicId(appContext.account!.avatarPublicId!) }} />
 
-    return <Avatar.Text size={size} label={initials(appContext.account!.name)} style={{ backgroundColor: lightPrimaryColor }} color="#000" />
+    return <AccountAvatar onPress={() => {}} account={appContext.account} size={size} />
 }
+
+const baseHeaderButtonSize = appBarsTitleFontSize * 0.75
+const profileButtonSize = baseHeaderButtonSize * 1.5
 
 const DealBoard = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const [currentTabTitle, setCurrentTabTitle] = useState('')
     const { ensureConnected } = useUserConnectionFunctions()
     const [supportVisible, setSupportVisible] = useState(false)
-    
-    const profileButtonSize = appBarsTitleFontSize * 1.5
 
     return <EditResourceContextProvider>
         <SearchFilterContextProvider>
             <View style={{ flex: 1 }}>
                 <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
                     <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
-                    <Appbar.Action icon="help" style={{ backgroundColor: lightPrimaryColor }} size={appBarsTitleFontSize - 8} color="#000" onPress={() => { setSupportVisible(true )}} />
+                    <Appbar.Action icon="help" style={{ backgroundColor: lightPrimaryColor }} size={baseHeaderButtonSize * 0.8} color="#000" onPress={() => { setSupportVisible(true )}} />
                     <Appbar.Action style={{ backgroundColor: appContext.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
                         icon={p => <ProfileIcon size={p.size} />} 
-                        size={ appContext.account ? profileButtonSize : appBarsTitleFontSize }
+                        size={ appContext.account ? profileButtonSize : baseHeaderButtonSize }
                         centered
                         borderless
                         onPress={() => { 
@@ -94,7 +92,7 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                                 setCurrentTabTitle(getViewTitleI18n(state.routes[state.index].name))
                             }
                     }}}
-                    activeColor={ primaryColor }>
+                    activeColor={ primaryColor } inactiveColor="#000">
                     <Tab.Screen name="search" component={Search} options={{ title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }} />
                     <Tab.Screen name="resource" component={Resources} options={{ title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }} />
                     <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <Images.Chat fill={p.color} />}} />
