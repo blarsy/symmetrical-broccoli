@@ -43,6 +43,7 @@ export interface RawConfig {
 interface VersionSpecificRawConfig {
     db: string
     apiPort: number
+    doNotSendMails?: boolean
 }
 
 export interface Config extends RawConfig, VersionSpecificRawConfig {

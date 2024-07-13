@@ -137,6 +137,12 @@ export default function Main () {
                                 screens: {
                                     conversation: 'conversation'
                                 }
+                            },
+                            search: {
+                                screens: {
+                                    viewresource: 'viewResource',
+                                    viewaccount: 'viewAccount'
+                                }
                             }
                         }
                     },

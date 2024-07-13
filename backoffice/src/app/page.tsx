@@ -27,6 +27,12 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { Button } from "@mui/material"
 import QuestionIcon from "@mui/icons-material/QuestionMark"
 import QAIcon from "@mui/icons-material/QuestionAnswer"
+import AccountsGallery from "@/components/showcase/AccountsGallery"
+import { ApolloProvider } from "@apollo/client"
+import { getApolloClient } from "@/lib/apolloClient"
+import { getCommonConfig } from "@/config"
+
+const { mainVersion, link2Url } = getCommonConfig()
 
 const PresentationCarousel = ({ theme }: { theme: Theme }) => {
     const swiperRef = useRef<SwiperType>()
@@ -93,68 +99,71 @@ const Page = () => {
     const dark = useMediaQuery('(prefers-color-scheme: dark)')
     const theme = createTheme(dark)
     
-    return <ThemeProvider theme={theme}>
-        <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Stack flexDirection="row" justifyContent="flex-end" padding="1rem 1rem 0 0" gap="1rem">
-                <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={33}/></Link>
-                <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo alt="Logo Instagram" height={33}/></Link>
-            </Stack>
-            <Stack alignItems="center">
-                <Logo alt="Logo Tope-la" height={323}/>
-            </Stack>
-            <Stack flexDirection="row" justifyContent="center" alignItems="flex-start" gap="2rem" paddingBottom="2rem">
-                <Stack sx={theme => ({
-                    flex: '0 1 40%',
-                    [theme.breakpoints.down('lg')]: {
-                        flex: '0 1 80%',
-                    },[theme.breakpoints.down('md')]: {
-                        flex: '0 1 90%'
-                    }
-                })} alignItems="center">
-                    <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
-                        sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app qui fait tourner les ressources.</Typography>
-                    <Typography textAlign="center" color="#000" sx={{ 
-                        padding: '3rem',
-                        backgroundImage: `url('/FOND.svg')`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundAttachment: 'local',
-                        backgroundSize: '100% 100%',
-                        [theme.breakpoints.down('md')]: {
-                            padding: '2.5rem 1.5rem'
-                        }
-                    }}>La <b>solidarit&#233;</b>, on y croit dur comme fer. La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
-                    <Button variant="outlined" startIcon={<QuestionIcon/>} endIcon={<QAIcon/>} target="_blank"
-                        href="https://foggy-neptune-444.notion.site/Foire-aux-questions-ebb4a58584b8449d836d91ab37995e9a" 
-                        style={{ color: '#fff', borderColor: '#ccc', alignSelf: 'center', justifyContent: 'center', 
-                        marginTop: '2rem', fontFamily: fonts.title.style.fontFamily, fontSize: '1.7rem', borderRadius: '1rem' }}>Foire aux questions</Button>
+    return <ApolloProvider client={getApolloClient(mainVersion)}>
+        <ThemeProvider theme={theme}>
+            <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <Stack flexDirection="row" justifyContent="flex-end" padding="1rem 1rem 0 0" gap="1rem">
+                    <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={33}/></Link>
+                    <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo alt="Logo Instagram" height={33}/></Link>
                 </Stack>
-                <Box sx={theme => ({
-                    [theme.breakpoints.down('lg')]: {
-                        display: 'none',
+                <Stack alignItems="center">
+                    <Logo alt="Logo Tope-la" height={323}/>
+                </Stack>
+                <Stack flexDirection="row" justifyContent="center" alignItems="flex-start" gap="2rem" paddingBottom="2rem">
+                    <Stack sx={theme => ({
+                        flex: '0 1 40%',
+                        [theme.breakpoints.down('lg')]: {
+                            flex: '0 1 80%',
+                        },[theme.breakpoints.down('md')]: {
+                            flex: '0 1 90%'
+                        }
+                    })} alignItems="center">
+                        <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
+                            sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem' }}>L&#39;app qui fait tourner les ressources.</Typography>
+                        <Typography textAlign="center" color="#000" sx={{ 
+                            padding: '3rem',
+                            backgroundImage: `url('/FOND.svg')`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundAttachment: 'local',
+                            backgroundSize: '100% 100%',
+                            [theme.breakpoints.down('md')]: {
+                                padding: '2.5rem 1.5rem'
+                            }
+                        }}>La <b>solidarit&#233;</b>, on y croit dur comme fer. La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au <b>don</b> ou <b>l&#8217;&#233;change</b>.</Typography>
+                        <Button variant="outlined" startIcon={<QuestionIcon/>} endIcon={<QAIcon/>} target="_blank"
+                            href={link2Url}
+                            style={{ color: '#fff', borderColor: '#ccc', alignSelf: 'center', justifyContent: 'center', 
+                            marginTop: '2rem', fontFamily: fonts.title.style.fontFamily, fontSize: '1.7rem', borderRadius: '1rem' }}>Foire aux questions</Button>
+                    </Stack>
+                    <Box sx={theme => ({
+                        [theme.breakpoints.down('lg')]: {
+                            display: 'none',
+                        },
+                        height: 410
+                    })} flex="0 1 25%">
+                        <img src={smartphone.src} width="100%" style={{ maxWidth: '430px' }} alt="smartphone"/>
+                    </Box>
+                </Stack>
+                <PresentationCarousel theme={theme} />
+                <Stack alignItems="center" justifyContent="center" sx={theme => ({
+                    flexDirection: 'column',
+                    //paddingTop: '2rem',
+                    gap: '1rem',
+                    // [theme.breakpoints.up('md')]: {
+                    //     paddingTop: '0'
+                    // },
+                    [theme.breakpoints.up('sm')]: {
+                        flexDirection: 'row',
+                        gap: '0'
                     },
-                    height: 410
-                })} flex="0 1 25%">
-                    <img src={smartphone.src} width="100%" style={{ maxWidth: '430px' }} alt="smartphone"/>
-                </Box>
+                })} padding="3rem">
+                    <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
+                    <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
+                </Stack>
+                {/* <AccountsGallery theme={theme} /> */}
             </Stack>
-            <PresentationCarousel theme={theme} />
-            <Stack alignItems="center" justifyContent="center" sx={theme => ({
-                flexDirection: 'column',
-                paddingTop: '2rem',
-                gap: '1rem',
-                [theme.breakpoints.up('md')]: {
-                    paddingTop: '0'
-                },
-                [theme.breakpoints.up('sm')]: {
-                    flexDirection: 'row',
-                    gap: '0'
-                },
-            })} paddingBottom="3rem">
-                <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
-                <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
-            </Stack>
-        </Stack>
-    </ThemeProvider>
+        </ThemeProvider>
+    </ApolloProvider>
 }
 
     

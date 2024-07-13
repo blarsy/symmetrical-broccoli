@@ -42,20 +42,20 @@ interface NewResourcePayload {
     resource_id: number
     title: string
     account_name: string
-    push_token: string
+    push_tokens: string[]
 }
 
 interface NewResourceNotificationPayload {
     resourceId: number
     title: string
     accountName: string
-    pushToken: string
+    pushTokens: string[]
 }
 
 const toResourceNotification = (payload: NewResourcePayload): NewResourceNotificationPayload => ({
     accountName: payload.account_name,
     resourceId: payload.resource_id,
-    pushToken: payload.push_token,
+    pushTokens: payload.push_tokens,
     title: payload.title
 })
 
@@ -64,7 +64,6 @@ export const handleMessageCreated = async (notification: PgParsedNotification) =
 
     try {
         const messageNotif = toMessageNotification(notification.payload)
-        logger.info(`Push notification ${JSON.stringify(messageNotif)}.`)
         const config = await getCommonConfig()
         await sendPushNotification([ { to: messageNotif.pushToken, body: messageNotif.text, title: messageNotif.sender, data: {
             url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${messageNotif.otherAccountName}`
@@ -79,11 +78,17 @@ export const handleResourceChange = async (notification: PgParsedNotification) =
 
     try {
         const resourceNotif = toResourceNotification(notification.payload)
-        logger.info(`Push notification ${JSON.stringify(resourceNotif)}.`)
-        const config = await getCommonConfig()
-        await sendPushNotification([ { to: resourceNotif.pushToken, body: resourceNotif.title, title: resourceNotif.accountName, data: {
-            url: `${config.pushNotificationsUrlPrefix}viewResource?resourceId=${resourceNotif.resourceId}`
-        }} ])
+        if(resourceNotif.pushTokens.length > 0) {
+            const config = await getCommonConfig()
+            await sendPushNotification(resourceNotif.pushTokens.map( pushToken =>  ({ 
+                to: pushToken,
+                body: resourceNotif.title, 
+                title: resourceNotif.accountName, 
+                data: {
+                    url: `${config.pushNotificationsUrlPrefix}resource/viewresource?resourceId=${resourceNotif.resourceId}`
+                }
+            })))
+        }
     } catch(e) {
         logger.error(`Error while sending push notification to Expo.`, e)
     }

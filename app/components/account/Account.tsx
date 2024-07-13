@@ -18,6 +18,7 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
   accountById(id: $id) {
     email
     name
+    id
     resourcesByAccountId(orderBy: CREATED_DESC) {
       nodes {
         id

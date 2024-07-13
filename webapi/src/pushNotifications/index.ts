@@ -1,3 +1,5 @@
+import logger from "../logger"
+
 export interface PushNotification {
     to: string,
     title: string,
@@ -6,6 +8,7 @@ export interface PushNotification {
 }
 
 export async function sendPushNotification(messages: PushNotification[]) {
+    logger.info(`Push notification ${JSON.stringify(messages)}.`)
     await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {

@@ -1,6 +1,7 @@
 {
     "apiUrl": "http://localhost:3000/graphql",
     "subscriptionsUrl": "ws://localhost:3000/graphql",
+    "linksUrl": "http://localhost:3002/api/link/",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
     "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",

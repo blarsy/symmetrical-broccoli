@@ -16,6 +16,7 @@ import { IMessage } from 'react-native-gifted-chat'
 import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { View } from 'react-native'
 
 export const editResourceContextDecorator = (StoryElement: any) => 
     makeEditResourceContextDecorator(StoryElement)
@@ -35,7 +36,7 @@ const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceCon
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'account-name', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
 
 const defaultResourceCategories = [
     { code: 'cat1', name: 'category 1' },
@@ -69,6 +70,10 @@ export const conversationContextDecorator =  (initialConversationData: Conversat
         <StoryElement />
     </ConversationContext.Provider>
 }
+
+export const statusBarCompensatorDecorator = (StoryElement: React.ElementType) => <View style={{ flex:1, marginTop: -30 }}>
+    <StoryElement/>
+</View>
 
 export const paperProviderDecorator = (StoryElement: React.ElementType) => {
     const [fontsLoaded, fontError] = useCustomFonts()

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, fontsLoaderDecorator, 
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, statusBarCompensatorDecorator, 
     gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import DealBoard from './DealBoard'
 import queryMocks from '@/lib/queryMocks'
@@ -9,7 +9,7 @@ import queryMocks from '@/lib/queryMocks'
 const meta: Meta<typeof DealBoard> = {
   component: DealBoard,
   decorators: [
-    paperProviderDecorator, configDayjsDecorator,
+    paperProviderDecorator, configDayjsDecorator, statusBarCompensatorDecorator,
     navigationContainerDecorator(), gestureHandlerDecorator
   ]
 }

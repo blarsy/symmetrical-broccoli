@@ -278,7 +278,7 @@ const getNewResourcsSummaryData = async (connectionString: string): Promise<NewR
     return resourcesSummaryData
 }
 
-export const sendSummaries = async (connectionString: string): Promise<void> => {
+export const sendSummaries = async (connectionString: string, version: string): Promise<void> => {
     const [resourcesSummaryData, chatMessagesSummaryData] = await Promise.all([
         getNewResourcsSummaryData(connectionString),
         getChatMessageSummaryData(connectionString)
@@ -325,6 +325,6 @@ export const sendSummaries = async (connectionString: string): Promise<void> => 
             runAndLog(makePostQuery(qry.eventType, qry.accountId), connectionString, `Setting last summary time.`)
         })
 
-        sendNotificationsSummaryMail(email, i18nMailSubject, [resourceSummaryContent, chatMessagesSummaryContent].join(''), language)
+        sendNotificationsSummaryMail(email, i18nMailSubject, [resourceSummaryContent, chatMessagesSummaryContent].join(''), language, version)
     })
 }

@@ -654,6 +654,27 @@ type Query implements Node {
     after: Cursor
   ): ResourcesConnection
 
+  """Reads and enables pagination through a set of `Account`."""
+  topAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AccountsConnection
+
   """Reads a single `Account` using its globally unique `ID`."""
   account(
     """The globally unique `ID` to be used in selecting a single `Account`."""
@@ -2331,6 +2352,7 @@ type ActiveAccount {
   avatarImageId: Int
   activated: Datetime
   language: String
+  logLevel: Int
 }
 
 """A `ActiveAccount` edge in the connection."""
@@ -2367,6 +2389,8 @@ enum ActiveAccountsOrderBy {
   ACTIVATED_DESC
   LANGUAGE_ASC
   LANGUAGE_DESC
+  LOG_LEVEL_ASC
+  LOG_LEVEL_DESC
 }
 
 """
@@ -2406,6 +2430,9 @@ input ActiveAccountCondition {
 
   """Checks for equality with the object’s `language` field."""
   language: String
+
+  """Checks for equality with the object’s `logLevel` field."""
+  logLevel: Int
 }
 
 """A connection to a list of `EmailActivation` values."""

@@ -123,7 +123,7 @@ const resources = {
       "send_a_message": "Tell us !",
       "support_info": "System info",
       "support_title": "Help & support",
-      "support_intro_text": "Tope-là is still young, so we expect issues, despite our efforts to make it work flawlessly.\nHelp us improve the life of change makers by giving us info about anything that feel wrong with Tope-là !",
+      "support_intro_text": "Tope-là is still young, so we expect issues, \nHelp us improve: tell us anything that feels wrong with Tope-là !",
       "support_mail_subject": "User message",
       "support_message_label": "Your message",
       "send_buttonCaption": "Send",
@@ -138,7 +138,9 @@ const resources = {
       "option_realtime": "Realtime in app",
       "option_regularSummary": "Email summaries",
       "notifications_settings_title": "Notification settings",
-      "publicInfo_settings_title": "Your activity's promotional links"
+      "publicInfo_settings_title": "Your activity's promotional links",
+      "faq_title": "Frequently asked questions",
+      "faq_button_label": "FAQ"
     }
   },
   fr: {
@@ -257,7 +259,7 @@ const resources = {
       "send_a_message": "Dites-nous !",
       "support_info": "Infos système",
       "support_title": "Aide & support",
-      "support_intro_text": "Tope-là est encore jeune, donc nous nous attendons à des soucis, malgré nos efforts pour la rendre impeccable.\nAidez-nous à améliorer la vie des créateurs de sens en nous donnant des infos à propos de quoi que ce soit qui n'a pas l'air normal dans Tope-là !",
+      "support_intro_text": "Tope-là est encore jeune, donc nous nous attendons à des soucis.\nAidez-nous à l'améliorer: donnez-nous des infos à propos de quoi que ce soit qui n'a pas l'air normal dans Tope-là !",
       "support_mail_subject": "Message utilisateur",
       "support_message_label": "Votre message",
       "send_buttonCaption": "Envoyer",
@@ -272,7 +274,9 @@ const resources = {
       "option_realtime": "Temps réél dans l'app",
       "option_regularSummary": "Résumés par email",
       "notifications_settings_title": "Paramètres de notification",
-      "publicInfo_settings_title": "Liens de promotion de votre activité"
+      "publicInfo_settings_title": "Liens de promotion de votre activité",
+      "faq_title": "Foire aux questions",
+      "faq_button_label": "FAQ"
     }
   }
 }

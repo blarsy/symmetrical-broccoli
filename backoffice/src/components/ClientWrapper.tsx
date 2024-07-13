@@ -10,8 +10,8 @@ import dayjs from 'dayjs'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useEffect, useState } from 'react'
 import { Theme } from '@emotion/react'
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, from } from '@apollo/client'
-import getConfig from '@/config/index'
+import { ApolloProvider } from '@apollo/client'
+import { getApolloClient } from '@/lib/apolloClient'
 
 dayjs.extend(relativeTime)
 
@@ -19,23 +19,6 @@ interface Props {
     children: JSX.Element
     version?: string
 }
-
-export const getApolloClient = (version?: string) => {
-    const config = getConfig(version)
-    const httpLink = createHttpLink({ uri: config.graphqlUrl })
-
-    return new ApolloClient({
-      link: from([
-        httpLink
-      ]),
-      cache: new InMemoryCache(),
-      defaultOptions: {
-        watchQuery: {
-          fetchPolicy: 'cache-and-network'
-        }
-      }
-    })
-  }
 
 export const ClientWrapper = ({ children, version }: Props) => {
     const [theme, setTheme] = useState(undefined as Theme | undefined)

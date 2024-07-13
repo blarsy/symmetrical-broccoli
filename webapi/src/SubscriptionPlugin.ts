@@ -42,7 +42,7 @@ export default makeExtendSchemaPlugin(({ pgSql: sql }) => {
               )
             }
           )
-          logger.info(`Returning from message subscription: ${rows[0]}`)
+          logger.info(`Returning from message subscription: ${JSON.stringify(rows[0])}`)
           return rows[0]
         },
       },

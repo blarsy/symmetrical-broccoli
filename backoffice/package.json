@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.8.8",
+    "@cloudinary/url-gen": "^1.19.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@graphile/pg-pubsub": "^4.13.0",

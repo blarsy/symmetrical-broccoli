@@ -98,7 +98,7 @@ const launchJobWorker = async (connectionString: string, version: string) => {
                 }, 'cleanOldClientLogs')
             },
             sendSummaries: async () => {
-                executeJob(() => sendSummaries(connectionString), 'sendSummaries')
+                executeJob(() => sendSummaries(connectionString, version), 'sendSummaries')
             }
         },
         schema: 'worker'

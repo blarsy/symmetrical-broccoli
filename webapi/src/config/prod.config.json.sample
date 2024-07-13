@@ -26,7 +26,8 @@
         },
         "v0_2": {
             "db": "sb_db_0_2",
-            "apiPort": 3001
+            "apiPort": 3001,
+            "doNotSendMails": true
         }
     }
 }

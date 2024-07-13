@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator, statusBarCompensatorDecorator } from '@/lib/storiesUtil'
 import { GET_MINIMUM_CLIENT_VERSION, StartApolloWrapped } from './Start'
 import { GET_CATEGORIES } from './Main'
 import { ISecureStore } from '@/lib/secureStore'
@@ -13,6 +13,7 @@ const meta: Meta<typeof StartApolloWrapped> = {
   component: StartApolloWrapped,
   decorators: [
     paperProviderDecorator,
+    statusBarCompensatorDecorator,
     appContextDecorator(true),
     configDayjsDecorator,
     apolloClientMocksDecorator([])

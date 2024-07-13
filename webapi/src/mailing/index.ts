@@ -2,12 +2,12 @@ import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
-import { getCommonConfig } from '../config'
+import getConfig,{ getCommonConfig } from '../config'
 import initTranslations from '../i18n'
 
 
-export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string) => {
-    const config = await getCommonConfig()
+export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string) => {
+    const config = await getConfig(version)
 
     const msg = {
       to,
@@ -17,7 +17,7 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
       html: htmlContent
     }
 
-    if(config.production){
+    if(config.production && !config.doNotSendMails){
         sgMail.setApiKey(config.mailApiKey!)
         await sgMail.send(msg)
     } else {
@@ -25,9 +25,9 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
     }
 }
 
-export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string) => {
+export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string, version: string) => {
     const config = await getCommonConfig()
-    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent)
+    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent, version)
 }
 
 let partialsPreparePromise: Promise<void> | null = null
@@ -76,7 +76,7 @@ export const sendEmailActivationCode = async (email: string, code: string, lang:
 
     await sendNoReplyMail(email, heading, 
         `${text}${link}`, 
-        htmlContent)
+        htmlContent, version)
 }
 
 export const sendAccountRecoveryMail = async (email: string, code: string, lang: string, version: string) => {
@@ -98,10 +98,10 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
 
     await sendNoReplyMail(email, heading, 
         `${text}${link}`, 
-        htmlContent)
+        htmlContent, version)
 }
 
-export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string) => {
+export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string, version: string) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
 
@@ -125,5 +125,5 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
 
     const htmlContent = template(data)
 
-    await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent )
+    await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent, version )
 }
