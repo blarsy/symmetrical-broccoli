@@ -69,7 +69,14 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.SetMessageReceivedHandler:
           return { ...previousState, ...{ messageReceivedHandler: action.payload.messageReceivedHandler } }
         case AppReducerActionType.SetNewChatMessage:
-          return { ...previousState, ...{ newChatMessage: action.payload } }
+          if(action.payload && previousState.messageReceivedHandler) {
+            previousState.messageReceivedHandler(action.payload)
+            return { ...previousState, ...{ lastConversationChangeTimestamp: new Date().valueOf() } }
+          } else if(action.payload) {
+            return { ...previousState, ...{ newChatMessage: action.payload, lastConversationChangeTimestamp: new Date().valueOf() } }
+          } else {
+            return { ...previousState, ...{ newChatMessage: undefined } }
+          }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload } }
         case AppReducerActionType.SetConversationsStale:

@@ -83,11 +83,7 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
         })
         const subscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
             debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
-            if(appState.messageReceivedHandler) {
-                appState.messageReceivedHandler(payload.data.messageReceived.message)
-            } else {
-                appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
-            }
+            appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
         } })
         appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, chatMessagesSubscription: subscription} })
 

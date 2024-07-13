@@ -61,7 +61,6 @@ const Conversation = ({ route }: RouteProps) => {
         GiftedChat.append(messages, [receivedMsg])
         return [receivedMsg, ...messages]
       })
-      appDispatch({ type: AppReducerActionType.SetConversationsStale, payload: undefined })
     }
 
     useEffect(() => {
