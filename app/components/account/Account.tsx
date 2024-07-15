@@ -5,7 +5,7 @@ import { gql, useQuery } from "@apollo/client"
 import ViewField from "../ViewField"
 import { t } from "@/i18n"
 import { Avatar, Text } from "react-native-paper"
-import { urlFromPublicId } from "@/lib/images"
+import { imgSourceFromPublicId } from "@/lib/images"
 import { adaptToWidth } from "@/lib/utils"
 import { Link, Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
@@ -79,7 +79,7 @@ export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) 
                     </ViewField>
                     { data.accountById.imageByAvatarImageId?.publicId &&
                         <ViewField title="Logo">
-                            <Avatar.Image style={{ marginVertical: 10 }} source={{ uri: urlFromPublicId(data.accountById.imageByAvatarImageId.publicId)}} size={adaptToWidth(150, 250, 300)} />
+                            <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId)} size={adaptToWidth(150, 250, 300)} />
                         </ViewField>
                     }
                     { data.accountById.accountsLinksByAccountId.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&

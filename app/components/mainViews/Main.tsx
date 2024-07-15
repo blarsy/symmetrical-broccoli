@@ -64,15 +64,13 @@ const subscribe = (listener: any) => {
 
     let subscription: Subscription | undefined = undefined
     // Listen to expo push notifications
-    //if(Device.isDevice && Device.brand) {
-        subscription = addNotificationResponseReceivedListener(response => {
-            const url = response.notification.request.content.data.url
-    
-            // Let React Navigation handle the URL
-            debug({ message: `Push notifications received in addNotificationResponseReceivedListener, linking to ${url}` })
-            listener(url)
-        })
-    //}
+    subscription = addNotificationResponseReceivedListener(response => {
+        const url = response.notification.request.content.data.url
+
+        // Let React Navigation handle the URL
+        debug({ message: `Push notifications received in addNotificationResponseReceivedListener, linking to ${url}` })
+        listener(url)
+    })
 
     return () => {
         // Clean up the event listeners

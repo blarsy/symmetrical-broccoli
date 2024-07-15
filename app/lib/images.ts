@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from "react-native"
 import { cloudinaryCloud, cloudinaryUploadPreset, cloudinaryRestUrl } from "./settings"
 import { Cloudinary } from "@cloudinary/url-gen"
 
@@ -26,3 +27,11 @@ export const uploadImage = async (path: string):Promise<string> => {
 }
 
 export const urlFromPublicId = (publicId: string) => cld.image(publicId).toURL()
+
+export const imgSourceFromPublicId = (publicId: string): ImageSourcePropType  => {
+    if(publicId) {
+        const uri = cld.image(publicId).toURL()
+        if(uri) return { uri }
+    }
+    return require('@/assets/img/placeholder.png')
+}

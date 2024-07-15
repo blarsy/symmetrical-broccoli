@@ -1,10 +1,10 @@
-import DataLoadState, { fromData, initial } from "@/lib/DataLoadState"
-import { urlFromPublicId } from "@/lib/images"
+import DataLoadState, { fromError, fromData, initial } from "@/lib/DataLoadState"
 import { gql, useLazyQuery } from "@apollo/client"
 import { createContext, useState } from "react"
 import React from "react"
 import { Category, Resource, fromServerGraphResource } from "@/lib/schema"
 import { IMessage } from "react-native-gifted-chat"
+import { t } from "@/i18n"
 
 const MESSAGES_PER_PAGE = 25
 const asIMessages = (messages: any[]): IMessage[] => messages.map(msg => asIMessage(msg.node))
@@ -17,11 +17,9 @@ export const asIMessage = (msg: any): IMessage => {
     user: {
         _id: msg.participantByParticipantId.accountByAccountId.id,
         name: msg.participantByParticipantId.accountByAccountId.name,
-        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId ?
-          urlFromPublicId(msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId.publicId):
-          undefined
+        //avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId
     },
-    image: msg.imageByImageId && urlFromPublicId(msg.imageByImageId.publicId),
+    image: msg.imageByImageId?.publicId,
     pending: false,
     received: !!msg.received,
     sent: true,
@@ -151,19 +149,24 @@ const ConversationContextProvider = ({ children }: Props) => {
     
     const actions: ConversationActions = {
         load: async (resourceId: number, otherAccountId: number, categories: Category[]) => {
-          
-          const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
-
-          if(res.data) {
-            const loadedMessages = asIMessages(res.data.conversationMessages.edges)
-            setConversationState(prevValue => ({ ...prevValue, ...{ 
-              conversation: fromData({ 
-                messages: loadedMessages,
-                otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name },
-                resource: fromServerGraphResource(res.data.resourceById, categories),
-                endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : ''
-              })
-            }}))
+          try {
+            const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
+            
+            if(res.data) {
+              const loadedMessages = asIMessages(res.data.conversationMessages.edges)
+              setConversationState(prevValue => ({ ...prevValue, ...{ 
+                conversation: fromData({ 
+                  messages: loadedMessages,
+                  otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name },
+                  resource: fromServerGraphResource(res.data.resourceById, categories),
+                  endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : ''
+                })
+              }}))
+            } else {
+              throw new Error('Unexpected data from API call')
+            }
+          } catch(e) {
+            setConversationState({ conversation: fromError(e, t('requestError')) })
           }
         },
         setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]): void => {

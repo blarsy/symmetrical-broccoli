@@ -28,19 +28,21 @@ export const ChatHeader = (p: ChatHeaderProps) => {
     
     return (<LoadedZone loading={conversationContext.state.conversation.loading} error={conversationContext.state.conversation.error}
         containerStyle={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', backgroundColor: lightPrimaryColor, maxWidth: Dimensions.get('window').width }}>
-        <IconButton icon="chevron-left" size={40}
-            onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
-        <AccountAvatar onPress={p.onAccountShowRequested} account={conversationContext.state.conversation.data!.resource?.account!} size={40} />
-        <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6, gap: 2 }}>
-            <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
-                style={{ color: primaryColor, textTransform: 'uppercase' }}>
-                    <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.state.conversation.data!.resource?.account!.name || t('name_account_removed')}</Text>
-            <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
-                style={{ textDecorationLine: resourceDeleted ? 'line-through' : 'none' }}>
-                    {conversationContext.state.conversation.data!.resource?.title}</Text>
-            { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
-        </View>
-        <IconButton style={{ borderRadius: 0 }} icon={() =>  <Images.Search />} onPress={() => p.onResourceShowRequested(conversationContext.state.conversation.data!.resource!.id)} />
+            { conversationContext.state.conversation.data?.resource && <>
+                <IconButton icon="chevron-left" size={40}
+                    onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
+                <AccountAvatar onPress={p.onAccountShowRequested} account={conversationContext.state.conversation.data!.resource?.account!} size={40} />
+                <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6, gap: 2 }}>
+                    <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
+                        style={{ color: primaryColor, textTransform: 'uppercase' }}>
+                            <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.state.conversation.data!.resource?.account!.name || t('name_account_removed')}</Text>
+                    <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
+                        style={{ textDecorationLine: resourceDeleted ? 'line-through' : 'none' }}>
+                            {conversationContext.state.conversation.data!.resource?.title}</Text>
+                    { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
+                </View>
+                <IconButton style={{ borderRadius: 0 }} icon={() =>  <Images.Search />} onPress={() => p.onResourceShowRequested(conversationContext.state.conversation.data!.resource!.id)} />
+            </>}
     </LoadedZone>)
 }
 

@@ -9,8 +9,10 @@ unzip ./build.zip -d ./
 
 # copy the components to locations where Docker containers can use it
 cd build
-rsync -av --progress webapi ./../docker/containers/webapi
-rsync -av --progress website ./../docker/containers/website
+rm -rf ./../docker/containers/webapi/webapi
+cp -r webapi ./../docker/containers/webapi/webapi
+rm -rf ./../docker/containers/website/website
+cp -r website ./../docker/containers/website/website
 
 cd /home/symbro/docker/environments/prod
 docker compose down

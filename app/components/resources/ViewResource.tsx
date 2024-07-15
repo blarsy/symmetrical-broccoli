@@ -3,25 +3,25 @@ import React, { useContext, useState } from "react"
 import { Banner, Button, Chip, Icon, Modal, Portal, Text } from "react-native-paper"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import { t } from "@/i18n"
-import { Dimensions, Image, ScrollView, TouchableOpacity, View } from "react-native"
+import { Dimensions, Image, ImageSourcePropType, ScrollView, TouchableOpacity, View } from "react-native"
 import dayjs from "dayjs"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import PanZoomImage from "../PanZoomImage"
 import { lightPrimaryColor } from "../layout/constants"
-import { urlFromPublicId } from "@/lib/images"
+import { imgSourceFromPublicId } from "@/lib/images"
 import { useQuery } from "@apollo/client"
 import LoadedZone from "../LoadedZone"
 import ViewField from "../ViewField"
 import { AppContext } from "../AppContextProvider"
 
 interface ImgMetadata { 
-    source: string
+    source: ImageSourcePropType
     idx: number
 }
 
 const ResourceInfoChip = (p: any) => <Chip style={{ backgroundColor: lightPrimaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
 
-const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImagePress: (imgSource: string) => void}) => {
+const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImagePress: (imgSource: ImageSourcePropType) => void}) => {
     const [swipedToEnd, setSwipedToEnd] = useState(false)
     const windowDimension = Dimensions.get('window')
     const hasOnlyOneImage = resource.images && resource.images.length === 1
@@ -37,8 +37,8 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
     }
 
     if(hasOnlyOneImage) {
-        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1, alignItems: 'center', marginBottom: 10 }} onPress={() => onImagePress(urlFromPublicId(resource.images[0].publicId!))}>
-            <Image style={{ flexGrow: 1 }} source={{ uri: urlFromPublicId(resource.images[0].publicId!)} }
+        return <TouchableOpacity style={{ height: imgSize, flexGrow: 1, alignItems: 'center', marginBottom: 10 }} onPress={() => onImagePress(imgSourceFromPublicId(resource.images[0].publicId!))}>
+            <Image style={{ flexGrow: 1 }} source={imgSourceFromPublicId(resource.images[0].publicId!)}
                 width={imgSize} height={imgSize} /> 
         </TouchableOpacity>
     }
@@ -46,7 +46,7 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
     return <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', flexDirection:"row", marginBottom: 10 }}>
         <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}></View>
         <SwiperFlatList style={{ width: imgSize, flexGrow: 0, flexShrink: 0 }} data={getSwiperData(resource)} onEndReached={() => setSwipedToEnd(true)} renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
-                <Image key={item.idx} source={{ uri: item.source}} width={imgSize} height={imgSize} />
+                <Image key={item.idx} source={item.source} width={imgSize} height={imgSize} />
         </TouchableOpacity>} />
         <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}>{ !swipedToEnd && <Icon source="gesture-swipe-right" size={40}/>}</View>
     </View>
@@ -55,18 +55,18 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
 const getSwiperData = (resource: Resource): ImgMetadata[] => {
     if(resource.images && resource.images.length > 0) {
         return resource.images.map((img, idx) => ({
-            source: urlFromPublicId(img.publicId!),
+            source: imgSourceFromPublicId(img.publicId || ''),
             idx
         }))
     } else {
-        return [{ source: '/placeholder.png', idx: 0}]
+        return [{ source: require('@/assets/img/placeholder.png'), idx: 0}]
     }
 }
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
     const appState = useContext(AppContext)
     const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: route.params.resourceId }})
-    const [ focusedImage, setFocusedImage] = useState('')
+    const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     
 
     let expiration: { text: string, date: string } | undefined = undefined
@@ -134,11 +134,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                     { resource.canBeExchanged && <ResourceInfoChip>{t('canBeExchanged_label')}</ResourceInfoChip>}
                 </View>
             </ViewField>
-            <Portal>
-                <Modal dismissable onDismiss={() => setFocusedImage('')} visible={ !!focusedImage }>
-                    { focusedImage && <PanZoomImage uri={focusedImage} /> }
-                </Modal>
-            </Portal>
+            <PanZoomImage onDismess={() => setFocusedImage(undefined)} source={focusedImage} />
         </>}
         </LoadedZone>
     </ScrollView>
