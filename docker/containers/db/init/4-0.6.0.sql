@@ -489,11 +489,302 @@ $BODY$;
 ALTER FUNCTION sb.update_account_broadcast_prefs(broadcast_pref_type[])
     OWNER TO sb;
 
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language,
+	accounts.log_level
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION sb.top_accounts(
+	)
+    RETURNS SETOF accounts 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT *
+FROM sb.active_accounts aa
+WHERE aa.avatar_image_id IS NOT NULL AND
+(SELECT COUNT(*) FROM sb.resources WHERE account_id = aa.id) > 1
+ORDER BY aa.created DESC LIMIT 10;
+
+$BODY$;
+
+ALTER FUNCTION sb.top_accounts()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.top_accounts() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.top_accounts() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.top_accounts() TO sb;
+
+CREATE OR REPLACE FUNCTION sb.register_account(
+	name character varying,
+	email character varying,
+	password character varying,
+	language character varying)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare inserted_id integer;
+declare hash character varying;
+declare salt character varying;
+declare activation_code character varying;
+begin
+	IF sb.is_password_valid(register_account.password) = FALSE THEN
+		RAISE EXCEPTION 'Password invalid';
+	ELSE
+		IF EXISTS(SELECT id FROM sb.accounts a WHERE a.email = LOWER(register_account.email)) THEN
+			RAISE EXCEPTION 'Email is in use';
+		END IF;
+	END IF;
+	
+	INSERT INTO sb.accounts(
+		name, email, hash, salt, language)
+	SELECT register_account.name, LOWER(register_account.email), phs.hash, phs.salt, register_account.language
+	FROM sb.get_password_hash_salt(register_account.password) phs
+	RETURNING id INTO inserted_id;
+	
+	SELECT array_to_string(array(select substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) 
+	INTO activation_code
+	FROM generate_series(1,32)),'');
+	
+	INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+	VALUES (2, inserted_id, 1);
+	
+	INSERT INTO sb.email_activations (account_id, email, activation_code)
+	VALUES (inserted_id, LOWER(register_account.email), activation_code);
+	
+	PERFORM sb.add_job('mailActivation', 
+		json_build_object('email', LOWER(register_account.email), 'code', activation_code, 'lang', register_account.language));
+	
+	RETURN (
+		inserted_id,
+		EXTRACT(epoch FROM now() + interval '100 day'),
+		'identified_account'
+    )::sb.jwt_token;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.create_resource(
+	title character varying,
+	description character varying,
+	expiration timestamp without time zone,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes character varying[])
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+declare inserted_id integer;
+begin
+	INSERT INTO sb.resources(
+	title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted)
+	VALUES (create_resource.title, create_resource.description, create_resource.expiration, sb.current_account_id(),
+			NOW(), create_resource.is_service, create_resource.is_product, create_resource.can_be_delivered,
+			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted)
+	RETURNING id INTO inserted_id;
+	
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT inserted_id, UNNEST(category_codes);
+	
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+	-- Emit notification for push notification handling
+	PERFORM pg_notify('resource_created', json_build_object(
+		'resource_id', inserted_id,
+		'title', create_resource.title,
+		'account_name', (SELECT name FROM sb.accounts WHERE id = sb.current_account_id()),
+		'push_tokens', (SELECT ARRAY(SELECT token FROM sb.accounts_push_tokens apt WHERE 
+			(NOT EXISTS (SELECT bp.id FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) OR 
+			(SELECT bp.days_between_summaries FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) = -1 )
+			AND account_id != sb.current_account_id()))
+	)::text);
+	
+	RETURN inserted_id;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.create_message(
+	resource_id integer,
+	other_account_id integer,
+	text character varying,
+	image_public_id character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE conversation_id INTEGER;
+DECLARE created_message_id INTEGER = 0;
+DECLARE created_message_text TEXT;
+DECLARE created_message_sender TEXT;
+DECLARE inserted_image_id INTEGER;
+DECLARE destinator_participant_id INTEGER;
+DECLARE destinator_id INTEGER;
+DECLARE destinator_name TEXT;
+DECLARE target_push_token TEXT;
+
+BEGIN
+	SELECT c.id FROM sb.conversations c
+	INTO conversation_id
+	WHERE c.resource_id = create_message.resource_id AND EXISTS(
+		SELECT * FROM sb.participants p
+		WHERE p.conversation_id = c.id AND p.account_id = sb.current_account_id()
+	) AND EXISTS(
+		SELECT * FROM sb.participants p
+		WHERE p.conversation_id = c.id AND p.account_id = create_message.other_account_id
+	);
+
+    SELECT a.name INTO created_message_sender
+    FROM sb.accounts a
+    WHERE a.id = sb.current_account_id();
+	
+	IF conversation_id IS NULL THEN
+		INSERT INTO sb.conversations (resource_id)
+		VALUES (create_message.resource_id)
+		RETURNING id INTO conversation_id;
+		
+		INSERT INTO sb.participants (account_id, conversation_id)
+		VALUES (sb.current_account_id(), block.conversation_id);
+		INSERT INTO sb.participants (account_id, conversation_id)
+		VALUES ((SELECT account_id FROM sb.resources r WHERE r.id = create_message.resource_id), block.conversation_id);
+		
+	END IF;
+	
+	IF create_message.image_public_id IS NOT NULL THEN
+		INSERT INTO sb.images (public_id)
+		VALUES (create_message.image_public_id)
+		RETURNING id INTO inserted_image_id;
+	END IF;
+	
+	INSERT INTO sb.messages(participant_id, text, image_id, received)
+	SELECT (
+			SELECT p.id FROM sb.participants p
+			WHERE p.conversation_id = block.conversation_id AND account_id = sb.current_account_id()
+	), create_message.text, block.inserted_image_id, null
+	RETURNING id, messages.text INTO created_message_id, created_message_text;
+	
+	SELECT p.id INTO destinator_participant_id FROM sb.participants p
+	WHERE p.conversation_id = block.conversation_id AND p.account_id <> sb.current_account_id();
+	
+	INSERT INTO sb.unread_messages (participant_id, message_id)
+	SELECT destinator_participant_id, created_message_id;
+	
+	UPDATE sb.conversations c SET last_message = created_message_id
+	WHERE c.id = block.conversation_id;
+	
+	SELECT a.id, a.name, apt.token INTO destinator_id, destinator_name, target_push_token FROM sb.accounts a
+	INNER JOIN sb.participants p ON a.id = p.account_id
+	LEFT JOIN sb.accounts_push_tokens apt ON a.id = apt.account_id
+	WHERE p.id = destinator_participant_id;
+
+	-- Emit notification for graphql/postgraphile's subscription plugin
+	PERFORM pg_notify('graphql:message_account:' || destinator_id, json_build_object(
+		'event', 'message_created',
+		'subject', created_message_id
+	)::text);
+
+	IF target_push_token IS NOT NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('message_created', json_build_object(
+			'message_id', created_message_id,
+			'text', created_message_text,
+			'sender', created_message_sender,
+			'push_token', target_push_token,
+			'resource_id', create_message.resource_id,
+			'other_account_id', create_message.other_account_id,
+			'other_account_name', destinator_name
+		)::text);
+	END IF;
+	
+	RETURN created_message_id;
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.suggested_resources(
+	search_term text,
+	is_product boolean,
+	is_service boolean,
+	can_be_gifted boolean,
+	can_be_exchanged boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	category_codes character varying[])
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+SELECT r.*
+  FROM sb.resources r
+  LEFT JOIN sb.active_accounts a ON a.id = r.account_id
+  WHERE r.expiration > LOCALTIMESTAMP
+  AND r.deleted IS NULL
+  AND (ARRAY_LENGTH(category_codes, 1) IS NULL OR EXISTS(
+	  SELECT * 
+	  FROM sb.resources_resource_categories rrc 
+	  WHERE r.id = rrc.resource_id AND rrc.resource_category_code IN (SELECT UNNEST(category_codes))))
+  AND (r.account_id = sb.current_account_id() OR a.id IS NOT NULL)
+  AND
+  (NOT suggested_resources.is_product OR r.is_product)
+  AND
+  (NOT suggested_resources.is_service OR r.is_service)
+  AND
+  (NOT suggested_resources.can_be_gifted OR r.can_be_gifted)
+  AND
+  (NOT suggested_resources.can_be_exchanged OR r.can_be_exchanged)
+  AND
+  (NOT suggested_resources.can_be_delivered OR r.can_be_delivered)
+  AND
+  (NOT suggested_resources.can_be_taken_away OR r.can_be_taken_away)
+  AND
+  (search_term = '' OR 
+	(r.title ILIKE '%' || search_term || '%' OR 
+	 r.description ILIKE '%' || search_term || '%' OR
+	 a.name ILIKE '%' || search_term || '%'))
+  ORDER BY COALESCE(r.deleted, LOCALTIMESTAMP) DESC, r.expiration DESC;
+ 
+$BODY$;
+
 
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.3.0', minimum_client_version = '0.3.0';
+	UPDATE sb.system SET version = '0.6.0', minimum_client_version = '0.6.0';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

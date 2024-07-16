@@ -1,6 +1,6 @@
 {
-    "apiUrl": "https://www.tope-la.com/graphqlv0_2",
-    "subscriptionsUrl": "wss://www.tope-la.com/graphqlv0_2",
+    "apiUrl": "https://www.tope-la.com/graphqlv0_6",
+    "subscriptionsUrl": "wss://www.tope-la.com/graphqlv0_6",
     "linksUrl": "https://www.tope-la.com/api/link/",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",

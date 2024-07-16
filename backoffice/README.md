@@ -40,6 +40,8 @@ First ensure your web server does not systematically redirect everything to SSL,
 
 `}`
 
+Make sure no other server is listening to port 80 by commenting out all other line in this nginx.conf file.
+
 make sure [certbot](https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal) is installed
 
 make sure you uploaded your SSH key to the target server first (should be done only once in the server's lifetime)

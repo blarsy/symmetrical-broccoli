@@ -186,6 +186,7 @@ export const initials = (text: string) => {
 }
 
 export const versionChecker = (serverVersion: string) => {
+  //console.log('nativeApplicationVersion', 'clientVersion', nativeApplicationVersion, clientVersion, 'serverVersion', serverVersion)
   if(nativeApplicationVersion || clientVersion)
     return compareVersions(nativeApplicationVersion || clientVersion, serverVersion) >= 0
   

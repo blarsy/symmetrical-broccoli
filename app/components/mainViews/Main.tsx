@@ -138,8 +138,8 @@ export default function Main () {
                             },
                             search: {
                                 screens: {
-                                    viewresource: 'viewResource',
-                                    viewaccount: 'viewAccount'
+                                    viewResource: 'viewresource',
+                                    viewAccount: 'viewaccount'
                                 }
                             }
                         }

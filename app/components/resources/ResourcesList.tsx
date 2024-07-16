@@ -109,7 +109,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
           <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.categories.data || [])}
               onAddRequested={addRequested} onRefreshRequested={() => {
                 refetch()
-              }}
+              }} noDataLabel={t('no_resource_created_yet')}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
               displayItem={(resource, idx) => <ResourceCard key={idx} resource={resource}
                 viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}

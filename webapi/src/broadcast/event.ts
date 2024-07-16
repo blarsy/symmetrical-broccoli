@@ -2,6 +2,8 @@ import { PgParsedNotification } from "pg-listen"
 import { getCommonConfig } from "../config"
 import { sendPushNotification } from "../pushNotifications"
 import logger from "../logger"
+import initTranslations from '../i18n'
+import { TFunction } from "i18next"
 
 export enum EventType {
     messageCreated = 1,
@@ -42,20 +44,20 @@ interface NewResourcePayload {
     resource_id: number
     title: string
     account_name: string
-    push_tokens: string[]
+    destinations: any[]
 }
 
 interface NewResourceNotificationPayload {
     resourceId: number
     title: string
     accountName: string
-    pushTokens: string[]
+    destinations: { token: string, language: string }[]
 }
 
 const toResourceNotification = (payload: NewResourcePayload): NewResourceNotificationPayload => ({
     accountName: payload.account_name,
     resourceId: payload.resource_id,
-    pushTokens: payload.push_tokens,
+    destinations: payload.destinations,
     title: payload.title
 })
 
@@ -77,17 +79,27 @@ export const handleResourceChange = async (notification: PgParsedNotification) =
     if(!notification.payload) throw new Error('Expected payload on notification, got none')
 
     try {
+        logger.info(`Handling new resource notification with payload ${JSON.stringify(notification.payload)}`)
         const resourceNotif = toResourceNotification(notification.payload)
-        if(resourceNotif.pushTokens.length > 0) {
+        if(resourceNotif.destinations.length > 0) {
             const config = await getCommonConfig()
-            await sendPushNotification(resourceNotif.pushTokens.map( pushToken =>  ({ 
-                to: pushToken,
-                body: resourceNotif.title, 
-                title: resourceNotif.accountName, 
-                data: {
-                    url: `${config.pushNotificationsUrlPrefix}resource/viewresource?resourceId=${resourceNotif.resourceId}`
+            const ts: {[ lang: string ]: TFunction<"translation", undefined>} = {}
+            const languages: string[] = []
+            resourceNotif.destinations.forEach(async dest => {
+                if(!languages.includes(dest.language)) languages.push(dest.language)
+            })
+            await Promise.all(languages.map(async lang => ts[lang] = await initTranslations(lang)))
+            
+            await sendPushNotification(resourceNotif.destinations.map(dest =>  {
+                return {
+                    to: dest.token,
+                    body: `${ts[dest.language]('new_resource_notification')} ${resourceNotif.title}`, 
+                    title: resourceNotif.accountName, 
+                    data: {
+                        url: `${config.pushNotificationsUrlPrefix}viewresource?resourceId=${resourceNotif.resourceId}`
+                    }
                 }
-            })))
+            }))
         }
     } catch(e) {
         logger.error(`Error while sending push notification to Expo.`, e)

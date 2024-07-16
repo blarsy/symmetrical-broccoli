@@ -20,9 +20,10 @@
     "webClientUrls": "[\"http://localhost:19006\", \"http://localhost:3001\"]",
     "websiteUrl": "http://localhost:3001/",
     "versions": {
-        "default": {
-            "db": "sb_db",
-            "apiPort": 3000
+        "v0_6": {
+            "db": "sb_db_0_6",
+            "apiPort": 3000,
+            "doNotSendMails": true
         },
         "v0_2": {
             "db": "sb_db_0_2",

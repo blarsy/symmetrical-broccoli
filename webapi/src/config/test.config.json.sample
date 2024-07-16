@@ -20,9 +20,10 @@
     "webClientUrls": "[\"http://localhost:19006\", \"https://test.tope-la.com\"]",
     "websiteUrl": "https://test.tope-la.com/",
     "versions": {
-       "default": {
-            "db": "sb_db_test",
-            "apiPort": 3000
+       "v0_6": {
+            "db": "sb_db_test_0_6",
+            "apiPort": 3000,
+            "doNotSendMails": true
         },
         "v0_2": {
             "db": "sb_db_test_0_2",

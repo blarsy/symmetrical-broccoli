@@ -23,7 +23,8 @@ const resources = {
         "created_date_column_title": "Time",
         "multiple_new_things_summary_subject": "Things happened on {{productName}}",
         "newResources_mail_section_title": "Resources recently created",
-        "chatMessages_mail_section_title": "Chat messages received"
+        "chatMessages_mail_section_title": "Chat messages received",
+        "new_resource_notification": "New resource available : "
         
     }},
     fr: { translation: {
@@ -47,7 +48,8 @@ const resources = {
         "created_date_column_title": "Heure",
         "multiple_new_things_summary_subject": "Des choses se sont passées sur {{productName}}",
         "newResources_mail_section_title": "Ressources récemment créées",
-        "chatMessages_mail_section_title": "Messages reçus"
+        "chatMessages_mail_section_title": "Messages reçus",
+        "new_resource_notification": "Nouvelle ressource disponible : "
     }}
 }
 

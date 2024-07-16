@@ -94,7 +94,7 @@ export default () => {
                         <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => submitForm()} loading={updating}>
                             {t('save_label')}
                         </WhiteButton>
-                        <OperationFeedback error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={() => {}} />
+                        <OperationFeedback error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={reset} />
                     </>
                 }}
             </Formik>

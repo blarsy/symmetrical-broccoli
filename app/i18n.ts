@@ -140,7 +140,9 @@ const resources = {
       "notifications_settings_title": "Notification settings",
       "publicInfo_settings_title": "Your activity's promotional links",
       "faq_title": "Frequently asked questions",
-      "faq_button_label": "FAQ"
+      "faq_button_label": "FAQ",
+      "look_for_me": "Look for me on the 'Search' screen !",
+      "no_resource_created_yet": "You did not create any resource yet"
     }
   },
   fr: {
@@ -214,7 +216,7 @@ const resources = {
       "close_buttonCaption": "Annuler",
       "done_buttonCaption": "Ok",
       "options_title": "Options",
-      "noConversationLoaded_label": "Aucune conversation pour l'instant ...",
+      "noConversationLoaded_label": "Pas encore de conversation ...",
       "search_hint": "Qu'est-ce que tu recherches ?",
       "published_at": "Publié le ",
       "back_label": "Retour",
@@ -276,7 +278,9 @@ const resources = {
       "notifications_settings_title": "Paramètres de notification",
       "publicInfo_settings_title": "Liens de promotion de votre activité",
       "faq_title": "Foire aux questions",
-      "faq_button_label": "FAQ"
+      "faq_button_label": "FAQ",
+      "look_for_me": "Cherchez-moi sur l'écran 'Rechercher' !",
+      "no_resource_created_yet": "Vous n'avez pas encore créé de ressource"
     }
   }
 }

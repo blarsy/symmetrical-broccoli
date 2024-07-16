@@ -31,11 +31,11 @@ export const ChatHeader = (p: ChatHeaderProps) => {
             { conversationContext.state.conversation.data?.resource && <>
                 <IconButton icon="chevron-left" size={40}
                     onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
-                <AccountAvatar onPress={p.onAccountShowRequested} account={conversationContext.state.conversation.data!.resource?.account!} size={40} />
+                <AccountAvatar onPress={p.onAccountShowRequested} account={conversationContext.state.conversation.data!.otherAccount} size={40} />
                 <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6, gap: 2 }}>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ color: primaryColor, textTransform: 'uppercase' }}>
-                            <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.state.conversation.data!.resource?.account!.name || t('name_account_removed')}</Text>
+                            <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.state.conversation.data!.otherAccount.name || t('name_account_removed')}</Text>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ textDecorationLine: resourceDeleted ? 'line-through' : 'none' }}>
                             {conversationContext.state.conversation.data!.resource?.title}</Text>

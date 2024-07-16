@@ -1,8 +1,10 @@
 {
-    "apiUrl": "https://test.tope-la.com/graphqlv0_2",
-    "subscriptionsUrl": "wss://test.tope-la.com/graphqlv0_2",
+    "apiUrl": "https://test.tope-la.com/graphqlv0_6",
+    "subscriptionsUrl": "wss://test.tope-la.com/graphqlv0_6",
     "linksUrl": "https://test.tope-la.com/api/link/",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
-    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/"
+    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
+    "clientVersion": "0.6.0",
+    "diagnostic": true
 }

@@ -22,10 +22,11 @@
     "versions": {
         "default": {
             "db": "sb_db",
-            "apiPort": 3000
+            "apiPort": 3000,
+            "doNotSendMails": true
         },
-        "v0_2": {
-            "db": "sb_db_0_2",
+        "v0_6": {
+            "db": "sb_db_0_6",
             "apiPort": 3001,
             "doNotSendMails": true
         }

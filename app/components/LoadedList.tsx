@@ -9,7 +9,7 @@ interface Props<T> {
     error?: StateError,
     data?: T[],
     displayItem: (item: T, index: number) => JSX.Element
-    noDataLabel?: string,
+    noDataLabel?: string | JSX.Element,
     style?: StyleProp<ViewStyle>,
     contentContainerStyle? : StyleProp<ViewStyle>
 }

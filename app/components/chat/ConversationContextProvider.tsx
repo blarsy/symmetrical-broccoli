@@ -64,6 +64,9 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
   accountById(id: $otherAccountId) {
     id
     name
+    imageByAvatarImageId {
+      publicId
+    }
   }
   resourceById(id: $resourceId) {
     accountByAccountId {
@@ -129,7 +132,7 @@ const blankState: ConversationState = {
   conversation: initial(true, {
     messages: [],
     resource: undefined, 
-    otherAccount: { id: 0, name: '' },
+    otherAccount: { id: 0, name: '', avatarPublicId: '' },
     endCursor: ''
   })
 }
@@ -157,7 +160,7 @@ const ConversationContextProvider = ({ children }: Props) => {
               setConversationState(prevValue => ({ ...prevValue, ...{ 
                 conversation: fromData({ 
                   messages: loadedMessages,
-                  otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name },
+                  otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name, avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId },
                   resource: fromServerGraphResource(res.data.resourceById, categories),
                   endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : ''
                 })

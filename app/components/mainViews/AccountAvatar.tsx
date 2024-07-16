@@ -7,20 +7,20 @@ import { Avatar } from "react-native-paper"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
 interface AccountAvatarProps {
-    account: AccountInfo | Account
+    account: { id: number, avatarPublicId?: string, name: string, avatarImageUrl?: string }
     size: number
     onPress: (accountId: number) => void
 }
 
 export default ({ account, size, onPress }: AccountAvatarProps) => {
-    if('avatarPublicId' in account) {
+    if(account.avatarPublicId) {
         return <TouchableOpacity onPress={() => onPress(account.id)}>
             <Avatar.Image size={size} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
         </TouchableOpacity>
     }
-    if((account as Account).avatarImageUrl) {
+    if(account.avatarImageUrl) {
         return <TouchableOpacity onPress={() => onPress(account.id)}>
-            <Avatar.Image size={size} source={{ uri: (account as Account).avatarImageUrl }} />
+            <Avatar.Image size={size} source={{ uri: account.avatarImageUrl }} />
         </TouchableOpacity>
     }
 

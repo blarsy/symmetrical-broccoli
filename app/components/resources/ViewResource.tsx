@@ -65,7 +65,7 @@ const getSwiperData = (resource: Resource): ImgMetadata[] => {
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
     const appState = useContext(AppContext)
-    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: route.params.resourceId }})
+    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number(route.params.resourceId) }})
     const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     
 
