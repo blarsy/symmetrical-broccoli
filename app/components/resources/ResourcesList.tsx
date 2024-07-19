@@ -5,13 +5,15 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import AppendableList, { AddItemButton } from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
-import { Banner } from "react-native-paper"
+import { Banner, Button } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import NoResourceYet from "./NoResourceYet"
+import { WhiteButton } from "../layout/lib"
 
 export const RESOURCES = gql`query MyResources {
     myresources {
@@ -109,7 +111,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
           <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.categories.data || [])}
               onAddRequested={addRequested} onRefreshRequested={() => {
                 refetch()
-              }} noDataLabel={t('no_resource_created_yet')}
+              }} noDataLabel={<NoResourceYet/>}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
               displayItem={(resource, idx) => <ResourceCard key={idx} resource={resource}
                 viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
@@ -119,8 +121,9 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 }}
               />}
           /> :
-          <View style={{ flexDirection: 'row', margin: 10 }}>
-            <AddItemButton onAddRequested={addRequested} />
+          <View style={{ flexDirection: 'column', alignItems:'stretch', margin: 10 }}>
+            <WhiteButton mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
+            <NoResourceYet />
           </View>
         }
         <ConfirmDialog title={t('Confirmation_DialogTitle')} question={t('Confirm_Resource_Delete_Question')}

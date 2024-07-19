@@ -140,9 +140,20 @@ const resources = {
       "notifications_settings_title": "Notification settings",
       "publicInfo_settings_title": "Your activity's promotional links",
       "faq_title": "Frequently asked questions",
-      "faq_button_label": "FAQ",
+      "faq_button_label": "Questions",
       "look_for_me": "Look for me on the 'Search' screen !",
-      "no_resource_created_yet": "You did not create any resource yet"
+      "no_resource_created_yet": "You did not create any resource yet",
+      "bug_issue_title": "Bug / issue ?",
+      "faq_explainer": "Our 'frequently asked questions' are available on our website www.tope-la.com:",
+      "create_circular_economy": "The resources you will create will be managed here",
+      "example": "Example",
+      "examples": "Examples",
+      "title_example_resource_available_timeslots": "Available session",
+      "description_example_resource_available_timeslots": "In May, on appointment",
+      "title_example_resource_things_to_rent": "Equipment to lend",
+      "description_example_resource_things_to_rent": "No need to buy one",
+      "title_example_resource_unused_object": "Unused objects",
+      "description_example_resource_unused_object": "To give or exchange"
     }
   },
   fr: {
@@ -278,9 +289,20 @@ const resources = {
       "notifications_settings_title": "Paramètres de notification",
       "publicInfo_settings_title": "Liens de promotion de votre activité",
       "faq_title": "Foire aux questions",
-      "faq_button_label": "FAQ",
+      "faq_button_label": "Questions",
       "look_for_me": "Cherchez-moi sur l'écran 'Rechercher' !",
-      "no_resource_created_yet": "Vous n'avez pas encore créé de ressource"
+      "no_resource_created_yet": "Vous n'avez pas encore créé de ressource",
+      "bug_issue_title": "Bug / problème ?",
+      "faq_explainer": "Notre 'foire aux questions' est disponible sur notre site web www.tope-la.com:",
+      "create_circular_economy": "Les ressources que vous allez créer seront gérées ici",
+      "example": "Exemple",
+      "examples": "Exemples",
+      "title_example_resource_available_timeslots": "Séance disponible",
+      "description_example_resource_available_timeslots": "En Mai, sur rendez-vous",
+      "title_example_resource_things_to_rent": "Matos à prêter",
+      "description_example_resource_things_to_rent": "Pas besoin d'un nouveau",
+      "title_example_resource_unused_object": "Objet inutilisé",
+      "description_example_resource_unused_object": "A donner ou échanger"
     }
   }
 }

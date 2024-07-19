@@ -13,7 +13,7 @@ interface Props {
     onAddRequested: () => void
     contentContainerStyle?: StyleProp<ViewStyle>
     onRefreshRequested?: () => void
-    noDataLabel?: string
+    noDataLabel?: string | JSX.Element
 }
 
 export const AddItemButton = ({ onAddRequested }: { onAddRequested: () => void }) => 

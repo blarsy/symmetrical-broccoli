@@ -62,3 +62,17 @@ export const WithDeleted: Story = {
   ],
   args: initialArgs
 }
+export const Empty: Story = {
+  name: 'List empty, with info',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: RESOURCES, 
+      result: { 
+        myresources: {
+          nodes: []
+        } 
+      }
+    }])
+  ],
+  args: initialArgs
+}

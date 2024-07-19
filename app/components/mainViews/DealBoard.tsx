@@ -15,8 +15,8 @@ import { AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import Animated, { useAnimatedStyle, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
 import { useSharedValue } from 'react-native-reanimated'
-import SupportModal from "../SupportModal"
 import AccountAvatar from "./AccountAvatar"
+import SupportModal from "../support/SupportModal"
 
 const Tab = createMaterialBottomTabNavigator()
 

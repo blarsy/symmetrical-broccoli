@@ -14,6 +14,7 @@ import { AppContext } from "../AppContextProvider"
 import ChatBackground from "../chat/ChatBackground"
 import AccountAvatar from "./AccountAvatar"
 import Images from "@/Images"
+import NoConversationYet from "../chat/NoConversationYet"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -53,7 +54,7 @@ const ConversationsList = ({ route, navigation }: RouteProps) => {
             <PastConversations onConversationSelected={(resource, otherAccountId) => navigation.navigate('conversation', { resourceId: resource.id, otherAccountId })} />
         </ChatBackground>
     } else {
-        return <Text style={{ textAlign: 'center', textTransform: 'uppercase', margin:10 }}>{t('connect_to_chat')}</Text>
+        return <NoConversationYet />
     }
 }
 

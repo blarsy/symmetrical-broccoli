@@ -601,6 +601,7 @@ CREATE OR REPLACE FUNCTION sb.create_resource(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 declare inserted_id integer;
+DECLARE days_summary INTEGER;
 begin
 	INSERT INTO sb.resources(
 	title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted)
@@ -620,16 +621,23 @@ begin
 	INSERT INTO sb.resources_images (resource_id, image_id)
 	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
 	
-	-- Emit notification for push notification handling
-	PERFORM pg_notify('resource_created', json_build_object(
-		'resource_id', inserted_id,
-		'title', create_resource.title,
-		'account_name', (SELECT name FROM sb.accounts WHERE id = sb.current_account_id()),
-		'push_tokens', (SELECT ARRAY(SELECT token FROM sb.accounts_push_tokens apt WHERE 
-			(NOT EXISTS (SELECT bp.id FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) OR 
-			(SELECT bp.days_between_summaries FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) = -1 )
-			AND account_id != sb.current_account_id()))
-	)::text);
+	SELECT days_between_summaries INTO days_summary FROM sb.broadcast_prefs bp
+	WHERE bp.account_id = sb.current_account_id() AND bp.event_type = 2;
+
+	IF days_summary IS NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('resource_created', json_build_object(
+			'resource_id', inserted_id,
+			'title', create_resource.title,
+			'account_name', (SELECT name FROM sb.accounts WHERE id = sb.current_account_id()),
+			'destinations', (SELECT (json_build_object('token', apt.token, 'language', a.language)) FROM sb.accounts_push_tokens apt
+				INNER JOIN sb.accounts a ON a.id = apt.account_id
+				WHERE 
+				(NOT EXISTS (SELECT bp.id FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) OR 
+				(SELECT bp.days_between_summaries FROM sb.broadcast_prefs bp WHERE apt.account_id = bp.account_id AND bp.event_type = 2) = -1 )
+				AND account_id != sb.current_account_id())
+		)::text);
+	END IF;
 	
 	RETURN inserted_id;
 end;

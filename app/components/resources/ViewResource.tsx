@@ -1,6 +1,6 @@
 import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, getScreenSize } from "@/lib/utils"
 import React, { useContext, useState } from "react"
-import { Banner, Button, Chip, Icon, Modal, Portal, Text } from "react-native-paper"
+import { Banner, Button, Chip, Icon, IconButton, Modal, Portal, Text } from "react-native-paper"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
 import { t } from "@/i18n"
 import { Dimensions, Image, ImageSourcePropType, ScrollView, TouchableOpacity, View } from "react-native"
@@ -13,6 +13,7 @@ import { useQuery } from "@apollo/client"
 import LoadedZone from "../LoadedZone"
 import ViewField from "../ViewField"
 import { AppContext } from "../AppContextProvider"
+import Images from "@/Images"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -90,10 +91,19 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             { resource.images && resource.images.length > 0 && 
                 <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }
             <ViewField title={t('brought_by_label')}>
-                <Button mode="outlined" labelStyle={{ marginVertical: 5 }} icon={() => 
-                    <Icon source="cellphone-information" size={25} color="#000" />} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })}>
+                <View style={{ flexDirection: 'column', flex: 1 }}>
                     <Text variant="bodyMedium">{resource.account?.name}</Text>
-                </Button>
+                    <View style={{ flex: 1, flexDirection: 'row' }}>
+                        <IconButton mode="outlined" icon="cellphone-information" size={35} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })} />
+                        <IconButton mode="outlined" icon={p => <View style={{ width: 35 }}><Images.Chat /></View>} size={35} onPress={() => navigation.navigate('chat', {
+                            screen: 'conversation',
+                            params: {
+                                resourceId: resource.id,
+                                otherAccountId: appState.account!.id
+                            }
+                        })} />
+                    </View>
+                </View>
             </ViewField>
             <ViewField title={t('title_label')}>
                 <Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{resource.title}</Text>

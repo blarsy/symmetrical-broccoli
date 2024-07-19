@@ -11,6 +11,7 @@ import { gql, useQuery } from "@apollo/client"
 import { userFriendlyChatTime } from "@/lib/utils"
 import { AppContext } from "../AppContextProvider"
 import Images from "@/Images"
+import NoConversationYet from "./NoConversationYet"
 
 export const MY_CONVERSATIONS = gql`query MyConversations {
     myConversations {
@@ -74,11 +75,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
 
     return <View style={{ flex: 1 }}>
         <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} 
-        error={error} noDataLabel={<View style={{ alignItems: 'center', padding: 20 }}>
-            <Text variant="bodyMedium" style={{ textAlign: 'center', paddingBottom: 20 }}>{t('noConversationLoaded_label')}</Text>
-            <Images.Chat height={35} width={35} />
-            <Text variant="labelLarge">{t('look_for_me')}</Text>
-          </View>}
+        error={error} noDataLabel={<NoConversationYet />}
             displayItem={(item, idx) => {
                 const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) && item.conversation.resource.images[0].publicId ?
                     { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
