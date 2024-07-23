@@ -83,13 +83,13 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 const resource = res as Resource
                 return <FoundResourceCard
                     key={idx} resource={resource} 
-                    onChatOpen={() => {
+                    onChatOpen={res => {
                         ensureConnected('introduce_yourself', '', () => {
                             setTimeout(() => navigation.navigate('chat', {
                                 screen: 'conversation',
                                 params: {
                                     resourceId: resource.id,
-                                    otherAccountId: appContext.account!.id
+                                    otherAccountId: res.account!.id
                                 }
                             }))
                         })

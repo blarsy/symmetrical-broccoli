@@ -95,13 +95,13 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                     <Text variant="bodyMedium">{resource.account?.name}</Text>
                     <View style={{ flex: 1, flexDirection: 'row' }}>
                         <IconButton mode="outlined" icon="cellphone-information" size={35} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })} />
-                        <IconButton mode="outlined" icon={p => <View style={{ width: 35 }}><Images.Chat /></View>} size={35} onPress={() => navigation.navigate('chat', {
+                        { resource.account?.id != appState.account?.id && <IconButton mode="outlined" icon={p => <View style={{ width: 35 }}><Images.Chat /></View>} size={35} onPress={() => navigation.navigate('chat', {
                             screen: 'conversation',
                             params: {
                                 resourceId: resource.id,
-                                otherAccountId: appState.account!.id
+                                otherAccountId: resource.account?.id 
                             }
-                        })} />
+                        })} />}
                     </View>
                 </View>
             </ViewField>
