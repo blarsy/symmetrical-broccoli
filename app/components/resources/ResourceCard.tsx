@@ -20,7 +20,8 @@ const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
 export default ({ viewRequested, resource, editRequested, deleteRequested, isExample}: Props) => <ResponsiveListItem onPress={() => viewRequested(resource.id) } title={resource.title} 
     titleNumberOfLines={1}
-    description={resource.description} style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, borderRadius: 10 }}
+    description={resource.description}
+    style={{ margin: 0, padding: 0, paddingLeft: 6, backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, borderRadius: 10, opacity: isExample ? 0.7 : 1 }}
     left={() => <SmallResourceImage resource={resource} />}
     right={() => resource.deleted ? <Text style={{ fontStyle: "italic" }}>{t('deleted')}</Text> : <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
         <IconButton style={{ alignSelf: 'center', margin: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
