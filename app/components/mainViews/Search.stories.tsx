@@ -13,17 +13,17 @@ const meta: Meta<typeof Search> = {
         appContextDecorator(),
         navigationContainerDecorator(),
         gestureHandlerDecorator,
-        editResourceContextDecorator,
+        editResourceContextDecorator(),
         searchFilterContextDecorator(fromData([{
             id: 1, title: 'Ressource 1', description: 'Description de la ressource 1', canBeDelivered: true,
             canBeExchanged: false, canBeGifted: true, canBeTakenAway: true, isProduct: false, isService: true,
             categories: [], created: new Date(), images: [], account: { id: 1, name: 'Assoc de teubés', email: 'me@me.com' },
-            deleted: null
+            deleted: null, specificLocation: null
         }, {
             id: 2, title: 'Ressource 2', description: 'Description de la ressource 2', canBeDelivered: false,
             canBeExchanged: true, canBeGifted: false, canBeTakenAway: true, isProduct: true, isService: false,
             categories: [], created: new Date(), images: [], account: { id: 1, name: 'Assoc de teubés', email: 'me@me.com' },
-            deleted: null
+            deleted: null, specificLocation: null
         }])),
         apolloClientMocksDecorator([queryMocks.searchResult]),
     ]

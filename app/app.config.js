@@ -1,5 +1,5 @@
-const version = '0.6.2'
-const versionCode = 111
+const version = '0.7.0'
+const versionCode = 113
 
 let appSettings
 if(process.env.TARGET_ENV) {
@@ -42,6 +42,9 @@ module.exports = {
       "supportsTablet": true,
       "bundleIdentifier": "com.topela",
       "buildNumber": version,
+      "config": {
+        "googleMapsApiKey": appSettings.googleMapsApiKey
+      },
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -78,7 +81,12 @@ module.exports = {
         "backgroundColor": "#ff4401"
       },
       "package": "com.topela",
-      "versionCode": versionCode
+      "versionCode": versionCode,
+      "config": {
+        "googleMaps": {
+          "apiKey": appSettings.googleMapsApiKey
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

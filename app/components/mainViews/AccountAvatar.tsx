@@ -1,6 +1,5 @@
 import React from "react"
 import { urlFromPublicId } from "@/lib/images"
-import { Account, AccountInfo } from "@/lib/schema"
 import { initials } from "@/lib/utils"
 import { t } from "i18next"
 import { Avatar } from "react-native-paper"

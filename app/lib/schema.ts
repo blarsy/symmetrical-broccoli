@@ -22,6 +22,12 @@ export interface Link {
     type: LinkTypes
 }
 
+export interface Location {
+    latitude: number
+    longitude: number
+    address: string
+}
+
 export interface AccountInfo {
     name: string
     id: number
@@ -65,7 +71,8 @@ export interface Resource {
     canBeGifted: boolean,
     canBeExchanged: boolean,
     created: Date,
-    deleted: Date | null
+    deleted: Date | null,
+    specificLocation: Location | null
 }
 
 export interface ConversationData {
@@ -94,6 +101,7 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         categories: resourceCategories, 
         account: rawRes.accountByAccountId,
         deleted: rawRes.deleted,
+        specificLocation: rawRes.locationBySpecificLocationId,
         images
 } as Resource
 }

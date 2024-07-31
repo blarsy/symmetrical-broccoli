@@ -4,5 +4,6 @@
     "linksUrl": "https://www.tope-la.com/api/link/",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
-    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/"
+    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
+    "googleMapsApiKey": "<ApiKey>"
 }

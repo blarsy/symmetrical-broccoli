@@ -105,7 +105,8 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
         },
           accountById: {
             id: otherAccountId,
-            name: otherAccountDeleted ? '' : 'Mon association trop bien'
+            name: otherAccountDeleted ? '' : 'Mon association trop bien',
+            imageByAvatarImageId: { publicId: '' }
           },
           resourceById: {
                 accountByAccountId: {

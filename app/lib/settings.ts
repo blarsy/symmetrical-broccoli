@@ -7,5 +7,6 @@ export const cloudinaryCloud = Constants.expoConfig!.extra!.appSettings.cloudina
 export const cloudinaryUploadPreset = Constants.expoConfig!.extra!.appSettings.cloudinaryUploadPreset
 export const cloudinaryRestUrl = Constants.expoConfig!.extra!.appSettings.cloudinaryRestUrl
 export const clientVersion = Constants.expoConfig!.extra!.appSettings.clientVersion
+export const googleMapsApiKey = Constants.expoConfig!.extra!.appSettings.googleMapsApiKey
 export const diagnostic = Constants.expoConfig!.extra!.appSettings.diagnostic
 

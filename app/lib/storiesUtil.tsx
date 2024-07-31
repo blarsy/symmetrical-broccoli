@@ -18,13 +18,13 @@ import { AppContextProvider } from '@/components/AppContextProvider'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { View } from 'react-native'
 
-export const editResourceContextDecorator = (StoryElement: any) => 
-    makeEditResourceContextDecorator(StoryElement)
-
-const makeEditResourceContextDecorator = (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
-    { editedResource: { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
+export const editResourceContextDecorator = (initialResource?: Resource) => (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
+    {
+        editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null }, changeCallbacks: [], imagesToAdd: []}, actions: {
+            isService: false, deleted: null, specificLocation: null },
+        changeCallbacks: [], imagesToAdd: []},
+        actions: {
             setResource: () => {},
             setChangeCallback: () => {},
             removeChangeCallback: () => {},

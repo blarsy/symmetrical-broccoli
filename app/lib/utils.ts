@@ -1,6 +1,6 @@
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
-import { Message } from "./schema"
+import { Location, Message } from "./schema"
 import { ApolloError, gql } from "@apollo/client"
 import { clientVersion } from "./settings"
 import { getLocales } from "expo-localization"
@@ -173,6 +173,12 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
         }
       }
     }
+    locationBySpecificLocationId {
+      address
+      latitude
+      longitude
+      id
+    }
     created
     deleted
   }
@@ -214,4 +220,11 @@ export const userFriendlyChatTime = (time: Date) => {
 export const useCustomFonts = () => useFonts({
   'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
   'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
+})
+
+export const regionFromLocation = (loc : Location) => ({
+  latitudeDelta: 0.005,
+  longitudeDelta: 0.005,
+  longitude: loc.longitude,
+  latitude: loc.latitude
 })

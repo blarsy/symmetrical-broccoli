@@ -4,19 +4,19 @@ import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
 
-export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
+export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}) {
     createResource(
-      input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title}
+      input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation}
     ) {
       integer
     }
 }`
 
-export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String) {
+export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [String], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}) {
     updateResource(
-      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title}
+      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation}
     ) {
-        integer
+      integer
     }
 }`
 
@@ -48,7 +48,7 @@ interface Props {
 const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: undefined,
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
-    canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null }
+    canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null, specificLocation: null }
 
 export const EditResourceContext = createContext<EditResourceContextProps>({
     state: { 
@@ -135,7 +135,8 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     canBeTakenAway: resource.canBeTakenAway,
                     canBeGifted: resource.canBeGifted,
                     categoryCodes: resource.categories.map(cat => cat.code.toString()),
-                    imagesPublicIds: resource.images.map(img => img.publicId)
+                    imagesPublicIds: resource.images.map(img => img.publicId),
+                    specificLocation: resource.specificLocation
                 }})
                 setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             } else {
@@ -155,7 +156,8 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     canBeTakenAway: resource.canBeTakenAway,
                     canBeGifted: resource.canBeGifted,
                     categoryCodes: resource.categories.map(cat => cat.code.toString()),
-                    imagesPublicIds
+                    imagesPublicIds,
+                    specificLocation: resource.specificLocation
                 }
 
                 await createResource({ variables })

@@ -31,6 +31,7 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
                     name: accountDeleted ? '' : accountName
                 },
                 deleted: resourceDeleted ? new Date() : null,
+                specificLocation: null,
                 id: 1, images: [], description: 'description de la ressource', categories: [], isService: false, isProduct: false, created: new Date()
             },
             otherAccount: {

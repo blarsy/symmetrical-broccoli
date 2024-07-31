@@ -166,6 +166,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
         },
         result: {
             accountById: {
+                id: 2,
                 email: 'me@me.com',
                 name: 'Artisan trop super',
                 resourcesByAccountId: {

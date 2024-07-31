@@ -1,18 +1,20 @@
 import React, { useContext, useState } from "react"
-import { ScrollView } from "react-native"
+import { ScrollView, View } from "react-native"
 import LoadedZone from "../LoadedZone"
 import { gql, useQuery } from "@apollo/client"
 import ViewField from "../ViewField"
 import { t } from "@/i18n"
 import { Avatar, Text } from "react-native-paper"
 import { imgSourceFromPublicId } from "@/lib/images"
-import { adaptToWidth } from "@/lib/utils"
+import { adaptToWidth, regionFromLocation } from "@/lib/utils"
 import { Link, Resource, fromServerGraphResource } from "@/lib/schema"
 import LoadedList from "../LoadedList"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import AccountResourceCard from "../resources/AccountResourceCard"
 import LinkList from "./LinkList"
 import EditLinkModal from "./EditLinkModal"
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import { parseLocationFromGraph } from "./PublicInfo"
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
   accountById(id: $id) {
@@ -55,8 +57,15 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
         }
       }
     }
+    locationByLocationId {
+      address
+      id
+      longitude
+      latitude
+    }
   }
-}`
+}
+`
 
 interface Props {
     id: number,
@@ -92,6 +101,16 @@ export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) 
                         } as Link)) } />
                       </ViewField>
                     }
+                    { data.accountById.locationByLocationId && <ViewField title={t('address_label')} titleOnOwnLine>
+                        <View style={{ flexDirection: 'column' }}>
+                            <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{data.accountById.locationByLocationId.address}</Text>
+                            <MapView style={{ height: adaptToWidth(200, 300, 550) }} 
+                                region={regionFromLocation(parseLocationFromGraph(data.accountById.locationByLocationId)!)}
+                                provider={PROVIDER_GOOGLE}>
+                                <Marker coordinate={parseLocationFromGraph(data.accountById.locationByLocationId)!} />
+                            </MapView>
+                        </View>
+                    </ViewField> }
                     { data.accountById.resourcesByAccountId.nodes && 
                         <ViewField title={t('available_resources')} titleOnOwnLine>
                             <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={data.accountById.resourcesByAccountId.nodes} 

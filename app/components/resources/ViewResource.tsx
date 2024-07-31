@@ -1,4 +1,4 @@
-import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, getScreenSize } from "@/lib/utils"
+import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, adaptToWidth, getScreenSize, regionFromLocation } from "@/lib/utils"
 import React, { useContext, useState } from "react"
 import { Banner, Button, Chip, Icon, IconButton, Modal, Portal, Text } from "react-native-paper"
 import { Resource, fromServerGraphResource } from "@/lib/schema"
@@ -14,6 +14,8 @@ import LoadedZone from "../LoadedZone"
 import ViewField from "../ViewField"
 import { AppContext } from "../AppContextProvider"
 import Images from "@/Images"
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import { parseLocationFromGraph } from "../account/PublicInfo"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -82,8 +84,8 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             expiration = { text: '', date: ''}
         }
     }
-    return <ScrollView style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff'}}>
-        <LoadedZone loading={loading} error={error}>
+    return <ScrollView style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff' }}>
+        <LoadedZone loading={loading} error={error} containerStyle={{ marginBottom: 15 }}>
         { resource && <>
             <Banner icon={p => <Icon size={20} source="trash-can" />} visible={!!resource.deleted}>
                 {t('resource_deleted', { deleted: dayjs(resource.deleted).format(t('dateFormat')) })}
@@ -142,6 +144,16 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <View style={{ flexDirection: 'row', gap: 1 }}>
                     { resource.canBeGifted && <ResourceInfoChip>{t('canBeGifted_label')}</ResourceInfoChip>}
                     { resource.canBeExchanged && <ResourceInfoChip>{t('canBeExchanged_label')}</ResourceInfoChip>}
+                </View>
+            </ViewField>
+            <ViewField title={t('address_label')} titleOnOwnLine>
+                <View style={{ flexDirection: 'column' }}>
+                    <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{resource.specificLocation?.address || t('no_address_defined')}</Text>
+                    { resource.specificLocation && <MapView style={{ height: adaptToWidth(200, 300, 550) }} 
+                        region={regionFromLocation(parseLocationFromGraph(resource.specificLocation)!)}
+                        provider={PROVIDER_GOOGLE}>
+                        <Marker coordinate={parseLocationFromGraph(resource.specificLocation)!} />
+                    </MapView> }
                 </View>
             </ViewField>
             <PanZoomImage onDismess={() => setFocusedImage(undefined)} source={focusedImage} />

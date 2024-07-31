@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import OperationFeedback from "../OperationFeedback"
 import EditLinkModal from "./EditLinkModal"
-import { Link, getIconForLink } from "@/lib/schema"
+import { Link, Location, getIconForLink } from "@/lib/schema"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
@@ -12,6 +12,7 @@ import { aboveMdWidth, adaptToWidth, fontSizeSmall, mdScreenWidth } from "@/lib/
 import { WhiteButton } from "../layout/lib"
 import { t } from "i18next"
 import { ScrollView } from "react-native-gesture-handler"
+import LocationEdit from "./LocationEdit"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
@@ -25,11 +26,17 @@ export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
           }
         }
       }
+      locationByLocationId {
+        address
+        latitude
+        longitude
+        id
+      }
     }
 }`
 
-export const UPDATE_ACCOUNT_PUBLIC_INFO = gql`mutation UpdateAccountPublicInfo($links: [AccountLinkInput]) {
-    updateAccountPublicInfo(input: {links: $links}) {
+export const UPDATE_ACCOUNT_PUBLIC_INFO = gql`mutation UpdateAccountPublicInfo($links: [AccountLinkInput], $location: NewLocationInput = null) {
+    updateAccountPublicInfo(input: {links: $links, location: $location}) {
       integer
     }
   }
@@ -54,31 +61,53 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
     <IconButton size={25} containerColor="#fff" iconColor="#000" icon="link-plus" onPress={newLinkRequested} />
 </View>
 
+export const parseLocationFromGraph = (raw: any): Location | null => {
+    if(raw === null) return null
+
+    return ({
+        address: raw.address,
+        latitude: parseFloat(raw.latitude),
+        longitude: parseFloat(raw.longitude)
+    })
+}
+
 export default () => {
     const [success, setSuccess] = useState(false)
     const appContext = useContext(AppContext)
     const [editedLink, setEditedLink] = useState<Link | undefined>(undefined)
     const [updateAccount, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
-    const { data, loading, error } = useQuery(GET_ACCOUNT_INFO, { variables: { id: appContext.account!.id } })
-    const [links, setLinks] = useState<Link[]>([])
+    const { data, loading, error, refetch } = useQuery(GET_ACCOUNT_INFO, { variables: { id: appContext.account!.id } })
+    const [publicInfo, setPublicInfo] = useState<{ links: Link[], location: Location | null}>({ links: [], location: null })
 
     useEffect(() => {
-        if(data) setLinks(data.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
-            id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
-        } as Link)))
+        if(data) setPublicInfo({
+            links: data.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
+                id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
+            } as Link)),
+            location: parseLocationFromGraph(data.accountById.locationByLocationId)
+        })
     }, [data])
     
     return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <LoadedZone loading={loading} error={error} loadIndicatorColor="#fff" 
             containerStyle={{ paddingTop: 10, paddingHorizontal: 10, flex: 1, justifyContent: 'center', width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth) }} >
             <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10 }}>{t('publicInfo_settings_title')}</Text>
-            <LinksEdit links={links}
-                deleteLinkRequested={link => setLinks(links.filter(l => l.id != link.id))}
+            <LinksEdit links={publicInfo.links}
+                deleteLinkRequested={link => setPublicInfo({ links: publicInfo.links.filter(l => l.id != link.id), location: publicInfo.location })}
                 editLinkRequested={setEditedLink}
                 newLinkRequested={() => { setEditedLink({ id: 0, label: '', type: 4, url: '' }) }} />
+            <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingVertical: 10 }}>{t('publicInfo_address_title')}</Text>
+            <LocationEdit location={publicInfo.location || undefined} 
+                onLocationChanged={newLocation => setPublicInfo({ links: publicInfo.links, location: newLocation }) }
+                onDeleteRequested={() => setPublicInfo({ location: null, links: publicInfo.links })} 
+                orangeBackground />
             <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}
                 onPress={async() => {
-                    await updateAccount({ variables: { links: links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })) } })
+                    await updateAccount({ variables: { 
+                        links: publicInfo.links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })),
+                        location: publicInfo.location
+                    } })
+                    refetch()
                     setSuccess(true)
                 }} loading={updating}>
                 {t('save_label')}
@@ -88,20 +117,20 @@ export default () => {
                 if(link) {
                     let newLinks: Link[]
                     if(link.id === 0) {
-                        const newLinkInternalId = links.reduce<number>((prev, current) => {
+                        const newLinkInternalId = publicInfo.links.reduce<number>((prev, current) => {
                             if(current.id < prev)
                                 return current.id
 
                             return prev
                         }, 0)
-                        links.push({ ...link, ...{ id: newLinkInternalId - 1 }})
-                        newLinks = [...links]
+                        publicInfo.links.push({ ...link, ...{ id: newLinkInternalId - 1 }})
+                        newLinks = [...publicInfo.links]
                     } else {
-                        const idx = links.findIndex(l => l.id === link.id)
-                        links.splice(idx, 1, link)
-                        newLinks = [...links]
+                        const idx = publicInfo.links.findIndex(l => l.id === link.id)
+                        publicInfo.links.splice(idx, 1, link)
+                        newLinks = [...publicInfo.links]
                     }
-                    setLinks(newLinks)
+                    setPublicInfo({ links: newLinks, location: publicInfo.location })
                 }
                 setEditedLink(undefined)
             }} />

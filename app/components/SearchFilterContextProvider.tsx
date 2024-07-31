@@ -76,6 +76,12 @@ export const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: Str
             resourceCategoryCode
           }
         }
+        locationBySpecificLocationId {
+          address
+          id
+          latitude
+          longitude
+        }
       }
     }
   }`

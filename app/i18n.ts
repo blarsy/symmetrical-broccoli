@@ -153,7 +153,15 @@ const resources = {
       "title_example_resource_things_to_rent": "Equipment to lend",
       "description_example_resource_things_to_rent": "No need to buy one",
       "title_example_resource_unused_object": "Unused objects",
-      "description_example_resource_unused_object": "To give or exchange"
+      "description_example_resource_unused_object": "To give or exchange",
+      "publicInfo_address_title": "Location",
+      "type_address_prompt": "Enter the address here ...",
+      "adjust_pin_instructions": "If necessary, adjust the pin by long touching it, then dragging it.",
+      "no_address_defined": "Address not defined",
+      "setLocation_dialog_title": "Set address",
+      "confirmation_unlink_account_location": "Remove this location ?",
+      "resource_location_label": "Address",
+      "address_label": "Location"
     }
   },
   fr: {
@@ -302,7 +310,15 @@ const resources = {
       "title_example_resource_things_to_rent": "Matos à prêter",
       "description_example_resource_things_to_rent": "Pas besoin d'un nouveau",
       "title_example_resource_unused_object": "Objet inutilisé",
-      "description_example_resource_unused_object": "A donner ou échanger"
+      "description_example_resource_unused_object": "A donner ou échanger",
+      "publicInfo_address_title": "Localisation",
+      "type_address_prompt": "Entrez l'adresse ici ...",
+      "adjust_pin_instructions": "Si nécessaire, ajustez l'épingle en la touchant longtemps, puis en la glissant avec le doigt.",
+      "no_address_defined": "Adresse non définie",
+      "setLocation_dialog_title": "Définir l'adresse",
+      "confirmation_unlink_account_location": "Enlever cette adresse ?",
+      "resource_location_label": "Adresse",
+      "address_label": "Adresse"
     }
   }
 }
@@ -325,9 +341,9 @@ i18n
         resources,
         fallbackLng: 'fr',
         interpolation: {
-        escapeValue: false // react already safes from xss
+          escapeValue: false // react already safes from xss
         }
     })
-
+  export const language = i18n.language
   export const t = i18n.t
   export default i18n
