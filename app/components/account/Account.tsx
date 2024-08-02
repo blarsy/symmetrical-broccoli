@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { ScrollView, View } from "react-native"
 import LoadedZone from "../LoadedZone"
 import { gql, useQuery } from "@apollo/client"
@@ -7,14 +7,13 @@ import { t } from "@/i18n"
 import { Avatar, Text } from "react-native-paper"
 import { imgSourceFromPublicId } from "@/lib/images"
 import { adaptToWidth, regionFromLocation } from "@/lib/utils"
-import { Link, Resource, fromServerGraphResource } from "@/lib/schema"
+import { Link, Resource, fromServerGraphResource, parseLocationFromGraph } from "@/lib/schema"
 import LoadedList from "../LoadedList"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppContext, } from "../AppContextProvider"
 import AccountResourceCard from "../resources/AccountResourceCard"
 import LinkList from "./LinkList"
-import EditLinkModal from "./EditLinkModal"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import { parseLocationFromGraph } from "./PublicInfo"
+import dayjs from "dayjs"
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
   accountById(id: $id) {
@@ -27,6 +26,8 @@ export const GET_ACCOUNT = gql`query Account($id: Int!) {
         canBeGifted
         canBeExchanged
         title
+        deleted
+        expiration
         resourcesImagesByResourceId {
           nodes {
             imageByImageId {
@@ -75,7 +76,16 @@ interface Props {
 
 export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id } })
+    const [accountResources, setAccountResources] = useState<Resource[]>([])
     const appContext = useContext(AppContext)
+
+    useEffect(() => {
+        if(data && data.accountById.resourcesByAccountId.nodes) {
+            setAccountResources(data.accountById.resourcesByAccountId.nodes
+                .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
+                .map((res:any) => fromServerGraphResource(res, appContext.categories.data!)))
+        }
+    }, [data])
 
     return <ScrollView style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff'}}>
         <LoadedZone loading={loading} error={error}>
@@ -111,20 +121,17 @@ export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) 
                             </MapView>
                         </View>
                     </ViewField> }
-                    { data.accountById.resourcesByAccountId.nodes && 
-                        <ViewField title={t('available_resources')} titleOnOwnLine>
-                            <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={data.accountById.resourcesByAccountId.nodes} 
-                                contentContainerStyle={{ gap: 10 }}
-                                displayItem={(rawRes: any) => {
-                                        const resource = fromServerGraphResource(rawRes, appContext.categories.data!)
-                                        return <AccountResourceCard key={rawRes.id} resource={resource} 
-                                          onPress={() => viewResourceRequested(resource)} 
-                                          onChatOpen={() => chatOpenRequested(resource) } />
-                                    }
-                                }
-                            />
-                        </ViewField>
-                    }
+                      <ViewField title={t('available_resources')} titleOnOwnLine>
+                          <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={accountResources} 
+                              contentContainerStyle={{ gap: 10 }}
+                              displayItem={resource => {
+                                      return <AccountResourceCard key={resource.id} resource={resource} 
+                                        onPress={() => viewResourceRequested(resource)} 
+                                        onChatOpen={() => chatOpenRequested(resource) } />
+                                  }
+                              }
+                          />
+                      </ViewField>
                 </>
             }
         </LoadedZone>

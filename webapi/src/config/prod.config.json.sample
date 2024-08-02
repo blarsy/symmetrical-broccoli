@@ -17,7 +17,7 @@
     "remoteBackupFolderName": "backups",
     "user": "sb",
     "webAppUrl": "https://www.tope-la.com/webapp/",
-    "webClientUrls": "[\"http://localhost:19006\", \"https://www.tope-la.com\"]",
+    "webClientUrls": "[\"http://localhost:19006\", \"https://www.tope-la.com\", \"https://tope-la.com\"]",
     "websiteUrl": "https://www.tope-la.com/",
     "versions": {
         "default": {

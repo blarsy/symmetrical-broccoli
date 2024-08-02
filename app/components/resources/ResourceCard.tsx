@@ -13,7 +13,7 @@ interface Props {
     editRequested: () => void
     deleteRequested: (resourceId: number) => void
     resource: Resource
-    isExample: boolean
+    isExample?: boolean
 }
 
 const iconButtonsSize = aboveMdWidth() ? 60 : 40

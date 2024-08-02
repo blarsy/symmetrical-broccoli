@@ -212,6 +212,7 @@ CREATE OR REPLACE FUNCTION sb.update_resource(
 AS $BODY$
 DECLARE ids_images_to_delete INTEGER[];
 DECLARE location_id INTEGER = NULL;
+DECLARE location_to_delete_id INTEGER = NULL;
 BEGIN
 	--Detect attempt to update a resource owned by another account
 	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND account_id = sb.current_account_id()) THEN
@@ -236,6 +237,11 @@ BEGIN
 			UPDATE sb.locations SET address = specific_location.address, latitude = specific_location.latitude, longitude = specific_location.longitude
 			WHERE id = location_id;
 		END IF;
+	ELSE
+		IF location_id IS NOT NULL THEN
+			SELECT location_id INTO location_to_delete_id;
+		END IF;
+		SELECT null INTO location_id;
 	END IF;
 
 	UPDATE sb.resources r SET title = update_resource.title, description = update_resource.description, 
@@ -245,6 +251,9 @@ BEGIN
 		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id
 	WHERE r.id = update_resource.resource_id;
 	
+	IF location_to_delete_id IS NOT NULL THEN
+		DELETE FROM sb.locations WHERE id = location_to_delete_id;
+	END IF;
 	DELETE FROM sb.resources_resource_categories rrc WHERE rrc.resource_id = update_resource.resource_id;
 	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
 	SELECT update_resource.resource_id, UNNEST(category_codes);

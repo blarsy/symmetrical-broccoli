@@ -19,7 +19,8 @@ const createRes = (id: number, account: Account, title: string, description: str
     canBeTakenAway: true,
     categories,
     canBeDelivered: true,
-    deleted: null
+    deleted: null,
+    specificLocation: null
 })
 
 const account1 = { id: 1, name: 'Super artisan', email: 'me@me.com', avatarImageUrl: undefined, avatarPublicId: 'cwd3apntbv1z2jdf1ocf' } as Account & { avatarPublicId?: string }
@@ -95,7 +96,8 @@ const makeGetResourceGraphQlOp = (res: Resource) => ({
                 })) 
             },
             created: res.created,
-            deleted: res.deleted
+            deleted: res.deleted,
+            locationBySpecificLocationId: null
       }
   }
 })

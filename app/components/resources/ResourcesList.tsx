@@ -16,42 +16,48 @@ import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 
 export const RESOURCES = gql`query MyResources {
-    myresources {
-      nodes {
+  myresources {
+    nodes {
+      id
+      expiration
+      description
+      created
+      isProduct
+      isService
+      title
+      canBeTakenAway
+      canBeExchanged
+      canBeGifted
+      canBeDelivered
+      deleted
+      accountByAccountId {
         id
-        expiration
-        description
-        created
-        isProduct
-        isService
-        title
-        canBeTakenAway
-        canBeExchanged
-        canBeGifted
-        canBeDelivered
-        deleted
-        accountByAccountId {
-          id
-          name
-          email
-        }
-        resourcesImagesByResourceId {
-          nodes {
-            imageByImageId {
-              created
-              id
-              publicId
-            }
-          }
-        }
-        resourcesResourceCategoriesByResourceId {
-          nodes {
-            resourceCategoryCode
+        name
+        email
+      }
+      resourcesImagesByResourceId {
+        nodes {
+          imageByImageId {
+            created
+            id
+            publicId
           }
         }
       }
+      resourcesResourceCategoriesByResourceId {
+        nodes {
+          resourceCategoryCode
+        }
+      }
+      locationBySpecificLocationId {
+        address
+        id
+        latitude
+        longitude
+      }
     }
-  }`
+  }
+}`
 
 export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
   deleteResource(input: {resourceId: $resourceId}) {

@@ -86,6 +86,16 @@ export interface ConversationData {
     }
 }
 
+export const parseLocationFromGraph = (raw: any): Location | null => {
+    if(!raw) return null
+
+    return ({
+        address: raw.address,
+        latitude: parseFloat(raw.latitude),
+        longitude: parseFloat(raw.longitude)
+    })
+}
+
 export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
@@ -101,7 +111,7 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         categories: resourceCategories, 
         account: rawRes.accountByAccountId,
         deleted: rawRes.deleted,
-        specificLocation: rawRes.locationBySpecificLocationId,
+        specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images
 } as Resource
 }
@@ -143,7 +153,8 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                     isService: false,
                     categories: [],
                     created: new Date(),
-                    deleted: null
+                    deleted: null,
+                    specificLocation: null
                 }
             },
             withUser: {

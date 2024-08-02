@@ -1,7 +1,7 @@
 import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, adaptToWidth, getScreenSize, regionFromLocation } from "@/lib/utils"
 import React, { useContext, useState } from "react"
-import { Banner, Button, Chip, Icon, IconButton, Modal, Portal, Text } from "react-native-paper"
-import { Resource, fromServerGraphResource } from "@/lib/schema"
+import { Banner, Chip, Icon, IconButton, Text } from "react-native-paper"
+import { Resource, fromServerGraphResource, parseLocationFromGraph } from "@/lib/schema"
 import { t } from "@/i18n"
 import { Dimensions, Image, ImageSourcePropType, ScrollView, TouchableOpacity, View } from "react-native"
 import dayjs from "dayjs"
@@ -15,7 +15,7 @@ import ViewField from "../ViewField"
 import { AppContext } from "../AppContextProvider"
 import Images from "@/Images"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import { parseLocationFromGraph } from "../account/PublicInfo"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -70,7 +70,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const appState = useContext(AppContext)
     const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number(route.params.resourceId) }})
     const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
-    
+    const { ensureConnected } = useUserConnectionFunctions()
 
     let expiration: { text: string, date: string } | undefined = undefined
     let resource : Resource | undefined = undefined
@@ -87,8 +87,11 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     return <ScrollView style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff' }}>
         <LoadedZone loading={loading} error={error} containerStyle={{ marginBottom: 15 }}>
         { resource && <>
-            <Banner icon={p => <Icon size={20} source="trash-can" />} visible={!!resource.deleted}>
-                {t('resource_deleted', { deleted: dayjs(resource.deleted).format(t('dateFormat')) })}
+            <Banner style={{ backgroundColor: lightPrimaryColor, marginBottom: 15 }} icon={p => <Icon size={25} source="trash-can" />} visible={!!resource.deleted}>
+                <Text variant="bodySmall">{t('resource_deleted', { deleted: dayjs(resource.deleted).format(t('dateFormat')) })}</Text>
+            </Banner>
+            <Banner style={{ backgroundColor: lightPrimaryColor, marginBottom: 15 }} icon={p => <Icon size={25} source="timer-off-outline" />} visible={!resource.deleted && !!resource.expiration && new Date(resource.expiration) < new Date()}>
+                <Text variant="bodySmall">{t('resource_expired', { expired: dayjs(resource.expiration).format(t('dateFormat')) })}</Text>
             </Banner>
             { resource.images && resource.images.length > 0 && 
                 <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }
@@ -97,13 +100,18 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                     <Text variant="bodyMedium">{resource.account?.name}</Text>
                     <View style={{ flex: 1, flexDirection: 'row' }}>
                         <IconButton mode="outlined" icon="cellphone-information" size={35} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })} />
-                        { resource.account?.id != appState.account?.id && <IconButton mode="outlined" icon={p => <View style={{ width: 35 }}><Images.Chat /></View>} size={35} onPress={() => navigation.navigate('chat', {
-                            screen: 'conversation',
-                            params: {
-                                resourceId: resource.id,
-                                otherAccountId: resource.account?.id 
-                            }
-                        })} />}
+                        { resource.account?.id != appState.account?.id && <IconButton mode="outlined" icon={p => <View style={{ width: 35 }}><Images.Chat /></View>} size={35} onPress={() => {
+                            ensureConnected('introduce_yourself', '', () => {
+                                setTimeout(() => navigation.navigate('chat', {
+                                    screen: 'conversation',
+                                    params: {
+                                        resourceId: resource.id,
+                                        otherAccountId: resource.account?.id 
+                                    }
+                                }))
+                            })
+
+                        } } />}
                     </View>
                 </View>
             </ViewField>

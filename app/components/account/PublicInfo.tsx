@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import OperationFeedback from "../OperationFeedback"
 import EditLinkModal from "./EditLinkModal"
-import { Link, Location, getIconForLink } from "@/lib/schema"
+import { Link, Location, getIconForLink, parseLocationFromGraph } from "@/lib/schema"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
@@ -60,16 +60,6 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
     </View>} />
     <IconButton size={25} containerColor="#fff" iconColor="#000" icon="link-plus" onPress={newLinkRequested} />
 </View>
-
-export const parseLocationFromGraph = (raw: any): Location | null => {
-    if(raw === null) return null
-
-    return ({
-        address: raw.address,
-        latitude: parseFloat(raw.latitude),
-        longitude: parseFloat(raw.longitude)
-    })
-}
 
 export default () => {
     const [success, setSuccess] = useState(false)

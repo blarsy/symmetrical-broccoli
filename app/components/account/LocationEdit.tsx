@@ -48,7 +48,7 @@ const EditAddressModal = ({ visible, onDone }: EditAddressModalProps) => {
                         latitude: res.results[0].geometry.location.lat,
                         longitude: res.results[0].geometry.location.lng
                      })
-                }} autoFillOnNotFound textInputProps={{ InputComp: TextInput }} fetchDetails={false} />
+                }} autoFillOnNotFound textInputProps={{ InputComp: TextInput }} fetchDetails={false} debounce={700} />
                 <MapView style={{ flex: 1, flexBasis: 300, opacity: currentLocation ? 1 : 0.1 }} 
                     region={regionFromLocation(currentLocation || DEFAUT_LOCATION)}
                     provider={PROVIDER_GOOGLE}>

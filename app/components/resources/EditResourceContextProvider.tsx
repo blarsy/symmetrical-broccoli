@@ -1,5 +1,5 @@
 import { SetStateAction, createContext, useState } from "react"
-import { ImageInfo, Resource } from "@/lib/schema"
+import { ImageInfo, Location, Resource } from "@/lib/schema"
 import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
@@ -33,7 +33,7 @@ interface EditResourceActions {
     addImage: (img: ImageInfo, resource: Resource) => Promise<void>
     deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
     save: (resource: Resource) => Promise<void>
-    reset: () => void
+    reset: (accountLocation?: Location) => void
 }
 
 export interface EditResourceContextProps {
@@ -63,7 +63,7 @@ export const EditResourceContext = createContext<EditResourceContextProps>({
         addImage: async() => {},
         deleteImage: async() => {},
         save: async() => {},
-        reset: () => {}
+        reset: (accountLocation?: Location) => {}
     }
 })
 
@@ -123,6 +123,8 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     resource.images.push(...newPublicIds.map(publicId => ({ publicId } as ImageInfo)))
                 }
 
+                console.log('updating res', resource)
+
                 await updateResource({ variables: {
                     resourceId: resource.id,
                     title: resource.title,
@@ -167,8 +169,10 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
             editResourceState.changeCallbacks.forEach(cb => cb())
         },
-        reset: () => {
+        reset: (accountLocation?: Location) => {
             const newResourceState = {...editResourceState, ...{ editedResource: blankResource, imagesToAdd: [] }}
+            
+            newResourceState.editedResource.specificLocation = accountLocation || null
             setState( newResourceState )
         }
     }

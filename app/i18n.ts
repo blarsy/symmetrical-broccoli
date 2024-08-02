@@ -60,16 +60,16 @@ const resources = {
       "dateTimeFormat": "MM/DD/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Add pictures",
-      "nature_label": "Nature",
+      "nature_label": "Nature(s)",
       "resourceCategories_label": "Categories",
       "Confirmation_DialogTitle": "Confirmation",
       "Confirm_Resource_Delete_Question": "Are you sure you want to delete this resource ?",
       "isProduct_label": "Product",
       "isService_label": "Service",
-      "type_label": "Exchange type",
+      "type_label": "Exchange type(s)",
       "canBeGifted_label": "Gift",
       "canBeExchanged_label": "Barter",
-      "transport_label": "Transport",
+      "transport_label": "Transport(s)",
       "canBeTakenAway_label": "Take away",
       "canBeDelivered_label": "Delivery",
       "nature_required": "Please select at least one option",
@@ -161,7 +161,8 @@ const resources = {
       "setLocation_dialog_title": "Set address",
       "confirmation_unlink_account_location": "Remove this location ?",
       "resource_location_label": "Address",
-      "address_label": "Location"
+      "address_label": "Location",
+      "resource_expired": "This resource is no more available since {{expired}}"
     }
   },
   fr: {
@@ -217,16 +218,16 @@ const resources = {
       "dateTimeFormat": "DD/MM/YYYY HH:mm",
       "expiration_label": "Expiration",
       "addPictures_Button": "Ajouter des photos",
-      "nature_label": "Nature",
+      "nature_label": "Nature(s)",
       "resourceCategories_label": "Catégories",
       "Confirmation_DialogTitle": "Confirmation",
       "Confirm_Resource_Delete_Question": "Etes-vous sûr.e de vouloir supprimer cette ressource ?",
       "isProduct_label": "Produit",
       "isService_label": "Service",
-      "type_label": "Type d'échange",
+      "type_label": "Type(s) d'échange",
       "canBeGifted_label": "Don",
       "canBeExchanged_label": "Troc",
-      "transport_label": "Transport",
+      "transport_label": "Transport()s",
       "canBeTakenAway_label": "A emporter",
       "canBeDelivered_label": "Livraison",
       "nature_required": "Choissisez au moins une option",
@@ -318,7 +319,8 @@ const resources = {
       "setLocation_dialog_title": "Définir l'adresse",
       "confirmation_unlink_account_location": "Enlever cette adresse ?",
       "resource_location_label": "Adresse",
-      "address_label": "Adresse"
+      "address_label": "Adresse",
+      "resource_expired": "Cette ressource n'est plus disponible depuis le {{expired}}"
     }
   }
 }

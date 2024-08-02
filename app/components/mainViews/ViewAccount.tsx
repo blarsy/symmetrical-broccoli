@@ -11,12 +11,13 @@ export default ({ route, navigation }: RouteProps) => {
         chatOpenRequested={resource => {
         ensureConnected('introduce_yourself', '', () => {
             setTimeout(() => navigation.navigate('chat', {
-                screen: 'conversation',
-                params: {
-                    resourceId: resource.id,
-                    otherAccountId: appContext.account!.id
-                }
-            }))
+                    screen: 'conversation',
+                    params: {
+                        resourceId: resource.id,
+                        otherAccountId: appContext.account!.id
+                    }
+                })
+            )
         })
     } } />
 }

@@ -7,12 +7,24 @@ import { RouteProps } from "@/lib/utils"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
 import EditResourceFields from "./EditResourceFields"
 import { ScrollView } from "react-native"
-import { Portal } from "react-native-paper"
+import { ActivityIndicator, Portal } from "react-native-paper"
 import { ErrorSnackbar } from "../OperationFeedback"
-import { Resource } from "@/lib/schema"
+import { Resource, parseLocationFromGraph } from "@/lib/schema"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import { gql, useLazyQuery } from "@apollo/client"
+
+export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
+    accountById(id: $id) {
+      locationByLocationId {
+        address
+        latitude
+        longitude
+        id
+      }
+    }
+}`
 
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
@@ -21,10 +33,25 @@ export default ({ route, navigation }:RouteProps) => {
     const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
     const { ensureConnected } = useUserConnectionFunctions()
+    const [getLocation] = useLazyQuery(ACCOUNT_LOCATION)
+    const [loadingAddress, setLoadingAddress] = useState(true)
 
     useEffect(() => {
+        const loadLocationAndReset = async () => {
+            try {
+                const res = await getLocation({ variables: { id: appContext.account!.id }, fetchPolicy: "network-only" })
+                const defaultLocation = parseLocationFromGraph(res.data.accountById.locationByLocationId)
+                editResourceContext.actions.reset(defaultLocation || undefined)
+            } catch(e) {
+                appDispatch({ type: AppReducerActionType.DisplayNotification,  payload: { error: e }})
+            } finally {
+                setLoadingAddress(false)
+            }
+        }
         if(route.params && route.params.isNew){
-            editResourceContext.actions.reset()
+            loadLocationAndReset()
+        } else {
+            setLoadingAddress(false)
         }
     }, [])
 
@@ -42,6 +69,7 @@ export default ({ route, navigation }:RouteProps) => {
     }
 
     return <ScrollView style={{ backgroundColor: '#fff' }}>
+        { loadingAddress ? <ActivityIndicator /> :
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
@@ -63,12 +91,12 @@ export default ({ route, navigation }:RouteProps) => {
         }}>
         {formikState => {
             return <ScrollView style={{ margin: 10 }}>
-                <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
+                    <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
                 <Portal>
                     <ErrorSnackbar error={saveResourceState.error} message={saveResourceState.error && t('requestError')} onDismissError={() => setSaveResourcestate(initial<null>(false, null))} />
                 </Portal>
             </ScrollView>
         }}
-        </Formik>
+        </Formik> }
     </ScrollView>
 }

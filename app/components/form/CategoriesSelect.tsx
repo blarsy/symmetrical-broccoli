@@ -4,7 +4,7 @@ import { useContext, useState } from "react"
 import LoadedZone from "../LoadedZone"
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
-import { Modal, Portal, Text, TextInput } from "react-native-paper"
+import { Icon, Modal, Portal, Text, TextInput } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
@@ -22,16 +22,22 @@ const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, o
     const [selectedCategories, setSelectedCategories] = useState(initialCategories)
     return <Modal visible={open} onDismiss={() => setOpen(false)} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
         <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
-        <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-            {categories.map(cat => <TouchableOpacity onPress={() => {
-                    if(selectedCategories.some(selectedCat => selectedCat.code === cat.code )) {
+        <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 5 }}>
+            {categories.map(cat => {
+                const isSelected = selectedCategories.some(selectedCat => selectedCat.code === cat.code )
+                return <TouchableOpacity onPress={() => {
+                    if(isSelected) {
                         setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.code != cat.code))
                     } else {
                         setSelectedCategories([...selectedCategories, cat])
                     }
                 }} key={cat.code}>
-                <Text style={{ color: selectedCategories.some(selectedCat => selectedCat.code === cat.code ) ? primaryColor : '#000' }} variant="bodyLarge">{cat.name}</Text>
-            </TouchableOpacity>)}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Icon source={isSelected ? `checkbox-marked` : `checkbox-blank-outline`} color={isSelected ? primaryColor : '#000'} size={25}/>
+                    <Text style={{ color: isSelected ? primaryColor : '#000', flex: 1, textAlign: 'center' }} variant="bodyLarge">{cat.name}</Text>
+                </View>
+            </TouchableOpacity>
+            })}
         </View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
             <OrangeButton onPress={() => setOpen(false)}>{t('close_buttonCaption')}</OrangeButton>
