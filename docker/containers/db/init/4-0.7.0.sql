@@ -325,7 +325,7 @@ $BODY$;
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.7.0', minimum_client_version = '0.7.0';
+	UPDATE sb.system SET version = '0.7.0', minimum_client_version = '0.7.2';
 END;
 $body$
 LANGUAGE 'plpgsql'; 
