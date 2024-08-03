@@ -19,7 +19,7 @@ const errorStringFromResponse = (e:ErrorResponse) => {
 
 export const getApolloClient = (token: string) => {
     const httpLink = createHttpLink({ uri: apiUrl })
-    const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, connectionParams: { authorization: `Bearer ${token}` } }))
+    const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, shouldRetry: e => true, retryAttempts: 5, connectionParams: { authorization: `Bearer ${token}` } }))
     
     const authLink = setContext(async (_, { headers }) => {
       if(token) {

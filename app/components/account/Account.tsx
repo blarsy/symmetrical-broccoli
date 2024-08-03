@@ -74,7 +74,7 @@ interface Props {
     chatOpenRequested: (resource: Resource) => void
 }
 
-export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) => {
+export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id } })
     const [accountResources, setAccountResources] = useState<Resource[]>([])
     const appContext = useContext(AppContext)
@@ -114,24 +114,24 @@ export const Account = ({ id,chatOpenRequested, viewResourceRequested }: Props) 
                     { data.accountById.locationByLocationId && <ViewField title={t('address_label')} titleOnOwnLine>
                         <View style={{ flexDirection: 'column' }}>
                             <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{data.accountById.locationByLocationId.address}</Text>
-                            <MapView style={{ height: adaptToWidth(200, 300, 550) }} 
+                            <MapView showsUserLocation={false} style={{ height: adaptToWidth(200, 300, 550) }} 
                                 region={regionFromLocation(parseLocationFromGraph(data.accountById.locationByLocationId)!)}
                                 provider={PROVIDER_GOOGLE}>
                                 <Marker coordinate={parseLocationFromGraph(data.accountById.locationByLocationId)!} />
                             </MapView>
                         </View>
                     </ViewField> }
-                      <ViewField title={t('available_resources')} titleOnOwnLine>
-                          <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={accountResources} 
-                              contentContainerStyle={{ gap: 10 }}
-                              displayItem={resource => {
-                                      return <AccountResourceCard key={resource.id} resource={resource} 
-                                        onPress={() => viewResourceRequested(resource)} 
-                                        onChatOpen={() => chatOpenRequested(resource) } />
-                                  }
-                              }
-                          />
-                      </ViewField>
+                    <ViewField title={t('available_resources')} titleOnOwnLine>
+                        <LoadedList loading={false} noDataLabel={t('no_available_resource')} data={accountResources} 
+                            contentContainerStyle={{ gap: 10 }}
+                            displayItem={resource => {
+                                    return <AccountResourceCard key={resource.id} resource={resource} 
+                                      onPress={() => viewResourceRequested(resource)} 
+                                      onChatOpen={() => chatOpenRequested(resource) } />
+                                }
+                            }
+                        />
+                    </ViewField>
                 </>
             }
         </LoadedZone>

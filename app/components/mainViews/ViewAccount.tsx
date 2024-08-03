@@ -14,7 +14,7 @@ export default ({ route, navigation }: RouteProps) => {
                     screen: 'conversation',
                     params: {
                         resourceId: resource.id,
-                        otherAccountId: appContext.account!.id
+                        otherAccountId: resource.account!.id
                     }
                 })
             )

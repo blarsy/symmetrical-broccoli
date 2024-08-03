@@ -49,7 +49,7 @@ const EditAddressModal = ({ visible, onDone }: EditAddressModalProps) => {
                         longitude: res.results[0].geometry.location.lng
                      })
                 }} autoFillOnNotFound textInputProps={{ InputComp: TextInput }} fetchDetails={false} debounce={700} />
-                <MapView style={{ flex: 1, flexBasis: 300, opacity: currentLocation ? 1 : 0.1 }} 
+                <MapView showsUserLocation={false} style={{ flex: 1, flexBasis: 300, opacity: currentLocation ? 1 : 0.1 }} 
                     region={regionFromLocation(currentLocation || DEFAUT_LOCATION)}
                     provider={PROVIDER_GOOGLE}>
                     <Marker coordinate={currentLocation || DEFAUT_LOCATION} draggable onDragEnd={e => setCurrentLocation({

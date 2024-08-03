@@ -157,7 +157,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             <ViewField title={t('address_label')} titleOnOwnLine>
                 <View style={{ flexDirection: 'column' }}>
                     <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{resource.specificLocation?.address || t('no_address_defined')}</Text>
-                    { resource.specificLocation && <MapView style={{ height: adaptToWidth(200, 300, 550) }} 
+                    { resource.specificLocation && <MapView showsUserLocation={false} style={{ height: adaptToWidth(200, 300, 550) }} 
                         region={regionFromLocation(parseLocationFromGraph(resource.specificLocation)!)}
                         provider={PROVIDER_GOOGLE}>
                         <Marker coordinate={parseLocationFromGraph(resource.specificLocation)!} />

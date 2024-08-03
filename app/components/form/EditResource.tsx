@@ -48,7 +48,7 @@ export default ({ route, navigation }:RouteProps) => {
                 setLoadingAddress(false)
             }
         }
-        if(route.params && route.params.isNew){
+        if(route.params && route.params.isNew && appContext.account){
             loadLocationAndReset()
         } else {
             setLoadingAddress(false)

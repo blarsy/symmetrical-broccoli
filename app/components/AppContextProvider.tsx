@@ -57,7 +57,7 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.Login:
           return {...previousState, ...{ account: action.payload.account, chatMessagesSubscription: action.payload.subscription, connecting: undefined, apolloClient: action.payload.apolloClient }}
         case AppReducerActionType.Logout:
-          return {...previousState, ...{ token: '', account: undefined, chatMessageSubscription: undefined, overrideMessageReceived: [] }}
+          return {...previousState, ...{ token: '', account: undefined, chatMessagesSubscription: undefined, overrideMessageReceived: [] }}
         case AppReducerActionType.UpdateAccount:
           return { ...previousState, ...{ account: action.payload } }
         case AppReducerActionType.DisplayNotification:
