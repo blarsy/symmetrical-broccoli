@@ -1,10 +1,11 @@
-import { fonts } from "@/theme"
-import { gql, useQuery } from "@apollo/client"
-import { Card, CircularProgress, Stack, Theme, Typography } from "@mui/material"
-import useMediaQuery from '@mui/material/useMediaQuery'
-import Image from 'next/image'
-import { urlFromPublicId } from "@/lib/images"
-import { lightPrimaryColor } from "@/utils"
+import { gql } from "@apollo/client"
+import { Box, Theme } from "@mui/material"
+
+import WhitePanel from "./WhitePanel"
+import ResponsiveGallery from "./ResponsiveGallery"
+import { Stack, useMediaQuery } from "@mui/system"
+import ActivityBikeRepair from '@/app/img/activities/veloman.svg'
+
 
 const TOP_ACCOUNTS = gql`query TopAccounts {
     topAccounts {
@@ -18,48 +19,36 @@ const TOP_ACCOUNTS = gql`query TopAccounts {
     }
 }`
 
-const TopAccounts = ({ theme }: { theme: Theme }) => {
-    const {data, loading, error} = useQuery(TOP_ACCOUNTS)
-    const smallScreen = useMediaQuery(theme.breakpoints.down('md'))
-    const medScreen = useMediaQuery(theme.breakpoints.up('md'))
-
-    const imgSize = smallScreen ? 200 : (medScreen ? 250 : 300)
-
-    if(loading) return <CircularProgress  />
-
-    if(error) return <Typography variant="body2" color="error">Problème de chargement</Typography>
-
-    if(data.topAccounts.nodes.length === 0) return <Typography variant="body2">Problème de chargement</Typography>
-    
-    return <Stack style={{ flexDirection: 'row', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-        { data.topAccounts.nodes.map((account: any, idx: number) => {
-            return <Card key={idx} elevation={5} style={{ display:'flex', flexDirection: 'column', backgroundColor: lightPrimaryColor, color: '#000', borderRadius: '1rem', padding: '1rem', gap: '1rem' }}>
-                <Typography style={{ fontFamily: fonts.title.style.fontFamily, fontWeight: 400, textAlign: 'center' }}>{account.name}</ Typography>
-                <Image style={{ borderRadius: '2.5rem' }} width={imgSize} height={imgSize} src={urlFromPublicId(account.imageByAvatarImageId.publicId)} alt={`Ìmage ${account.name}`}  />
-            </Card>
-        }) }
-    </Stack>
-}
-
 const AccountsGallery = ({ theme }: { theme: Theme }) => {
-    const smallScreen = useMediaQuery(theme.breakpoints.down('md'))
-    return <Stack paddingTop="2rem">
-        <Typography textAlign="center" color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400}  fontSize={48} textTransform="uppercase" 
-            sx={{ transform: 'rotate(3.7deg)', marginBottom: '2rem' }}>Rejoignez-les !</Typography>
-        <Stack alignContent="center" padding={smallScreen ? '2rem' : '5rem'} sx={{
-            backgroundColor: '#fcf5ef',
-            [theme.breakpoints.up('md')]: {
-                backgroundColor: 'transparent',
-                backgroundImage: `url('/FOND.svg')`,
-                backgroundRepeat: 'no-repeat',
-                backgroundOrigin: "border-box",
-                backgroundPosition: 'top',
-                backgroundSize: '110% 100%'
+    const smallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+    const medScreen = useMediaQuery(theme.breakpoints.up('md'))
+    const hugeScreen = useMediaQuery(theme.breakpoints.up('xl'))
+
+    const flexBasis = smallScreen ? '0 0 20%' : (!medScreen ? '0 0 10%' : (hugeScreen ? '0 0 160px' : '0 0 10%'))
+    
+    return <>
+        <Stack direction="row" justifyContent="space-around" flexWrap="wrap" marginTop="-50px">
+            {[<ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>,
+            <ActivityBikeRepair/>].map((img, idx) => <Box key={idx} flex={flexBasis} padding="0.5rem">
+                {img}
+            </Box>)
             }
-        }}>
-            <TopAccounts theme={theme} />
         </Stack>
-    </Stack>
+        <WhitePanel title="Rejoignez-les !" theme={theme}>
+            <ResponsiveGallery theme={theme} query={TOP_ACCOUNTS} itemsFromData={data => data.topAccounts.nodes.map((account: any) => ({
+                title: account.name, imagePublicId: account.imageByAvatarImageId.publicId
+            }))} />
+        </WhitePanel>
+    </>
 }
+
 
 export default AccountsGallery

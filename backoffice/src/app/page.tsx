@@ -31,6 +31,8 @@ import AccountsGallery from "@/components/showcase/AccountsGallery"
 import { ApolloProvider } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
 import { getCommonConfig } from "@/config"
+import ResourcesGallery from "@/components/showcase/ResourcesGallery"
+import Roadmap from "@/components/showcase/Roadmap"
 
 const { mainVersion, link2Url } = getCommonConfig()
 
@@ -147,11 +149,7 @@ const Page = () => {
                 <PresentationCarousel theme={theme} />
                 <Stack alignItems="center" justifyContent="center" sx={theme => ({
                     flexDirection: 'column',
-                    //paddingTop: '2rem',
                     gap: '1rem',
-                    // [theme.breakpoints.up('md')]: {
-                    //     paddingTop: '0'
-                    // },
                     [theme.breakpoints.up('sm')]: {
                         flexDirection: 'row',
                         gap: '0'
@@ -160,7 +158,9 @@ const Page = () => {
                     <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
                     <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
                 </Stack>
-                {/* <AccountsGallery theme={theme} /> */}
+                <AccountsGallery theme={theme} />
+                <ResourcesGallery theme={theme} />
+                <Roadmap />
             </Stack>
         </ThemeProvider>
     </ApolloProvider>
