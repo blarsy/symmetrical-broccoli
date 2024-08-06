@@ -322,6 +322,75 @@ SELECT r.*
  
 $BODY$;
 
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language,
+    accounts.log_level,
+    accounts.location_id
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION sb.top_accounts(
+	)
+    RETURNS SETOF accounts 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT *
+FROM sb.active_accounts aa
+WHERE aa.avatar_image_id IS NOT NULL AND
+(SELECT COUNT(*) FROM sb.resources WHERE account_id = aa.id) > 0
+ORDER BY aa.created DESC LIMIT 10;
+
+$BODY$;
+
+ALTER FUNCTION sb.top_accounts()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.top_accounts() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.top_accounts() TO sb;
+
+
+CREATE OR REPLACE FUNCTION sb.top_resources(
+	)
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT *
+FROM sb.resources r
+WHERE deleted IS NULL AND expiration > NOW() AND
+(SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = r.id) > 0
+ORDER BY r.created DESC LIMIT 10;
+
+$BODY$;
+
+ALTER FUNCTION sb.top_resources()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.top_resources() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.top_resources() TO sb;
+
 DO
 $body$
 BEGIN

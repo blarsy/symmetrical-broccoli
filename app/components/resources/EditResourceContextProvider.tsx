@@ -123,8 +123,6 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     resource.images.push(...newPublicIds.map(publicId => ({ publicId } as ImageInfo)))
                 }
 
-                console.log('updating res', resource)
-
                 await updateResource({ variables: {
                     resourceId: resource.id,
                     title: resource.title,
