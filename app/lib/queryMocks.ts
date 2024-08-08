@@ -57,7 +57,8 @@ const makeSearchResourceResult = (resources: Resource[]) => resources.map(resour
         nodes: resource.categories.map(cat => ({
             resourceCategoryCode: cat.code
           }))
-      }
+      },
+      locationBySpecificLocationId: null
 }))
 
 const makeGetResourceGraphQlOp = (res: Resource) => ({

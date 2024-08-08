@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Appbar, Avatar, Icon } from "react-native-paper"
+import { Appbar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'
@@ -17,6 +17,7 @@ import Animated, { useAnimatedStyle, withRepeat, withSequence, withSpring, withT
 import { useSharedValue } from 'react-native-reanimated'
 import AccountAvatar from "./AccountAvatar"
 import SupportModal from "../support/SupportModal"
+import Notifications from "../notifications/Notifications"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -28,6 +29,8 @@ const getViewTitleI18n = (screenName: string): string => {
             return t('resource_label')
         case 'chat':
             return t('chat_label')
+        case 'notifications':
+            return t('notifications_title')
         default:
             return ''
     }
@@ -96,6 +99,7 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                     <Tab.Screen name="search" component={Search} options={{ title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }} />
                     <Tab.Screen name="resource" component={Resources} options={{ title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }} />
                     <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <Images.Chat fill={p.color} />}} />
+                    <Tab.Screen name="notifications" component={Notifications} options={{ title: t('notifications_label'), tabBarIcon: p => <Icon source="bell" size={30} color={p.color}/>}} />
                 </Tab.Navigator>
                 <SupportModal visible={supportVisible} onDismiss={() => setSupportVisible(false)} />
             </View>
