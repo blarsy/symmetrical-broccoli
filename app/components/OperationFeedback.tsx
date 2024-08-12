@@ -1,7 +1,7 @@
 import { t } from "i18next"
 import React from "react"
 import { View } from "react-native"
-import { Icon, Portal, Snackbar, Text, Tooltip } from "react-native-paper"
+import { ActivityIndicator, Icon, Portal, Snackbar, Text, Tooltip } from "react-native-paper"
 
 interface Props {
     error: Error | undefined
@@ -37,6 +37,16 @@ export const SuccessSnackbar = ({ message, onDismissSuccess }: SuccessSnackbarPr
     style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', backgroundColor: 'rgb(204, 232, 205)' }} 
     visible={!!message} onDismiss={onDismissSuccess}>
     <Text variant="bodySmall">{message}</Text>
+</Snackbar>
+
+export const InfoSnackbar = ({ message }: { message: string}) => <Snackbar
+    theme={{ colors: { inverseOnSurface: 'rgb(12, 19, 13)' } }}
+    style={{ backgroundColor: '#f0b91e' }}
+    visible={!!message} onDismiss={() => {}}>
+        <View style={{ flexDirection: 'row', alignItems:'center', gap: 15 }}>
+            <Text variant="bodySmall" style={{ color: '#000' }}>{message}</Text>
+            <ActivityIndicator color="#000" size="small" />
+        </View>
 </Snackbar>
 
 const OperationFeedback = ({ error, success, successMessage, onDismissError, onDismissSuccess }: Props) => {

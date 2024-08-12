@@ -1,7 +1,7 @@
-import { ErrorMessage, FormikErrors, FormikProps } from "formik"
+import { ErrorMessage, FormikProps } from "formik"
 import { t } from "i18next"
 import React, { useContext, useEffect } from "react"
-import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton, CheckboxGroup, StyledLabel } from "../layout/lib"
+import { TransparentTextInput, ErrorText, DateTimePickerField, OrangeButton, CheckboxGroup, StyledLabel, SubmitButton, Hr } from "../layout/lib"
 import PicturesField from "./PicturesField"
 import { Category, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
@@ -16,8 +16,6 @@ interface Props {
     formikState: FormikProps<Resource>
     processing: boolean
 }
-
-const Hr = () => <View style={{ backgroundColor: '#343434', height: 1, transform: 'scaleY(0.5)' }}></View>
 
 const EditResourceFields = ({formikState, processing}: Props) => {
     const appDispatch = useContext(AppDispatchContext)
@@ -67,10 +65,11 @@ const EditResourceFields = ({formikState, processing}: Props) => {
         }} label={t('expiration_label') + ' *'} />
         <ErrorMessage component={ErrorText} name="expiration" />
         <Hr />
-        <CategoriesSelect label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
+        <CategoriesSelect inline label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
             setFieldValue('categories', categories)
         }} />
         <ErrorMessage component={ErrorText} name="categories" />
+        <Hr/>
         <CheckboxGroup title={t('type_label') + ' *'} onChanged={val => {
             setFieldValue('canBeGifted', val.canBeGifted)
             setTouched({ canBeGifted: true })
@@ -104,10 +103,13 @@ const EditResourceFields = ({formikState, processing}: Props) => {
             } } 
             orangeBackground={false}/>
         <Hr />
-        <OrangeButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="pencil-square" />} onPress={() => handleSubmit()} 
-            loading={processing}>
-            {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')}
-        </OrangeButton>
+        <SubmitButton
+            handleSubmit={handleSubmit} icon={props => <Icons {...props} name="pencil-square" />} 
+            onPress={() => handleSubmit()} 
+            loading={processing} Component={OrangeButton} ErrorTextComponent={ErrorText} isValid={formikState.isValid}
+            submitCount={formikState.submitCount} updating={processing}>
+            {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')} 
+        </SubmitButton>
     </>
 }
 

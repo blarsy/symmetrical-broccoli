@@ -49,7 +49,7 @@ const resources = {
       "newResource_viewTitle": "Create resource",
       "viewResource_viewTitle": "View resource",
       "editResource_viewTitle": "Edit resource",
-      "date_mustBeFuture": "This date must be in the future",
+      "date_mustBeFuture": "Must be in the future",
       "title_label": "Title",
       "brought_by_label": "Brought by",
       "description_label": "Description",
@@ -59,7 +59,7 @@ const resources = {
       "shortDateFormat": "MM/DD",
       "dateTimeFormat": "MM/DD/YYYY HH:mm",
       "expiration_label": "Expiration",
-      "addPictures_Button": "Add pictures",
+      "addPictures_Button": "Add picture(s)",
       "nature_label": "Nature(s)",
       "resourceCategories_label": "Categories",
       "Confirmation_DialogTitle": "Confirmation",
@@ -162,7 +162,10 @@ const resources = {
       "confirmation_unlink_account_location": "Remove this location ?",
       "resource_location_label": "Address",
       "address_label": "Location",
-      "resource_expired": "This resource is no more available since {{expired}}"
+      "resource_expired": "This resource is no more available since {{expired}}",
+      "someDataInvalid": "Save failed: values missing or invalid",
+      "updating_status_message": "Saving",
+      "takePicture_Button": "Take picture(s)"
     }
   },
   fr: {
@@ -207,7 +210,7 @@ const resources = {
       "newResource_viewTitle": "Créer ressource",
       "viewResource_viewTitle": "Visualiser ressource",
       "editResource_viewTitle": "Modifier ressource",
-      "date_mustBeFuture": "Cette date doit être dans le futur",
+      "date_mustBeFuture": "Doit être dans le futur",
       "title_label": "Titre",
       "brought_by_label": "Proposé par",
       "description_label": "Description",
@@ -227,7 +230,7 @@ const resources = {
       "type_label": "Type(s) d'échange",
       "canBeGifted_label": "Don",
       "canBeExchanged_label": "Troc",
-      "transport_label": "Transport()s",
+      "transport_label": "Transport(s)",
       "canBeTakenAway_label": "A emporter",
       "canBeDelivered_label": "Livraison",
       "nature_required": "Choissisez au moins une option",
@@ -320,7 +323,10 @@ const resources = {
       "confirmation_unlink_account_location": "Enlever cette adresse ?",
       "resource_location_label": "Adresse",
       "address_label": "Adresse",
-      "resource_expired": "Cette ressource n'est plus disponible depuis le {{expired}}"
+      "resource_expired": "Cette ressource n'est plus disponible depuis le {{expired}}",
+      "someDataInvalid": "Echec: valeurs manquantes ou invalides",
+      "updating_status_message": "Sauvegarde",
+      "takePicture_Button": "Prendre des photos"
     }
   }
 }

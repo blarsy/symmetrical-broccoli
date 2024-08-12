@@ -8,7 +8,7 @@ import { RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
 import CategoriesSelect from "../form/CategoriesSelect"
 import Images from '@/Images'
-import { CheckboxGroup } from "../layout/lib"
+import { CheckboxGroup, Hr } from "../layout/lib"
 import { ScrollView } from "react-native-gesture-handler"
 import AccordionItem from "../AccordionItem"
 import { SearchFilterContext, SearchOptions } from "../SearchFilterContextProvider"
@@ -47,31 +47,26 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
 
     return <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
         <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options })} value={searchFilterContext.filter.search} />
-        <CategoriesSelect value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
+        <CategoriesSelect inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
             onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options })} />
+        <Hr />
         <AccordionItem title={t('options_title')}>
             <View style={{ flexDirection: 'column' }}>
-            <CheckboxGroup title={''} options={{
-                    isProduct: t('isProduct_label'), isService: t('isService_label') }} values={searchFilterContext.filter.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
-                    categories: searchFilterContext.filter.categories, 
-                    options: values as any as SearchOptions })} />
-                <View style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth
-                }} />
-            <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
-                    categories: searchFilterContext.filter.categories, 
-                    options: values as any as SearchOptions })} />
-                <View style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth
-                }} />
-            <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
-                onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
-                    categories: searchFilterContext.filter.categories, 
-                    options: values as any as SearchOptions })} />
+                <CheckboxGroup title={''} options={{
+                        isProduct: t('isProduct_label'), isService: t('isService_label') }} values={searchFilterContext.filter.options as any}
+                    onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                        categories: searchFilterContext.filter.categories, 
+                        options: values as any as SearchOptions })} />
+                <Hr />
+                <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
+                    onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                        categories: searchFilterContext.filter.categories, 
+                        options: values as any as SearchOptions })} />
+                <Hr />
+                <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
+                    onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
+                        categories: searchFilterContext.filter.categories, 
+                        options: values as any as SearchOptions })} />
             </View>
         </AccordionItem>
 

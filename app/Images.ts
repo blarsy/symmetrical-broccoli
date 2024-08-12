@@ -11,5 +11,6 @@ import Chat from './assets/img/CHAT.svg'
 import History from './assets/img/HISTORY.svg'
 import Photos from './assets/img/PHOTOS.svg'
 import BackgroundChat from './assets/img/background-chat.svg'
+import Camera from './assets/img/CAMERA.svg'
 
-export default { Profile, Cross, Arrow, Heart, Received, Sent, Valid, Search, Modify, Chat, History, Photos, BackgroundChat }
+export default { Profile, Cross, Arrow, Heart, Received, Sent, Valid, Search, Modify, Chat, History, Photos, BackgroundChat, Camera }

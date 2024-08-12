@@ -22,7 +22,7 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     {
         editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null, specificLocation: null },
+            isService: false, deleted: null, specificLocation: null, expiration: new Date() },
         changeCallbacks: [], imagesToAdd: []},
         actions: {
             setResource: () => {},
@@ -31,7 +31,7 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
             addImage: async() => {},
             deleteImage: async() => {},
             save: async() => {},
-            reset: () => {}
+            reset: () => { }
     }}}>
     <StoryElement />
 </EditResourceContext.Provider>

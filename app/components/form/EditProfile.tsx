@@ -58,7 +58,7 @@ export default function EditProfile () {
         email: yup.string().email(t('invalid_email')),
         avatarPublicId: yup.string().nullable()
     })} onSubmit={update}>
-    {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+    {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, isValid, submitCount }) => (
         <View style={{ flex: 1, padding: 10 }}>
             <Banner visible={newEmailMustBeActivated}>{t('newEmailMustBeActivated_message')}</Banner>
             <View style={{ alignItems: 'center' }}>
@@ -83,9 +83,12 @@ export default function EditProfile () {
             <OrangeTextInput label={<StyledLabel label={t('email_label')} color="#fff"/>} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
-            <WhiteButton disabled={updating} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => handleSubmit()} loading={updating}>
-                {t('save_label')}
-            </WhiteButton>
+            <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
+                { submitCount > 0 && !isValid && <OrangeBackedErrorText>{t('someDataInvalid')}</OrangeBackedErrorText> }
+                <WhiteButton disabled={updating} onPress={e => handleSubmit()} loading={updating}>
+                    {t('save_label')}
+                </WhiteButton>
+            </View>
             <OperationFeedback error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
         </View>)}
     </Formik>  

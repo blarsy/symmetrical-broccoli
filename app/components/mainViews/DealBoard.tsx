@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Appbar, Avatar, Icon } from "react-native-paper"
+import { Appbar, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'

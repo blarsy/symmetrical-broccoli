@@ -14,7 +14,7 @@ export default ({ children, title }: AccordionItemPros): JSX.Element => {
     const body = <View>{ children }</View>
   
     return (
-      <View>
+      <View style={{ marginTop: 10 }}>
         <TouchableOpacity onPress={ () => setExpanded(!expanded) }>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16 }}>
                 <Text variant="bodyMedium">{ title }</Text>
