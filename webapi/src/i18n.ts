@@ -1,6 +1,8 @@
 import i18n, { TFunction } from 'i18next'
 
 const translationFunctions = {} as { [lng: string]: TFunction<"translation", undefined> }
+let root = undefined as TFunction<"translation", undefined> | undefined
+
 const resources = {
     en: { translation: {
         "recover_account_subject": "Account recovery",
@@ -54,11 +56,11 @@ const resources = {
 }
 
 export default async (lng: string) => {
+    if(!root) {
+        root = await i18n.init({ resources })
+    }
     if(!translationFunctions[lng]){
-        translationFunctions[lng] = await i18n.init({
-            lng,
-            resources 
-        })
+        translationFunctions[lng] = i18n.getFixedT(lng)
     }
     return translationFunctions[lng]
 }

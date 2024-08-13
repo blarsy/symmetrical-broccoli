@@ -61,6 +61,29 @@ BEGIN
 end;
 $BODY$;
 
+CREATE TABLE sb.mails
+(
+    id serial NOT NULL,
+    account_id integer NOT NULL,
+    email character varying NOT NULL,
+	sent_from character varying NOT NULL,
+    subject character varying NOT NULL,
+    text_content character varying NOT NULL,
+    html_content character varying NOT NULL,
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT mails_pk PRIMARY KEY (id),
+    CONSTRAINT mails_accounts_fk FOREIGN KEY (account_id)
+        REFERENCES sb.accounts (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS sb.mails
+    OWNER to sb;
+
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE sb.mails TO sb;
+
 DO
 $body$
 BEGIN
