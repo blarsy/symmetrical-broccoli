@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import EditResource from './EditResource';
-import { apolloClientMocksDecorator, appContextDecorator, editResourceContextDecorator, gestureHandlerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil';
-import { ACCOUNT_LOCATION } from './EditResourceFields';
+import EditResource, { ACCOUNT_LOCATION } from './EditResource'
+import { apolloClientMocksDecorator, appContextDecorator, editResourceContextDecorator, gestureHandlerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
+
 
 const meta: Meta<typeof EditResource> = {
   component: EditResource,

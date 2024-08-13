@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { ScrollView, View } from "react-native"
+import { ImageSourcePropType, ScrollView, View } from "react-native"
 import LoadedZone from "../LoadedZone"
 import { gql, useQuery } from "@apollo/client"
 import ViewField from "../ViewField"
@@ -14,6 +14,8 @@ import AccountResourceCard from "../resources/AccountResourceCard"
 import LinkList from "./LinkList"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import dayjs from "dayjs"
+import PanZoomImage from "../PanZoomImage"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export const GET_ACCOUNT = gql`query Account($id: Int!) {
   accountById(id: $id) {
@@ -76,6 +78,7 @@ interface Props {
 
 export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id } })
+    const [logoToZoom, setLogotoZoom] = useState<ImageSourcePropType | undefined>(undefined)
     const [accountResources, setAccountResources] = useState<Resource[]>([])
     const appContext = useContext(AppContext)
 
@@ -98,7 +101,9 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
                     </ViewField>
                     { data.accountById.imageByAvatarImageId?.publicId &&
                         <ViewField title="Logo">
-                            <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId)} size={adaptToWidth(150, 250, 300)} />
+                            <TouchableOpacity onPress={() => setLogotoZoom(imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId))}>
+                              <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId)} size={adaptToWidth(150, 250, 300)} />
+                            </TouchableOpacity>
                         </ViewField>
                     }
                     { data.accountById.accountsLinksByAccountId.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&
@@ -135,6 +140,7 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
                 </>
             }
         </LoadedZone>
+        <PanZoomImage source={logoToZoom} onDismess={() => setLogotoZoom(undefined)} />
     </ScrollView>
 }
 

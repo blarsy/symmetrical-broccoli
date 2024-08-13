@@ -1,16 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import CategoriesSelect from './CategoriesSelect';
-import { PaperProvider } from 'react-native-paper';
-import { appContextDecorator } from '@/lib/storiesUtil';
+import CategoriesSelect from './CategoriesSelect'
+import { appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 
 const meta: Meta<typeof CategoriesSelect> = {
   component: CategoriesSelect,
   decorators: [
-    (Story) => <PaperProvider>
-        <Story/>
-    </PaperProvider>,
+    paperProviderDecorator,
     appContextDecorator()
   ]
 }

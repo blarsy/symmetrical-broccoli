@@ -21,7 +21,7 @@ interface CategoriesSelectModalProps {
 const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, onChange }: CategoriesSelectModalProps) => {
     const [selectedCategories, setSelectedCategories] = useState(initialCategories)
     return <Modal visible={open} onDismiss={() => setOpen(false)} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
-        <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
+        <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
         <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 5 }}>
             {categories.map(cat => {
                 const isSelected = selectedCategories.some(selectedCat => selectedCat.code === cat.code )
@@ -54,19 +54,20 @@ interface Props {
     onChange: (categories: Category[])=> void
     label?: string
     labelVariant?: VariantProp<never> | undefined
+    inline?: boolean
 }
 
-const CategoriesSelect = ({ value, onChange, labelVariant, label }: Props) => {
+const CategoriesSelect = ({ value, onChange, labelVariant, label, inline }: Props) => {
     const appContext = useContext(AppContext)
     const [ open, setOpen ] = useState(false)
 
     const openModal = () => setOpen(true)
     
     return <LoadedZone loading={appContext.categories.loading} error={appContext.categories.error}>
-        { appContext.categories.data ? <View style={{ paddingVertical: 10 }}>
+        { appContext.categories.data ? <View>
             <TouchableOpacity onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TransparentTextInput label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
+                    <TransparentTextInput inlineMode={inline} label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
                         value={( value.map(cat => cat.name).join(', '))} right={<TextInput.Icon color="#000" onPress={openModal} size={26} icon="chevron-right"/>} 
                         style={{ margin: 0, flex: 1, backgroundColor: 'transparent' }}/>
                 </View>

@@ -13,6 +13,7 @@ import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { configureFonts } from "react-native-paper"
 import { useFonts } from 'expo-font'
+import { useCameraPermissions } from "expo-camera"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -123,7 +124,7 @@ export const getLanguage = (): string => {
       language = firstCompatibleLanguage || supportedLanguages[0]
   }
   return language
-}
+}        
 
 export const pickImage = async (success: ((img: ImageResult)=> void), height: number) => {
     await requestMediaLibraryPermissionsAsync(true)

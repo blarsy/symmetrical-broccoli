@@ -1,0 +1,3971 @@
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """Reads and enables pagination through a set of `Account`."""
+  allAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Account`."""
+    orderBy: [AccountsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountCondition
+  ): AccountsConnection
+
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  allAccountsLinks(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection
+
+  """Reads and enables pagination through a set of `AccountsPushToken`."""
+  allAccountsPushTokens(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsPushToken`."""
+    orderBy: [AccountsPushTokensOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsPushTokenCondition
+  ): AccountsPushTokensConnection
+
+  """Reads and enables pagination through a set of `ActiveAccount`."""
+  allActiveAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ActiveAccount`."""
+    orderBy: [ActiveAccountsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ActiveAccountCondition
+  ): ActiveAccountsConnection
+
+  """Reads and enables pagination through a set of `BroadcastPref`."""
+  allBroadcastPrefs(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `BroadcastPref`."""
+    orderBy: [BroadcastPrefsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BroadcastPrefCondition
+  ): BroadcastPrefsConnection
+
+  """Reads and enables pagination through a set of `ClientLog`."""
+  allClientLogs(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ClientLog`."""
+    orderBy: [ClientLogsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ClientLogCondition
+  ): ClientLogsConnection
+
+  """Reads and enables pagination through a set of `Conversation`."""
+  allConversations(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Conversation`."""
+    orderBy: [ConversationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConversationCondition
+  ): ConversationsConnection
+
+  """Reads and enables pagination through a set of `EmailActivation`."""
+  allEmailActivations(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `EmailActivation`."""
+    orderBy: [EmailActivationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: EmailActivationCondition
+  ): EmailActivationsConnection
+
+  """Reads and enables pagination through a set of `Image`."""
+  allImages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Image`."""
+    orderBy: [ImagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ImageCondition
+  ): ImagesConnection
+
+  """Reads and enables pagination through a set of `LinkType`."""
+  allLinkTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `LinkType`."""
+    orderBy: [LinkTypesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LinkTypeCondition
+  ): LinkTypesConnection
+
+  """Reads and enables pagination through a set of `Location`."""
+  allLocations(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Location`."""
+    orderBy: [LocationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LocationCondition
+  ): LocationsConnection
+
+  """Reads and enables pagination through a set of `Mail`."""
+  allMail(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Mail`."""
+    orderBy: [MailOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MailCondition
+  ): MailConnection
+
+  """Reads and enables pagination through a set of `Message`."""
+  allMessages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Message`."""
+    orderBy: [MessagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MessageCondition
+  ): MessagesConnection
+
+  """Reads and enables pagination through a set of `Participant`."""
+  allParticipants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection
+
+  """Reads and enables pagination through a set of `ResourceCategory`."""
+  allResourceCategories(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourceCategory`."""
+    orderBy: [ResourceCategoriesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourceCategoryCondition
+  ): ResourceCategoriesConnection
+
+  """Reads and enables pagination through a set of `Resource`."""
+  allResources(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourcesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourceCondition
+  ): ResourcesConnection
+
+  """Reads and enables pagination through a set of `ResourcesImage`."""
+  allResourcesImages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesImage`."""
+    orderBy: [ResourcesImagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesImageCondition
+  ): ResourcesImagesConnection
+
+  """
+  Reads and enables pagination through a set of `ResourcesResourceCategory`.
+  """
+  allResourcesResourceCategories(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesResourceCategory`."""
+    orderBy: [ResourcesResourceCategoriesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesResourceCategoryCondition
+  ): ResourcesResourceCategoriesConnection
+
+  """Reads and enables pagination through a set of `System`."""
+  allSystems(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `System`."""
+    orderBy: [SystemsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SystemCondition
+  ): SystemsConnection
+
+  """Reads and enables pagination through a set of `UnreadMessage`."""
+  allUnreadMessages(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `UnreadMessage`."""
+    orderBy: [UnreadMessagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UnreadMessageCondition
+  ): UnreadMessagesConnection
+  accountById(id: Int!): Account
+  accountByEmail(email: String!): Account
+  accountsLinkById(id: Int!): AccountsLink
+  accountsPushTokenByAccountIdAndToken(accountId: Int!, token: String!): AccountsPushToken
+  broadcastPrefById(id: Int!): BroadcastPref
+  conversationById(id: Int!): Conversation
+  emailActivationByAccountIdAndActivationCodeAndEmail(accountId: Int!, activationCode: String!, email: String!): EmailActivation
+  imageById(id: Int!): Image
+  imageByPublicId(publicId: String!): Image
+  linkTypeById(id: Int!): LinkType
+  locationById(id: Int!): Location
+  mailById(id: Int!): Mail
+  messageById(id: Int!): Message
+  participantById(id: Int!): Participant
+  resourceCategoryByLocaleAndCode(locale: String!, code: Int!): ResourceCategory
+  resourceById(id: Int!): Resource
+  unreadMessageByParticipantIdAndMessageId(participantId: Int!, messageId: Int!): UnreadMessage
+
+  """Reads and enables pagination through a set of `Message`."""
+  conversationMessages(
+    resourceId: Int
+    otherAccountId: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): MessagesConnection
+  getMinimumClientVersion: String
+  getSessionData: SessionDatum
+
+  """Reads and enables pagination through a set of `Conversation`."""
+  myConversations(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ConversationsConnection
+
+  """Reads and enables pagination through a set of `Resource`."""
+  myresources(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ResourcesConnection
+
+  """Reads and enables pagination through a set of `Resource`."""
+  suggestedResources(
+    searchTerm: String
+    isProduct: Boolean
+    isService: Boolean
+    canBeGifted: Boolean
+    canBeExchanged: Boolean
+    canBeDelivered: Boolean
+    canBeTakenAway: Boolean
+    categoryCodes: [String]
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ResourcesConnection
+
+  """Reads and enables pagination through a set of `Account`."""
+  topAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AccountsConnection
+
+  """Reads and enables pagination through a set of `Resource`."""
+  topResources(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ResourcesConnection
+
+  """Reads a single `Account` using its globally unique `ID`."""
+  account(
+    """The globally unique `ID` to be used in selecting a single `Account`."""
+    nodeId: ID!
+  ): Account
+
+  """Reads a single `AccountsLink` using its globally unique `ID`."""
+  accountsLink(
+    """
+    The globally unique `ID` to be used in selecting a single `AccountsLink`.
+    """
+    nodeId: ID!
+  ): AccountsLink
+
+  """Reads a single `AccountsPushToken` using its globally unique `ID`."""
+  accountsPushToken(
+    """
+    The globally unique `ID` to be used in selecting a single `AccountsPushToken`.
+    """
+    nodeId: ID!
+  ): AccountsPushToken
+
+  """Reads a single `BroadcastPref` using its globally unique `ID`."""
+  broadcastPref(
+    """
+    The globally unique `ID` to be used in selecting a single `BroadcastPref`.
+    """
+    nodeId: ID!
+  ): BroadcastPref
+
+  """Reads a single `Conversation` using its globally unique `ID`."""
+  conversation(
+    """
+    The globally unique `ID` to be used in selecting a single `Conversation`.
+    """
+    nodeId: ID!
+  ): Conversation
+
+  """Reads a single `EmailActivation` using its globally unique `ID`."""
+  emailActivation(
+    """
+    The globally unique `ID` to be used in selecting a single `EmailActivation`.
+    """
+    nodeId: ID!
+  ): EmailActivation
+
+  """Reads a single `Image` using its globally unique `ID`."""
+  image(
+    """The globally unique `ID` to be used in selecting a single `Image`."""
+    nodeId: ID!
+  ): Image
+
+  """Reads a single `LinkType` using its globally unique `ID`."""
+  linkType(
+    """The globally unique `ID` to be used in selecting a single `LinkType`."""
+    nodeId: ID!
+  ): LinkType
+
+  """Reads a single `Location` using its globally unique `ID`."""
+  location(
+    """The globally unique `ID` to be used in selecting a single `Location`."""
+    nodeId: ID!
+  ): Location
+
+  """Reads a single `Mail` using its globally unique `ID`."""
+  mail(
+    """The globally unique `ID` to be used in selecting a single `Mail`."""
+    nodeId: ID!
+  ): Mail
+
+  """Reads a single `Message` using its globally unique `ID`."""
+  message(
+    """The globally unique `ID` to be used in selecting a single `Message`."""
+    nodeId: ID!
+  ): Message
+
+  """Reads a single `Participant` using its globally unique `ID`."""
+  participant(
+    """
+    The globally unique `ID` to be used in selecting a single `Participant`.
+    """
+    nodeId: ID!
+  ): Participant
+
+  """Reads a single `Resource` using its globally unique `ID`."""
+  resource(
+    """The globally unique `ID` to be used in selecting a single `Resource`."""
+    nodeId: ID!
+  ): Resource
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""A connection to a list of `Account` values."""
+type AccountsConnection {
+  """A list of `Account` objects."""
+  nodes: [Account!]!
+
+  """
+  A list of edges which contains the `Account` and cursor to aid in pagination.
+  """
+  edges: [AccountsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Account` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Account implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  name: String!
+  email: String
+  hash: String!
+  salt: String!
+  recoveryCode: String
+  recoveryCodeExpiration: Datetime
+  created: Datetime!
+  avatarImageId: Int
+  activated: Datetime
+  language: String!
+  logLevel: Int!
+  locationId: Int
+
+  """Reads a single `Image` that is related to this `Account`."""
+  imageByAvatarImageId: Image
+
+  """Reads a single `Location` that is related to this `Account`."""
+  locationByLocationId: Location
+
+  """Reads and enables pagination through a set of `Resource`."""
+  resourcesByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourcesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourceCondition
+  ): ResourcesConnection!
+
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  accountsLinksByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection!
+
+  """Reads and enables pagination through a set of `AccountsPushToken`."""
+  accountsPushTokensByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsPushToken`."""
+    orderBy: [AccountsPushTokensOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsPushTokenCondition
+  ): AccountsPushTokensConnection!
+
+  """Reads and enables pagination through a set of `BroadcastPref`."""
+  broadcastPrefsByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `BroadcastPref`."""
+    orderBy: [BroadcastPrefsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BroadcastPrefCondition
+  ): BroadcastPrefsConnection!
+
+  """Reads and enables pagination through a set of `ClientLog`."""
+  clientLogsByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ClientLog`."""
+    orderBy: [ClientLogsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ClientLogCondition
+  ): ClientLogsConnection!
+
+  """Reads and enables pagination through a set of `Participant`."""
+  participantsByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection!
+
+  """Reads and enables pagination through a set of `Mail`."""
+  mailByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Mail`."""
+    orderBy: [MailOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MailCondition
+  ): MailConnection!
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+"""
+scalar Datetime
+
+type Image implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  publicId: String!
+  created: Datetime!
+
+  """Reads and enables pagination through a set of `Message`."""
+  messagesByImageId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Message`."""
+    orderBy: [MessagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MessageCondition
+  ): MessagesConnection!
+
+  """Reads and enables pagination through a set of `Account`."""
+  accountsByAvatarImageId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Account`."""
+    orderBy: [AccountsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountCondition
+  ): AccountsConnection!
+
+  """Reads and enables pagination through a set of `ResourcesImage`."""
+  resourcesImagesByImageId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesImage`."""
+    orderBy: [ResourcesImagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesImageCondition
+  ): ResourcesImagesConnection!
+}
+
+"""A connection to a list of `Message` values."""
+type MessagesConnection {
+  """A list of `Message` objects."""
+  nodes: [Message!]!
+
+  """
+  A list of edges which contains the `Message` and cursor to aid in pagination.
+  """
+  edges: [MessagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Message` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Message implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  participantId: Int!
+  text: String!
+  received: Datetime
+  created: Datetime!
+  imageId: Int
+
+  """Reads a single `Participant` that is related to this `Message`."""
+  participantByParticipantId: Participant
+
+  """Reads a single `Image` that is related to this `Message`."""
+  imageByImageId: Image
+
+  """Reads and enables pagination through a set of `Conversation`."""
+  conversationsByLastMessage(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Conversation`."""
+    orderBy: [ConversationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConversationCondition
+  ): ConversationsConnection!
+
+  """Reads and enables pagination through a set of `UnreadMessage`."""
+  unreadMessagesByMessageId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `UnreadMessage`."""
+    orderBy: [UnreadMessagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UnreadMessageCondition
+  ): UnreadMessagesConnection!
+}
+
+type Participant implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  accountId: Int!
+  conversationId: Int!
+  created: Datetime!
+
+  """Reads a single `Account` that is related to this `Participant`."""
+  accountByAccountId: Account
+
+  """Reads a single `Conversation` that is related to this `Participant`."""
+  conversationByConversationId: Conversation
+
+  """Reads and enables pagination through a set of `Message`."""
+  messagesByParticipantId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Message`."""
+    orderBy: [MessagesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MessageCondition
+  ): MessagesConnection!
+
+  """Reads and enables pagination through a set of `UnreadMessage`."""
+  unreadMessagesByParticipantId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `UnreadMessage`."""
+    orderBy: [UnreadMessagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UnreadMessageCondition
+  ): UnreadMessagesConnection!
+}
+
+type Conversation implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  resourceId: Int!
+  lastMessage: Int
+  created: Datetime!
+
+  """Reads a single `Resource` that is related to this `Conversation`."""
+  resourceByResourceId: Resource
+
+  """Reads a single `Message` that is related to this `Conversation`."""
+  messageByLastMessage: Message
+
+  """Reads and enables pagination through a set of `Participant`."""
+  participantsByConversationId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection!
+}
+
+type Resource implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  title: String!
+  description: String!
+  expiration: Datetime!
+  accountId: Int!
+  created: Datetime!
+  isService: Boolean!
+  isProduct: Boolean!
+  canBeDelivered: Boolean!
+  canBeTakenAway: Boolean!
+  canBeExchanged: Boolean!
+  canBeGifted: Boolean!
+  deleted: Datetime
+  specificLocationId: Int
+
+  """Reads a single `Account` that is related to this `Resource`."""
+  accountByAccountId: Account
+
+  """Reads a single `Location` that is related to this `Resource`."""
+  locationBySpecificLocationId: Location
+
+  """Reads and enables pagination through a set of `Conversation`."""
+  conversationsByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Conversation`."""
+    orderBy: [ConversationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ConversationCondition
+  ): ConversationsConnection!
+
+  """Reads and enables pagination through a set of `ResourcesImage`."""
+  resourcesImagesByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesImage`."""
+    orderBy: [ResourcesImagesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesImageCondition
+  ): ResourcesImagesConnection!
+
+  """
+  Reads and enables pagination through a set of `ResourcesResourceCategory`.
+  """
+  resourcesResourceCategoriesByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesResourceCategory`."""
+    orderBy: [ResourcesResourceCategoriesOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesResourceCategoryCondition
+  ): ResourcesResourceCategoriesConnection!
+}
+
+type Location implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  address: String!
+  latitude: BigFloat
+  longitude: BigFloat
+  created: Datetime!
+
+  """Reads and enables pagination through a set of `Resource`."""
+  resourcesBySpecificLocationId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Resource`."""
+    orderBy: [ResourcesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourceCondition
+  ): ResourcesConnection!
+
+  """Reads and enables pagination through a set of `Account`."""
+  accountsByLocationId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Account`."""
+    orderBy: [AccountsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountCondition
+  ): AccountsConnection!
+}
+
+"""
+A floating point number that requires more precision than IEEE 754 binary 64
+"""
+scalar BigFloat
+
+"""A connection to a list of `Resource` values."""
+type ResourcesConnection {
+  """A list of `Resource` objects."""
+  nodes: [Resource!]!
+
+  """
+  A list of edges which contains the `Resource` and cursor to aid in pagination.
+  """
+  edges: [ResourcesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Resource` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Resource` edge in the connection."""
+type ResourcesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Resource` at the end of the edge."""
+  node: Resource!
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""Methods to use when ordering `Resource`."""
+enum ResourcesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  EXPIRATION_ASC
+  EXPIRATION_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  IS_SERVICE_ASC
+  IS_SERVICE_DESC
+  IS_PRODUCT_ASC
+  IS_PRODUCT_DESC
+  CAN_BE_DELIVERED_ASC
+  CAN_BE_DELIVERED_DESC
+  CAN_BE_TAKEN_AWAY_ASC
+  CAN_BE_TAKEN_AWAY_DESC
+  CAN_BE_EXCHANGED_ASC
+  CAN_BE_EXCHANGED_DESC
+  CAN_BE_GIFTED_ASC
+  CAN_BE_GIFTED_DESC
+  DELETED_ASC
+  DELETED_DESC
+  SPECIFIC_LOCATION_ID_ASC
+  SPECIFIC_LOCATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Resource` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ResourceCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `expiration` field."""
+  expiration: Datetime
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `isService` field."""
+  isService: Boolean
+
+  """Checks for equality with the object’s `isProduct` field."""
+  isProduct: Boolean
+
+  """Checks for equality with the object’s `canBeDelivered` field."""
+  canBeDelivered: Boolean
+
+  """Checks for equality with the object’s `canBeTakenAway` field."""
+  canBeTakenAway: Boolean
+
+  """Checks for equality with the object’s `canBeExchanged` field."""
+  canBeExchanged: Boolean
+
+  """Checks for equality with the object’s `canBeGifted` field."""
+  canBeGifted: Boolean
+
+  """Checks for equality with the object’s `deleted` field."""
+  deleted: Datetime
+
+  """Checks for equality with the object’s `specificLocationId` field."""
+  specificLocationId: Int
+}
+
+"""Methods to use when ordering `Account`."""
+enum AccountsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  HASH_ASC
+  HASH_DESC
+  SALT_ASC
+  SALT_DESC
+  RECOVERY_CODE_ASC
+  RECOVERY_CODE_DESC
+  RECOVERY_CODE_EXPIRATION_ASC
+  RECOVERY_CODE_EXPIRATION_DESC
+  CREATED_ASC
+  CREATED_DESC
+  AVATAR_IMAGE_ID_ASC
+  AVATAR_IMAGE_ID_DESC
+  ACTIVATED_ASC
+  ACTIVATED_DESC
+  LANGUAGE_ASC
+  LANGUAGE_DESC
+  LOG_LEVEL_ASC
+  LOG_LEVEL_DESC
+  LOCATION_ID_ASC
+  LOCATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Account` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input AccountCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `hash` field."""
+  hash: String
+
+  """Checks for equality with the object’s `salt` field."""
+  salt: String
+
+  """Checks for equality with the object’s `recoveryCode` field."""
+  recoveryCode: String
+
+  """Checks for equality with the object’s `recoveryCodeExpiration` field."""
+  recoveryCodeExpiration: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `avatarImageId` field."""
+  avatarImageId: Int
+
+  """Checks for equality with the object’s `activated` field."""
+  activated: Datetime
+
+  """Checks for equality with the object’s `language` field."""
+  language: String
+
+  """Checks for equality with the object’s `logLevel` field."""
+  logLevel: Int
+
+  """Checks for equality with the object’s `locationId` field."""
+  locationId: Int
+}
+
+"""A connection to a list of `Conversation` values."""
+type ConversationsConnection {
+  """A list of `Conversation` objects."""
+  nodes: [Conversation!]!
+
+  """
+  A list of edges which contains the `Conversation` and cursor to aid in pagination.
+  """
+  edges: [ConversationsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Conversation` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Conversation` edge in the connection."""
+type ConversationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Conversation` at the end of the edge."""
+  node: Conversation!
+}
+
+"""Methods to use when ordering `Conversation`."""
+enum ConversationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  LAST_MESSAGE_ASC
+  LAST_MESSAGE_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Conversation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ConversationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `lastMessage` field."""
+  lastMessage: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ResourcesImage` values."""
+type ResourcesImagesConnection {
+  """A list of `ResourcesImage` objects."""
+  nodes: [ResourcesImage!]!
+
+  """
+  A list of edges which contains the `ResourcesImage` and cursor to aid in pagination.
+  """
+  edges: [ResourcesImagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ResourcesImage` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ResourcesImage {
+  resourceId: Int!
+  imageId: Int!
+  created: Datetime!
+
+  """Reads a single `Resource` that is related to this `ResourcesImage`."""
+  resourceByResourceId: Resource
+
+  """Reads a single `Image` that is related to this `ResourcesImage`."""
+  imageByImageId: Image
+}
+
+"""A `ResourcesImage` edge in the connection."""
+type ResourcesImagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourcesImage` at the end of the edge."""
+  node: ResourcesImage!
+}
+
+"""Methods to use when ordering `ResourcesImage`."""
+enum ResourcesImagesOrderBy {
+  NATURAL
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  IMAGE_ID_ASC
+  IMAGE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+}
+
+"""
+A condition to be used against `ResourcesImage` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ResourcesImageCondition {
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `imageId` field."""
+  imageId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ResourcesResourceCategory` values."""
+type ResourcesResourceCategoriesConnection {
+  """A list of `ResourcesResourceCategory` objects."""
+  nodes: [ResourcesResourceCategory!]!
+
+  """
+  A list of edges which contains the `ResourcesResourceCategory` and cursor to aid in pagination.
+  """
+  edges: [ResourcesResourceCategoriesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ResourcesResourceCategory` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type ResourcesResourceCategory {
+  resourceId: Int!
+  created: Datetime!
+  resourceCategoryCode: String!
+
+  """
+  Reads a single `Resource` that is related to this `ResourcesResourceCategory`.
+  """
+  resourceByResourceId: Resource
+}
+
+"""A `ResourcesResourceCategory` edge in the connection."""
+type ResourcesResourceCategoriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourcesResourceCategory` at the end of the edge."""
+  node: ResourcesResourceCategory!
+}
+
+"""Methods to use when ordering `ResourcesResourceCategory`."""
+enum ResourcesResourceCategoriesOrderBy {
+  NATURAL
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  RESOURCE_CATEGORY_CODE_ASC
+  RESOURCE_CATEGORY_CODE_DESC
+}
+
+"""
+A condition to be used against `ResourcesResourceCategory` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input ResourcesResourceCategoryCondition {
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `resourceCategoryCode` field."""
+  resourceCategoryCode: String
+}
+
+"""A connection to a list of `Participant` values."""
+type ParticipantsConnection {
+  """A list of `Participant` objects."""
+  nodes: [Participant!]!
+
+  """
+  A list of edges which contains the `Participant` and cursor to aid in pagination.
+  """
+  edges: [ParticipantsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Participant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Participant` edge in the connection."""
+type ParticipantsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Participant` at the end of the edge."""
+  node: Participant!
+}
+
+"""Methods to use when ordering `Participant`."""
+enum ParticipantsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  CONVERSATION_ID_ASC
+  CONVERSATION_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Participant` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ParticipantCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `conversationId` field."""
+  conversationId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""Methods to use when ordering `Message`."""
+enum MessagesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  PARTICIPANT_ID_ASC
+  PARTICIPANT_ID_DESC
+  TEXT_ASC
+  TEXT_DESC
+  RECEIVED_ASC
+  RECEIVED_DESC
+  CREATED_ASC
+  CREATED_DESC
+  IMAGE_ID_ASC
+  IMAGE_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Message` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MessageCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `participantId` field."""
+  participantId: Int
+
+  """Checks for equality with the object’s `text` field."""
+  text: String
+
+  """Checks for equality with the object’s `received` field."""
+  received: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `imageId` field."""
+  imageId: Int
+}
+
+"""A connection to a list of `UnreadMessage` values."""
+type UnreadMessagesConnection {
+  """A list of `UnreadMessage` objects."""
+  nodes: [UnreadMessage!]!
+
+  """
+  A list of edges which contains the `UnreadMessage` and cursor to aid in pagination.
+  """
+  edges: [UnreadMessagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `UnreadMessage` you could get from the connection."""
+  totalCount: Int!
+}
+
+type UnreadMessage {
+  participantId: Int!
+  messageId: Int!
+  created: Datetime!
+
+  """Reads a single `Participant` that is related to this `UnreadMessage`."""
+  participantByParticipantId: Participant
+
+  """Reads a single `Message` that is related to this `UnreadMessage`."""
+  messageByMessageId: Message
+}
+
+"""A `UnreadMessage` edge in the connection."""
+type UnreadMessagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UnreadMessage` at the end of the edge."""
+  node: UnreadMessage!
+}
+
+"""Methods to use when ordering `UnreadMessage`."""
+enum UnreadMessagesOrderBy {
+  NATURAL
+  PARTICIPANT_ID_ASC
+  PARTICIPANT_ID_DESC
+  MESSAGE_ID_ASC
+  MESSAGE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+}
+
+"""
+A condition to be used against `UnreadMessage` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input UnreadMessageCondition {
+  """Checks for equality with the object’s `participantId` field."""
+  participantId: Int
+
+  """Checks for equality with the object’s `messageId` field."""
+  messageId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A `Message` edge in the connection."""
+type MessagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Message` at the end of the edge."""
+  node: Message!
+}
+
+"""A connection to a list of `AccountsLink` values."""
+type AccountsLinksConnection {
+  """A list of `AccountsLink` objects."""
+  nodes: [AccountsLink!]!
+
+  """
+  A list of edges which contains the `AccountsLink` and cursor to aid in pagination.
+  """
+  edges: [AccountsLinksEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AccountsLink` you could get from the connection."""
+  totalCount: Int!
+}
+
+type AccountsLink implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  url: String!
+  label: String
+  linkTypeId: Int!
+  accountId: Int!
+
+  """Reads a single `LinkType` that is related to this `AccountsLink`."""
+  linkTypeByLinkTypeId: LinkType
+
+  """Reads a single `Account` that is related to this `AccountsLink`."""
+  accountByAccountId: Account
+}
+
+type LinkType implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `AccountsLink`."""
+  accountsLinksByLinkTypeId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsLink`."""
+    orderBy: [AccountsLinksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsLinkCondition
+  ): AccountsLinksConnection!
+}
+
+"""Methods to use when ordering `AccountsLink`."""
+enum AccountsLinksOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  URL_ASC
+  URL_DESC
+  LABEL_ASC
+  LABEL_DESC
+  LINK_TYPE_ID_ASC
+  LINK_TYPE_ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `AccountsLink` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input AccountsLinkCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `url` field."""
+  url: String
+
+  """Checks for equality with the object’s `label` field."""
+  label: String
+
+  """Checks for equality with the object’s `linkTypeId` field."""
+  linkTypeId: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+}
+
+"""A `AccountsLink` edge in the connection."""
+type AccountsLinksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AccountsLink` at the end of the edge."""
+  node: AccountsLink!
+}
+
+"""A connection to a list of `AccountsPushToken` values."""
+type AccountsPushTokensConnection {
+  """A list of `AccountsPushToken` objects."""
+  nodes: [AccountsPushToken!]!
+
+  """
+  A list of edges which contains the `AccountsPushToken` and cursor to aid in pagination.
+  """
+  edges: [AccountsPushTokensEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AccountsPushToken` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type AccountsPushToken implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  accountId: Int!
+  token: String!
+  lastTimeUsed: Datetime!
+  created: Datetime!
+
+  """Reads a single `Account` that is related to this `AccountsPushToken`."""
+  accountByAccountId: Account
+}
+
+"""A `AccountsPushToken` edge in the connection."""
+type AccountsPushTokensEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AccountsPushToken` at the end of the edge."""
+  node: AccountsPushToken!
+}
+
+"""Methods to use when ordering `AccountsPushToken`."""
+enum AccountsPushTokensOrderBy {
+  NATURAL
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  TOKEN_ASC
+  TOKEN_DESC
+  LAST_TIME_USED_ASC
+  LAST_TIME_USED_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `AccountsPushToken` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input AccountsPushTokenCondition {
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `token` field."""
+  token: String
+
+  """Checks for equality with the object’s `lastTimeUsed` field."""
+  lastTimeUsed: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `BroadcastPref` values."""
+type BroadcastPrefsConnection {
+  """A list of `BroadcastPref` objects."""
+  nodes: [BroadcastPref!]!
+
+  """
+  A list of edges which contains the `BroadcastPref` and cursor to aid in pagination.
+  """
+  edges: [BroadcastPrefsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `BroadcastPref` you could get from the connection."""
+  totalCount: Int!
+}
+
+type BroadcastPref implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  eventType: Int!
+  accountId: Int!
+  daysBetweenSummaries: Int
+  lastSummarySent: Datetime
+  created: Datetime!
+
+  """Reads a single `Account` that is related to this `BroadcastPref`."""
+  accountByAccountId: Account
+}
+
+"""A `BroadcastPref` edge in the connection."""
+type BroadcastPrefsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `BroadcastPref` at the end of the edge."""
+  node: BroadcastPref!
+}
+
+"""Methods to use when ordering `BroadcastPref`."""
+enum BroadcastPrefsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  EVENT_TYPE_ASC
+  EVENT_TYPE_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  DAYS_BETWEEN_SUMMARIES_ASC
+  DAYS_BETWEEN_SUMMARIES_DESC
+  LAST_SUMMARY_SENT_ASC
+  LAST_SUMMARY_SENT_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `BroadcastPref` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input BroadcastPrefCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `eventType` field."""
+  eventType: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `daysBetweenSummaries` field."""
+  daysBetweenSummaries: Int
+
+  """Checks for equality with the object’s `lastSummarySent` field."""
+  lastSummarySent: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ClientLog` values."""
+type ClientLogsConnection {
+  """A list of `ClientLog` objects."""
+  nodes: [ClientLog!]!
+
+  """
+  A list of edges which contains the `ClientLog` and cursor to aid in pagination.
+  """
+  edges: [ClientLogsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ClientLog` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ClientLog {
+  created: Datetime!
+  accountId: Int
+  activityId: String!
+  data: String!
+  level: Int!
+
+  """Reads a single `Account` that is related to this `ClientLog`."""
+  accountByAccountId: Account
+}
+
+"""A `ClientLog` edge in the connection."""
+type ClientLogsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ClientLog` at the end of the edge."""
+  node: ClientLog!
+}
+
+"""Methods to use when ordering `ClientLog`."""
+enum ClientLogsOrderBy {
+  NATURAL
+  CREATED_ASC
+  CREATED_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  ACTIVITY_ID_ASC
+  ACTIVITY_ID_DESC
+  DATA_ASC
+  DATA_DESC
+  LEVEL_ASC
+  LEVEL_DESC
+}
+
+"""
+A condition to be used against `ClientLog` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ClientLogCondition {
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `activityId` field."""
+  activityId: String
+
+  """Checks for equality with the object’s `data` field."""
+  data: String
+
+  """Checks for equality with the object’s `level` field."""
+  level: Int
+}
+
+"""A connection to a list of `Mail` values."""
+type MailConnection {
+  """A list of `Mail` objects."""
+  nodes: [Mail!]!
+
+  """
+  A list of edges which contains the `Mail` and cursor to aid in pagination.
+  """
+  edges: [MailEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Mail` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Mail implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  accountId: Int!
+  email: String!
+  sentFrom: String!
+  subject: String!
+  textContent: String!
+  htmlContent: String!
+  created: Datetime!
+
+  """Reads a single `Account` that is related to this `Mail`."""
+  accountByAccountId: Account
+}
+
+"""A `Mail` edge in the connection."""
+type MailEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Mail` at the end of the edge."""
+  node: Mail!
+}
+
+"""Methods to use when ordering `Mail`."""
+enum MailOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  SENT_FROM_ASC
+  SENT_FROM_DESC
+  SUBJECT_ASC
+  SUBJECT_DESC
+  TEXT_CONTENT_ASC
+  TEXT_CONTENT_DESC
+  HTML_CONTENT_ASC
+  HTML_CONTENT_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Mail` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MailCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `sentFrom` field."""
+  sentFrom: String
+
+  """Checks for equality with the object’s `subject` field."""
+  subject: String
+
+  """Checks for equality with the object’s `textContent` field."""
+  textContent: String
+
+  """Checks for equality with the object’s `htmlContent` field."""
+  htmlContent: String
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A `Account` edge in the connection."""
+type AccountsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Account` at the end of the edge."""
+  node: Account!
+}
+
+"""A connection to a list of `ActiveAccount` values."""
+type ActiveAccountsConnection {
+  """A list of `ActiveAccount` objects."""
+  nodes: [ActiveAccount!]!
+
+  """
+  A list of edges which contains the `ActiveAccount` and cursor to aid in pagination.
+  """
+  edges: [ActiveAccountsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ActiveAccount` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ActiveAccount {
+  id: Int
+  name: String
+  email: String
+  hash: String
+  salt: String
+  recoveryCode: String
+  recoveryCodeExpiration: Datetime
+  created: Datetime
+  avatarImageId: Int
+  activated: Datetime
+  language: String
+  logLevel: Int
+  locationId: Int
+}
+
+"""A `ActiveAccount` edge in the connection."""
+type ActiveAccountsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ActiveAccount` at the end of the edge."""
+  node: ActiveAccount!
+}
+
+"""Methods to use when ordering `ActiveAccount`."""
+enum ActiveAccountsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  HASH_ASC
+  HASH_DESC
+  SALT_ASC
+  SALT_DESC
+  RECOVERY_CODE_ASC
+  RECOVERY_CODE_DESC
+  RECOVERY_CODE_EXPIRATION_ASC
+  RECOVERY_CODE_EXPIRATION_DESC
+  CREATED_ASC
+  CREATED_DESC
+  AVATAR_IMAGE_ID_ASC
+  AVATAR_IMAGE_ID_DESC
+  ACTIVATED_ASC
+  ACTIVATED_DESC
+  LANGUAGE_ASC
+  LANGUAGE_DESC
+  LOG_LEVEL_ASC
+  LOG_LEVEL_DESC
+  LOCATION_ID_ASC
+  LOCATION_ID_DESC
+}
+
+"""
+A condition to be used against `ActiveAccount` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ActiveAccountCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `hash` field."""
+  hash: String
+
+  """Checks for equality with the object’s `salt` field."""
+  salt: String
+
+  """Checks for equality with the object’s `recoveryCode` field."""
+  recoveryCode: String
+
+  """Checks for equality with the object’s `recoveryCodeExpiration` field."""
+  recoveryCodeExpiration: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `avatarImageId` field."""
+  avatarImageId: Int
+
+  """Checks for equality with the object’s `activated` field."""
+  activated: Datetime
+
+  """Checks for equality with the object’s `language` field."""
+  language: String
+
+  """Checks for equality with the object’s `logLevel` field."""
+  logLevel: Int
+
+  """Checks for equality with the object’s `locationId` field."""
+  locationId: Int
+}
+
+"""A connection to a list of `EmailActivation` values."""
+type EmailActivationsConnection {
+  """A list of `EmailActivation` objects."""
+  nodes: [EmailActivation!]!
+
+  """
+  A list of edges which contains the `EmailActivation` and cursor to aid in pagination.
+  """
+  edges: [EmailActivationsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `EmailActivation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type EmailActivation implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  accountId: Int!
+  email: String!
+  activationCode: String!
+  activated: Datetime
+  created: Datetime!
+}
+
+"""A `EmailActivation` edge in the connection."""
+type EmailActivationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `EmailActivation` at the end of the edge."""
+  node: EmailActivation!
+}
+
+"""Methods to use when ordering `EmailActivation`."""
+enum EmailActivationsOrderBy {
+  NATURAL
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  ACTIVATION_CODE_ASC
+  ACTIVATION_CODE_DESC
+  ACTIVATED_ASC
+  ACTIVATED_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `EmailActivation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input EmailActivationCondition {
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `activationCode` field."""
+  activationCode: String
+
+  """Checks for equality with the object’s `activated` field."""
+  activated: Datetime
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `Image` values."""
+type ImagesConnection {
+  """A list of `Image` objects."""
+  nodes: [Image!]!
+
+  """
+  A list of edges which contains the `Image` and cursor to aid in pagination.
+  """
+  edges: [ImagesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Image` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Image` edge in the connection."""
+type ImagesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Image` at the end of the edge."""
+  node: Image!
+}
+
+"""Methods to use when ordering `Image`."""
+enum ImagesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  PUBLIC_ID_ASC
+  PUBLIC_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Image` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input ImageCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `publicId` field."""
+  publicId: String
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `LinkType` values."""
+type LinkTypesConnection {
+  """A list of `LinkType` objects."""
+  nodes: [LinkType!]!
+
+  """
+  A list of edges which contains the `LinkType` and cursor to aid in pagination.
+  """
+  edges: [LinkTypesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LinkType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LinkType` edge in the connection."""
+type LinkTypesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LinkType` at the end of the edge."""
+  node: LinkType!
+}
+
+"""Methods to use when ordering `LinkType`."""
+enum LinkTypesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `LinkType` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LinkTypeCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""A connection to a list of `Location` values."""
+type LocationsConnection {
+  """A list of `Location` objects."""
+  nodes: [Location!]!
+
+  """
+  A list of edges which contains the `Location` and cursor to aid in pagination.
+  """
+  edges: [LocationsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Location` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Location` edge in the connection."""
+type LocationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Location` at the end of the edge."""
+  node: Location!
+}
+
+"""Methods to use when ordering `Location`."""
+enum LocationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ADDRESS_ASC
+  ADDRESS_DESC
+  LATITUDE_ASC
+  LATITUDE_DESC
+  LONGITUDE_ASC
+  LONGITUDE_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Location` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LocationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `address` field."""
+  address: String
+
+  """Checks for equality with the object’s `latitude` field."""
+  latitude: BigFloat
+
+  """Checks for equality with the object’s `longitude` field."""
+  longitude: BigFloat
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `ResourceCategory` values."""
+type ResourceCategoriesConnection {
+  """A list of `ResourceCategory` objects."""
+  nodes: [ResourceCategory!]!
+
+  """
+  A list of edges which contains the `ResourceCategory` and cursor to aid in pagination.
+  """
+  edges: [ResourceCategoriesEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ResourceCategory` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type ResourceCategory {
+  name: String!
+  locale: String!
+  created: Datetime!
+  code: Int!
+}
+
+"""A `ResourceCategory` edge in the connection."""
+type ResourceCategoriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourceCategory` at the end of the edge."""
+  node: ResourceCategory!
+}
+
+"""Methods to use when ordering `ResourceCategory`."""
+enum ResourceCategoriesOrderBy {
+  NATURAL
+  NAME_ASC
+  NAME_DESC
+  LOCALE_ASC
+  LOCALE_DESC
+  CREATED_ASC
+  CREATED_DESC
+  CODE_ASC
+  CODE_DESC
+}
+
+"""
+A condition to be used against `ResourceCategory` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ResourceCategoryCondition {
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `locale` field."""
+  locale: String
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `code` field."""
+  code: Int
+}
+
+"""A connection to a list of `System` values."""
+type SystemsConnection {
+  """A list of `System` objects."""
+  nodes: [System!]!
+
+  """
+  A list of edges which contains the `System` and cursor to aid in pagination.
+  """
+  edges: [SystemsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `System` you could get from the connection."""
+  totalCount: Int!
+}
+
+type System {
+  version: String!
+  created: Datetime!
+  minimumClientVersion: String
+}
+
+"""A `System` edge in the connection."""
+type SystemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `System` at the end of the edge."""
+  node: System!
+}
+
+"""Methods to use when ordering `System`."""
+enum SystemsOrderBy {
+  NATURAL
+  VERSION_ASC
+  VERSION_DESC
+  CREATED_ASC
+  CREATED_DESC
+  MINIMUM_CLIENT_VERSION_ASC
+  MINIMUM_CLIENT_VERSION_DESC
+}
+
+"""
+A condition to be used against `System` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input SystemCondition {
+  """Checks for equality with the object’s `version` field."""
+  version: String
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `minimumClientVersion` field."""
+  minimumClientVersion: String
+}
+
+type SessionDatum {
+  accountId: Int
+  name: String
+  email: String
+  role: String
+  avatarPublicId: String
+  activated: Datetime
+  logLevel: Int
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  activateAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ActivateAccountInput!
+  ): ActivateAccountPayload
+  addJob(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AddJobInput!
+  ): AddJobPayload
+  authenticate(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AuthenticateInput!
+  ): AuthenticatePayload
+  changePassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ChangePasswordInput!
+  ): ChangePasswordPayload
+  createClientLog(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateClientLogInput!
+  ): CreateClientLogPayload
+  createImage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateImageInput!
+  ): CreateImagePayload
+  createMessage(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMessageInput!
+  ): CreateMessagePayload
+  createResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateResourceInput!
+  ): CreateResourcePayload
+  currentAccountId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CurrentAccountIdInput!
+  ): CurrentAccountIdPayload
+  currentRole(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CurrentRoleInput!
+  ): CurrentRolePayload
+  deleteAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAccountInput!
+  ): DeleteAccountPayload
+  deleteResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteResourceInput!
+  ): DeleteResourcePayload
+  getPasswordHashSalt(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: GetPasswordHashSaltInput!
+  ): GetPasswordHashSaltPayload
+  isPasswordValid(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: IsPasswordValidInput!
+  ): IsPasswordValidPayload
+  recoverAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RecoverAccountInput!
+  ): RecoverAccountPayload
+  registerAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RegisterAccountInput!
+  ): RegisterAccountPayload
+  requestAccountRecovery(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestAccountRecoveryInput!
+  ): RequestAccountRecoveryPayload
+  sendActivationAgain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SendActivationAgainInput!
+  ): SendActivationAgainPayload
+  setParticipantRead(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetParticipantReadInput!
+  ): SetParticipantReadPayload
+  syncPushToken(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SyncPushTokenInput!
+  ): SyncPushTokenPayload
+  updateAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAccountInput!
+  ): UpdateAccountPayload
+  updateAccountBroadcastPrefs(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAccountBroadcastPrefsInput!
+  ): UpdateAccountBroadcastPrefsPayload
+  updateAccountPublicInfo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAccountPublicInfoInput!
+  ): UpdateAccountPublicInfoPayload
+  updateResource(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateResourceInput!
+  ): UpdateResourcePayload
+}
+
+"""The output of our `activateAccount` mutation."""
+type ActivateAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  string: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `activateAccount` mutation."""
+input ActivateAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  activationCode: String
+}
+
+"""The output of our `addJob` mutation."""
+type AddJobPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `addJob` mutation."""
+input AddJobInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  identifier: String
+  payload: JSON
+  queueName: String
+  runAt: Datetime
+  maxAttempts: Int
+  jobKey: String
+  priority: Int
+  flags: [String]
+  jobKeyMode: String
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""The output of our `authenticate` mutation."""
+type AuthenticatePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519)
+which securely represents claims between two parties.
+"""
+scalar JwtToken
+
+"""All input for the `authenticate` mutation."""
+input AuthenticateInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+}
+
+"""The output of our `changePassword` mutation."""
+type ChangePasswordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `changePassword` mutation."""
+input ChangePasswordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  oldPassword: String
+  newPassword: String
+}
+
+"""The output of our `createClientLog` mutation."""
+type CreateClientLogPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createClientLog` mutation."""
+input CreateClientLogInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  data: String
+  level: Int
+  activityId: String
+  accountId: Int
+}
+
+"""The output of our `createImage` mutation."""
+type CreateImagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createImage` mutation."""
+input CreateImageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  imagePublicId: String
+}
+
+"""The output of our `createMessage` mutation."""
+type CreateMessagePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createMessage` mutation."""
+input CreateMessageInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+  otherAccountId: Int
+  text: String
+  imagePublicId: String
+}
+
+"""The output of our `createResource` mutation."""
+type CreateResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createResource` mutation."""
+input CreateResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  title: String
+  description: String
+  expiration: Datetime
+  isService: Boolean
+  isProduct: Boolean
+  canBeDelivered: Boolean
+  canBeTakenAway: Boolean
+  canBeExchanged: Boolean
+  canBeGifted: Boolean
+  imagesPublicIds: [String]
+  categoryCodes: [String]
+  specificLocation: NewLocationInput
+}
+
+"""An input for mutations affecting `NewLocation`"""
+input NewLocationInput {
+  address: String
+  latitude: BigFloat
+  longitude: BigFloat
+}
+
+"""The output of our `currentAccountId` mutation."""
+type CurrentAccountIdPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `currentAccountId` mutation."""
+input CurrentAccountIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `currentRole` mutation."""
+type CurrentRolePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  string: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `currentRole` mutation."""
+input CurrentRoleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `deleteAccount` mutation."""
+type DeleteAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteAccount` mutation."""
+input DeleteAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `deleteResource` mutation."""
+type DeleteResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteResource` mutation."""
+input DeleteResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+}
+
+"""The output of our `getPasswordHashSalt` mutation."""
+type GetPasswordHashSaltPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: GetPasswordHashSaltRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""The return type of our `getPasswordHashSalt` mutation."""
+type GetPasswordHashSaltRecord {
+  hash: String
+  salt: String
+}
+
+"""All input for the `getPasswordHashSalt` mutation."""
+input GetPasswordHashSaltInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  password: String
+}
+
+"""The output of our `isPasswordValid` mutation."""
+type IsPasswordValidPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  boolean: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `isPasswordValid` mutation."""
+input IsPasswordValidInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  password: String
+}
+
+"""The output of our `recoverAccount` mutation."""
+type RecoverAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `recoverAccount` mutation."""
+input RecoverAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  recoveryCode: String
+  newPassword: String
+}
+
+"""The output of our `registerAccount` mutation."""
+type RegisterAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `registerAccount` mutation."""
+input RegisterAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String
+  email: String
+  password: String
+  language: String
+}
+
+"""The output of our `requestAccountRecovery` mutation."""
+type RequestAccountRecoveryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `requestAccountRecovery` mutation."""
+input RequestAccountRecoveryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+}
+
+"""The output of our `sendActivationAgain` mutation."""
+type SendActivationAgainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `sendActivationAgain` mutation."""
+input SendActivationAgainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `setParticipantRead` mutation."""
+type SetParticipantReadPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `setParticipantRead` mutation."""
+input SetParticipantReadInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+  otherAccountId: Int
+}
+
+"""The output of our `syncPushToken` mutation."""
+type SyncPushTokenPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `syncPushToken` mutation."""
+input SyncPushTokenInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  token: String
+}
+
+"""The output of our `updateAccount` mutation."""
+type UpdateAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateAccount` mutation."""
+input UpdateAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String
+  email: String
+  avatarPublicId: String
+}
+
+"""The output of our `updateAccountBroadcastPrefs` mutation."""
+type UpdateAccountBroadcastPrefsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateAccountBroadcastPrefs` mutation."""
+input UpdateAccountBroadcastPrefsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  prefs: [BroadcastPrefTypeInput]
+}
+
+"""An input for mutations affecting `BroadcastPrefType`"""
+input BroadcastPrefTypeInput {
+  eventType: Int
+  daysBetweenSummaries: Int
+}
+
+"""The output of our `updateAccountPublicInfo` mutation."""
+type UpdateAccountPublicInfoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateAccountPublicInfo` mutation."""
+input UpdateAccountPublicInfoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  links: [AccountLinkInput]
+  location: NewLocationInput
+}
+
+"""An input for mutations affecting `AccountLink`"""
+input AccountLinkInput {
+  url: String
+  label: String
+  linkTypeId: Int
+}
+
+"""The output of our `updateResource` mutation."""
+type UpdateResourcePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateResource` mutation."""
+input UpdateResourceInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+  title: String
+  description: String
+  expiration: Datetime
+  isService: Boolean
+  isProduct: Boolean
+  canBeDelivered: Boolean
+  canBeTakenAway: Boolean
+  canBeExchanged: Boolean
+  canBeGifted: Boolean
+  imagesPublicIds: [String]
+  categoryCodes: [String]
+  specificLocation: NewLocationInput
+}
+
+"""
+The root subscription type: contains realtime events you can subscribe to with the `subscription` operation.
+"""
+type Subscription {
+  messageReceived: MessageSubscriptionPayload
+}
+
+type MessageSubscriptionPayload {
+  message: Message
+  event: String
+}

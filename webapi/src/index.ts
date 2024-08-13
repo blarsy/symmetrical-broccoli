@@ -1,6 +1,6 @@
 import express from "express"
 import postgraphile from "./postgraphile"
-import getConfig, { Config, getVersions } from './config'
+import getConfig, { Config, getConnectionString, getVersions } from './config'
 import cors from 'cors'
 import { JobHelpers, run } from "graphile-worker"
 import { sendAccountRecoveryMail, sendEmailActivationCode } from "./mailing"
@@ -15,10 +15,6 @@ import dayjs from "dayjs"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
-
-const getConnectionString = (config: Config) => {
-    return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
-}
 
 let notificationsListeners: NotificationsListener[] = []
 

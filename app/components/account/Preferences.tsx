@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
@@ -8,7 +8,7 @@ import { CheckboxGroup, OrangeBackedErrorText, OrangeTextInput, StyledLabel, Whi
 import { ErrorMessage, Formik } from "formik"
 import * as yup from 'yup'
 import OperationFeedback from "../OperationFeedback"
-import { aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/utils"
 import { ScrollView } from "react-native-gesture-handler"
 import { Text } from "react-native-paper"
 
@@ -54,7 +54,7 @@ export const PrefSelector = ({ value, onChange, title, handleBlur, fieldName }: 
         onChangeText={e => onChange(new Number(e).valueOf())} onBlur={handleBlur(fieldName)} />}
 </View>
 
-export default () => {
+export default ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const { data, loading, error } = useQuery(GET_PREFERENCES, { variables: { id: appContext.account?.id } })
     const [update, { data: updateData, loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_BROADCAST_PREFS)
@@ -80,7 +80,7 @@ export default () => {
                     { eventType: 2, daysBetweenSummaries: values.newResourcesDaysSummary || -1 }
                 ] } })
             }}>
-                {({handleBlur, setFieldValue, submitForm, values }) => {
+                {({handleBlur, setFieldValue, submitForm, values, dirty }) => {
                     return <>
                         <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10 }}>{t('notifications_settings_title')}</Text>
                         <PrefSelector title={t('chat_broadcast_prefs_title')} onChange={numberOfDays => {

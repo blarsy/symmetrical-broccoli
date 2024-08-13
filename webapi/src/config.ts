@@ -15,6 +15,10 @@ const getConfig = async(): Promise<Config> => {
     return config
 }
 
+export const getConnectionString = (config: Config) => {
+    return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
+}
+
 export interface RawConfig {
     backupCommand: string
     dbPassword: string

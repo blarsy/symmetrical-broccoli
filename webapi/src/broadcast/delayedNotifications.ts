@@ -3,6 +3,7 @@ import { runAndLog } from "../db_jobs/utils"
 import initTranslations from '../i18n'
 import { TFunction } from "i18next"
 import dayjs from "dayjs"
+import logger from "../logger"
 
 const succinctDate = (date: Date, t: TFunction) => {
     const todayMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0)
@@ -240,7 +241,7 @@ const getAccountNewResources = async (accountNewResourcesData: AccountNewResourc
     return newResourcesList.concat(`</table>`)
 }
 
-const getNewResourcsSummaryData = async (connectionString: string): Promise<NewResourcesSummaryData> => {
+const getNewResourcesSummaryData = async (connectionString: string): Promise<NewResourcesSummaryData> => {
     const resources = await runAndLog(`SELECT r.id as resourceid, 
         r.title, 
         author.id as authorid, 
@@ -280,9 +281,11 @@ const getNewResourcsSummaryData = async (connectionString: string): Promise<NewR
 
 export const sendSummaries = async (connectionString: string, version: string): Promise<void> => {
     const [resourcesSummaryData, chatMessagesSummaryData] = await Promise.all([
-        getNewResourcsSummaryData(connectionString),
+        getNewResourcesSummaryData(connectionString),
         getChatMessageSummaryData(connectionString)
     ])
+
+    logger.info(`Data objects for sending summaries by email:\nresourcesSummaryData: ${JSON.stringify(resourcesSummaryData)}\nchatMessagesSummaryData: ${JSON.stringify(chatMessagesSummaryData)}`)
 
     const emails = [] as string[]
     [...Object.keys(resourcesSummaryData), ...Object.keys(chatMessagesSummaryData)].forEach(mail => {

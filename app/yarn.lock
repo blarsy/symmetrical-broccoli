@@ -4083,10 +4083,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/slider@npm:4.4.2":
-  version: 4.4.2
-  resolution: "@react-native-community/slider@npm:4.4.2"
-  checksum: 1ae613f594a8ea9d7243b3125d26b36aab4e4c2dd9eba1bf66c4f31878e74fae055cd35a1babc46b262240885bb61fa321610417bb2a6d9f77a330136ff33293
+"@react-native-community/slider@npm:^4.5.2":
+  version: 4.5.2
+  resolution: "@react-native-community/slider@npm:4.5.2"
+  checksum: 99023660756a1a876fc3d9c1a7cec13f7e414abee3452e1e03d2794bc7f46a9d689740bed5c3889914adf6ed85a55c6017e2f0d73b5de353025ba52bba6e79e1
   languageName: node
   linkType: hard
 
@@ -6511,7 +6511,7 @@ __metadata:
     "@os-team/i18next-react-native-language-detector": ^1.0.33
     "@react-native-async-storage/async-storage": ^1.23.1
     "@react-native-community/datetimepicker": ^8.0.0
-    "@react-native-community/slider": 4.4.2
+    "@react-native-community/slider": ^4.5.2
     "@react-native/metro-config": ^0.74.81
     "@react-navigation/native": ^6.1.17
     "@react-navigation/native-stack": ^6.9.26
@@ -6529,6 +6529,7 @@ __metadata:
     dayjs: ^1.11.10
     eas-cli: ^5.2.0
     expo: ^50.0.17
+    expo-camera: 14.1.3
     expo-dev-client: ^3.3.11
     expo-device: ^5.9.4
     expo-image-manipulator: ^11.8.0
@@ -9523,6 +9524,17 @@ __metadata:
     invariant: ^2.2.4
     md5-file: ^3.2.3
   checksum: 461e335d17877d8fc54d559dea2d52d6c2a2a27c1a99a796f3181ebf92f62e227f1298c51a6ab0c619d97b127a3ffbfd3e679f8cf6907aed68a1e31fd73d5061
+  languageName: node
+  linkType: hard
+
+"expo-camera@npm:14.1.3":
+  version: 14.1.3
+  resolution: "expo-camera@npm:14.1.3"
+  dependencies:
+    invariant: ^2.2.4
+  peerDependencies:
+    expo: "*"
+  checksum: c6b99409f1631d8bf747e43dd1cc6cd84068bdb32d324f7a129f2d40016a72a4f271fea3944d13ba940204e613c095a7241715f0808e6f4545c9e37af361bc83
   languageName: node
   linkType: hard
 

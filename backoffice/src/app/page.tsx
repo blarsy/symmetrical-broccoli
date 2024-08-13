@@ -27,7 +27,6 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { Button } from "@mui/material"
 import QuestionIcon from "@mui/icons-material/QuestionMark"
 import QAIcon from "@mui/icons-material/QuestionAnswer"
-import AccountsGallery from "@/components/showcase/AccountsGallery"
 import { ApolloProvider } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
 import { getCommonConfig } from "@/config"

@@ -45,7 +45,7 @@ interface Props {
     children: JSX.Element
 }
 
-const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: undefined,
+const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: new Date(),
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
     canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null, specificLocation: null }

@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from "react"
-import OperationFeedback from "../OperationFeedback"
+import OperationFeedback, { InfoSnackbar } from "../OperationFeedback"
 import EditLinkModal from "./EditLinkModal"
 import { Link, Location, getIconForLink, parseLocationFromGraph } from "@/lib/schema"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
 import ListOf from "../ListOf"
-import { Button, Icon, IconButton, Text } from "react-native-paper"
-import { DimensionValue, FlexAlignType, Linking, View } from "react-native"
-import { aboveMdWidth, adaptToWidth, fontSizeSmall, mdScreenWidth } from "@/lib/utils"
-import { WhiteButton } from "../layout/lib"
+import { ActivityIndicator, Button, Icon, IconButton, Portal, Snackbar, Text } from "react-native-paper"
+import { DimensionValue, FlexAlignType, Linking, StyleProp, View, ViewStyle } from "react-native"
+import { adaptToWidth, fontSizeSmall, mdScreenWidth } from "@/lib/utils"
+import { Hr } from "../layout/lib"
 import { t } from "i18next"
 import { ScrollView } from "react-native-gesture-handler"
 import LocationEdit from "./LocationEdit"
@@ -47,18 +47,19 @@ interface LinksEditProps {
     newLinkRequested: () => void
     editLinkRequested: (link: Link) => void
     deleteLinkRequested: (link: Link) => void
+    style?: StyleProp<ViewStyle>
 }
 
-const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkRequested }: LinksEditProps) => <View style={{ alignItems: 'center' }}>
+const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkRequested, style }: LinksEditProps) => <View style={{...{ alignItems: 'center' }, ...(style as object || {})}}>
     <ListOf data={links} noDataLabel={t('no_link')} noDataLabelStyle={{ color: '#fff' }}
         displayItem={(link, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' }}>
         <Icon color="#fff" source={getIconForLink(link.type)} size={25}/>
         <Button style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" 
             mode="text" onPress={() => Linking.openURL(link.url)}>{ link.label || t('link_button_default_label') }</Button>
-        <IconButton iconColor="#fff" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
-        <IconButton iconColor="#fff" icon="delete" onPress={() => deleteLinkRequested(link)} />
+        <IconButton containerColor="#fff" iconColor="#000" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
+        <IconButton containerColor="#fff" iconColor="#000" icon="delete" onPress={() => deleteLinkRequested(link)} />
     </View>} />
-    <IconButton size={25} containerColor="#fff" iconColor="#000" icon="link-plus" onPress={newLinkRequested} />
+    <Button style={{ backgroundColor: '#fff' }} textColor="#000" icon="link-plus" onPress={newLinkRequested}>{t('add_buttonLabel')}</Button>
 </View>
 
 export default () => {
@@ -66,7 +67,7 @@ export default () => {
     const appContext = useContext(AppContext)
     const [editedLink, setEditedLink] = useState<Link | undefined>(undefined)
     const [updateAccount, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
-    const { data, loading, error, refetch } = useQuery(GET_ACCOUNT_INFO, { variables: { id: appContext.account!.id } })
+    const { data, loading, error } = useQuery(GET_ACCOUNT_INFO, { variables: { id: appContext.account!.id } })
     const [publicInfo, setPublicInfo] = useState<{ links: Link[], location: Location | null}>({ links: [], location: null })
 
     useEffect(() => {
@@ -77,31 +78,45 @@ export default () => {
             location: parseLocationFromGraph(data.accountById.locationByLocationId)
         })
     }, [data])
+
+    const update = async(publicInfo: {
+        links: Link[];
+        location: Location | null;
+    }) => {
+        await updateAccount({ variables: { 
+            links: publicInfo.links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })),
+            location: publicInfo.location
+        } })
+        // refetch()
+        setSuccess(true)
+    }
     
     return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <LoadedZone loading={loading} error={error} loadIndicatorColor="#fff" 
             containerStyle={{ paddingTop: 10, paddingHorizontal: 10, flex: 1, justifyContent: 'center', width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth) }} >
-            <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10 }}>{t('publicInfo_settings_title')}</Text>
-            <LinksEdit links={publicInfo.links}
-                deleteLinkRequested={link => setPublicInfo({ links: publicInfo.links.filter(l => l.id != link.id), location: publicInfo.location })}
+            <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 20 }}>{t('publicInfo_settings_title')}</Text>
+            <LinksEdit style={{ paddingBottom: 20 }} links={publicInfo.links}
+                deleteLinkRequested={link => {
+                    const newPublicInfo = { links: publicInfo.links.filter(l => l.id != link.id), location: publicInfo.location }
+                    setPublicInfo(newPublicInfo)
+                    update(newPublicInfo)
+                }}
                 editLinkRequested={setEditedLink}
                 newLinkRequested={() => { setEditedLink({ id: 0, label: '', type: 4, url: '' }) }} />
-            <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingVertical: 10 }}>{t('publicInfo_address_title')}</Text>
+            <Hr color="#fff" thick />
+            <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10, paddingTop: 20 }}>{t('publicInfo_address_title')}</Text>
             <LocationEdit location={publicInfo.location || undefined} 
-                onLocationChanged={newLocation => setPublicInfo({ links: publicInfo.links, location: newLocation }) }
-                onDeleteRequested={() => setPublicInfo({ location: null, links: publicInfo.links })} 
+                onLocationChanged={newLocation => {
+                    const newPublicInfo = { links: publicInfo.links, location: newLocation }
+                    setPublicInfo(newPublicInfo)
+                    update(newPublicInfo)
+                }}
+                onDeleteRequested={() => {
+                    const newPublicInfo = { location: null, links: publicInfo.links }
+                    setPublicInfo(newPublicInfo)
+                    update(newPublicInfo)
+                }} 
                 orangeBackground />
-            <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}
-                onPress={async() => {
-                    await updateAccount({ variables: { 
-                        links: publicInfo.links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })),
-                        location: publicInfo.location
-                    } })
-                    refetch()
-                    setSuccess(true)
-                }} loading={updating}>
-                {t('save_label')}
-            </WhiteButton>
             <OperationFeedback error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
             <EditLinkModal visible={!!editedLink} initial={editedLink} onDismiss={link => {
                 if(link) {
@@ -120,10 +135,15 @@ export default () => {
                         publicInfo.links.splice(idx, 1, link)
                         newLinks = [...publicInfo.links]
                     }
-                    setPublicInfo({ links: newLinks, location: publicInfo.location })
+                    const newPublicInfo = { links: newLinks, location: publicInfo.location }
+                    setPublicInfo(newPublicInfo)
+                    update(newPublicInfo)
                 }
                 setEditedLink(undefined)
             }} />
         </LoadedZone>
+        <Portal>
+            { updating && <InfoSnackbar message={t('updating_status_message')} /> }
+        </Portal>
     </ScrollView>
 }

@@ -41,6 +41,7 @@ export default ({ route, navigation }:RouteProps) => {
             try {
                 const res = await getLocation({ variables: { id: appContext.account!.id }, fetchPolicy: "network-only" })
                 const defaultLocation = parseLocationFromGraph(res.data.accountById.locationByLocationId)
+                
                 editResourceContext.actions.reset(defaultLocation || undefined)
             } catch(e) {
                 appDispatch({ type: AppReducerActionType.DisplayNotification,  payload: { error: e }})
@@ -73,7 +74,7 @@ export default ({ route, navigation }:RouteProps) => {
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
-            expiration: yup.date().required(t('field_required')),
+            expiration: yup.date().required(t('field_required')).min(new Date(), t('date_mustBeFuture')),
             categories: yup.array().min(1, t('field_required')),
             isProduct: yup.bool().test('natureIsPresent', t('nature_required'), (val, ctx) => {
                 return val || ctx.parent.isService

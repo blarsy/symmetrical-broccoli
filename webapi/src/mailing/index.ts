@@ -2,11 +2,12 @@ import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
-import getConfig,{ getCommonConfig } from '../config'
+import getConfig,{ getCommonConfig, getConnectionString } from '../config'
 import initTranslations from '../i18n'
+import { runAndLog } from '../db_jobs/utils'
 
 
-export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string) => {
+export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string, connectionString: string) => {
     const config = await getConfig(version)
 
     const msg = {
@@ -17,17 +18,20 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
       html: htmlContent
     }
 
-    if(config.production && !config.doNotSendMails){
-        sgMail.setApiKey(config.mailApiKey!)
-        await sgMail.send(msg)
-    } else {
-        await recordMail(msg)
-    }
+    const promises: Promise<any>[] = (config.production && !config.doNotSendMails) ?
+        [sgMail.send(msg)] :
+        [recordMail(msg)]
+
+    promises.push(persistMail(msg, connectionString))
+
+    await Promise.all(promises)
 }
 
 export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string, version: string) => {
-    const config = await getCommonConfig()
-    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent, version)
+    const config = await getConfig(version)
+    const connectionString = getConnectionString(config)
+    
+    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent, version, connectionString)
 }
 
 let partialsPreparePromise: Promise<void> | null = null
@@ -126,4 +130,13 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
     const htmlContent = template(data)
 
     await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent, version )
+}
+
+const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, connectionString: string): Promise<void> => {
+    runAndLog(`INSERT INTO sb.mails(
+        account_id, email, sent_from, subject, text_content, html_content)
+        VALUES ((SELECT id FROM sb.accounts WHERE email = '${msg.to}' ), '${msg.to}', '${msg.from}', 
+        $1, $2, $3);`, connectionString, 'Persisting mail', [
+            msg.subject, msg.text, msg.html
+        ])
 }

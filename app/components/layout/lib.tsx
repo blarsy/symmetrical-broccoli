@@ -8,7 +8,8 @@ import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { getLanguage } from "@/lib/utils"
+import { aboveMdWidth, getLanguage } from "@/lib/utils"
+import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -17,7 +18,24 @@ const mergeWith = (a: object, b: any): object => {
     return a
 }
 
-export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff" {...props} style={mergeWith({ borderRadius: 5 } , props.style )}/>
+interface SubmitButtonProps extends ButtonProps {
+    ErrorTextComponent: React.ComponentType<TextProps<never>>
+    Component: React.ComponentType<ButtonProps>
+    submitCount: number
+    isValid: boolean
+    updating: boolean
+    handleSubmit: () => void
+}
+
+export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
+{ props.submitCount > 0 && !props.isValid && <props.ErrorTextComponent>{t('someDataInvalid')}</props.ErrorTextComponent> }
+    <props.Component disabled={props.updating} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
+        {t('save_label')}
+    </props.Component>
+</View>
+
+export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff"
+    {...props} style={mergeWith({ borderRadius: 5 } , props.style )}/>
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
     {...props} style={mergeWith({ borderRadius: 5 } , props.style )} />
@@ -44,17 +62,22 @@ export const OrangeTextInput = (props: TextInputProps) => <TextInput
         marginTop: 10,
     }, props.style)}/>
 
-export const TransparentTextInput = (props: TextInputProps) => {
-    return <TextInput 
-        placeholderTextColor="#222" mode="flat" textColor="#000" underlineColor="#222"
-        activeUnderlineColor="#222" selectionColor="transparent"
+interface TransparentTextInput extends TextInputProps {
+    inlineMode?: boolean
+}
+
+export const TransparentTextInput = (props: TransparentTextInput) => {
+    return <TextInput dense={props.inlineMode}
+        placeholderTextColor="#222" mode="flat" textColor="#000" underlineColor={ props.inlineMode ? 'transparent' : "#222" }
+        activeUnderlineColor={ props.inlineMode ? 'transparent' : "#222" } selectionColor="transparent"
         theme={{ colors: { onSurfaceVariant: '#222'} }}
         contentStyle={{
-            color: '#000'
+            color: '#000',
+            padding: props.inlineMode ? 0 : undefined
         }} 
         style={Object.assign({
             backgroundColor: 'transparent',
-            marginTop: 10,
+            marginTop: 10
         }, props.style)} 
         {...props}/>
 }
@@ -71,7 +94,7 @@ interface CheckboxGroupProps {
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
-    <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text>
+    { props.title && <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text> }
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
         { Object.entries(props.options).map((p, idx) => <OptionSelect selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
             const oldValues = {...props.values}
@@ -92,7 +115,7 @@ interface DateTimePickerFieldProps {
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5 }}
+    return <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10 }}
         onPress={() => setDateOpen(true)}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
         <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
@@ -116,3 +139,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
         />
     </TouchableOpacity>
 }
+
+
+export const Hr = ({ color, thick }: { color?: ColorValue, thick?: boolean }) => 
+    <View style={{ backgroundColor: color || '#343434', height: thick ? 5 : 1, transform: 'scaleY(0.5)' }}></View>

@@ -57,7 +57,7 @@ interface NewResourceNotificationPayload {
 const toResourceNotification = (payload: NewResourcePayload): NewResourceNotificationPayload => ({
     accountName: payload.account_name,
     resourceId: payload.resource_id,
-    destinations: payload.destinations,
+    destinations: payload.destinations || [],
     title: payload.title
 })
 

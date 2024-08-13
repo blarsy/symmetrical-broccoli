@@ -106,7 +106,15 @@ module.exports = {
           "photosPermission": "Tope-là voudrait accéder à vos fichiers images pour vous permettre de choisir les photos de vos ressources, et le logo de votre activité."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Tope-là voudrait accéder à votre appareil photo pour prendre des photos de vos ressources.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ],
     "owner": "tope_la"
   }
