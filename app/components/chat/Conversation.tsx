@@ -122,7 +122,7 @@ const Conversation = ({ route }: RouteProps) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }} textStyle={{ color: primaryColor }} disabled={!conversationContext.state.conversation.data?.otherAccount.name || sending}>
-                      <View style={{ flexDirection: 'row' }}>
+                      <View style={{ flexDirection: 'row', paddingRight: 5 }}>
                         {sending && <ActivityIndicator color={primaryColor}/>}
                         <Icon color={conversationContext.state.conversation.data?.otherAccount.name ? primaryColor : '#777'} source="send" size={35} />
                       </View>

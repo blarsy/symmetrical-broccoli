@@ -11,7 +11,7 @@ import DataLoadState from "@/lib/DataLoadState"
 import { t } from "@/i18n"
 import { urlFromPublicId } from "@/lib/images"
 import { NavigationHelpers, ParamListBase, useNavigation } from "@react-navigation/native"
-import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 interface NotificationData {
     read: boolean
@@ -138,16 +138,19 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
 }
 
 export default ({ navigation }: RouteProps) => {
+    const appContext = useContext(AppContext)
     const nativeNavigation = useNavigation()
     const appDispatch = useContext(AppDispatchContext)
     const { data, loading, error, refetch } = useNotifications(navigation)
     const [setNotificationsRead] = useMutation(SET_NOTIFICATIONS_READ)
 
     useEffect(() => {
-        setNotificationsRead().then(() => {
-            appDispatch({ type: AppReducerActionType.NotificationsRead, payload: undefined })
-            refetch()
-        })
+        if(appContext.account) {
+            setNotificationsRead().then(() => {
+                appDispatch({ type: AppReducerActionType.NotificationsRead, payload: undefined })
+                refetch()
+            })
+        }
         
         nativeNavigation.addListener('focus', () => {
             appDispatch({ type: AppReducerActionType.SetNewNotificationHandler, payload: { handler: refetch }})
@@ -159,17 +162,20 @@ export default ({ navigation }: RouteProps) => {
     }, [])
 
     return <ScrollView>
-        <LoadedList loading={loading} error={error} data={data} displayItem={(notif, idx) => <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
-                left={() =>
-                    notif.image ? <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={{ uri: notif.image }} /> : <Icon size={70} source="creation" />
-                } key={idx} onPress={notif.onPress}
-                right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
-                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{ userFriendlyTime(notif.created) }</Text>
-                        { !notif.read && <Icon size={20} color={primaryColor} source="circle" /> }
-                    </View>}
-                title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
-                    <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
-                    <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
-                </View>} description={<Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />} />
+        { appContext.account ?
+            <LoadedList loading={loading} error={error} data={data} displayItem={(notif, idx) => <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
+                    left={() =>
+                        notif.image ? <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={{ uri: notif.image }} /> : <Icon size={70} source="creation" />
+                    } key={idx} onPress={notif.onPress}
+                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+                            <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{ userFriendlyTime(notif.created) }</Text>
+                            { !notif.read && <Icon size={20} color={primaryColor} source="circle" /> }
+                        </View>}
+                    title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
+                        <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
+                        <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
+                    </View>} description={<Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />} />:
+            <Text variant="labelLarge" style={{ textAlign: 'center', padding: 10 }}>{t('PleaseConnectLabel')}</Text>
+        }
     </ScrollView>
 }

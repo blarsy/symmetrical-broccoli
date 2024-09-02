@@ -74,7 +74,7 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.Logout:
           return {...previousState, ...{ token: '', account: undefined, 
               chatMessagesSubscription: undefined, notificationSubscription: undefined,
-              unreadConversations: [], numberOfUnreadNotifications: 0
+              unreadConversations: [], numberOfUnreadNotifications: 0, apolloClient: action.payload.apolloClient
             }}
         case AppReducerActionType.UpdateAccount:
           return { ...previousState, ...{ account: action.payload } }

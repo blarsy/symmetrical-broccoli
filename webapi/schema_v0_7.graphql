@@ -2891,7 +2891,7 @@ type Search implements Node {
   referenceLocationLongitude: BigFloat
   distanceToReferenceLocation: BigFloat
   excludeUnlocated: Boolean
-  accountId: Int!
+  accountId: Int
   created: Datetime!
 
   """Reads a single `Account` that is related to this `Search`."""

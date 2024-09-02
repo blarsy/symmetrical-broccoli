@@ -120,7 +120,7 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
       await remove(TOKEN_KEY)
       appState.chatMessagesSubscription?.unsubscribe()
       appState.notificationSubscription?.unsubscribe()
-      appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
+      appDispatch({ type: AppReducerActionType.Logout, payload: { apolloClient: getApolloClient('') } })
       info({ message: 'logged out' })
     }
 

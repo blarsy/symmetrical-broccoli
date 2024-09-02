@@ -52,7 +52,7 @@ export default () => {
         </Formik>
         <Text style={{ marginVertical: 10 }} variant="headlineLarge">{t('support_info')}</Text>
         <LoadedZone loading={supportInfo.loading} error={supportInfo.error}>
-            { Object.entries(supportInfo.data).map((tuple, idx) => <ViewField titleOnOwnLine key={idx} title={tuple[0]}><Text style={{ flexWrap: 'wrap' }}>{tuple[1] as string}</Text></ViewField>) }
+            { Object.entries(supportInfo.data).map((tuple, idx) => <ViewField titleOnOwnLine key={idx} title={tuple[0]} style={{ paddingBottom: 0, marginBottom: 0 }}><Text style={{ flexWrap: 'wrap' }}>{tuple[1] as string}</Text></ViewField>) }
         </LoadedZone>
     </ScrollView>
 }

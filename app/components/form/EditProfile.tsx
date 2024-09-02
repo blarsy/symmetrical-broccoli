@@ -70,7 +70,8 @@ export default function EditProfile () {
                 try {
                     const avatarPublicId = await uploadImage(img.uri)
                     setFieldValue('avatarPublicId', avatarPublicId)
-                    update({ ...values, ...{ avatarPublicId }})
+                    await update({ ...values, ...{ avatarPublicId }})
+                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('logoChangedMessage') } })
                 } catch (e) {
                     appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
                 }

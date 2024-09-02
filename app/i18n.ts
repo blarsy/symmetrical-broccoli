@@ -170,7 +170,9 @@ const resources = {
       "newResourceFrom_notificationHeadline": "New resource created by ",
       "proximity_title": "Proximity",
       "exclude_unlocated_label": "Filter out resources without address",
-      "max_distance_label": "Max. distance {{distance}} km"
+      "max_distance_label": "Max. distance {{distance}} km",
+      "logoChangedMessage": "Logo changed successfully",
+      "PleaseConnectLabel": "Please connect, first ..."
     }
   },
   fr: {
@@ -336,7 +338,9 @@ const resources = {
       "newResourceFrom_notificationHeadline": "Nouvelle ressource créée par ",
       "proximity_title": "Proximité",
       "exclude_unlocated_label": "Exclure les ressources sans adresse",
-      "max_distance_label": "Distance max. {{distance}} km"
+      "max_distance_label": "Distance max. {{distance}} km",
+      "logoChangedMessage": "Le logo a été changé",
+      "PleaseConnectLabel": "Veuillez vous connecter d'abord ..."
     }
   }
 }

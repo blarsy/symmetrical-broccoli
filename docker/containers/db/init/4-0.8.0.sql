@@ -261,7 +261,7 @@ CREATE TABLE sb.searches
     reference_location_longitude numeric,
     distance_to_reference_location numeric,
 	exclude_unlocated boolean,
-    account_id integer NOT NULL,
+    account_id integer NULL,
     created timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT searches_pk PRIMARY KEY (id)
         INCLUDE(id),
