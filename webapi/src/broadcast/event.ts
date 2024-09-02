@@ -1,9 +1,10 @@
 import { PgParsedNotification } from "pg-listen"
-import { getCommonConfig } from "../config"
+import { Config, getCommonConfig, getConnectionString } from "../config"
 import { sendPushNotification } from "../pushNotifications"
 import logger from "../logger"
 import initTranslations from '../i18n'
 import { TFunction } from "i18next"
+import { runAndLog } from "../db_jobs/utils"
 
 export enum EventType {
     messageCreated = 1,
@@ -40,28 +41,7 @@ const toMessageNotification = (payload: MessagePayload): NewMessageNotificationP
     pushToken: payload.push_token
 })
 
-interface NewResourcePayload {
-    resource_id: number
-    title: string
-    account_name: string
-    destinations: any[]
-}
-
-interface NewResourceNotificationPayload {
-    resourceId: number
-    title: string
-    accountName: string
-    destinations: { token: string, language: string }[]
-}
-
-const toResourceNotification = (payload: NewResourcePayload): NewResourceNotificationPayload => ({
-    accountName: payload.account_name,
-    resourceId: payload.resource_id,
-    destinations: payload.destinations || [],
-    title: payload.title
-})
-
-export const handleMessageCreated = async (notification: PgParsedNotification) => {
+export const handleMessageCreated = async (notification: PgParsedNotification, config: Config) => {
     if(!notification.payload) throw new Error('Expected payload on notification, got none')
 
     try {
@@ -75,33 +55,58 @@ export const handleMessageCreated = async (notification: PgParsedNotification) =
     }
 }
 
-export const handleResourceChange = async (notification: PgParsedNotification) => {
-    if(!notification.payload) throw new Error('Expected payload on notification, got none')
+export const handleResourceCreated = async (notification: PgParsedNotification, config: Config) => {
+
+    const connectionString = getConnectionString(config)
 
     try {
-        logger.info(`Handling new resource notification with payload ${JSON.stringify(notification.payload)}`)
-        const resourceNotif = toResourceNotification(notification.payload)
-        if(resourceNotif.destinations.length > 0) {
-            const config = await getCommonConfig()
+        //Find all accounts that can be suggested the new resource
+        const cmdResult = await runAndLog(`SELECT sb.get_accounts_to_notify_of_new_resource(${notification.payload.resource_id});`,
+            connectionString, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`)
+    
+        const accountsToNotify = cmdResult.rows[0][Object.getOwnPropertyNames(cmdResult.rows[0])[0]]
+
+        if(accountsToNotify.length > 0) {
+            //Create a resource suggestion for all such accounts
+            await runAndLog(`SELECT sb.create_new_resource_notifications($1, $2);`, connectionString, 
+                `Creating notifications for new resource ${JSON.stringify(notification.payload)}, accounts ${accountsToNotify}`,
+                [notification.payload.resource_id, accountsToNotify]
+            )
+        
+            const notifsToPushRes =  await runAndLog(`SELECT token, r.id as resourceId, r.title, creator.name as accountName, destinator.language
+                FROM sb.accounts_push_tokens apt
+                INNER JOIN sb.resources r ON r.id = $1
+                INNER JOIN sb.accounts creator ON creator.id = r.account_id
+                INNER JOIN sb.accounts destinator ON destinator.id = apt.account_id
+                WHERE NOT EXISTS (SELECT * FROM sb.broadcast_prefs bp WHERE bp.account_id = apt.account_id)
+                AND apt.account_id = ANY($2)`, connectionString, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`,
+                [notification.payload.resource_id,accountsToNotify]
+            )
+        
             const ts: {[ lang: string ]: TFunction<"translation", undefined>} = {}
             const languages: string[] = []
-            resourceNotif.destinations.forEach(async dest => {
+            notifsToPushRes.rows.forEach(async dest => {
                 if(!languages.includes(dest.language)) languages.push(dest.language)
             })
             await Promise.all(languages.map(async lang => ts[lang] = await initTranslations(lang)))
-            
-            await sendPushNotification(resourceNotif.destinations.map(dest =>  {
-                return {
-                    to: dest.token,
-                    body: `${ts[dest.language]('new_resource_notification')} ${resourceNotif.title}`, 
-                    title: resourceNotif.accountName, 
-                    data: {
-                        url: `${config.pushNotificationsUrlPrefix}viewresource?resourceId=${resourceNotif.resourceId}`
+        
+            try {
+                //Send push notification to all such accounts configured for push notifications
+                await sendPushNotification(notifsToPushRes.rows.map(dest => {
+                    return {
+                        to: dest.token,
+                        body: `${ts[dest.language]('new_resource_notification')} ${dest.title}`, 
+                        title: dest.accountName, 
+                        data: {
+                            url: `${config.pushNotificationsUrlPrefix}viewresource?resourceId=${dest.resourceId}`
+                        }
                     }
-                }
-            }))
+                }))
+            } catch(e) {
+                logger.error(`Error while sending push notification to Expo.`, e)
+            }
         }
     } catch(e) {
-        logger.error(`Error while sending push notification to Expo.`, e)
+        logger.error(`Error while registering notifications for new resource.`, e)
     }
 }

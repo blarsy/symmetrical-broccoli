@@ -13,7 +13,6 @@ import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { configureFonts } from "react-native-paper"
 import { useFonts } from 'expo-font'
-import { useCameraPermissions } from "expo-camera"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
 
@@ -38,6 +37,8 @@ export enum ScreenSize {
     md,
     lg
 }
+
+export const MAX_DISTANCE = 50
 
 export const getTheme = () => ({
   fonts: configureFonts({ config: { 
@@ -200,7 +201,7 @@ export const versionChecker = (serverVersion: string) => {
   return true
 }
 
-export const userFriendlyChatTime = (time: Date) => {
+export const userFriendlyTime = (time: Date) => {
   const djTime = dayjs.utc(time)
   const millisecondsEllapsed = Math.abs(djTime.diff())
   const epoch = time.valueOf()

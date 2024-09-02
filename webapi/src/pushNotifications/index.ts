@@ -8,7 +8,7 @@ export interface PushNotification {
 }
 
 export async function sendPushNotification(messages: PushNotification[]) {
-    logger.info(`Push notification ${JSON.stringify(messages)}.`)
+    logger.info(`Push notifications ${JSON.stringify(messages)}.`)
     await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {

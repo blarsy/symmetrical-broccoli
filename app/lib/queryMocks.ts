@@ -1,8 +1,9 @@
-import { SUGGESTED_RESOURCES } from "@/components/SearchFilterContextProvider"
 import { Account, Category, Resource } from "./schema"
 import { GET_RESOURCE } from "./utils"
 import { GraphQlOp } from "./storiesUtil"
 import { GET_ACCOUNT } from "@/components/account/Account"
+import { SUGGEST_RESOURCES } from "@/components/SearchFilterContextProvider"
+import { ACCOUNT_LOCATION } from "./useProfileAddress"
 
 const createRes = (id: number, account: Account, title: string, description: string, categories: Category[], imgPubIds: string[]): Resource => ({
     account,
@@ -34,31 +35,31 @@ const makeSearchResourceResult = (resources: Resource[]) => resources.map(resour
     accountByAccountId: {
         name: resource.account?.name,
         id: resource.account?.id
-      },
-      created: resource.created,
-      description: resource.description,
-      title: resource.title,
-      canBeExchanged: resource.canBeExchanged,
-      canBeGifted: resource.canBeGifted,
-      resourcesImagesByResourceId: {
-        nodes: resource.images.map(img => ({
-            imageByImageId: {
-              publicId: img.publicId
-            }
-          }))
-      },
-      expiration: resource.expiration,
-      isProduct: resource.isProduct,
-      isService: resource.isService,
-      id: resource.id,
-      canBeTakenAway: resource.canBeTakenAway,
-      canBeDelivered: resource.canBeDelivered,
-      resourcesResourceCategoriesByResourceId: {
-        nodes: resource.categories.map(cat => ({
-            resourceCategoryCode: cat.code
-          }))
-      },
-      locationBySpecificLocationId: null
+    },
+    created: resource.created,
+    description: resource.description,
+    title: resource.title,
+    canBeExchanged: resource.canBeExchanged,
+    canBeGifted: resource.canBeGifted,
+    resourcesImagesByResourceId: {
+      nodes: resource.images.map(img => ({
+          imageByImageId: {
+            publicId: img.publicId
+          }
+        }))
+    },
+    expiration: resource.expiration,
+    isProduct: resource.isProduct,
+    isService: resource.isService,
+    id: resource.id,
+    canBeTakenAway: resource.canBeTakenAway,
+    canBeDelivered: resource.canBeDelivered,
+    resourcesResourceCategoriesByResourceId: {
+      nodes: resource.categories.map(cat => ({
+          resourceCategoryCode: cat.code
+        }))
+    },
+    locationBySpecificLocationId: null
 }))
 
 const makeGetResourceGraphQlOp = (res: Resource) => ({
@@ -135,33 +136,85 @@ const makeGetAccountGraphQlOp = (resources: Resource[], account: Account & { ava
       },
       imageByAvatarImageId: {
         publicId: account.avatarPublicId,
-      }
+      },
+      locationByLocationId: null
     }
   }
 })
 
 export default {
-    searchResult: {
-        query: SUGGESTED_RESOURCES,
+    searchResultWithoutLocation: {
+        query: SUGGEST_RESOURCES,
         variables: {
-            searchTerm: '',
-            canBeDelivered: false,
-            canBeExchanged: false,
-            canBeGifted: false,
-            canBeTakenAway: false,
-            isProduct: false,
-            isService: false,
-            categoryCodes: []
+          excludeUnlocated:false,
+          referenceLocationLatitude:0,
+          referenceLocationLongitude:0,
+          distanceToReferenceLocation:50,
+          categoryCodes:[],
+          searchTerm:"",
+          canBeDelivered:false,
+          canBeExchanged:false,
+          canBeGifted:false,
+          canBeTakenAway:false,
+          isProduct:false,
+          isService:false
         },
         result: {
-            suggestedResources: {
-                nodes: makeSearchResourceResult([resource1, resource2, resource3])
-            }
+          suggestedResources: {
+            resources: makeSearchResourceResult([resource1, resource2, resource3])
+          }
         }
     },
+    searchResultWithDefaultAccountLocation: {
+      query: SUGGEST_RESOURCES,
+      variables: {
+        excludeUnlocated:false,
+        referenceLocationLatitude:50,
+        referenceLocationLongitude:3,
+        distanceToReferenceLocation:50,
+        categoryCodes:[],
+        searchTerm:"",
+        canBeDelivered:false,
+        canBeExchanged:false,
+        canBeGifted:false,
+        canBeTakenAway:false,
+        isProduct:false,
+        isService:false
+      },
+      result: {
+        suggestedResources: {
+          resources: makeSearchResourceResult([resource1, resource2, resource3])
+        }
+      }
+  },
     getResource1ToView: makeGetResourceGraphQlOp(resource1),
     getResource2ToView: makeGetResourceGraphQlOp(resource2),
     getResource3ToView: makeGetResourceGraphQlOp(resource3),
     getAccount1: makeGetAccountGraphQlOp([ resource1, resource2 ], account1),
     getAccount2: makeGetAccountGraphQlOp([ resource3 ], account2),
+    getAccountLocation: {
+      query: ACCOUNT_LOCATION,
+      variables: { id: 1 },
+      result: {
+        accountById: {
+          id: 1,
+          locationByLocationId: {
+            address: 'Rue de la rue, 1',
+            latitude: 50,
+            longitude: 3,
+            id: 1
+          }
+        }
+      }
+    },
+    getNoAccountLocation: {
+      query: ACCOUNT_LOCATION,
+      variables: { id: 1 },
+      result: {
+        accountById: {
+          id: 1,
+          locationByLocationId: null
+        }
+      }
+    }
 } as { [name: string]: GraphQlOp }

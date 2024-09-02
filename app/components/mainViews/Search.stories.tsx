@@ -25,7 +25,7 @@ const meta: Meta<typeof Search> = {
             categories: [], created: new Date(), images: [], account: { id: 1, name: 'Assoc de teubés', email: 'me@me.com' },
             deleted: null, specificLocation: null
         }])),
-        apolloClientMocksDecorator([queryMocks.searchResult]),
+        apolloClientMocksDecorator([queryMocks.searchResultWithDefaultAccountLocation, queryMocks.getAccountLocation]),
     ]
   }
 

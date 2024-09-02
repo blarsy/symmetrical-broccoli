@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import EditResource, { ACCOUNT_LOCATION } from './EditResource'
+import EditResource from './EditResource'
 import { apolloClientMocksDecorator, appContextDecorator, editResourceContextDecorator, gestureHandlerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
+import { ACCOUNT_LOCATION } from '@/lib/useProfileAddress'
 
 
 const meta: Meta<typeof EditResource> = {
@@ -23,6 +24,7 @@ export const EditNew: Story = {
         variables: { id: 1 },
         result: {
             accountById: {
+                id: 1,
                 locationByLocationId: {
                     address: 'Rue de la picole, 36, 7500 Tournai',
                     latitude: 50,
@@ -49,6 +51,7 @@ export const EditExisting: Story = {
         variables: { id: 1 },
         result: {
             accountById: {
+                id: 1,
                 locationByLocationId: {
                     address: 'Rue de la picole, 36, 7500 Tournai',
                     latitude: 50,
@@ -70,6 +73,7 @@ export const EditNewWithoutAddress: Story = {
         variables: { id: 1 },
         result: {
             accountById: {
+                id: 1,
                 locationByLocationId: null
             }
         }

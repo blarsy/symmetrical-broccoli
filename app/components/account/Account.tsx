@@ -94,8 +94,8 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
         <LoadedZone loading={loading} error={error}>
             { data && 
                 <>
-                    <ViewField title={t('organization_name_label')}>
-                        <Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>
+                    <ViewField titleOnOwnLine title={t('organization_name_label')}>
+                        <Text variant="bodyMedium" style={{ textTransform: 'uppercase', paddingTop: 10 }}>
                             {data.accountById.name}
                         </Text>
                     </ViewField>

@@ -11,7 +11,7 @@ import { setNotificationHandler } from 'expo-notifications'
       if (Platform.OS === 'android') {
         Notifications.setNotificationChannelAsync('default', {
           name: 'default',
-          importance: Notifications.AndroidImportance.HIGH
+          importance: Notifications.AndroidImportance.MAX
         })
       }
   

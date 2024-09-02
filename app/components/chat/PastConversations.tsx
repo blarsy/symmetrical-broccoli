@@ -8,9 +8,8 @@ import { Icon, Text } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import { urlFromPublicId } from "@/lib/images"
 import { gql, useQuery } from "@apollo/client"
-import { userFriendlyChatTime } from "@/lib/utils"
+import { userFriendlyTime } from "@/lib/utils"
 import { AppContext } from "../AppContextProvider"
-import Images from "@/Images"
 import NoConversationYet from "./NoConversationYet"
 
 export const MY_CONVERSATIONS = gql`query MyConversations {
@@ -85,12 +84,12 @@ const PastConversations = ({ onConversationSelected }: Props) => {
                     onPress={() => {
                       onConversationSelected(item.conversation.resource, item.withUser.id)
                     }}
-                    right={p => item.conversation.hasUnread ? <View style={{ flexDirection: 'column', justifyContent: 'center' }}><Icon size={20} color={primaryColor} source="circle" /></View> : undefined}
+                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end'}}>
+                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyTime(item.conversation.lastMessageTime) }</Text>
+                        { item.conversation.hasUnread && <Icon size={20} color={primaryColor} source="circle" /> }
+                      </View>}
                     title={() => <View style={{ flexDirection: 'column' }}>
-                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>
-                            <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyChatTime(item.conversation.lastMessageTime) }</Text>
-                        </View>
+                        <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>
                         <Text variant="bodyMedium" style={{ fontWeight: 'normal', textTransform: 'uppercase' }}>{item.conversation.resource.title}</Text>
                     </View>} description={<Text style={{ fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{item.conversation.lastMessageExcerpt}</Text>} />
             }} />

@@ -166,7 +166,11 @@ const resources = {
       "resource_expired": "This resource is no more available since {{expired}}",
       "someDataInvalid": "Save failed: values missing or invalid",
       "updating_status_message": "Saving",
-      "takePicture_Button": "Take picture(s)"
+      "takePicture_Button": "Take picture(s)",
+      "newResourceFrom_notificationHeadline": "New resource created by ",
+      "proximity_title": "Proximity",
+      "exclude_unlocated_label": "Filter out resources without address",
+      "max_distance_label": "Max. distance {{distance}} km"
     }
   },
   fr: {
@@ -328,7 +332,11 @@ const resources = {
       "resource_expired": "Cette ressource n'est plus disponible depuis le {{expired}}",
       "someDataInvalid": "Echec: valeurs manquantes ou invalides",
       "updating_status_message": "Sauvegarde",
-      "takePicture_Button": "Prendre des photos"
+      "takePicture_Button": "Prendre des photos",
+      "newResourceFrom_notificationHeadline": "Nouvelle ressource créée par ",
+      "proximity_title": "Proximité",
+      "exclude_unlocated_label": "Exclure les ressources sans adresse",
+      "max_distance_label": "Distance max. {{distance}} km"
     }
   }
 }

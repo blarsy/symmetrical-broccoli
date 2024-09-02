@@ -7,8 +7,6 @@ import { Category, Resource } from "@/lib/schema"
 import { EditResourceContext } from "../resources/EditResourceContextProvider"
 import Icons from "@expo/vector-icons/FontAwesome"
 import CategoriesSelect from "./CategoriesSelect"
-import { aboveMdWidth } from "@/lib/utils"
-import { View } from "react-native"
 import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import LocationEdit from "../account/LocationEdit"
 

@@ -30,6 +30,12 @@ const meta: Meta<typeof Profile> = {
                 id: 1
               }
             }]
+          },
+          locationByLocationId: {
+            address: 'Rue de la paix, 7',
+            id: 1,
+            longitude: 50,
+            latitude: 3
           }
         }
       }
@@ -57,6 +63,12 @@ const meta: Meta<typeof Profile> = {
               daysBetweenSummaries: 4
             }]
           }
+        },
+        locationByLocationId: {
+          address: 'Rue de la vache, 3',
+          id: 1,
+          longitude: 49,
+          latitude: 2
         }
       }
     }])

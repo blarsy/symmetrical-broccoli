@@ -75,9 +75,10 @@ interface Props {
     onLocationChanged: (newLocation: Location) => void
     onDeleteRequested: () => void
     orangeBackground?: boolean
+    small?: boolean
 }
 
-export default ({ location, style, onLocationChanged, onDeleteRequested, orangeBackground }: Props) => {
+export default ({ location, style, onLocationChanged, onDeleteRequested, orangeBackground, small }: Props) => {
     const [editedLocation, setEditedLocation] = useState<Location | undefined>(undefined)
     const [currentLocation, setCurrentLocation] = useState<Location | undefined>(location)
     const [deleteRequested, setDeleteRequested] = useState(false)
@@ -99,7 +100,7 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
                     onPress={() => { setDeleteRequested(true)}} />}
             </View>
         </View>
-        { currentLocation && <MapView region={regionFromLocation(currentLocation)} scrollEnabled={false} 
+        { currentLocation && !small && <MapView region={regionFromLocation(currentLocation)} scrollEnabled={false} 
             zoomEnabled={false} style={{ flex: 1, height: adaptToWidth(200, 300, 550) }} provider={PROVIDER_GOOGLE}>
             <Marker coordinate={{latitude: currentLocation.latitude, longitude: currentLocation.longitude}}/>
         </MapView>}

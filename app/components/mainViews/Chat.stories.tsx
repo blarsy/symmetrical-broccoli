@@ -27,12 +27,16 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                             publicId: ''
                         },
                         participantByParticipantId: {
+                            id: 1,
                             accountByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
                                     publicId: ''
                                 }
+                            },
+                            conversationByConversationId: {
+                                id: 1
                             }
                         }
                     }, 
@@ -48,12 +52,16 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                             publicId: ''
                         },
                         participantByParticipantId: {
+                            id: 2,
                             accountByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
                                     publicId: ''
                                 }
+                            },
+                            conversationByConversationId: {
+                                id: 2
                             }
                         }
                     }, 
@@ -69,12 +77,16 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                             publicId: ''
                         },
                         participantByParticipantId: {
+                            id: 3,
                             accountByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
                                     publicId: ''
                                 }
+                            },
+                            conversationByConversationId: {
+                                id: 3
                             }
                         }
                     },
@@ -90,12 +102,16 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                             publicId: ''
                         },
                         participantByParticipantId: {
+                            id: 3,
                             accountByAccountId: {
                                 id: otherAccountId,
                                 name: 'Nouveau pote potentiel',
                                 imageByAvatarImageId: {
                                     publicId: ''
                                 }
+                            },
+                            conversationByConversationId: {
+                                id: 3
                             }
                         }
                     },
@@ -257,6 +273,12 @@ export const SingleConversationAboutDeletedResource: Story = {
                     first: 25
                 },
                 result: makeConversationData(defaultResourceId, defaultOtherAccountId, true, false)
+            }, {
+                query: SET_PARTICIPANT_READ,
+                variables: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId },
+                result: {
+                    setParticipantRead: { integer: 1 }
+                }
             }
         ])
     ]

@@ -1,11 +1,11 @@
 import createPostgresSubscriber, { PgParsedNotification, Subscriber } from "pg-listen"
 import logger from "../logger"
 import { Config } from "../config"
-import { handleMessageCreated, handleResourceChange } from "./event"
+import { handleMessageCreated, handleResourceCreated } from "./event"
 
-const dbNotificationConfigs = [
+const dbNotificationConfigs: { channel: string, handler: (notification: PgParsedNotification, config: Config) => Promise<void> }[] = [
     { channel: 'message_created', handler: handleMessageCreated },
-    { channel: 'resource_created', handler: handleResourceChange },
+    { channel: 'resource_created', handler: handleResourceCreated },
 ]
 
 export class NotificationsListener {
@@ -23,7 +23,7 @@ export class NotificationsListener {
         this.subscriber.events.on('connected', () => {
             dbNotificationConfigs.forEach(cfg => this.subscriber.listenTo(cfg.channel))
         })
-        this.subscriber.events.on('notification', this.onNotification)
+        this.subscriber.events.on('notification', (notification: PgParsedNotification) => this.onNotification(notification, config))
         this.subscriber.events.on('error', this.errorHandler)
     }
 
@@ -31,7 +31,7 @@ export class NotificationsListener {
         await this.subscriber.connect()
     }
 
-    async onNotification(notification: PgParsedNotification) {
+    async onNotification(notification: PgParsedNotification, config: Config) {
         try {
             const targetConfig = dbNotificationConfigs.find(cfg => cfg.channel === notification.channel)
             if(!targetConfig){
@@ -39,8 +39,8 @@ export class NotificationsListener {
                 return
             }
 
-            await targetConfig.handler(notification)
-        } catch(e) {
+            await targetConfig.handler(notification, config)
+        } catch(e) { 
             logger.error(`Error while handling Postgres notification ${JSON.stringify(notification)}.`, e)
         }
     }

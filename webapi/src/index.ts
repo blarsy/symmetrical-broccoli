@@ -93,6 +93,13 @@ const launchJobWorker = async (connectionString: string, version: string) => {
                         WHERE created < to_timestamp(extract(epoch from now() - interval '${daysOfLogToKeep} day'));`, connectionString, 'Running client logs cleanup')
                 }, 'cleanOldClientLogs')
             },
+            cleanOldNotifications: async () => {
+                const daysOfNotificationsToKeep = 5
+                executeJob(async () => {
+                    await runAndLog(`DELETE FROM sb.notifications
+                        WHERE created < to_timestamp(extract(epoch from now() - interval '${daysOfNotificationsToKeep} day'));`, connectionString, 'Running notifications cleanup')
+                }, 'cleanOldClientLogs')
+            },
             sendSummaries: async () => {
                 executeJob(() => sendSummaries(connectionString, version), 'sendSummaries')
             }

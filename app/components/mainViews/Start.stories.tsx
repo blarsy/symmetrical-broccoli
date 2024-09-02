@@ -15,8 +15,7 @@ const meta: Meta<typeof StartApolloWrapped> = {
     paperProviderDecorator,
     statusBarCompensatorDecorator,
     appContextDecorator(true),
-    configDayjsDecorator,
-    apolloClientMocksDecorator([])
+    configDayjsDecorator
   ]
 }
 
@@ -37,7 +36,7 @@ const simpleStartApolloQueries = [{
     result: {
         getMinimumClientVersion: '0.0.4'
     }
-}, queryMocks.searchResult]
+}, queryMocks.searchResultWithoutLocation]
 
 export default meta
 
@@ -83,7 +82,9 @@ export const Outdated: Story = {
               name: 'Super artisan',
               avatarPublicId: '',
               activated: new Date(),
-              logLevel: 2
+              logLevel: 2,
+              numberOfUnreadNotifications: 2,
+              unreadConversations: [1, 2]
           }
         }}))
         return client

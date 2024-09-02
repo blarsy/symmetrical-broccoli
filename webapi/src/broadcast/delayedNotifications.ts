@@ -250,16 +250,18 @@ const getNewResourcesSummaryData = async (connectionString: string): Promise<New
         notified.id as notifiedid, 
         notified.language,
         notified.email as notifiedemail
-    FROM sb.resources r
+	FROM sb.notifications n
+	INNER JOIN sb.resources r ON n.data::json->'resource_id' IS NOT NULL AND r.id = (n.data::json->>'resource_id')::integer
     INNER JOIN sb.accounts author ON author.id = r.account_id
-    INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2
+    INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id
     INNER JOIN sb.accounts notified ON notified.id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
-        r.created > NOW() - interval '1 day' * bp.days_between_summaries AND
+        n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
         author.id <> notified.id AND
-        notified.email IS NOT NULL
+        notified.email IS NOT NULL AND
+		n.read IS NULL
     ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, connectionString, `Querying new resources to notify`)
 
     const resourcesSummaryData = {} as NewResourcesSummaryData

@@ -1,23 +1,31 @@
 import { createContext, useState } from "react"
-import { Category, Resource, fromServerGraphResources } from "@/lib/schema"
+import { Category, Location, Resource, fromServerGraphResources } from "@/lib/schema"
 import React from "react"
-import { gql, useLazyQuery } from "@apollo/client"
+import { gql, useMutation } from "@apollo/client"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { t } from "@/i18n"
+import { MAX_DISTANCE } from "@/lib/utils"
 
 export interface SearchOptions {
-    isProduct: boolean
-    isService: boolean
-    canBeTakenAway: boolean
-    canBeDelivered: boolean
-    canBeExchanged: boolean
-    canBeGifted: boolean
+  isProduct: boolean
+  isService: boolean
+  canBeTakenAway: boolean
+  canBeDelivered: boolean
+  canBeExchanged: boolean
+  canBeGifted: boolean
+}
+
+export interface LocationSearchOptions {
+  excludeUnlocated: boolean
+  referenceLocation?: Location
+  distanceToReferenceLocation: number
 }
 
 export interface SearchFilterState {
     search: string
     categories: Category[]
     options: SearchOptions
+    location: LocationSearchOptions
 }
 
 interface SearchFilterActions {
@@ -35,56 +43,54 @@ interface Props {
     children: JSX.Element
 }
 
-const blankSearchFilter: SearchFilterState = { categories: [], options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }
+const blankSearchFilter: SearchFilterState = { 
+  categories: [], 
+  options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, 
+  search: '',
+  location: { distanceToReferenceLocation: MAX_DISTANCE, excludeUnlocated: false }
+}
 
-export const SUGGESTED_RESOURCES = gql`query SuggestedResources($searchTerm: String, $isService: Boolean, $isProduct: Boolean, $categoryCodes: [String], $canBeTakenAway: Boolean, $canBeGifted: Boolean, $canBeExchanged: Boolean, $canBeDelivered: Boolean) {
-    suggestedResources(
-      searchTerm: $searchTerm
-      canBeDelivered: $canBeDelivered
-      canBeExchanged: $canBeExchanged
-      canBeGifted: $canBeGifted
-      canBeTakenAway: $canBeTakenAway
-      isProduct: $isProduct
-      isService: $isService
-      categoryCodes: $categoryCodes
-    ) {
-      nodes {
-        accountByAccountId {
-          name
-          id
-        }
-        created
-        description
-        title
-        canBeExchanged
-        canBeGifted
-        resourcesImagesByResourceId {
-          nodes {
-            imageByImageId {
-              publicId
-            }
-          }
-        }
-        expiration
-        isProduct
-        isService
+export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [String], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
+  suggestedResources(
+    input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm}
+  ) {
+    resources {
+      accountByAccountId {
+        name
         id
-        canBeTakenAway
-        canBeDelivered
-        resourcesResourceCategoriesByResourceId {
-          nodes {
-            resourceCategoryCode
+      }
+      created
+      description
+      title
+      canBeExchanged
+      canBeGifted
+      resourcesImagesByResourceId {
+        nodes {
+          imageByImageId {
+            publicId
           }
-        }
-        locationBySpecificLocationId {
-          address
-          id
-          latitude
-          longitude
         }
       }
+      expiration
+      isProduct
+      isService
+      id
+      canBeTakenAway
+      canBeDelivered
+      resourcesResourceCategoriesByResourceId {
+        nodes {
+          resourceCategoryCode
+        }
+      }
+      locationBySpecificLocationId {
+        address
+        id
+        latitude
+        longitude
+      }
     }
-  }`
+  }
+}`
 
 export const SearchFilterContext = createContext<SearchFilterContext>({
     filter: blankSearchFilter, 
@@ -98,11 +104,7 @@ export const SearchFilterContext = createContext<SearchFilterContext>({
 const SearchFilterContextProvider = ({ children }: Props) => {
     const [searchFilterState, setSearchFilterState] = useState(blankSearchFilter)
     const [searchResults, setSearchResults] = useState(initial(true, [] as Resource[]))
-    const [getSuggestedResources] = useLazyQuery(SUGGESTED_RESOURCES, { variables: {
-        categoryCodes: searchFilterState.categories.map(cat => cat.code.toString()),
-        searchTerm: searchFilterState.search,
-        ...searchFilterState.options
-    } })
+    const [suggestResources] = useMutation(SUGGEST_RESOURCES)
 
     const actions: SearchFilterActions = {
         setSearchFilter: async newFilter => {
@@ -111,12 +113,16 @@ const SearchFilterContextProvider = ({ children }: Props) => {
         requery: async (categories: Category[]) => {
             setSearchResults(initial(true, [] as Resource[]))
             try {
-                const res = await getSuggestedResources({ variables: {
+                const res = await suggestResources({ variables: {
                     categoryCodes: searchFilterState.categories.map(cat => cat.code.toString()),
                     searchTerm: searchFilterState.search,
-                    ...searchFilterState.options
+                    ...searchFilterState.options,
+                    excludeUnlocated: searchFilterState.location?.excludeUnlocated,
+                    referenceLocationLatitude: (searchFilterState.location && searchFilterState.location.referenceLocation) ? searchFilterState.location.referenceLocation.latitude : 0,
+                    referenceLocationLongitude: (searchFilterState.location && searchFilterState.location.referenceLocation) ? searchFilterState.location?.referenceLocation.longitude : 0,
+                    distanceToReferenceLocation: searchFilterState.location?.distanceToReferenceLocation
                 }})
-                setSearchResults(fromData(fromServerGraphResources(res.data.suggestedResources.nodes, categories)))
+                setSearchResults(fromData(fromServerGraphResources(res.data.suggestedResources.resources, categories)))
             }
             catch(e) {
                 setSearchResults(fromError(e, t('requestError')))

@@ -14,23 +14,29 @@ export interface IAppState {
     account?: AccountInfo
     apolloClient?: ApolloClient<NormalizedCacheObject>
     chatMessagesSubscription?: { unsubscribe: () => void }
-    numberOfUnread: number
+    notificationSubscription?: { unsubscribe: () => void }
+    unreadConversations: number[]
     categories: DataLoadState<Category[]>
     lastNotification?: AppNotification
     newChatMessage: any
     connecting: { message: string, subMessage: string, onConnected: () => void } | undefined
     messageReceivedHandler: ((msg: any) => void) | undefined
+    notificationReceivedHandler: (() => void) | undefined
     lastConversationChangeTimestamp: number
+    numberOfUnreadNotifications: number
 }
 
 const initialAppState = { 
-    numberOfUnread: 0,
+    unreadConversations: [],
+    numberOfUnreadNotifications: 0,
     apolloClient: getApolloClient(''),
     categories: initial<Category[]>(true, []),
     chatMessagesSubscription: undefined,
+    notificationSubscription: undefined,
     connecting: undefined,
     newChatMessage: undefined,
     messageReceivedHandler: undefined,
+    notificationReceivedHandler: undefined,
     account: undefined,
     lastNotification: undefined,
     lastConversationChangeTimestamp: new Date().valueOf()
@@ -45,9 +51,12 @@ export enum AppReducerActionType {
   ClearNotification,
   SetCategoriesState,
   SetMessageReceivedHandler,
+  SetNewNotificationHandler,
   SetNewChatMessage,
   SetConnectingStatus,
-  SetConversationsStale
+  SetConversationRead,
+  NotificationReceived,
+  NotificationsRead
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
@@ -55,9 +64,18 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.SetAuthToken:
           return {...previousState, ...{ token: action.payload }}
         case AppReducerActionType.Login:
-          return {...previousState, ...{ account: action.payload.account, chatMessagesSubscription: action.payload.subscription, connecting: undefined, apolloClient: action.payload.apolloClient }}
+          return {...previousState, ...{ account: action.payload.account, 
+              chatMessagesSubscription: action.payload.chatMessagesSubscription, connecting: undefined, 
+              apolloClient: action.payload.apolloClient, 
+              notificationSubscription: action.payload.notificationSubscription,
+              unreadConversations: action.payload.account.unreadConversations,
+              numberOfUnreadNotifications: action.payload.account.numberOfUnreadNotifications
+            }}
         case AppReducerActionType.Logout:
-          return {...previousState, ...{ token: '', account: undefined, chatMessagesSubscription: undefined, overrideMessageReceived: [] }}
+          return {...previousState, ...{ token: '', account: undefined, 
+              chatMessagesSubscription: undefined, notificationSubscription: undefined,
+              unreadConversations: [], numberOfUnreadNotifications: 0
+            }}
         case AppReducerActionType.UpdateAccount:
           return { ...previousState, ...{ account: action.payload } }
         case AppReducerActionType.DisplayNotification:
@@ -68,19 +86,43 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
           return { ...previousState, ...{ categories: action.payload } }
         case AppReducerActionType.SetMessageReceivedHandler:
           return { ...previousState, ...{ messageReceivedHandler: action.payload.messageReceivedHandler } }
+        case AppReducerActionType.SetNewNotificationHandler:
+          return { ...previousState, ...{ notificationReceivedHandler: action.payload.handler } }
         case AppReducerActionType.SetNewChatMessage:
-          if(action.payload && previousState.messageReceivedHandler) {
-            previousState.messageReceivedHandler(action.payload)
-            return { ...previousState, ...{ lastConversationChangeTimestamp: new Date().valueOf() } }
-          } else if(action.payload) {
-            return { ...previousState, ...{ newChatMessage: action.payload, lastConversationChangeTimestamp: new Date().valueOf() } }
-          } else {
+          if (!action.payload) {
             return { ...previousState, ...{ newChatMessage: undefined } }
           }
+          const newState: any = { 
+            lastConversationChangeTimestamp: new Date().valueOf(), 
+            newChatMessage: action.payload 
+          }
+          
+          if(action.payload) {
+            const participantId = action.payload.participantByParticipantId?.id
+            if(!previousState.unreadConversations.includes(participantId)) {
+              newState.unreadConversations = [ ...previousState.unreadConversations, participantId ]
+            }
+
+            if(previousState.messageReceivedHandler) {
+              previousState.messageReceivedHandler(action.payload)
+            }
+          }
+
+          return { ...previousState, ...newState }
+        case AppReducerActionType.NotificationReceived:
+          if(previousState.notificationReceivedHandler) {
+            previousState.notificationReceivedHandler()
+          }
+          return { ...previousState, ...{ numberOfUnreadNotifications: previousState.numberOfUnreadNotifications + 1 } }
+        case AppReducerActionType.NotificationsRead:
+          return { ...previousState, ...{ numberOfUnreadNotifications: 0 } }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload } }
-        case AppReducerActionType.SetConversationsStale:
-          return { ...previousState, ...{ lastConversationChangeTimestamp: new Date().valueOf() } }
+        case AppReducerActionType.SetConversationRead:
+          return { ...previousState, ...{ 
+            lastConversationChangeTimestamp: new Date().valueOf(), 
+            unreadConversations: previousState.unreadConversations.filter(val => val != action.payload)
+          } }
         default:
           throw new Error(`Unexpected reducer action type ${action.type}`)
     }

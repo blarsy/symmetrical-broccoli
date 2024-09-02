@@ -50,7 +50,7 @@ const oneImage = [
   }
 ]
 
-const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true) => ({
+const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true, hasAddress: boolean = false) => ({
     resourceById: {
         canBeDelivered: true,
         canBeExchanged: true,
@@ -80,7 +80,13 @@ const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true) 
             {
                 resourceCategoryCode: 'cat4'
             }]
-        }
+        },
+        locationBySpecificLocationId: hasAddress ? {
+          address: 'Rue de la resource, 123',
+          latitude: 50,
+          longitude: 3,
+          id: 1
+        }: null
     }
 })
 
@@ -113,14 +119,27 @@ export const SingleImageView: Story = {
 }
 
 export const DeletedView: Story = {
-    name: 'View deleted resource',
+  name: 'View deleted resource',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: GET_RESOURCE,
+      variables: {
+        id: 1
+      },
+      result: simpleResource(true)
+    }])
+  ],
+  args: initialArgs
+}
+export const WithSpecificAddress: Story = {
+    name: 'View resource with an address',
     decorators: [
       apolloClientMocksDecorator([ { 
         query: GET_RESOURCE,
         variables: {
           id: 1
         },
-        result: simpleResource(true)
+        result: simpleResource(true,false, true)
       }])
     ],
     args: initialArgs

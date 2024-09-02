@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import { apolloClientMocksDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Account, { GET_ACCOUNT } from './Account'
 
 const accountId = 1
 
-const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false, noLogo: boolean = false) => {
+const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false, noLogo: boolean = false, withAddress: boolean = true, longContent: boolean = false) => {
     let links = [] as any[]
 
     if(!noLinks) {
@@ -50,6 +50,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 canBeExchanged: true,
                 canBeGifted: false,
                 title: 'Ressource 1',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -64,12 +65,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }, {
                 id: 2,
                 canBeExchanged: false,
                 canBeGifted: true,
                 title: 'Ressource 2',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -82,12 +85,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }, {
                 id: 3,
                 canBeExchanged: true,
                 canBeGifted: true,
                 title: 'Ressource 3',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -100,12 +105,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }, {
                 id: 4,
                 canBeExchanged: true,
                 canBeGifted: true,
                 title: 'Ressource 4',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -118,12 +125,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }, {
                 id: 5,
                 canBeExchanged: true,
                 canBeGifted: true,
                 title: 'Ressource 5',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -136,12 +145,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }, {
                 id: 6,
                 canBeExchanged: true,
                 canBeGifted: true,
                 title: 'Ressource 6',
+                expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
                 resourcesImagesByResourceId: {
                     nodes: [{
                         imageByImageId: {
@@ -154,7 +165,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountByAccountId: {
                     id: accountId
-                }
+                },
+                deleted: null
             }
         ]
     }
@@ -168,7 +180,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
             accountById: {
                 id: 2,
                 email: 'me@me.com',
-                name: 'Artisan trop super',
+                name: longContent ? 'Artisan trop super mais alors!' : 'Artisan trop super',
                 resourcesByAccountId: {
                     nodes: resources
                 },
@@ -177,7 +189,13 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 },
                 accountsLinksByAccountId: {
                     nodes: links
-                }
+                },
+                locationByLocationId: withAddress ? {
+                    address: 'Rue Tripoli, 3',
+                    id: 2,
+                    longitude: 5,
+                    latitude: 48
+                } : null
             }
         }
     }
@@ -186,7 +204,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
 const meta: Meta<typeof Account> = {
   component: Account,
   decorators: [
-    paperProviderDecorator
+    paperProviderDecorator, gestureHandlerDecorator
   ]
 }
 
@@ -201,6 +219,11 @@ export const Simple: Story = {
 
 export const NoLinksNoResourceNoLogo: Story = {
     name: 'Minimum data account view',
-    decorators: [apolloClientMocksDecorator([makeGetAccountOp(true, true, true)])],
+    decorators: [apolloClientMocksDecorator([makeGetAccountOp(true, true, true, false)])],
     args: { id: 1 }
+}
+
+export const WithLongContent: Story = {
+    decorators: [apolloClientMocksDecorator([makeGetAccountOp(false, false, false, true, true)])],
+    args: { id: 1 } 
 }

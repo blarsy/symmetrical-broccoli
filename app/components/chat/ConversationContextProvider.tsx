@@ -17,7 +17,6 @@ export const asIMessage = (msg: any): IMessage => {
     user: {
         _id: msg.participantByParticipantId.accountByAccountId.id,
         name: msg.participantByParticipantId.accountByAccountId.name,
-        //avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId
     },
     image: msg.imageByImageId?.publicId,
     pending: false,
@@ -49,12 +48,16 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
           publicId
         }
         participantByParticipantId {
+          id
           accountByAccountId {
             id
             name
             imageByAvatarImageId {
               publicId
             }
+          }
+          conversationByConversationId {
+            id
           }
         }
       }
@@ -102,10 +105,13 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
     created
     deleted
   }
-}`
+}
+`
 
 export interface ConversationState {
     conversation: DataLoadState<{ 
+      id: number,
+      participantId: number,
       messages: IMessage[], 
       resource?: Resource, 
       otherAccount: { id: number, name: string } 
@@ -130,6 +136,8 @@ interface Props {
 
 const blankState: ConversationState = {
   conversation: initial(true, {
+    id: 0,
+    participantId: 0,
     messages: [],
     resource: undefined, 
     otherAccount: { id: 0, name: '', avatarPublicId: '' },
@@ -159,6 +167,12 @@ const ConversationContextProvider = ({ children }: Props) => {
               const loadedMessages = asIMessages(res.data.conversationMessages.edges)
               setConversationState(prevValue => ({ ...prevValue, ...{ 
                 conversation: fromData({ 
+                  id: res.data.conversationMessages.edges.length > 0 ? 
+                    res.data.conversationMessages.edges[0].node.participantByParticipantId.conversationByConversationId.id :
+                    -1,
+                  participantId: res.data.conversationMessages.edges.length > 0 ? 
+                  res.data.conversationMessages.edges[0].node.participantByParticipantId.id :
+                  -1,
                   messages: loadedMessages,
                   otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name, avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId },
                   resource: fromServerGraphResource(res.data.resourceById, categories),
@@ -193,6 +207,8 @@ const ConversationContextProvider = ({ children }: Props) => {
     
               setConversationState(prevValue => ({ ...prevValue, ...{ 
                 conversation: fromData({ 
+                  id: prevValue.conversation.data!.id,
+                  participantId: prevValue.conversation.data!.participantId,
                   messages: [...prevValue.conversation.data!.messages, ...nextMessages],
                   otherAccount: prevValue.conversation.data!.otherAccount,
                   resource: prevValue.conversation.data!.resource,

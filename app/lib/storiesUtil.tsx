@@ -46,9 +46,10 @@ const defaultResourceCategories = [
 ]
 
 const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
-    newChatMessage: '', categories: fromData(defaultResourceCategories), numberOfUnread: 0, account, 
+    newChatMessage: '', categories: fromData(defaultResourceCategories), account, numberOfUnreadNotifications: 0,
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
-    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined }}>
+    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined, unreadConversations: [],
+    notificationReceivedHandler: undefined }}>
     <StoryElement />
 </AppContextProvider>
 
@@ -94,15 +95,17 @@ export interface GraphQlOp {
 }
 
 export const apolloClientMocksDecorator = (ops: GraphQlOp[]) => 
-    (Story: React.ElementType) => <MockedProvider mocks={
-        ops.map(op => ({
-            delay: 2000,
-            request: { query: op.query, variables: op.variables },
-            result: { data: op.result }
-        } as MockedResponse<any, any>))
-    }>
-        <Story />
-</MockedProvider>
+    (Story: React.ElementType) => {
+        return <MockedProvider mocks={
+            ops.map(op => ({
+                delay: 2000,
+                request: { query: op.query, variables: op.variables },
+                result: { data: op.result }
+            } as MockedResponse<any, any>))
+        }>
+            <Story />
+        </MockedProvider>
+    }
 
 export const configDayjsDecorator = (Story: React.ElementType) => {
     dayjs.extend(relativeTime)

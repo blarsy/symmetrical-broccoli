@@ -16,6 +16,8 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       avatarPublicId
       activated
       logLevel
+      unreadConversations
+      numberOfUnreadNotifications
     }
   }`
 
@@ -24,6 +26,19 @@ export const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
       integer
     }
   }`
+
+export const NOTFICATION_RECEIVED = gql`subscription NotificationSubscription {
+  notificationReceived {
+    event
+    notification {
+      data
+      id
+      created
+      read
+    }
+  }
+}`
+
 export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     messageReceived {
         event
@@ -70,7 +85,9 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
             name: res.data.getSessionData.name, 
             email: res.data.getSessionData.email, 
             avatarPublicId: res.data.getSessionData.avatarPublicId,
-            activated: res.data.getSessionData.activated
+            activated: res.data.getSessionData.activated,
+            unreadConversations: res.data.getSessionData.unreadConversations,
+            numberOfUnreadNotifications: res.data.getSessionData.numberOfUnreadNotifications
         }
     
         await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
@@ -81,11 +98,20 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
         registerForPushNotificationsAsync().then(token => {
             client.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
         })
-        const subscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
+        const messageSubscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
             debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
             appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
         } })
-        appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, chatMessagesSubscription: subscription} })
+        const notificationSubscription = client.subscribe({ query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
+            debug({ message: `Received in-app notification notification: ${payload.data.notificationReceived.notification}` })
+            appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
+        } })
+        
+        appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, 
+            chatMessagesSubscription: messageSubscription, notificationSubscription,
+            numberOfUnreadNotifications: account.numberOfUnreadNotifications,
+            unreadConversations: account.unreadConversations
+        } })
 
         info({ message: `Logged in with session: ${JSON.stringify(account)}` })
     }
@@ -93,6 +119,7 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
     const logout = async () => {
       await remove(TOKEN_KEY)
       appState.chatMessagesSubscription?.unsubscribe()
+      appState.notificationSubscription?.unsubscribe()
       appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
       info({ message: 'logged out' })
     }

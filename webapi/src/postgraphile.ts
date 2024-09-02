@@ -39,7 +39,7 @@ export default (config: Config) => {
             // Settings common to all environments
             pluginHook,
             subscriptions: true,
-            appendPlugins: [SubscriptionPlugin],
+            appendPlugins: [SubscriptionPlugin(config.version)],
             legacyRelations: "omit",
             graphqlRoute: `/graphql`,
             graphiqlRoute: `/graphiql`,

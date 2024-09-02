@@ -20,7 +20,7 @@ type Story = StoryObj<typeof DealBoard>
 export const SimpleView: Story = {
     name: 'Simple view',
     decorators: [
-      apolloClientMocksDecorator([queryMocks.searchResult, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2 ]), 
+      apolloClientMocksDecorator([queryMocks.searchResultWithoutLocation, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2, queryMocks.getNoAccountLocation ]), 
       appContextDecorator()
     ],
     args: { route: {}}
@@ -29,7 +29,7 @@ export const SimpleView: Story = {
 export const NotLoggedIn: Story = {
   name: 'not logged in',
   decorators: [
-    apolloClientMocksDecorator([queryMocks.searchResult, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2 ]), 
+    apolloClientMocksDecorator([queryMocks.searchResultWithoutLocation, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2 ]), 
     appContextDecorator(true)
   ],
   args: { route: {}}
@@ -38,7 +38,16 @@ export const NotLoggedIn: Story = {
 export const loggedInWithAccountLogo: Story = {
   name: 'Logged in, account has logo',
   decorators: [
-    apolloClientMocksDecorator([queryMocks.searchResult, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2 ]), 
+    apolloClientMocksDecorator([queryMocks.searchResultWithoutLocation, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2, queryMocks.getNoAccountLocation ]), 
+    appContextDecorator(false, false)
+  ],
+  args: { route: {}}
+}
+
+export const loggedInWithAccountAddress: Story = {
+  name: 'Logged in, account has address',
+  decorators: [
+    apolloClientMocksDecorator([queryMocks.searchResultWithDefaultAccountLocation, queryMocks.getResource1ToView, queryMocks.getResource2ToView, queryMocks.getResource3ToView, queryMocks.getAccount1, queryMocks.getAccount2, queryMocks.getAccountLocation ]), 
     appContextDecorator(false, false)
   ],
   args: { route: {}}

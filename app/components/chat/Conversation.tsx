@@ -90,7 +90,7 @@ const Conversation = ({ route }: RouteProps) => {
           resourceId: conversationContext.state.conversation.data?.resource?.id, 
           otherAccountId: conversationContext.state.conversation.data?.otherAccount.id
          } })
-         appDispatch({ type: AppReducerActionType.SetConversationsStale, payload: undefined })
+         appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.state.conversation.data?.participantId })
       }
     }, [conversationContext.state.conversation.data?.messages])
 

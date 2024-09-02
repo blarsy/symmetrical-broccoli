@@ -9,22 +9,12 @@ import EditResourceFields from "./EditResourceFields"
 import { ScrollView } from "react-native"
 import { ActivityIndicator, Portal } from "react-native-paper"
 import { ErrorSnackbar } from "../OperationFeedback"
-import { Resource, parseLocationFromGraph } from "@/lib/schema"
+import { Resource } from "@/lib/schema"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import { gql, useLazyQuery } from "@apollo/client"
+import useProfileAddress from "@/lib/useProfileAddress"
 
-export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
-    accountById(id: $id) {
-      locationByLocationId {
-        address
-        latitude
-        longitude
-        id
-      }
-    }
-}`
 
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
@@ -33,28 +23,7 @@ export default ({ route, navigation }:RouteProps) => {
     const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial<null>(false, null))
     const { ensureConnected } = useUserConnectionFunctions()
-    const [getLocation] = useLazyQuery(ACCOUNT_LOCATION)
-    const [loadingAddress, setLoadingAddress] = useState(true)
-
-    useEffect(() => {
-        const loadLocationAndReset = async () => {
-            try {
-                const res = await getLocation({ variables: { id: appContext.account!.id }, fetchPolicy: "network-only" })
-                const defaultLocation = parseLocationFromGraph(res.data.accountById.locationByLocationId)
-                
-                editResourceContext.actions.reset(defaultLocation || undefined)
-            } catch(e) {
-                appDispatch({ type: AppReducerActionType.DisplayNotification,  payload: { error: e }})
-            } finally {
-                setLoadingAddress(false)
-            }
-        }
-        if(route.params && route.params.isNew && appContext.account){
-            loadLocationAndReset()
-        } else {
-            setLoadingAddress(false)
-        }
-    }, [])
+    const { loading: loadingAddress, data: defaultLocation } = useProfileAddress()
 
     const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
@@ -68,6 +37,10 @@ export default ({ route, navigation }:RouteProps) => {
             appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e } })
         }
     }
+
+    useEffect(() => {
+        editResourceContext.actions.reset(defaultLocation || undefined)
+    },  [defaultLocation])
 
     return <ScrollView style={{ backgroundColor: '#fff' }}>
         { loadingAddress ? <ActivityIndicator /> :

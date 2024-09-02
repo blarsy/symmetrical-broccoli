@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Appbar, Icon } from "react-native-paper"
+import { Appbar, Badge, Icon } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'
@@ -98,8 +98,14 @@ const DealBoard = ({ route, navigation }: RouteProps) => {
                     activeColor={ primaryColor } inactiveColor="#000">
                     <Tab.Screen name="search" component={Search} options={{ title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }} />
                     <Tab.Screen name="resource" component={Resources} options={{ title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }} />
-                    <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <Images.Chat fill={p.color} />}} />
-                    <Tab.Screen name="notifications" component={Notifications} options={{ title: t('notifications_label'), tabBarIcon: p => <Icon source="bell" size={30} color={p.color}/>}} />
+                    <Tab.Screen name="chat" component={Chat} options={{ title: t('chat_label'), tabBarIcon: p => <>
+                        <Images.Chat fill={p.color} />
+                        { appContext.unreadConversations.length != 0 && <Badge style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadConversations.length}</Badge>}
+                    </>}} />
+                    <Tab.Screen name="notifications" component={Notifications} options={{ title: t('notifications_label'), tabBarIcon: p => <>
+                        <Icon source="bell" size={30} color={p.color}/>
+                        { appContext.numberOfUnreadNotifications != 0 && <Badge style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.numberOfUnreadNotifications}</Badge>}
+                    </>}} />
                 </Tab.Navigator>
                 <SupportModal visible={supportVisible} onDismiss={() => setSupportVisible(false)} />
             </View>
