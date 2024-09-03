@@ -114,6 +114,12 @@ module.exports = {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
+      ], 
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "$(PRODUCT_NAME) voudrait accéder à votre position pour positionner vos ressources."
+        }
       ]
     ],
     "owner": "tope_la"

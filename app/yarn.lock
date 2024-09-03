@@ -6536,6 +6536,7 @@ __metadata:
     expo-image-picker: ^14.7.1
     expo-linking: ^6.2.2
     expo-localization: ^14.8.4
+    expo-location: ^17.0.1
     expo-notifications: ^0.27.7
     expo-secure-store: ~12.8.1
     expo-splash-screen: ^0.26.4
@@ -9707,6 +9708,15 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: ae109b00428b3c4ac68619ecbad848aa9a69d0a98173cea6eb6caa57d07adc083ac04f5b4a4a43e36f6b37478f2bc4d3ac84f88f5c52cf2b913ca197a2116887
+  languageName: node
+  linkType: hard
+
+"expo-location@npm:^17.0.1":
+  version: 17.0.1
+  resolution: "expo-location@npm:17.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 1bfadaf16851cff26c14276aae7507daf159b2e62fc0c1e45c0f2288bb83be6314d55b4d4726317beff08d6582735a4b2c06cfdd4969b594a19321c735acdd1d
   languageName: node
   linkType: hard
 

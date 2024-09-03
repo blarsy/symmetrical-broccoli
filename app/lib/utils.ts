@@ -14,7 +14,7 @@ import { t } from "@/i18n"
 import { configureFonts } from "react-native-paper"
 import { useFonts } from 'expo-font'
 
-export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/^[A-Z]/)
+export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
 export interface RouteProps {
     route: any, 
