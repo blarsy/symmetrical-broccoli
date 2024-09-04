@@ -40,6 +40,7 @@ module.exports = {
     ],
     "ios": {
       "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.topela",
       "buildNumber": version,
       "config": {
@@ -99,6 +100,7 @@ module.exports = {
       "appSettings": appSettings
     },
     "plugins": [
+      "@react-native-google-signin/google-signin",
       "expo-localization",
       [
         "expo-image-picker",
@@ -119,6 +121,14 @@ module.exports = {
         "expo-location",
         {
           "locationWhenInUsePermission": "$(PRODUCT_NAME) voudrait accéder à votre position pour positionner vos ressources."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ],

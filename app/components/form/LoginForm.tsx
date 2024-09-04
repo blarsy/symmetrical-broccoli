@@ -10,6 +10,13 @@ import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes
+  } from '@react-native-google-signin/google-signin'
+
+GoogleSignin.configure()
 
 interface Props {
     toggleRegistering: () => void,
@@ -28,46 +35,62 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
-    return <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
-        email: yup.string().email(t('invalid_email')).required(t('field_required')),
-        password: yup.string().required(t('field_required'))
-    })} onSubmit={async (values) => {
-        try {
-            const res = await authenticate({variables: { email: values.email, password: values.password }})
-            if(res.data && res.data.authenticate.jwtToken) {
-                await login(res.data.authenticate.jwtToken)
-                onDone && onDone()
-            } else {
-                setAuthError(new Error('Authentication failed'))
+    return <View style={{ alignItems: 'stretch' }}>
+        <GoogleSigninButton style={{ alignSelf: 'center' }} onPress={async () => {
+            try{
+                await GoogleSignin.hasPlayServices()
+                const res = await GoogleSignin.signIn()
+                if(res.type === 'success') {
+                    //Call backend to verity google account
+                    console.log(res.data.user.id)
+                }
+            } catch (e) {
+                console.log(e)
+                setAuthError(e as Error)
             }
-        }catch(e) {
-            setAuthError(e as Error)
-        }
-    }}>
-    {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
-            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
-                onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="email" />
-            <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
-                onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="password" />
-            <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
-                loading={loading}>
-                {t('connection_label')}
-            </WhiteButton>
-            <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
-                onPress={toggleRegistering}>
-                {t('notsubscribedyet_label')}
-            </Button>                
-            <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="lock" />} 
-                onPress={toggleRecovering}>
-                {t('forgotPassword_label')}
-            </Button>
-            <Portal>
-                <ErrorSnackbar error={authError} message={authError ? t('authentication_failed') : undefined} onDismissError={() => setAuthError(undefined)} />
-            </Portal>
-        </View>)}
-    </Formik>
+        }} />
+        <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
+            email: yup.string().email(t('invalid_email')).required(t('field_required')),
+            password: yup.string().required(t('field_required'))
+        })} onSubmit={async (values) => {
+            try {
+                
+                const res = await authenticate({variables: { email: values.email, password: values.password }})
+                if(res.data && res.data.authenticate.jwtToken) {
+                    await login(res.data.authenticate.jwtToken)
+                    onDone && onDone()
+                } else {
+                    setAuthError(new Error('Authentication failed'))
+                }
+            }catch(e) {
+                setAuthError(e as Error)
+            }
+        }}>
+        {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
+                <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+                    onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="email" />
+                <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                    onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="password" />
+                <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
+                    loading={loading}>
+                    {t('connection_label')}
+                </WhiteButton>
+                <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="user-plus" />} 
+                    onPress={toggleRegistering}>
+                    {t('notsubscribedyet_label')}
+                </Button>                
+                <Button mode="text" textColor="#fff" icon={props => <Icons {...props} name="lock" />} 
+                    onPress={toggleRecovering}>
+                    {t('forgotPassword_label')}
+                </Button>
+                <Portal>
+                    <ErrorSnackbar error={authError} message={authError ? t('authentication_failed') : undefined} onDismissError={() => setAuthError(undefined)} />
+                </Portal>
+            </View>)}
+        </Formik>
+    </View>
 }
 
 export default LoginForm

@@ -12,7 +12,28 @@
           "package_name": "com.topela"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "940052967066-orqdhq7a3i23r23q8gtg123hpsvcdr4t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.topela",
+            "certificate_hash": "f6cef9380790e606c6d0daddb80993afde808a59"
+          }
+        },
+        {
+          "client_id": "940052967066-tr2mrc1gkr6hflic24bp26vtb3ch9dkn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.topela",
+            "certificate_hash": "6027a1f900d417540bd19abb02f21c00a18f5037"
+          }
+        },
+        {
+          "client_id": "940052967066-3ct1ie7kurg1alpf0dlr5fvfqckj0gqd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBN8f_2n4IqhRykn77gSNmohODTZRYL5pk"
@@ -20,7 +41,20 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "940052967066-3ct1ie7kurg1alpf0dlr5fvfqckj0gqd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "940052967066-sc7nhl39md08efgkca8i64076i5uskic.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.topela",
+                "app_store_id": "6470202780"
+              }
+            }
+          ]
         }
       }
     }
