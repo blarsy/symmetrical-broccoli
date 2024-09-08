@@ -8,10 +8,12 @@ import { gql, useMutation } from "@apollo/client"
 import { isValidPassword, } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import GoogleSignin from "./GoogleSignin"
 
 interface Props {
     toggleRegistering: () => void
     onAccountRegistered?: () => void
+    onAccountRegistrationRequired: (email: string, token: string) => void
 }
 
 const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
@@ -22,55 +24,61 @@ const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: Str
     }
 }`
 
-const RegisterForm = ({ toggleRegistering, onAccountRegistered }: Props) => {
+const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistrationRequired }: Props) => {
     const { login } = useUserConnectionFunctions()
-    const [registerAccount, { data, loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
-    return <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
-        name: yup.string().required(t('field_required')),
-        email: yup.string().email(t('invalid_email')).required(t('field_required')),
-        password: yup.string().required(t('field_required')).test({ 
-            name: 'passwordValid', 
-            message: t('password_invalid'), 
-            test: isValidPassword
-        }),
-        repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
-    })} onSubmit={async (values) => {
-        const res = await registerAccount({ variables: { email: values.email,
-            name: values.name, 
-            password: values.password,
-            language: i18n.language.substring(0, 2).toLowerCase() } })
-        if(res.data) {
-            await login(res.data.registerAccount.jwtToken)
+    const [registerAccount, { loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
+    return <>
+        <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
+            await login(jwtToken)
             onAccountRegistered && onAccountRegistered()
-        }
-    }}>
-    {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View>
-            <OrangeTextInput label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
-                onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="name" />
-            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
-                onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="email" />
-            <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
-                onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="password" />
-            <OrangeTextInput label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
-                onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
-            <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-                <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
-                    {t('ok_caption')}
-                </WhiteButton>
-                <OperationFeedback error={error} onDismissError={reset}/>
-                <WhiteButton style={{ flex: 1 }} onPress={() => {
-                    toggleRegistering()
-                }}>
-                    {t('cancel_caption')}
-                </WhiteButton>
-            </View>
-        </View>)}
-    </Formik>
+        }} />
+        <Formik initialValues={{ email: '', password: '', repeatPassword: '', name: '' }} validationSchema={yup.object().shape({
+            name: yup.string().required(t('field_required')).max(30, t('name_too_long')),
+            email: yup.string().email(t('invalid_email')).required(t('field_required')),
+            password: yup.string().required(t('field_required')).test({ 
+                name: 'passwordValid', 
+                message: t('password_invalid'), 
+                test: isValidPassword
+            }),
+            repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
+        })} onSubmit={async (values) => {
+            const res = await registerAccount({ variables: { email: values.email,
+                name: values.name, 
+                password: values.password,
+                language: i18n.language.substring(0, 2).toLowerCase() } })
+            if(res.data) {
+                await login(res.data.registerAccount.jwtToken)
+                onAccountRegistered && onAccountRegistered()
+            }
+        }}>
+        {({ handleChange, handleBlur, handleSubmit, values }) => (
+            <View>
+                <OrangeTextInput label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
+                    onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="name" />
+                <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+                    onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="email" />
+                <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                    onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="password" />
+                <OrangeTextInput label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
+                    onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
+                <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+                    <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
+                        {t('ok_caption')}
+                    </WhiteButton>
+                    <OperationFeedback error={error} onDismissError={reset}/>
+                    <WhiteButton style={{ flex: 1 }} onPress={() => {
+                        toggleRegistering()
+                    }}>
+                        {t('cancel_caption')}
+                    </WhiteButton>
+                </View>
+            </View>)}
+        </Formik>
+    </>
 }
 
 export default RegisterForm

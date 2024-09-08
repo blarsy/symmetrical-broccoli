@@ -4,7 +4,7 @@ import { Dimensions, Linking, ScrollView } from "react-native"
 import { Text } from "react-native-paper"
 import * as yup from 'yup'
 import { ErrorText, OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
-import { apiUrl, clientVersion, linksUrl, subscriptionsUrl } from "@/lib/settings"
+import { graphQlApiUrl, clientVersion, linksUrl, subscriptionsUrl, apiUrl } from "@/lib/settings"
 import ViewField from "../ViewField"
 import { t } from "@/i18n"
 import { AppContext } from "../AppContextProvider"
@@ -21,7 +21,7 @@ export default () => {
             const windowDims = Dimensions.get('window')
             const screenDims = Dimensions.get('screen')
             const supportInfo = {
-                apiUrl, subscriptionsUrl, linksUrl, clientVersion: nativeApplicationVersion || clientVersion,
+                graphQlApiUrl, apiUrl, subscriptionsUrl, linksUrl, clientVersion: nativeApplicationVersion || clientVersion,
                 windowWidth: windowDims.width.toFixed(1), windowHeight: windowDims.height.toFixed(1), screenWidth: screenDims.width.toFixed(1),
                 screenHeight: screenDims.height.toFixed(1), account: appContext.account?.id, logActivityId: activityId
             }

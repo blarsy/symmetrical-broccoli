@@ -22,6 +22,7 @@ export const getConnectionString = (config: Config) => {
 export interface RawConfig {
     backupCommand: string
     dbPassword: string
+    googleAuthAudience: string
     googleServiceAccount: string
     googlePrivateKey: string
     host: string

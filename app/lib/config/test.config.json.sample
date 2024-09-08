@@ -1,11 +1,12 @@
 {
-    "apiUrl": "https://test.tope-la.com/graphqlv0_6",
-    "subscriptionsUrl": "wss://test.tope-la.com/graphqlv0_6",
-    "linksUrl": "https://test.tope-la.com/api/link/",
+    "apiUrl": "https://test.tope-la.com/v0_8",
+    "graphQlApiUrl": "https://test.tope-la.com/v0_8/graphql",
+    "subscriptionsUrl": "wss://test.tope-la.com/v0_8/graphql",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
     "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
     "clientVersion": "0.6.0",
     "googleMapsApiKey": "<ApiKey>",
+    "googleAuthWebClienttId": "<WebClientId>",
     "diagnostic": true
 }

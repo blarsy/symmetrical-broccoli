@@ -373,6 +373,156 @@ BEGIN
 END;
 $BODY$;
 
+CREATE TABLE IF NOT EXISTS sb.google_auth_tokens
+(
+    email character varying COLLATE pg_catalog."default" NOT NULL,
+    token character varying COLLATE pg_catalog."default" NOT NULL,
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    updated timestamp with time zone NOT NULL DEFAULT now()
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS sb.google_auth_tokens
+    OWNER to sb;
+
+GRANT SELECT ON TABLE sb.google_auth_tokens TO anonymous;
+
+GRANT SELECT ON TABLE sb.google_auth_tokens TO identified_account;
+
+GRANT ALL ON TABLE sb.google_auth_tokens TO sb;
+
+CREATE OR REPLACE FUNCTION sb.update_google_auth_status(
+	email character varying,
+	token character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare account_id INTEGER;
+declare current_token character varying;
+begin
+  SELECT a.id, gat.token INTO account_id, current_token
+    FROM sb.accounts AS a
+	LEFT JOIN sb.google_auth_tokens gat ON gat.email = a.email
+    WHERE a.email = LOWER(update_google_auth_status.email);
+
+  IF account_id IS NOT NULL THEN
+    IF current_token IS NULL THEN
+		INSERT INTO sb.google_auth_tokens (email, token)
+		VALUES (update_google_auth_status.email, update_google_auth_status.token);
+	ELSE
+		UPDATE sb.google_auth_tokens gat
+		SET token = update_google_auth_status.token, updated = now()
+		WHERE gat.email = update_google_auth_status.email;
+	END IF;
+	RETURN 2;
+  ELSE
+  	IF EXISTS(SELECT * FROM sb.google_auth_tokens gat WHERE gat.email = update_google_auth_status.email) THEN
+		UPDATE sb.google_auth_tokens gat
+		SET token = update_google_auth_status.token, updated = now()
+		WHERE gat.email = update_google_auth_status.email;
+	ELSE
+		INSERT INTO sb.google_auth_tokens (email, token)
+		VALUES (update_google_auth_status.email, update_google_auth_status.token);
+	END IF;
+    RETURN 1;
+  END IF;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.update_google_auth_status(character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.update_google_auth_status(character varying, character varying) TO sb;
+
+REVOKE ALL ON FUNCTION sb.update_google_auth_status(character varying, character varying) FROM PUBLIC;
+
+ALTER TABLE IF EXISTS sb.accounts
+    ALTER COLUMN hash DROP NOT NULL;
+
+ALTER TABLE IF EXISTS sb.accounts
+    ALTER COLUMN salt DROP NOT NULL;
+
+CREATE OR REPLACE FUNCTION sb.register_account_external_auth(
+	email character varying,
+	token character varying,
+	account_name character varying,
+	language character varying)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id integer;
+BEGIN
+	IF EXISTS(SELECT *
+		FROM sb.google_auth_tokens gat
+		WHERE gat.email = LOWER(register_account_external_auth.email) AND
+			gat.token = register_account_external_auth.token) THEN
+	
+		INSERT INTO sb.accounts(name, email, language, activated)
+		VALUES (account_name, LOWER(register_account_external_auth.email), 
+			register_account_external_auth.language, now())
+		RETURNING id INTO inserted_id;
+
+		INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+		VALUES (2, inserted_id, 1);
+
+		RETURN (
+			inserted_id,
+			EXTRACT(epoch FROM now() + interval '100 day'),
+			'identified_account'
+		)::sb.jwt_token;
+	
+  	END IF;
+	RETURN NULL;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.register_account_external_auth(character varying, character varying, character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.register_account_external_auth(character varying, character varying, character varying, character varying) TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.register_account_external_auth(character varying, character varying, character varying, character varying) TO PUBLIC;
+
+CREATE OR REPLACE FUNCTION sb.authenticate_external_auth(
+	email character varying,
+	token character varying)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare account_id INTEGER;
+begin
+  select a.id into account_id
+    from sb.accounts as a
+	inner join sb.google_auth_tokens gat ON gat.email = a.email
+    where a.email = LOWER(authenticate_external_auth.email) and gat.token = authenticate_external_auth.token;
+
+  if account_id IS NOT NULL then
+    return (
+      account_id,
+      extract(epoch from now() + interval '100 day'),
+      'identified_account'
+    )::sb.jwt_token;
+  else
+    return null;
+  end if;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.authenticate_external_auth(character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying) TO anonymous;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying) TO sb;
 
 DO
 $body$

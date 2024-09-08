@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { logger } from 'react-native-logs'
-import { apiUrl, diagnostic } from "./settings"
+import { graphQlApiUrl, diagnostic } from "./settings"
 import * as Device from 'expo-device'
 import uuid from 'react-native-uuid'
 import secureStore from '@/lib/secureStore'
@@ -46,7 +46,7 @@ let globalLogger: {
 }
 
 export const setOrResetGlobalLogger = async (levelCode?: number) => {
-    const client = new ApolloClient({ uri: apiUrl, cache: new InMemoryCache() })
+    const client = new ApolloClient({ uri: graphQlApiUrl, cache: new InMemoryCache() })
 
     const currentLevelCode = await new Number(secureStore.get(LOG_LEVEL_STORE_KEY))
     if(levelCode && currentLevelCode !== levelCode) {

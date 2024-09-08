@@ -8,6 +8,7 @@ import PrimaryColoredView from "@/components/layout/PrimaryColoredView"
 import { Text } from "react-native-paper"
 import RecoveryForm from "../form/RecoveryForm"
 import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
+import RegisterExternalAuthForm from "../form/RegisterExternalAuthForm"
 
 interface ConnectProps {
     children: JSX.Element,
@@ -34,22 +35,38 @@ const ConnectContainer = ({ children, titleI18n, infoTextI18n, infoSubtextI18n }
     </PrimaryColoredView>
 } 
 
-export default function Login ({ onDone, infoTextI18n, infoSubtextI18n }: Props) {
-    const [registering, setRegistering] = useState(false)
-    const [recovering, setRecovering] = useState(false)
-    if(!registering) {
-        if(recovering) {
-            return <ConnectContainer titleI18n="recovery_page_title">
-                <RecoveryForm toggleRecovering={() => setRecovering(false)} />
-            </ConnectContainer>
-        }
-        return <ConnectContainer titleI18n="login_page_title" infoTextI18n={infoTextI18n} infoSubtextI18n={infoSubtextI18n}>
-            <LoginForm toggleRegistering={() => setRegistering(true) } toggleRecovering={() => setRecovering(true)} onDone={onDone} />
-        </ConnectContainer>
-    } else {
-        return <ConnectContainer titleI18n="register_page_title">
-            <RegisterForm toggleRegistering={() => setRegistering(false)} onAccountRegistered={onDone} />
-        </ConnectContainer>
-    }
+enum CurrentOperationEnum {
+    Login,
+    Recovery,
+    Registration,
+    ExternalAuthRegistration
+}
 
+export default function Login ({ onDone, infoTextI18n, infoSubtextI18n }: Props) {
+    const [currentOp, setCurrentOp] = useState({ stage: CurrentOperationEnum.Login, data: null as null | any})
+    switch(currentOp.stage) {
+        case CurrentOperationEnum.Login:
+            return <ConnectContainer titleI18n="login_page_title" infoTextI18n={infoTextI18n} infoSubtextI18n={infoSubtextI18n}>
+                <LoginForm toggleRegistering={() => setCurrentOp({ stage: CurrentOperationEnum.Registration, data: null }) } 
+                    toggleRecovering={() => setCurrentOp({ stage: CurrentOperationEnum.Recovery, data: null })}
+                    onDone={onDone}
+                    onAccountRegistrationRequired={(email, token) => setCurrentOp({ stage: CurrentOperationEnum.ExternalAuthRegistration, data: { email, token } })} />
+            </ConnectContainer>
+        case CurrentOperationEnum.Recovery:
+            return <ConnectContainer titleI18n="recovery_page_title">
+                <RecoveryForm toggleRecovering={() => setCurrentOp({ stage: CurrentOperationEnum.Login, data: null })} />
+            </ConnectContainer>
+        case CurrentOperationEnum.Registration:
+            return <ConnectContainer titleI18n="register_page_title">
+                <RegisterForm toggleRegistering={() => setCurrentOp({ stage: CurrentOperationEnum.Login, data: null })} 
+                onAccountRegistered={onDone} 
+                onAccountRegistrationRequired={(email, token) => setCurrentOp({ stage: CurrentOperationEnum.ExternalAuthRegistration, data: { email, token } })}/>
+            </ConnectContainer>
+        case CurrentOperationEnum.ExternalAuthRegistration:
+            return <ConnectContainer titleI18n="register_page_title">
+                <RegisterExternalAuthForm email={ currentOp.data.email } token={ currentOp.data.token } 
+                onAccountRegistered={onDone} 
+                toggleRegisteringExternalAuth={() => setCurrentOp({ stage: CurrentOperationEnum.Login, data: null })} />
+            </ConnectContainer>
+    }
 }

@@ -3,24 +3,19 @@ import { t } from "i18next"
 import { View } from "react-native"
 import React, { useState } from "react"
 import * as yup from "yup"
-import { Button, Portal } from "react-native-paper"
+import { ActivityIndicator, Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { aboveMdWidth } from "@/lib/utils"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import {
-    GoogleSignin,
-    GoogleSigninButton,
-    statusCodes
-  } from '@react-native-google-signin/google-signin'
-
-GoogleSignin.configure()
+import GoogleSignin from "./GoogleSignin"
 
 interface Props {
-    toggleRegistering: () => void,
-    toggleRecovering: () => void,
+    toggleRegistering: () => void
+    toggleRecovering: () => void
+    onAccountRegistrationRequired: (email: string, token: string) => void
     onDone?: () => void
 }
 
@@ -30,31 +25,21 @@ const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
     }
 }`
 
-const LoginForm = ({ toggleRegistering, toggleRecovering, onDone }: Props) => {
+const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegistrationRequired }: Props) => {
     const [authenticate, {loading}] = useMutation(GET_JWT)
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
     return <View style={{ alignItems: 'stretch' }}>
-        <GoogleSigninButton style={{ alignSelf: 'center' }} onPress={async () => {
-            try{
-                await GoogleSignin.hasPlayServices()
-                const res = await GoogleSignin.signIn()
-                if(res.type === 'success') {
-                    //Call backend to verity google account
-                    console.log(res.data.user.id)
-                }
-            } catch (e) {
-                console.log(e)
-                setAuthError(e as Error)
-            }
+        <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
+            await login(jwtToken)
+            onDone && onDone()
         }} />
         <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
             email: yup.string().email(t('invalid_email')).required(t('field_required')),
             password: yup.string().required(t('field_required'))
         })} onSubmit={async (values) => {
             try {
-                
                 const res = await authenticate({variables: { email: values.email, password: values.password }})
                 if(res.data && res.data.authenticate.jwtToken) {
                     await login(res.data.authenticate.jwtToken)

@@ -12,6 +12,7 @@ import { sendSummaries } from "./broadcast/delayedNotifications"
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import dayjs from "dayjs"
+import googleAuth from "./googleAuth"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -47,6 +48,8 @@ const launchPostgraphileWebApi = (config: Config) => {
             callback(new Error('Disallowed'))
         }
     }, }))
+
+    googleAuth(app, config)
 
     app.use(postgraphile(config))
     

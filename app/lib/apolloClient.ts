@@ -5,7 +5,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { createClient } from "graphql-ws"
 import { debug, info, error } from "./logger"
-import { apiUrl, subscriptionsUrl } from "./settings"
+import { graphQlApiUrl, subscriptionsUrl } from "./settings"
 import { errorToString, apolloTokenExpiredHandler } from "./utils"
 
 const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
@@ -18,7 +18,7 @@ const errorStringFromResponse = (e:ErrorResponse) => {
 }
 
 export const getApolloClient = (token: string) => {
-    const httpLink = createHttpLink({ uri: apiUrl })
+    const httpLink = createHttpLink({ uri: graphQlApiUrl })
     const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, shouldRetry: e => true, retryAttempts: 5, connectionParams: { authorization: `Bearer ${token}` } }))
     
     const authLink = setContext(async (_, { headers }) => {

@@ -249,6 +249,35 @@ type Query implements Node {
     condition: EmailActivationCondition
   ): EmailActivationsConnection
 
+  """Reads and enables pagination through a set of `GoogleAuthToken`."""
+  allGoogleAuthTokens(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `GoogleAuthToken`."""
+    orderBy: [GoogleAuthTokensOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: GoogleAuthTokenCondition
+  ): GoogleAuthTokensConnection
+
   """Reads and enables pagination through a set of `Image`."""
   allImages(
     """Only read the first `n` values of the set."""
@@ -969,8 +998,8 @@ type Account implements Node {
   id: Int!
   name: String!
   email: String
-  hash: String!
-  salt: String!
+  hash: String
+  salt: String
   recoveryCode: String
   recoveryCodeExpiration: Datetime
   created: Datetime!
@@ -3205,6 +3234,72 @@ input EmailActivationCondition {
   created: Datetime
 }
 
+"""A connection to a list of `GoogleAuthToken` values."""
+type GoogleAuthTokensConnection {
+  """A list of `GoogleAuthToken` objects."""
+  nodes: [GoogleAuthToken!]!
+
+  """
+  A list of edges which contains the `GoogleAuthToken` and cursor to aid in pagination.
+  """
+  edges: [GoogleAuthTokensEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `GoogleAuthToken` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type GoogleAuthToken {
+  email: String!
+  token: String!
+  created: Datetime!
+  updated: Datetime!
+}
+
+"""A `GoogleAuthToken` edge in the connection."""
+type GoogleAuthTokensEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GoogleAuthToken` at the end of the edge."""
+  node: GoogleAuthToken!
+}
+
+"""Methods to use when ordering `GoogleAuthToken`."""
+enum GoogleAuthTokensOrderBy {
+  NATURAL
+  EMAIL_ASC
+  EMAIL_DESC
+  TOKEN_ASC
+  TOKEN_DESC
+  CREATED_ASC
+  CREATED_DESC
+  UPDATED_ASC
+  UPDATED_DESC
+}
+
+"""
+A condition to be used against `GoogleAuthToken` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input GoogleAuthTokenCondition {
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `token` field."""
+  token: String
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+
+  """Checks for equality with the object’s `updated` field."""
+  updated: Datetime
+}
+
 """A connection to a list of `Image` values."""
 type ImagesConnection {
   """A list of `Image` objects."""
@@ -3528,6 +3623,12 @@ type Mutation {
     """
     input: AuthenticateInput!
   ): AuthenticatePayload
+  authenticateExternalAuth(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: AuthenticateExternalAuthInput!
+  ): AuthenticateExternalAuthPayload
   changePassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3624,6 +3725,12 @@ type Mutation {
     """
     input: RegisterAccountInput!
   ): RegisterAccountPayload
+  registerAccountExternalAuth(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RegisterAccountExternalAuthInput!
+  ): RegisterAccountExternalAuthPayload
   requestAccountRecovery(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3684,6 +3791,12 @@ type Mutation {
     """
     input: UpdateAccountPublicInfoInput!
   ): UpdateAccountPublicInfoPayload
+  updateGoogleAuthStatus(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateGoogleAuthStatusInput!
+  ): UpdateGoogleAuthStatusPayload
   updateResource(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3779,6 +3892,32 @@ input AuthenticateInput {
   clientMutationId: String
   email: String
   password: String
+}
+
+"""The output of our `authenticateExternalAuth` mutation."""
+type AuthenticateExternalAuthPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `authenticateExternalAuth` mutation."""
+input AuthenticateExternalAuthInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  token: String
 }
 
 """The output of our `changePassword` mutation."""
@@ -4214,6 +4353,34 @@ input RegisterAccountInput {
   language: String
 }
 
+"""The output of our `registerAccountExternalAuth` mutation."""
+type RegisterAccountExternalAuthPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  jwtToken: JwtToken
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `registerAccountExternalAuth` mutation."""
+input RegisterAccountExternalAuthInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  token: String
+  accountName: String
+  language: String
+}
+
 """The output of our `requestAccountRecovery` mutation."""
 type RequestAccountRecoveryPayload {
   """
@@ -4488,6 +4655,32 @@ input AccountLinkInput {
   url: String
   label: String
   linkTypeId: Int
+}
+
+"""The output of our `updateGoogleAuthStatus` mutation."""
+type UpdateGoogleAuthStatusPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateGoogleAuthStatus` mutation."""
+input UpdateGoogleAuthStatusInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  token: String
 }
 
 """The output of our `updateResource` mutation."""

@@ -1,5 +1,6 @@
 {
     "dbPassword": "yourdbpassword",
+    "googleAuthAudience": "yourFirebaseProjectNumber",
     "googlePrivateKey": "-----BEGIN PRIVATE KEY-----\nsomeprivatekey\n-----END PRIVATE KEY-----\n",
     "googleServiceAccount": "symbro@symbro.iam.gserviceaccount.com",
     "host": "sb_db",
