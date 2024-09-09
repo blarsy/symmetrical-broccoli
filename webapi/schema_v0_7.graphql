@@ -3659,6 +3659,12 @@ type Mutation {
     """
     input: CreateNewResourceNotificationsInput!
   ): CreateNewResourceNotificationsPayload
+  createNotification(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNotificationInput!
+  ): CreateNotificationPayload
   createNotificationsOnNewResource(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4051,6 +4057,32 @@ input CreateNewResourceNotificationsInput {
   clientMutationId: String
   resourceId: Int
   accountsToNotify: [Int]
+}
+
+"""The output of our `createNotification` mutation."""
+type CreateNotificationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `createNotification` mutation."""
+input CreateNotificationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  accountId: Int
+  data: JSON
 }
 
 """The output of our `createNotificationsOnNewResource` mutation."""

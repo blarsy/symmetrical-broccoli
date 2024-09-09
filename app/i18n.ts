@@ -172,7 +172,13 @@ const resources = {
       "exclude_unlocated_label": "Filter out resources without address",
       "max_distance_label": "Max. distance {{distance}} km",
       "logoChangedMessage": "Logo changed successfully",
-      "PleaseConnectLabel": "Please connect, first ..."
+      "PleaseConnectLabel": "Please connect, first ...",
+      "refreshButton": "Check again",
+      "editResourceButton": "Edit",
+      "wantToEditYourResourceQuestion": "This is one of your resources, you may edit it from here.",
+      "welcomeNotificationHeadline": "Welcome !",
+      "completeProcessNotificationHeadline": "Create a profile worthy of your activity",
+      "completeProcessNotificationDetails": "Add a logo, your address, links to your contents on the web, ..."
     }
   },
   fr: {
@@ -340,7 +346,13 @@ const resources = {
       "exclude_unlocated_label": "Exclure les ressources sans adresse",
       "max_distance_label": "Distance max. {{distance}} km",
       "logoChangedMessage": "Le logo a été changé",
-      "PleaseConnectLabel": "Veuillez vous connecter d'abord ..."
+      "PleaseConnectLabel": "Veuillez vous connecter d'abord ...",
+      "refreshButton": "Revérifier",
+      "editResourceButton": "Editer",
+      "wantToEditYourResourceQuestion": "Ceci est une de vos ressources. Vous pouvez la changer d'ici.",
+      "welcomeNotificationHeadline": "Bienvenue !",
+      "completeProcessNotificationHeadline": "Crée un profil digne de ton activité",
+      "completeProcessNotificationDetails": "Ajoute ton logo, l'adresse de ton activité, des liens vers tes contenus web, ..."
     }
   }
 }

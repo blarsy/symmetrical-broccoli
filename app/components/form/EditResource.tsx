@@ -39,7 +39,9 @@ export default ({ route, navigation }:RouteProps) => {
     }
 
     useEffect(() => {
-        editResourceContext.actions.reset(defaultLocation || undefined)
+        if(defaultLocation && route.params?.isNew) {
+            editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...{specificLocation: defaultLocation} })
+        }
     },  [defaultLocation])
 
     return <ScrollView style={{ backgroundColor: '#fff' }}>

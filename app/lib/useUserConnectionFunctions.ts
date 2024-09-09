@@ -75,7 +75,13 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
 
     const TOKEN_KEY = 'token'
 
-    const completeLogin = async (token: string) => {
+    const reloadAccount = async () => {
+        const token = await get(TOKEN_KEY)
+        const { account } = await loadAccount(token)
+        appDispatch({ type: AppReducerActionType.RefreshAccount, payload: account })
+    }
+
+    const loadAccount = async (token: string) => {
         const client = clientGetter ? clientGetter(token) : getApolloClient(token)
 
         const res = await client.query({ query: GET_SESSION_DATA })
@@ -89,6 +95,12 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
             unreadConversations: res.data.getSessionData.unreadConversations,
             numberOfUnreadNotifications: res.data.getSessionData.numberOfUnreadNotifications
         }
+
+        return { res, account, client }
+    }
+
+    const completeLogin = async (token: string) => {
+        const { res, account, client } = await loadAccount(token)
     
         await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
 
@@ -148,6 +160,6 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
         }
     }
 
-    return { logout, ensureConnected, tryRestoreToken, login }
+    return { logout, ensureConnected, tryRestoreToken, login, reloadAccount }
 }
 

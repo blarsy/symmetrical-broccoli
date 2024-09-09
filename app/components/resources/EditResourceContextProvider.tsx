@@ -169,7 +169,6 @@ const EditResourceContextProvider = ({ children }: Props) => {
         },
         reset: (accountLocation?: Location) => {
             const newResourceState = {...editResourceState, ...{ editedResource: blankResource, imagesToAdd: [] }}
-            
             newResourceState.editedResource.specificLocation = accountLocation || null
             setState( newResourceState )
         }

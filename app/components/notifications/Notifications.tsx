@@ -113,20 +113,44 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
 
     const load = async () => {
         if(data) {
-            const resIds = data.myNotifications.nodes.filter((rawNotif: any) => rawNotif.data?.resource_id).map((rawNotif: any) => rawNotif.data?.resource_id)
+            try {
+                let newResourceNotifs: NotificationData[] = []
+                const otherNotifs: NotificationData[] = []
 
-            if(resIds.length > 0) {
-                try {
+                const resIds = data.myNotifications.nodes.filter((rawNotif: any) => rawNotif.data?.resource_id).map((rawNotif: any) => rawNotif.data?.resource_id)
+
+                if(resIds.length > 0) {
                     const resourcesData = await getResources({ variables: { resourceIds: resIds } })
-                    setNotificationData({ loading: false, data: makeNotificationsData(data, resourcesData.data), error: undefined, refetch: refetchResourcesAndNotifications })
-                } catch(e) {
-                    setNotificationData({ loading: false, error: e as Error, refetch: refetchResourcesAndNotifications })
+                    newResourceNotifs = makeNotificationsData(data, resourcesData.data)
+                } else {
+                    setNotificationData({ loading: false, data: [], refetch: refetchResourcesAndNotifications })
                 }
-            } else {
-                setNotificationData({ loading: false, data: [], refetch: refetchResourcesAndNotifications })
+
+                data.myNotifications.nodes.forEach((rawNotification: any) => {
+                    if(rawNotification.data.info === 'COMPLETE_PROFILE') {
+                        otherNotifs.push({
+                            created: rawNotification.created, 
+                            headline1: t('welcomeNotificationHeadline'),
+                            headline2: t('completeProcessNotificationHeadline'),
+                            read: rawNotification.read,
+                            text: t('completeProcessNotificationDetails'),
+                            image: undefined,
+                            onPress: async () => {
+                                navigation.navigate('profile')
+                            }
+                        })
+                    }
+                })
+
+                const allNotifications = newResourceNotifs.concat(otherNotifs)
+                allNotifications.sort((a, b) => a.created == b.created ? 0 : (a.created > b.created ? 1 : -1))
+
+                setNotificationData({ loading: false, refetch: refetchResourcesAndNotifications, data: allNotifications })
+            } catch(e) {
+                setNotificationData({ loading: false, error: e as Error, refetch: refetchResourcesAndNotifications })
             }
         } else {
-            setNotificationData({ loading, error, refetch: refetchResourcesAndNotifications })
+            setNotificationData({ loading, error: error || resourcesError, refetch: refetchResourcesAndNotifications })
         }
     }
 

@@ -56,7 +56,8 @@ export enum AppReducerActionType {
   SetConnectingStatus,
   SetConversationRead,
   NotificationReceived,
-  NotificationsRead
+  NotificationsRead,
+  RefreshAccount
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
@@ -123,6 +124,8 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
             lastConversationChangeTimestamp: new Date().valueOf(), 
             unreadConversations: previousState.unreadConversations.filter(val => val != action.payload)
           } }
+        case AppReducerActionType.RefreshAccount:
+          return { ...previousState, account: action.payload }
         default:
           throw new Error(`Unexpected reducer action type ${action.type}`)
     }

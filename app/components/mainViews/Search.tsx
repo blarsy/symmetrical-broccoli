@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
-import { ActivityIndicator, Text, TextInput } from "react-native-paper"
+import { ActivityIndicator, IconButton, Text, TextInput } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { MAX_DISTANCE, RouteProps } from "@/lib/utils"
@@ -31,7 +31,7 @@ interface SearchBoxProps {
     value: string
 }
 const SearchBox = ({ onChange, value }: SearchBoxProps) => {
-    return <View>
+    return <View style={{ flex: 1 }}>
         <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
     </View>
 }
@@ -101,7 +101,12 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
     return loadingAddress ? 
         <ActivityIndicator /> : 
         <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
-            <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
+            <View style={{ flexDirection: 'row' }}>
+                <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
+                <IconButton style={{ margin: 2 }} icon="refresh" onPress={() => {
+                    searchFilterContext.actions.requery(appContext.categories.data!)
+                }} />
+            </View>
             <CategoriesSelect inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
                 onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} />
             <Hr />
@@ -139,7 +144,6 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 
                 error={searchFilterContext.results.error} data={searchFilterContext.results.data}
                 displayItem={(res, idx) => {
-                    
                     const resource = res as Resource
                     return <FoundResourceCard
                         key={idx} resource={resource} 

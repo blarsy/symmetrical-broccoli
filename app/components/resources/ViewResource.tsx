@@ -16,6 +16,7 @@ import { AppContext } from "../AppContextProvider"
 import Images from "@/Images"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import { EditResourceContext } from "./EditResourceContextProvider"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -68,6 +69,7 @@ const getSwiperData = (resource: Resource): ImgMetadata[] => {
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
     const appState = useContext(AppContext)
+    const editResourceContext = useContext(EditResourceContext)
     const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number(route.params.resourceId) }})
     const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const { ensureConnected } = useUserConnectionFunctions()
@@ -92,6 +94,15 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             </Banner>
             <Banner style={{ backgroundColor: lightPrimaryColor, marginBottom: 15 }} icon={p => <Icon size={25} source="timer-off-outline" />} visible={!resource.deleted && !!resource.expiration && new Date(resource.expiration) < new Date()}>
                 <Text variant="bodySmall">{t('resource_expired', { expired: dayjs(resource.expiration).format(t('dateFormat')) })}</Text>
+            </Banner>
+            <Banner style={{ backgroundColor: lightPrimaryColor, marginBottom: 15 }}
+                visible={!!(appState.account && resource.account!.id === appState.account!.id)}
+                actions={[ { label: t('editResourceButton'), onPress: () => {
+                    editResourceContext.actions.setResource(resource)
+                    navigation.goBack()
+                    navigation.navigate('editResource')
+                }} ]}>
+                <Text variant="bodySmall">{t('wantToEditYourResourceQuestion')}</Text>
             </Banner>
             { resource.images && resource.images.length > 0 && 
                 <ImagesViewer onImagePress={setFocusedImage} resource={resource} /> }

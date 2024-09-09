@@ -14,6 +14,7 @@ import ResourceCard from "./ResourceCard"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 export const RESOURCES = gql`query MyResources {
   myresources {
@@ -88,6 +89,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const [deleteResource] = useMutation(DELETE_RESOURCE)
     const [sendAgain] = useMutation(SEND_AGAIN)
     const [hideBanner, setHideBanner] = useState(false)
+    const { reloadAccount } = useUserConnectionFunctions()
 
     useEffect(() => {
       appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: undefined })
@@ -102,7 +104,10 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
 
     return <>
         <Banner visible={!!appContext.account && !appContext.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
-            actions={[ { label: t('send_activation_mail_again_button'), onPress: async () => {
+            actions={[ {
+              label: t('refreshButton'), onPress: () => {
+                reloadAccount()
+            } }, { label: t('send_activation_mail_again_button'), onPress: async () => {
                 try {
                     await sendAgain()
                 } catch(e) {
