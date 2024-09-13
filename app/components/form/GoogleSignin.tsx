@@ -76,7 +76,7 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
         }} />
         { signedInUser && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: '#fff' }} variant="bodyMedium">{signedInUser.user.email} ?</Text>
-            <IconButton iconColor="#fff" icon="logout" onPress={() => {
+            <IconButton mode="contained" containerColor="#fff" iconColor="#000" icon="logout" onPress={() => {
                 GoogleSignin.signOut()
                 setSignedInUser(null)
             }} />

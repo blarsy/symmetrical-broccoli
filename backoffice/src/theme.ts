@@ -5,10 +5,12 @@ import { lightPrimaryColor, primaryColor } from "./utils"
 const title = localFont({ src: './app/dk-magical-brush.otf' })
 const general = localFont({ src: './app/futura-std-book.otf' })
 const altGeneral = localFont({ src: './app/futura-std-heavy.otf' })
+const sugar = localFont({ src: './app/more-sugar.regular.otf' })
 export const fonts = {
   title,
   general,
-  altGeneral
+  altGeneral,
+  sugar
 }
 
 export default (dark: boolean) => createTheme({
@@ -23,7 +25,7 @@ export default (dark: boolean) => createTheme({
   },
   typography: {
     body1: { fontFamily: fonts.general.style.fontFamily },
-    body2: { fontFamily: fonts.general.style.fontFamily },
+    body2: { fontFamily: fonts.sugar.style.fontFamily },
     h1: {
       fontFamily: fonts.title.style.fontFamily,
       fontSize: '2.5rem', padding: '1.5rem 0'

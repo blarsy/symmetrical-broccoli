@@ -524,6 +524,113 @@ GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, chara
 
 GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying) TO sb;
 
+CREATE OR REPLACE FUNCTION sb.create_notification(
+	account_id integer,
+	data json)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+declare inserted_id integer;
+begin
+	INSERT INTO sb.notifications (account_id, data)
+	VALUES (create_notification.account_id, create_notification.data)
+	RETURNING id into inserted_id;
+	
+	PERFORM pg_notify('graphql:notification_account:' || account_id, json_build_object(
+		'event', 'notification_created',
+		'subject', inserted_id
+	)::text);
+	
+	RETURN 1;
+END;
+$BODY$;
+
+GRANT EXECUTE ON FUNCTION sb.create_notification(integer, json) TO sb;
+
+CREATE OR REPLACE FUNCTION sb.register_account(
+	name character varying,
+	email character varying,
+	password character varying,
+	language character varying)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare inserted_id integer;
+declare hash character varying;
+declare salt character varying;
+declare activation_code character varying;
+begin
+	IF sb.is_password_valid(register_account.password) = FALSE THEN
+		RAISE EXCEPTION 'Password invalid';
+	ELSE
+		IF EXISTS(SELECT id FROM sb.accounts a WHERE a.email = LOWER(register_account.email)) THEN
+			RAISE EXCEPTION 'Email is in use';
+		END IF;
+	END IF;
+	
+	INSERT INTO sb.accounts(
+		name, email, hash, salt, language)
+	SELECT register_account.name, LOWER(register_account.email), phs.hash, phs.salt, register_account.language
+	FROM sb.get_password_hash_salt(register_account.password) phs
+	RETURNING id INTO inserted_id;
+	
+	SELECT array_to_string(array(select substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) 
+	INTO activation_code
+	FROM generate_series(1,32)),'');
+	
+	PERFORM sb.create_notification(inserted_id, json_build_object(
+        'info', 'COMPLETE_PROFILE'
+    ));
+	
+	INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+	VALUES (2, inserted_id, 1);
+	
+	INSERT INTO sb.email_activations (account_id, email, activation_code)
+	VALUES (inserted_id, LOWER(register_account.email), activation_code);
+	
+	PERFORM sb.add_job('mailActivation', 
+		json_build_object('email', LOWER(register_account.email), 'code', activation_code, 'lang', register_account.language));
+	
+	RETURN (
+		inserted_id,
+		EXTRACT(epoch FROM now() + interval '100 day'),
+		'identified_account'
+    )::sb.jwt_token;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.register_account(character varying, character varying, character varying, character varying)
+    OWNER TO sb;
+
+CREATE OR REPLACE FUNCTION sb.top_resources(
+	)
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT *
+FROM sb.resources r
+WHERE deleted IS NULL AND expiration > NOW() AND
+(SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = r.id) > 0
+ORDER BY r.created DESC LIMIT 10;
+
+$BODY$;
+
+ALTER FUNCTION sb.top_resources()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.top_resources() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.top_resources() TO sb;
+
 DO
 $body$
 BEGIN
