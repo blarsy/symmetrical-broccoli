@@ -4,11 +4,11 @@ import React from "react"
 import * as yup from 'yup'
 import { View } from "react-native"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
-import { gql, useMutation } from "@apollo/client"
-import { isValidPassword, } from "@/lib/utils"
+import { isValidPassword } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
+import { useRegisterAccount } from "@/lib/backendFacade"
 
 interface Props {
     toggleRegistering: () => void
@@ -16,17 +16,9 @@ interface Props {
     onAccountRegistrationRequired: (email: string, token: string) => void
 }
 
-const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
-    registerAccount(
-      input: {email: $email, name: $name, password: $password, language: $language}
-    ) {
-      jwtToken
-    }
-}`
-
 const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistrationRequired }: Props) => {
     const { login } = useUserConnectionFunctions()
-    const [registerAccount, { loading, error, reset }] = useMutation(REGISTER_ACCOUNT)
+    const [registerAccount, { loading, error, reset }] = useRegisterAccount()
     return <>
         <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
             await login(jwtToken)
@@ -42,10 +34,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
             }),
             repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
         })} onSubmit={async (values) => {
-            const res = await registerAccount({ variables: { email: values.email,
-                name: values.name, 
-                password: values.password,
-                language: i18n.language.substring(0, 2).toLowerCase() } })
+            const res = await registerAccount(values.name, values.email, values.password, i18n.language.substring(0, 2).toLowerCase())
             if(res.data) {
                 await login(res.data.registerAccount.jwtToken)
                 onAccountRegistered && onAccountRegistered()
@@ -53,24 +42,24 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
         }}>
         {({ handleChange, handleBlur, handleSubmit, values }) => (
             <View>
-                <OrangeTextInput label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
+                <OrangeTextInput testID="name" label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
                     onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="name" />
-                <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+                <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                     onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="email" />
-                <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                     onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="password" />
-                <OrangeTextInput label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
+                <OrangeTextInput testID="repeatPassword" label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
                     onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
                 <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-                    <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
+                    <WhiteButton testID="ok" style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                         {t('ok_caption')}
                     </WhiteButton>
                     <OperationFeedback error={error} onDismissError={reset}/>
-                    <WhiteButton style={{ flex: 1 }} onPress={() => {
+                    <WhiteButton testID="cancel" style={{ flex: 1 }} onPress={() => {
                         toggleRegistering()
                     }}>
                         {t('cancel_caption')}

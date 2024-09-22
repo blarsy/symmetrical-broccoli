@@ -4,7 +4,7 @@ import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 import { setNotificationHandler } from 'expo-notifications'
   
-  export async function registerForPushNotificationsAsync(): Promise<string> {
+  export async function registerForPushNotificationsAsync(): Promise<string | undefined> {
     let token
   
     if (Device.isDevice && Device.brand) {
@@ -40,6 +40,6 @@ import { setNotificationHandler } from 'expo-notifications'
       
       return token.data
     } else {
-      throw new Error('Must use physical device for Push Notifications')
+      console.warn('Must use physical device for Push Notifications. So these are currently disabled.')
     }
   }

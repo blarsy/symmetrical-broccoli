@@ -17,6 +17,35 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
+  """Reads and enables pagination through a set of `AccountId`."""
+  allAccountIds(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountId`."""
+    orderBy: [AccountIdsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountIdCondition
+  ): AccountIdsConnection
+
   """Reads and enables pagination through a set of `Account`."""
   allAccounts(
     """Only read the first `n` values of the set."""
@@ -973,6 +1002,70 @@ interface Node {
   nodeId: ID!
 }
 
+"""A connection to a list of `AccountId` values."""
+type AccountIdsConnection {
+  """A list of `AccountId` objects."""
+  nodes: [AccountId!]!
+
+  """
+  A list of edges which contains the `AccountId` and cursor to aid in pagination.
+  """
+  edges: [AccountIdsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AccountId` you could get from the connection."""
+  totalCount: Int!
+}
+
+type AccountId {
+  id: Int
+}
+
+"""A `AccountId` edge in the connection."""
+type AccountIdsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AccountId` at the end of the edge."""
+  node: AccountId!
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""Methods to use when ordering `AccountId`."""
+enum AccountIdsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against `AccountId` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input AccountIdCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
 """A connection to a list of `Account` values."""
 type AccountsConnection {
   """A list of `Account` objects."""
@@ -1810,24 +1903,6 @@ type ResourcesEdge {
 
   """The `Resource` at the end of the edge."""
   node: Resource!
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
 }
 
 """Methods to use when ordering `Resource`."""
@@ -4726,9 +4801,15 @@ The root subscription type: contains realtime events you can subscribe to with t
 """
 type Subscription {
   messageReceived: MessageSubscriptionPayload
+  notificationReceived: NotificationSubscriptionPayload
 }
 
 type MessageSubscriptionPayload {
   message: Message
+  event: String
+}
+
+type NotificationSubscriptionPayload {
+  notification: Notification
   event: String
 }

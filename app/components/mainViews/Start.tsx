@@ -95,8 +95,8 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
         <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
     }
 }
-
 const theme = getTheme()
+
 export default () => {
     const appContext = useContext(AppContext)
 

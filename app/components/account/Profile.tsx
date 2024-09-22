@@ -9,27 +9,22 @@ import ChangePassword from "../form/ChangePassword"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
-import { gql, useMutation } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import PublicInfo from "./PublicInfo"
 import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
+import { GraphQlLib, useDeleteAccount } from "@/lib/backendFacade"
 
 const Tab = createMaterialBottomTabNavigator()
-
-const DELETE_ACCOUNT = gql`mutation DeleteAccount {
-    deleteAccount(input: {}) {
-        integer
-    }
-}`
 
 export default function Profile ({ route, navigation }: RouteProps) {
     const [changingPassword, setChangingPassword] = useState(false)
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [confirmedAccountDelete, setConfirmedAccountDelete] = useState(false)
     const [deleting, setDeleting] = useState(initial<null>(false, null))
-    const [deleteAccount] = useMutation(DELETE_ACCOUNT)
+    const [deleteAccount] = useDeleteAccount()
     const appDispatch = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
     const { logout } = useUserConnectionFunctions()

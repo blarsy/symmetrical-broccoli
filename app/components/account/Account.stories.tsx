@@ -220,7 +220,7 @@ export const Simple: Story = {
 export const NoLinksNoResourceNoLogo: Story = {
     name: 'Minimum data account view',
     decorators: [apolloClientMocksDecorator([makeGetAccountOp(true, true, true, false)])],
-    args: { id: 1 }
+    args: { id: 1 },
 }
 
 export const WithLongContent: Story = {

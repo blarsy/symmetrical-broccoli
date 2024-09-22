@@ -108,7 +108,9 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
             await logout()
         }
         registerForPushNotificationsAsync().then(token => {
-            client.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
+            if(token) {
+                client.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
+            }
         })
         const messageSubscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
             debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })

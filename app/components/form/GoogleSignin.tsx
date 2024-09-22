@@ -36,7 +36,7 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
     return <>
         <GoogleSigninButton style={{ alignSelf: 'center' }} onPress={async () => {
             setAuthStatus(beginOperation())
-            try{
+            try {
                 await GoogleSignin.hasPlayServices()
                 const res = await GoogleSignin.signIn()
                 

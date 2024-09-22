@@ -18,8 +18,21 @@ const errorStringFromResponse = (e:ErrorResponse) => {
 }
 
 export const getApolloClient = (token: string) => {
+    let webSocketImpl
+    if(typeof(WebSocket) === 'undefined') {
+      // This is required to run Jest tests under NodeJs
+      webSocketImpl = require('ws')
+    }
+
     const httpLink = createHttpLink({ uri: graphQlApiUrl })
-    const wsLink = new GraphQLWsLink(createClient({ url: subscriptionsUrl, shouldRetry: e => true, retryAttempts: 5, connectionParams: { authorization: `Bearer ${token}` } }))
+    const wsLink = new GraphQLWsLink(
+      createClient({ 
+        url: subscriptionsUrl,
+        shouldRetry: e => true, 
+        retryAttempts: 5, 
+        webSocketImpl,
+        connectionParams: { authorization: `Bearer ${token}` } })
+    )
     
     const authLink = setContext(async (_, { headers }) => {
       if(token) {

@@ -42,4 +42,5 @@ web_test.zip
 
 /app/ios
 /app/android
+/app/tests/sanityTests/config.ts
 *storybook.log

@@ -3,14 +3,14 @@ import { t } from "i18next"
 import { View } from "react-native"
 import React, { useState } from "react"
 import * as yup from "yup"
-import { ActivityIndicator, Button, Portal } from "react-native-paper"
+import { Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { aboveMdWidth } from "@/lib/utils"
-import { gql, useMutation } from "@apollo/client"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
+import { useAuthenticate } from "@/lib/backendFacade"
 
 interface Props {
     toggleRegistering: () => void
@@ -19,14 +19,8 @@ interface Props {
     onDone?: () => void
 }
 
-const GET_JWT = gql`mutation Authenticate($email: String, $password: String) {
-    authenticate(input: {email: $email, password: $password}) {
-        jwtToken
-    }
-}`
-
 const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegistrationRequired }: Props) => {
-    const [authenticate, {loading}] = useMutation(GET_JWT)
+    const [authenticate, {loading}] = useAuthenticate()
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
@@ -40,7 +34,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
             password: yup.string().required(t('field_required'))
         })} onSubmit={async (values) => {
             try {
-                const res = await authenticate({variables: { email: values.email, password: values.password }})
+                const res = await authenticate(values.email, values.password)
                 if(res.data && res.data.authenticate.jwtToken) {
                     await login(res.data.authenticate.jwtToken)
                     onDone && onDone()

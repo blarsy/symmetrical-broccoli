@@ -162,32 +162,6 @@ ALTER FUNCTION sb.get_resources(integer[])
     OWNER TO sb;
 GRANT EXECUTE ON FUNCTION sb.get_resources(integer[]) TO identified_account;
 
-CREATE OR REPLACE FUNCTION sb.set_notifications_read()
-    RETURNS integer
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
-BEGIN
-	UPDATE sb.notifications SET read = NOW()
-	WHERE account_id = sb.current_account_id();
-
-	PERFORM pg_notify('graphql:notification_account:' || sb.current_account_id(), json_build_object(
-		'event', 'notifications_read',
-		'subject', ''
-	)::text);
-
-	RETURN 1;
-END;
-$BODY$;
-
-ALTER FUNCTION sb.set_notifications_read()
-    OWNER TO sb;
-
-GRANT EXECUTE ON FUNCTION sb.set_notifications_read() TO identified_account;
-
-GRANT EXECUTE ON FUNCTION sb.set_notifications_read() TO sb;
-
 CREATE OR REPLACE FUNCTION sb.set_notification_read(
 	notification_id INTEGER)
     RETURNS integer
@@ -201,7 +175,7 @@ BEGIN
 
 	PERFORM pg_notify('graphql:notification_account:' || sb.current_account_id(), json_build_object(
 		'event', 'notifications_read',
-		'subject', ''
+		'subject', notification_id
 	)::text);
 
 	RETURN 1;
@@ -470,6 +444,10 @@ BEGIN
 		INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
 		VALUES (2, inserted_id, 1);
 
+		PERFORM sb.create_notification(inserted_id, json_build_object(
+			'info', 'COMPLETE_PROFILE'
+		));
+	
 		RETURN (
 			inserted_id,
 			EXTRACT(epoch FROM now() + interval '100 day'),

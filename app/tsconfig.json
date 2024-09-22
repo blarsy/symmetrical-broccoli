@@ -2,11 +2,10 @@
   "extends": "@tsconfig/react-native/tsconfig.json",
   "include": [
       "**/*.ts",
-      "**/*.tsx"
-, "components/AppContextProvider.tsx.bak"  ],
+      "**/*.tsx", "tests/jestSetup.ts" ],
   "compilerOptions": {
     "jsx": "react",
-    "types": ["node"],
+    "types": ["node", "jest"],
     "lib": ["ES2017"],
     "baseUrl": ".",                                      
     "paths": {
