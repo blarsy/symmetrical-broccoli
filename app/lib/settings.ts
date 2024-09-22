@@ -1,22 +1,11 @@
 import { isTesting } from '@/tests/util'
 import Constants from 'expo-constants'
+import testSettings from '@/lib/config/dev.config.json'
 
 let config
 
 if(isTesting()) {
-    config = {
-        apiUrl: "http://localhost:3001",
-        graphQlApiUrl: "http://localhost:3001/graphql",
-        subscriptionsUrl: "ws://localhost:3001/graphql",
-        linksUrl: "http://localhost:3002/api/link/",
-        cloudinaryCloud: "dsgfeclck",
-        cloudinaryUploadPreset: "ecibpquo",
-        cloudinaryRestUrl: "https://api.cloudinary.com/v1_1/",
-        clientVersion: "0.6.0",
-        googleMapsApiKey: "AIzaSyBfDiyPA7g9_qtda_t9foXartoC14kBoDI",
-        googleAuthWebClienttId: "940052967066-3ct1ie7kurg1alpf0dlr5fvfqckj0gqd.apps.googleusercontent.com",
-        diagnostic: true
-    }
+    config = testSettings
 } else {
     config = {
         apiUrl: Constants.expoConfig!.extra!.appSettings.apiUrl,
