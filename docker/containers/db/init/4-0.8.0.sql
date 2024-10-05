@@ -609,6 +609,13 @@ GRANT EXECUTE ON FUNCTION sb.top_resources() TO PUBLIC;
 
 GRANT EXECUTE ON FUNCTION sb.top_resources() TO sb;
 
+ALTER TABLE IF EXISTS sb.mails
+    ALTER COLUMN account_id DROP NOT NULL;
+ALTER TABLE IF EXISTS sb.mails
+    ALTER COLUMN account_id SET DEFAULT null;
+ALTER TABLE IF EXISTS sb.mails DROP CONSTRAINT IF EXISTS mails_accounts_fk;
+
+
 DO
 $body$
 BEGIN

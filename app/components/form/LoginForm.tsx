@@ -46,13 +46,13 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
             }
         }}>
         {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
-                <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+                <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                     onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="email" />
-                <OrangeTextInput label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                     onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="password" />
-                <WhiteButton style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
+                <WhiteButton testID="login" style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 
                     loading={loading}>
                     {t('connection_label')}
                 </WhiteButton>

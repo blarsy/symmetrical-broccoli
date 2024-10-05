@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from "react"
-import Main from "./Main"
+import { ReactNode, useContext, useEffect, useState } from "react"
 import React from "react"
 import i18n from '@/i18n'
 import Splash from "./Splash"
@@ -45,18 +44,15 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
     return { checkingVersion: busy, outdated }
 }
 
-const SPLASH_DELAY = 3000
-async function executeWithinMinimumDelay(promise: Promise<void>): Promise<any> {
-    return Promise.all([promise, new Promise(resolve => setTimeout(resolve, SPLASH_DELAY)) ])
-}
-
 interface Props {
     overrideSecureStore?: ISecureStore
     overrideVersionChecker?: (serverVersion: string) => boolean
     clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>
+    children: ReactNode
+    splashScreenMinimumDuration: number
 }
 
-export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker, clientGetter }: Props) => {
+export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker, clientGetter, children, splashScreenMinimumDuration }: Props) => {
     const { t } = i18n
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
@@ -67,7 +63,7 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     
     const load = async () => {
         try {
-            await executeWithinMinimumDelay(tryRestoreToken())
+            await Promise.all([tryRestoreToken(), new Promise(resolve => setTimeout(resolve, splashScreenMinimumDuration)) ])
          } finally {
             setStartingUp(false)
          }
@@ -87,22 +83,26 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
 
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
-            <Main />
-            <ErrorSnackbar error={appContext.lastNotification?.error} message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} onDismissError={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
-            <SuccessSnackbar message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} onDismissSuccess={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+            { children }
+            <ErrorSnackbar testID="startupError" error={appContext.lastNotification?.error} 
+                message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} 
+                onDismissError={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+            <SuccessSnackbar testID="startupSuccess" 
+                message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} 
+                onDismissSuccess={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
         </GestureHandlerRootView>
     } else {
-        <ErrorSnackbar error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
+        <ErrorSnackbar testID="fontLoadError" error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />
     }
 }
 const theme = getTheme()
 
-export default () => {
+export default (p: Props) => {
     const appContext = useContext(AppContext)
 
     return <ApolloProvider client={appContext.apolloClient!}>
         <Provider theme={theme}>
-            <StartApolloWrapped />
+            <StartApolloWrapped {...p}/>
         </Provider>
     </ApolloProvider>
 }

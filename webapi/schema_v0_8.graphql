@@ -1253,35 +1253,6 @@ type Account implements Node {
     condition: ClientLogCondition
   ): ClientLogsConnection!
 
-  """Reads and enables pagination through a set of `Mail`."""
-  mailByAccountId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Mail`."""
-    orderBy: [MailOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MailCondition
-  ): MailConnection!
-
   """Reads and enables pagination through a set of `Participant`."""
   participantsByAccountId(
     """Only read the first `n` values of the set."""
@@ -2780,102 +2751,6 @@ input ClientLogCondition {
   level: Int
 }
 
-"""A connection to a list of `Mail` values."""
-type MailConnection {
-  """A list of `Mail` objects."""
-  nodes: [Mail!]!
-
-  """
-  A list of edges which contains the `Mail` and cursor to aid in pagination.
-  """
-  edges: [MailEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Mail` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Mail implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  accountId: Int!
-  email: String!
-  sentFrom: String!
-  subject: String!
-  textContent: String!
-  htmlContent: String!
-  created: Datetime!
-
-  """Reads a single `Account` that is related to this `Mail`."""
-  accountByAccountId: Account
-}
-
-"""A `Mail` edge in the connection."""
-type MailEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Mail` at the end of the edge."""
-  node: Mail!
-}
-
-"""Methods to use when ordering `Mail`."""
-enum MailOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  ACCOUNT_ID_ASC
-  ACCOUNT_ID_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  SENT_FROM_ASC
-  SENT_FROM_DESC
-  SUBJECT_ASC
-  SUBJECT_DESC
-  TEXT_CONTENT_ASC
-  TEXT_CONTENT_DESC
-  HTML_CONTENT_ASC
-  HTML_CONTENT_DESC
-  CREATED_ASC
-  CREATED_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-A condition to be used against `Mail` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input MailCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `accountId` field."""
-  accountId: Int
-
-  """Checks for equality with the object’s `email` field."""
-  email: String
-
-  """Checks for equality with the object’s `sentFrom` field."""
-  sentFrom: String
-
-  """Checks for equality with the object’s `subject` field."""
-  subject: String
-
-  """Checks for equality with the object’s `textContent` field."""
-  textContent: String
-
-  """Checks for equality with the object’s `htmlContent` field."""
-  htmlContent: String
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-}
-
 """A connection to a list of `Notification` values."""
 type NotificationsConnection {
   """A list of `Notification` objects."""
@@ -3536,6 +3411,99 @@ input LocationCondition {
 
   """Checks for equality with the object’s `longitude` field."""
   longitude: BigFloat
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A connection to a list of `Mail` values."""
+type MailConnection {
+  """A list of `Mail` objects."""
+  nodes: [Mail!]!
+
+  """
+  A list of edges which contains the `Mail` and cursor to aid in pagination.
+  """
+  edges: [MailEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Mail` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Mail implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  accountId: Int
+  email: String!
+  sentFrom: String!
+  subject: String!
+  textContent: String!
+  htmlContent: String!
+  created: Datetime!
+}
+
+"""A `Mail` edge in the connection."""
+type MailEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Mail` at the end of the edge."""
+  node: Mail!
+}
+
+"""Methods to use when ordering `Mail`."""
+enum MailOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  SENT_FROM_ASC
+  SENT_FROM_DESC
+  SUBJECT_ASC
+  SUBJECT_DESC
+  TEXT_CONTENT_ASC
+  TEXT_CONTENT_DESC
+  HTML_CONTENT_ASC
+  HTML_CONTENT_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Mail` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MailCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `email` field."""
+  email: String
+
+  """Checks for equality with the object’s `sentFrom` field."""
+  sentFrom: String
+
+  """Checks for equality with the object’s `subject` field."""
+  subject: String
+
+  """Checks for equality with the object’s `textContent` field."""
+  textContent: String
+
+  """Checks for equality with the object’s `htmlContent` field."""
+  htmlContent: String
 
   """Checks for equality with the object’s `created` field."""
   created: Datetime

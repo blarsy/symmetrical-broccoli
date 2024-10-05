@@ -58,7 +58,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                     <WhiteButton testID="ok" style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                         {t('ok_caption')}
                     </WhiteButton>
-                    <OperationFeedback error={error} onDismissError={reset}/>
+                    <OperationFeedback errorTestID="registerError" successTestID="registerSuccess" error={error} onDismissError={reset}/>
                     <WhiteButton testID="cancel" style={{ flex: 1 }} onPress={() => {
                         toggleRegistering()
                     }}>

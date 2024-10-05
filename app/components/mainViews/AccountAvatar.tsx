@@ -5,26 +5,25 @@ import { t } from "i18next"
 import { Avatar } from "react-native-paper"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
-interface AccountAvatarProps {
-    account: { id: number, avatarPublicId?: string, name: string, avatarImageUrl?: string }
-    size: number
+interface AccountAvatarProps extends AvatarIconProps {
     onPress: (accountId: number) => void
 }
 
-export default ({ account, size, onPress }: AccountAvatarProps) => {
-    if(account.avatarPublicId) {
-        return <TouchableOpacity onPress={() => onPress(account.id)}>
-            <Avatar.Image size={size} source={{ uri:urlFromPublicId(account.avatarPublicId!) }} />
-        </TouchableOpacity>
-    }
-    if(account.avatarImageUrl) {
-        return <TouchableOpacity onPress={() => onPress(account.id)}>
-            <Avatar.Image size={size} source={{ uri: account.avatarImageUrl }} />
-        </TouchableOpacity>
-    }
+interface AvatarIconProps {
+    account: { id: number, avatarPublicId?: string, name: string, avatarImageUrl?: string }
+    size: number
+}
 
+export const AvatarIcon = ({ account, size }: AvatarIconProps) => {
+    if(account.avatarImageUrl || account.avatarPublicId) {
+        return <Avatar.Image size={size} source={{ uri: account.avatarPublicId ? urlFromPublicId(account.avatarPublicId!) : account.avatarImageUrl }} />
+    }
+    return <Avatar.Text size={size} label={initials(account.name || t('name_account_removed'))} 
+        style={{ backgroundColor: '#0D70E0' }} color="#000" />
+}
+
+export default ({ account, size, onPress }: AccountAvatarProps) => {
     return <TouchableOpacity onPress={() => onPress(account.id)}>
-        <Avatar.Text size={size} label={initials(account.name || t('name_account_removed'))} 
-            style={{ backgroundColor: '#0D70E0' }} color="#000" />
+        <AvatarIcon account={account} size={size} />
     </TouchableOpacity>
 }

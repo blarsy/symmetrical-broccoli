@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
 import { logger } from 'react-native-logs'
 import { graphQlApiUrl, diagnostic } from "./settings"
 import * as Device from 'expo-device'
@@ -46,7 +46,13 @@ let globalLogger: {
 }
 
 export const setOrResetGlobalLogger = async (levelCode?: number) => {
-    const client = new ApolloClient({ uri: graphQlApiUrl, cache: new InMemoryCache() })
+    let customFetch
+    if(typeof fetch === 'undefined') {
+        customFetch = require('cross-fetch')
+    }
+    
+    const httpLink = createHttpLink({ uri: graphQlApiUrl, fetch: customFetch || undefined })
+    const client = new ApolloClient({ link: httpLink , cache: new InMemoryCache() })
 
     const currentLevelCode = await new Number(secureStore.get(LOG_LEVEL_STORE_KEY))
     if(levelCode && currentLevelCode !== levelCode) {

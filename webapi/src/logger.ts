@@ -23,8 +23,8 @@ export const init = async () => {
                 format.json()
             ),
             transports: [
-                new transports.File({ filename: config.logPath + 'error.log', level: 'error' }),
-                new transports.File({ filename: config.logPath + 'combined.log' }),
+                new transports.File({ filename: config.logPath + 'error.log', level: 'error', maxsize: 5000000, maxFiles: 3 }),
+                new transports.File({ filename: config.logPath + 'combined.log', maxsize: 5000000, maxFiles: 3 }),
             ],
         })
         logger.error =  (message: string, error: any, cb?: LogCallback) => {

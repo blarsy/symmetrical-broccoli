@@ -3,5 +3,6 @@ export default {
     host: 'pgserver',
     database: 'db',
     password: 'pwd',
-    port: 5432
+    port: 5432,
+    graphQlUrl: 'http://localhost:3001/graphql'
 }

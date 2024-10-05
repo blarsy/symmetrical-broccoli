@@ -4,6 +4,7 @@ import { AccountInfo, Category } from '../lib/schema'
 import DataLoadState, { initial } from '../lib/DataLoadState'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { getApolloClient } from '@/lib/apolloClient'
+import { t } from '@/i18n'
 
 interface AppNotification {
     message?: string
@@ -78,7 +79,7 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
               unreadConversations: [], numberOfUnreadNotifications: 0, apolloClient: action.payload.apolloClient
             }}
         case AppReducerActionType.UpdateAccount:
-          return { ...previousState, ...{ account: action.payload } }
+          return { ...previousState, ...{ account: action.payload, lastNotification: { message: t('updateAccountSuccessful') } } }
         case AppReducerActionType.DisplayNotification:
           return { ...previousState, ...{ lastNotification: { error: action.payload.error, message: action.payload.message } } }
         case AppReducerActionType.ClearNotification:

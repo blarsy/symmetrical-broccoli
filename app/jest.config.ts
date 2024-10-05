@@ -1,11 +1,12 @@
 export default {
     "preset": "jest-expo",
     "verbose": true,
+    "testEnvironment": "node",
     "setupFiles": [
-        "./node_modules/@react-native-google-signin/google-signin/jest/build/jest/setup.js",
-        "./tests/jestSetup.ts"
+        "./tests/jestSetup.ts",
+        "./node_modules/@react-native-google-signin/google-signin/jest/build/jest/setup.js"
     ],
     "setupFilesAfterEnv": [
-        "@testing-library/react-native/extend-expect"
+        "./tests/jestSetupAfterEnv.ts"
     ]
 }

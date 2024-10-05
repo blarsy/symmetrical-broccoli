@@ -1,14 +1,12 @@
 import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
 import React, { useContext, useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
-import Profile from '../account/Profile'
-import DealBoard from './DealBoard'
-import { Appbar, Portal, Snackbar } from 'react-native-paper'
+import { Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
-import { adaptHeight, appBarsTitleFontSize, getLanguage } from '@/lib/utils'
+import { adaptHeight, getLanguage, RouteProps } from '@/lib/utils'
 import * as Linking from 'expo-linking'
 import { gql, useLazyQuery } from '@apollo/client'
 import { Subscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
@@ -17,16 +15,8 @@ import { debug } from '@/lib/logger'
 import { fromData, fromError } from '@/lib/DataLoadState'
 import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppContextProvider'
 import ConnectionDialog from '../ConnectionDialog'
-import useUserConnectionFunctions from '@/lib/useUserConnectionFunctions'
 
 const StackNav = createNativeStackNavigator()
-
-const getViewTitleI18n = (viewName: string) => {
-    switch (viewName) {
-        case 'profile': return 'profile_label'
-        default: return ''
-    }
-}
 
 export const GET_CATEGORIES = gql`query Categories($locale: String) {
     allResourceCategories(condition: {locale: $locale}) {
@@ -101,13 +91,20 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
             </ScrollView>
         </Snackbar>
     </Portal>
-} 
+}
 
-export default function Main () {
+interface Props {
+    screens: {
+        name: string, 
+        component: (r: RouteProps) => JSX.Element
+        options?: NativeStackNavigationOptions
+    }[]
+}
+
+export default function Main ({ screens }: Props) {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
-    const { logout } = useUserConnectionFunctions()
 
     const loadCategories = async () => {
         try {
@@ -154,27 +151,16 @@ export default function Main () {
             }, dark: false
         }}>
             <View style={{ flex: 1,alignItems: 'stretch', alignSelf: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
-                <StackNav.Navigator screenOptions={{ header: (props) =>
-                    <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
-                        <Appbar.BackAction onPress={() => props.navigation.navigate('main')} />
-                        <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} title={t(getViewTitleI18n(props.route.name))}  />
-                        <Appbar.Action icon="logout" size={appBarsTitleFontSize} color="#000" onPress={ async () => {
-                            await logout()
-                            props.navigation.reset({ routes: [
-                                {name: 'main'}
-                            ], index: 0 })
-                        }} />
-                    </Appbar.Header> }}>
-                    <StackNav.Screen name="main" component={DealBoard} key="main" options={{ headerShown: false }} />
-                    <StackNav.Screen name="profile" component={Profile} key="profile"  />
+                <StackNav.Navigator screenOptions={{ headerShown: false }}>
+                    { screens.map((screenData, idx) => <StackNav.Screen key={idx} name={screenData.name} component={screenData.component} options={screenData.options}/>) }
                 </StackNav.Navigator>
                 <ChatMessagesNotificationArea onClose={() => appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: undefined })} newMessage={appContext.newChatMessage} />
             </View>
         </NavigationContainer>
         <ConnectionDialog onCloseRequested={() => appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: undefined })} visible={!!appContext.connecting}
-                infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
-                onDone={() => {
-                    appContext.connecting?.onConnected()
-                }} />
+            infoTextI18n={appContext.connecting?.message} infoSubtextI18n={appContext.connecting?.subMessage}
+            onDone={() => {
+                appContext.connecting?.onConnected()
+            }} />
     </Container>
 }

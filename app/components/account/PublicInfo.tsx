@@ -117,7 +117,7 @@ export default () => {
                     update(newPublicInfo)
                 }} 
                 orangeBackground />
-            <OperationFeedback error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
+            <OperationFeedback errorTestID="publicInfoError" successTestID="publicInfoSuccess" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
             <EditLinkModal visible={!!editedLink} initial={editedLink} onDismiss={link => {
                 if(link) {
                     let newLinks: Link[]

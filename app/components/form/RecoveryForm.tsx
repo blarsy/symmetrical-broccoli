@@ -48,7 +48,7 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
                     {t('cancel_caption')}
                 </WhiteButton>
             </View>
-            <OperationFeedback error={error} onDismissError={reset} success={recoveryRequested} 
+            <OperationFeedback errorTestID="recoveryError" successTestID="recoverySuccess" error={error} onDismissError={reset} success={recoveryRequested} 
                 successMessage={t('recoveryRequested_message')} onDismissSuccess={toggleRecovering} />
         </View>)}
     </Formik>

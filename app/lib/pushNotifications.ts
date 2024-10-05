@@ -40,6 +40,6 @@ import { setNotificationHandler } from 'expo-notifications'
       
       return token.data
     } else {
-      console.warn('Must use physical device for Push Notifications. So these are currently disabled.')
+      //console.warn('Must use physical device for Push Notifications. So these are currently disabled.')
     }
   }

@@ -19,12 +19,18 @@ const errorStringFromResponse = (e:ErrorResponse) => {
 
 export const getApolloClient = (token: string) => {
     let webSocketImpl
-    if(typeof(WebSocket) === 'undefined') {
+    let customFetch
+    if(typeof WebSocket  === 'undefined') {
       // This is required to run Jest tests under NodeJs
-      webSocketImpl = require('ws')
+      const ws = require('ws')
+      //console.debug('ws', ws)
+      webSocketImpl = ws
+    }
+    if(typeof fetch === 'undefined') {
+      customFetch = require('cross-fetch')
     }
 
-    const httpLink = createHttpLink({ uri: graphQlApiUrl })
+    const httpLink = createHttpLink({ uri: graphQlApiUrl, fetch: customFetch || undefined })
     const wsLink = new GraphQLWsLink(
       createClient({ 
         url: subscriptionsUrl,

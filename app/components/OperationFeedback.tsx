@@ -9,12 +9,15 @@ interface Props {
     successMessage?: string
     onDismissError: () => void
     onDismissSuccess?: () => void
+    successTestID: string
+    errorTestID: string
 }
 
 interface ErrorSnackbarProps {
     message?: string
     error?: Error
     onDismissError: () => void
+    testID: string
 }
 export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarProps) => {
     useEffect(() => {
@@ -30,7 +33,7 @@ export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarP
         visible={!!message} onDismiss={onDismissError}>
             <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center' }}>
                 { error && <Tooltip title={error?.message}><Icon source="information" size={20}/></Tooltip>}
-                <Text variant="bodySmall">{message}</Text>
+                <Text variant="bodySmall" testID="errorMsg">{message}</Text>
             </View>
     </Snackbar>
 } 
@@ -38,13 +41,14 @@ export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarP
 interface SuccessSnackbarProps {
     message?: string
     onDismissSuccess: () => void
+    testID: string
 }
-export const SuccessSnackbar = ({ message, onDismissSuccess }: SuccessSnackbarProps) => <Snackbar 
+export const SuccessSnackbar = ({ message, onDismissSuccess, testID }: SuccessSnackbarProps) => <Snackbar 
     theme={{ colors: { inverseOnSurface: 'rgb(12, 19, 13)' } }} 
     icon="close" onIconPress={onDismissSuccess} 
     style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', backgroundColor: 'rgb(204, 232, 205)' }} 
     visible={!!message} onDismiss={onDismissSuccess}>
-    <Text variant="bodySmall">{message}</Text>
+    <Text testID={testID} variant="bodySmall">{message}</Text>
 </Snackbar>
 
 export const InfoSnackbar = ({ message }: { message: string}) => <Snackbar
@@ -57,10 +61,10 @@ export const InfoSnackbar = ({ message }: { message: string}) => <Snackbar
         </View>
 </Snackbar>
 
-const OperationFeedback = ({ error, success, successMessage, onDismissError, onDismissSuccess }: Props) => {
+const OperationFeedback = ({ error, success, successMessage, onDismissError, onDismissSuccess, errorTestID, successTestID }: Props) => {
     return <Portal>
-        <ErrorSnackbar error={error} message={error && t('requestError')} onDismissError={onDismissError} />
-        { success && onDismissSuccess && <SuccessSnackbar message={successMessage || t('success_message')} onDismissSuccess={onDismissSuccess} /> }
+        <ErrorSnackbar testID={errorTestID} error={error} message={error && t('requestError')} onDismissError={onDismissError} />
+        { success && onDismissSuccess && <SuccessSnackbar testID={successTestID} message={successMessage || t('success_message')} onDismissSuccess={onDismissSuccess} /> }
     </Portal>
 }
 

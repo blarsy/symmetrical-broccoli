@@ -163,7 +163,7 @@ const Conversation = ({ route }: RouteProps) => {
                       }, 400)} />
                   </View>}
               />
-              <OperationFeedback error={conversationContext.state.conversation.error || createError} onDismissError={reset} />
+              <OperationFeedback errorTestID="conversationError" successTestID="conversationSuccess" error={conversationContext.state.conversation.error || createError} onDismissError={reset} />
           </View>
           <PanZoomImage source={focusedImage} onDismess={() => setFocusedImage(undefined)} />
         </LoadedZone>

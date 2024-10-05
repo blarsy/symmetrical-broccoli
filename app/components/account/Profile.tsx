@@ -2,20 +2,19 @@ import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
-import { RouteProps, adaptToWidth, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, adaptToWidth, appBarsTitleFontSize, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
-import { Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
+import { Appbar, Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
-import { useMutation } from "@apollo/client"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import PublicInfo from "./PublicInfo"
 import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
-import { GraphQlLib, useDeleteAccount } from "@/lib/backendFacade"
+import { useDeleteAccount } from "@/lib/backendFacade"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -61,7 +60,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                         </View>
                         { deleting.loading && <ActivityIndicator /> }
                         <Portal>
-                            <ErrorSnackbar message={deleting.error ? deleting.error.message : undefined} onDismissError={() => setDeleting(initial(false, null))} />
+                            <ErrorSnackbar testID="deleteAccountError" message={deleting.error ? deleting.error.message : undefined} onDismissError={() => setDeleting(initial(false, null))} />
                         </Portal>
                     </Dialog.Content>
                     <Dialog.Actions>
@@ -88,10 +87,22 @@ export default function Profile ({ route, navigation }: RouteProps) {
         </View>
     </ScrollView>)
 
-    return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch' }}>
+    return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch'}}>
+        <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
+            <Appbar.BackAction onPress={() => navigation.navigate('main')} />
+            <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', 
+                fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} 
+                title={t('profile_label')}  />
+            <Appbar.Action testID="logout" icon="logout" size={appBarsTitleFontSize} color="#000" onPress={ async () => {
+                await logout()
+                navigation.reset({ routes: [
+                    {name: 'main'}
+                ], index: 0 })
+            }} />
+        </Appbar.Header>
         <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
             theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
-            activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }}>
+            activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }} >
             <Tab.Screen name="main" options={{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }} component={Main} />
             <Tab.Screen name="publicInfo" options={{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }} component={PublicInfo} />
             <Tab.Screen name="preferences" options={{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }} component={Preferences} />

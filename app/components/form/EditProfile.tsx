@@ -7,7 +7,7 @@ import { WhiteButton, OrangeTextInput, StyledLabel, OrangeBackedErrorText } from
 import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { Avatar, Banner } from "react-native-paper"
+import { ActivityIndicator, Avatar, Banner } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import { AccountInfo } from "@/lib/schema"
@@ -51,6 +51,8 @@ export default function EditProfile () {
         appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
 
+    if(!appContext.account) return <ActivityIndicator/>
+
     return <Formik initialValues={{ email: appContext.account!.email, 
         name: appContext.account!.name,
         avatarPublicId: appContext.account!.avatarPublicId }} validationSchema={yup.object().shape({
@@ -60,7 +62,7 @@ export default function EditProfile () {
     })} onSubmit={update}>
     {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, isValid, submitCount }) => (
         <View style={{ flex: 1, padding: 10 }}>
-            <Banner visible={newEmailMustBeActivated}>{t('newEmailMustBeActivated_message')}</Banner>
+            <Banner testID="emailChangingBanner" visible={newEmailMustBeActivated}>{t('newEmailMustBeActivated_message')}</Banner>
             <View style={{ alignItems: 'center' }}>
                 { values.avatarPublicId ? 
                     <Avatar.Image source={{ uri: urlFromPublicId(values.avatarPublicId)}} size={adaptToWidth(150, 250, 300)} /> :
@@ -78,19 +80,20 @@ export default function EditProfile () {
             }, 200)}>
                 {t('modify_logo')}
             </WhiteButton>
-            <OrangeTextInput style={{ flex: 1 }} label={<StyledLabel label={t('organization_name_label')} color="#fff"/>} textContentType="name" value={values.name}
+            <OrangeTextInput testID="name" style={{ flex: 1 }} label={<StyledLabel label={t('organization_name_label')}
+                color="#fff"/>} textContentType="name" value={values.name}
                 onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={OrangeBackedErrorText} name="name" />
-            <OrangeTextInput label={<StyledLabel label={t('email_label')} color="#fff"/>} textContentType="emailAddress" value={values.email}
+            <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} color="#fff"/>} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
             <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
                 { submitCount > 0 && !isValid && <OrangeBackedErrorText>{t('someDataInvalid')}</OrangeBackedErrorText> }
-                <WhiteButton disabled={updating} onPress={e => handleSubmit()} loading={updating}>
+                <WhiteButton testID="save" disabled={updating} onPress={e => handleSubmit()} loading={updating}>
                     {t('save_label')}
                 </WhiteButton>
             </View>
-            <OperationFeedback error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
+            <OperationFeedback errorTestID="editProfileError" successTestID="editProfileSuccess" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
         </View>)}
     </Formik>  
 }

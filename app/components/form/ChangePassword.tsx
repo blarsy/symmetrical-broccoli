@@ -74,7 +74,7 @@ export default function ChangePassword ({ onDone }: Props) {
                     {t('cancel_caption')}
                 </WhiteButton>
             </View>
-            <OperationFeedback error={error} onDismissError={reset} />
+            <OperationFeedback errorTestID="changePasswordError" successTestID="changePasswordSuccess" error={error} onDismissError={reset} />
         </View>)}
     </Formik>
 }

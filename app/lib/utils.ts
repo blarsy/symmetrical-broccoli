@@ -17,7 +17,7 @@ import { useFonts } from 'expo-font'
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
 export interface RouteProps {
-    route: any, 
+    route: { name: string }, 
     navigation: NavigationHelpers<ParamListBase>
 }
 
@@ -194,7 +194,8 @@ export const initials = (text: string) => {
 }
 
 export const versionChecker = (serverVersion: string) => {
-  //console.log('nativeApplicationVersion', 'clientVersion', nativeApplicationVersion, clientVersion, 'serverVersion', serverVersion)
+  if(nativeApplicationVersion === 'mock') return true
+
   if(nativeApplicationVersion || clientVersion)
     return compareVersions(nativeApplicationVersion || clientVersion, serverVersion) >= 0
   
