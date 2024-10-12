@@ -4,9 +4,11 @@ import { initials } from "@/lib/utils"
 import { t } from "i18next"
 import { Avatar } from "react-native-paper"
 import { TouchableOpacity } from "react-native-gesture-handler"
+import { StyleProp, ViewStyle } from "react-native"
 
 interface AccountAvatarProps extends AvatarIconProps {
     onPress: (accountId: number) => void
+    style?: StyleProp<ViewStyle>
 }
 
 interface AvatarIconProps {
@@ -22,8 +24,8 @@ export const AvatarIcon = ({ account, size }: AvatarIconProps) => {
         style={{ backgroundColor: '#0D70E0' }} color="#000" />
 }
 
-export default ({ account, size, onPress }: AccountAvatarProps) => {
-    return <TouchableOpacity onPress={() => onPress(account.id)}>
+export default ({ account, size, onPress, style }: AccountAvatarProps) => {
+    return <TouchableOpacity style={style} onPress={() => onPress(account.id)}>
         <AvatarIcon account={account} size={size} />
     </TouchableOpacity>
 }

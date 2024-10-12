@@ -67,9 +67,9 @@ export default ({ route, navigation }:RouteProps) => {
         }}>
         {formikState => {
             return <ScrollView style={{ margin: 10 }}>
-                    <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
+                <EditResourceFields formikState={formikState} processing={saveResourceState.loading} />
                 <Portal>
-                    <ErrorSnackbar error={saveResourceState.error} message={saveResourceState.error && t('requestError')} onDismissError={() => setSaveResourcestate(initial<null>(false, null))} />
+                    <ErrorSnackbar testID="resourceCreationError" error={saveResourceState.error} message={saveResourceState.error && t('requestError')} onDismissError={() => setSaveResourcestate(initial<null>(false, null))} />
                 </Portal>
             </ScrollView>
         }}

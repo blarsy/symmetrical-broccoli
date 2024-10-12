@@ -25,13 +25,13 @@ function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, 
     }
 
     return <ScrollView style={actualStyle} contentContainerStyle={contentContainerStyle}>
-    { loading && <ActivityIndicator /> }
-    { !loading && !error && <ListOf data={data} displayItem={displayItem} noDataLabel={noDataLabel} /> }
-    {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
-    { error && <View style={{ height: 60 }}>
-        <ErrorSnackbar message={error.message} onDismissError={() => {}} />
-    </View> }
-</ScrollView>
+        { loading && <ActivityIndicator /> }
+        { !loading && !error && <ListOf data={data} displayItem={displayItem} noDataLabel={noDataLabel} /> }
+        {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
+        { error && <View style={{ height: 60 }}>
+            <ErrorSnackbar testID="ListLoadError" message={error.message} onDismissError={() => {}} />
+        </View> }
+    </ScrollView>
 }
 
 export default LoadedList

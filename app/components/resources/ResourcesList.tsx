@@ -7,7 +7,7 @@ import AppendableList, { AddItemButton } from "../AppendableList"
 import { fromServerGraphResources } from "@/lib/schema"
 import { Banner, Button } from "react-native-paper"
 import { t } from "@/i18n"
-import { View } from "react-native"
+import { ScrollView, View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
@@ -123,7 +123,9 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
               onAddRequested={addRequested} onRefreshRequested={() => {
                 refetch()
               }} noDataLabel={<NoResourceYet/>}
-              contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5 }}
+              contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
+                borderColor: 'yellow', borderWidth: 0
+               }}
               displayItem={(resource, idx) => <ResourceCard key={idx} resource={resource}
                 viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
                 editRequested={() => {
@@ -132,7 +134,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 }}
               />}
           /> :
-          <View style={{ flexDirection: 'column', alignItems:'stretch', margin: 10 }}>
+          <View style={{ margin: 10, flexDirection: 'column', borderColor: 'green', borderWidth: 0, flex: 1 }}>
             <WhiteButton mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
             <NoResourceYet />
           </View>

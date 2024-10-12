@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator, statusBarCompensatorDecorator } from '@/lib/storiesUtil'
 import { GET_MINIMUM_CLIENT_VERSION, StartApolloWrapped } from './Start'
-import { GET_CATEGORIES } from './Main'
+import MainNavigator, { GET_CATEGORIES } from './MainNavigator'
 import { ISecureStore } from '@/lib/secureStore'
 import { GET_SESSION_DATA } from '@/lib/useUserConnectionFunctions'
 import { createMockClient } from 'mock-apollo-client'
@@ -48,7 +48,9 @@ export const Initial: Story = {
     apolloClientMocksDecorator(simpleStartApolloQueries)
   ],
   args: {
-    overrideVersionChecker: (serverVersion) => true
+    overrideVersionChecker: () => true,
+    splashScreenMinimumDuration: 1000,
+    children: <MainNavigator />
   }
 }
 
@@ -58,7 +60,9 @@ export const Outdated: Story = {
       apolloClientMocksDecorator(simpleStartApolloQueries)
     ],
     args: {
-      overrideVersionChecker: (serverVersion) => false
+      overrideVersionChecker: () => false,
+      splashScreenMinimumDuration: 1000,
+      children: <MainNavigator />
     }
   }
 
@@ -88,6 +92,8 @@ export const Outdated: Story = {
           }
         }}))
         return client
-      }
+      },
+      splashScreenMinimumDuration: 1000,
+      children: <MainNavigator />
     }
   }

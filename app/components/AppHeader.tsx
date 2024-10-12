@@ -40,8 +40,8 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
     const appContext = useContext(AppContext)
 
     return <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>
-        <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
         <Appbar.Action icon="help" style={{ backgroundColor: lightPrimaryColor }} size={baseHeaderButtonSize * 0.8} color="#000" onPress={onSupportScreenRequested} />
+        <Appbar.Content title={currentTabTitle} titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
         <Appbar.Action testID={appContext.account ? 'openProfile': 'openLoginScreen'} style={{ backgroundColor: appContext.account?.avatarPublicId ? 'transparent' : '#fff', height: profileButtonSize, width: profileButtonSize }} 
             icon={p => appContext.account ? <AvatarIcon account={appContext.account} size={p.size} /> : <LoginButton size={p.size} />} 
             size={ appContext.account ? profileButtonSize : baseHeaderButtonSize }

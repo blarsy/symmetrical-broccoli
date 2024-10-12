@@ -9,10 +9,7 @@ import { deleteAccount, getTestNum, simulateActivation,  } from './datastoreSetu
 import { checkAccountActivated, checkActivationEmailSent, checkAllAccountDataCreated } from './datastoreCheck'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import Start from '@/components/mainViews/Start'
-import Login from '@/components/mainViews/Login'
-import Main from '@/components/mainViews/Main'
-import AppHeader from '@/components/AppHeader'
-import Profile from '@/components/account/Profile'
+import MainNavigator from '@/components/mainViews/MainNavigator'
 import { RouteProps } from '@/lib/utils'
 import DealBoard from '@/components/mainViews/DealBoard'
 import { ISecureStore } from '@/lib/secureStore'
@@ -60,8 +57,7 @@ test('register new user', async () => {
 const EmptyComponent = () => <></>
 const Dut = (p: RouteProps) => <DealBoard {...p} tabs={[{ 
   name: 'test', 
-  component: EmptyComponent,
-  options: {} 
+  component: EmptyComponent
 }]} />
 
 let currentToken = ''
@@ -74,11 +70,7 @@ const inMemoryStore: ISecureStore = {
 test('can log in and log out to new account', async() => {
     const e = render(<AppContextProvider>
         <Start splashScreenMinimumDuration={0} overrideSecureStore={inMemoryStore}>
-            <Main screens={[{
-                    name: 'main', component: Dut
-                }, {
-                    name: 'profile', component: Profile
-                }]} />
+            <MainNavigator />
         </Start>
     </AppContextProvider>)
 

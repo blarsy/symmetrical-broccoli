@@ -8,13 +8,11 @@ import 'dayjs/locale/fr'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import Constants from 'expo-constants'
-import { errorToString, getLanguage, RouteProps } from './lib/utils'
+import { errorToString, getLanguage } from './lib/utils'
 import './lib/logger'
 import { error } from './lib/logger'
 import { AppContextProvider } from './components/AppContextProvider'
-import Main from './components/mainViews/Main'
-import Profile from './components/account/Profile'
-import DealBoard from './components/mainViews/DealBoard'
+import MainNavigator from './components/mainViews/MainNavigator'
 
 if(typeof ErrorUtils != 'undefined') {
   // ErrorUtils is not defined on web
@@ -41,11 +39,7 @@ function App() {
       <>
         <StatusBar backgroundColor={primaryColor}/>
         <Start splashScreenMinimumDuration={3000}>
-          <Main screens={[{
-            name: 'main', component: DealBoard
-          }, {
-            name: 'profile', component: Profile
-          }]} />
+          <MainNavigator />
         </Start>
       </>
   </AppContextProvider>

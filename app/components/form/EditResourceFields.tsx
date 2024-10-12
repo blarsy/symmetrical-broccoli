@@ -40,13 +40,13 @@ const EditResourceFields = ({formikState, processing}: Props) => {
                 editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
                 return editResourceContext.actions.deleteImage(img, values)
             }} />
-        <TransparentTextInput label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
+        <TransparentTextInput testID="title" label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
             onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
         <ErrorMessage component={ErrorText} name="title" />
-        <TransparentTextInput label={<StyledLabel label={t('description_label')} />} value={values.description}
+        <TransparentTextInput testID="description" label={<StyledLabel label={t('description_label')} />} value={values.description}
             onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
         <ErrorMessage component={ErrorText} name="description" />
-        <CheckboxGroup title={t('nature_label') + ' *'} onChanged={val => {
+        <CheckboxGroup testID="nature" title={t('nature_label') + ' *'} onChanged={val => {
             setFieldValue('isProduct', val.isProduct)
             setTouched({ isProduct: true })
             setFieldValue('isService', val.isService)

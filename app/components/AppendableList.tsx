@@ -16,14 +16,14 @@ interface Props {
     noDataLabel?: string | JSX.Element
 }
 
-export const AddItemButton = ({ onAddRequested }: { onAddRequested: () => void }) => 
-    <WhiteButton style={{flex: 1}} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
+export const AddItemButton = ({ onAddRequested, style }: { onAddRequested: () => void, style?: ViewStyle }) => 
+    <WhiteButton style={{flex: 1, ...style}} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
 
 function AppendableList ({ state, dataFromState, displayItem, onAddRequested, contentContainerStyle, onRefreshRequested, noDataLabel }:Props) {
-    return <View style={{ flexDirection: 'column', margin: 10, flex: 1, alignItems: 'center' }}>
-        <View style={{ display: 'flex', flexDirection: 'row', width: aboveMdWidth() ? '60%' : '80%'  }}>
-            <AddItemButton onAddRequested={onAddRequested} />
-            { onRefreshRequested && <IconButton style={{ margin: 2 }} icon="refresh" onPress={onRefreshRequested} /> }
+    return <View style={{ flexDirection: 'column', margin: 10, flex: 1, alignItems: 'stretch' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'relative'  }}>
+            <AddItemButton style={{ flexGrow: 0, flexShrink: 0, flexBasis: aboveMdWidth() ? '60%' : '70%' }} onAddRequested={onAddRequested} />
+            { onRefreshRequested && <IconButton style={{ margin: 2, position: 'absolute', right: 0 }} icon="refresh" onPress={onRefreshRequested} /> }
         </View>
         { Array.isArray(state) ? <LoadedList contentContainerStyle={contentContainerStyle} loading={false} error={undefined} data={state}
             displayItem={displayItem}/> :

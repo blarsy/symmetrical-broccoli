@@ -21,6 +21,12 @@ const initialResourceList = {
     nodes: [
       { id: 1, title: 'Super ressource', description: 'description de la super ressource' },
       { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien' },
+      { id: 3, title: 'Super ressource', description: 'description de la super ressource' },
+      { id: 4, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien' },
+      { id: 5, title: 'Super ressource', description: 'description de la super ressource' },
+      { id: 6, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien' },
+      { id: 7, title: 'Super ressource', description: 'description de la super ressource' },
+      { id: 8, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien' },
     ]
   } 
 }

@@ -1,14 +1,14 @@
-import { imgSourceFromPublicId } from "@/lib/images"
+import Images from "@/Images"
+import { IMAGE_BORDER_RADIUS, imgSourceFromPublicId } from "@/lib/images"
 import { Resource } from "@/lib/schema"
 import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import React from "react"
-import { Image } from "react-native"
+import { Image, ImageStyle, StyleProp } from "react-native"
+import { primaryColor } from "../layout/constants"
 
 interface Props {
     resource: Resource
 }
-
-const IMAGE_BORDER_RADIUS = 15
 
 const MainResourceImage = ({ resource }: Props) => {
     const size = aboveMdWidth() ? 350 :
@@ -22,6 +22,33 @@ export const SmallResourceImage = ({ resource }: Props) => {
     return <ResourceImage size={size} resource={resource} />
 }
 
+interface FlexResourceImageProps {
+    resource: Resource
+}
+
+export const FlexResourceImage = ({ resource }: FlexResourceImageProps) => {
+    const style: StyleProp<ImageStyle> = {
+        borderRadius: IMAGE_BORDER_RADIUS,
+    }
+    if(resource.images && resource.images.length > 0 && resource.images[0].publicId) {
+        const imgData = resource.images[0]
+        return <Image source={imgSourceFromPublicId(imgData.publicId!)} style={{
+            flex: 1,
+            resizeMode: 'contain',
+            aspectRatio: 1,
+            ...style
+        }} />
+    }
+
+    return <Images.Photos fill="#aaa" style={{
+        flex: 1,
+        height: '100%',
+        resizeMode: 'contain',
+        aspectRatio: 1,
+        ...style
+    }}/>
+}
+
 interface ResourceImageProps {
     resource: Resource
     size: number
@@ -32,6 +59,7 @@ export const ResourceImage = ({ resource, size }: ResourceImageProps) => {
         const imgData = resource.images[0]
         return <Image source={imgSourceFromPublicId(imgData.publicId!)} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
     }
+    //return <Images.Photos width={size} height={size} style={{ borderRadius: IMAGE_BORDER_RADIUS }}/>
     return <Image source={require('@/assets/img/placeholder.png')} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
 }
 

@@ -2,6 +2,7 @@ import { ImageSourcePropType } from "react-native"
 import { cloudinaryCloud, cloudinaryUploadPreset, cloudinaryRestUrl } from "./settings"
 import { Cloudinary } from "@cloudinary/url-gen"
 
+export const IMAGE_BORDER_RADIUS = 15
 
 const cld = new Cloudinary({
     cloud: {

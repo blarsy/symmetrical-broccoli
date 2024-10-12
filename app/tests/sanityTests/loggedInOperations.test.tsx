@@ -6,6 +6,8 @@ import { checkActivationEmailSent, checkNameOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
 import { AppContextProvider } from "@/components/AppContextProvider"
 import '@testing-library/react-native/extend-expect'
+import EditResource from "@/components/form/EditResource"
+import { AppWithSingleScreen } from "./lib"
 
 jest.useFakeTimers()
 
@@ -64,4 +66,16 @@ test('edit account data: email', async () => {
     simulateActivation(activationCode)
     
     await checkNameOnAccount(newEmail, name)
+})
+
+test.only('Create resource', async () => {
+    render(<AppWithSingleScreen component={EditResource} name="editResource" overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }} />)
+
+    await waitFor(() => expect(screen.getByTestId('title')).toBeOnTheScreen())
+
+    fireEvent.changeText(screen.getByTestId('title'), 'A title for this resource')
+    fireEvent.changeText(screen.getByTestId('description'), 'A description, potentially long.')
+    fireEvent.press(screen.getByTestId('nature:isProduct:Button'))
+    
+    screen.debug()
 })

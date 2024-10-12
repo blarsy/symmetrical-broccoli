@@ -7,6 +7,6 @@ interface Props {
     style?: StyleProp<ViewStyle>
 }
 
-export default ({ children, style }: Props) => <View style={{ backgroundColor: primaryColor, ...(style as object) }}>
+export default ({ children, style }: Props) => <View style={{ ...(style as object) }}>
     {children}
 </View>

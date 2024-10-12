@@ -9,7 +9,8 @@ import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/l
 import { View } from "react-native"
 
 GoogleSignin.configure({
-    webClientId: googleAuthWebClienttId
+    webClientId: googleAuthWebClienttId,
+    iosClientId: googleAuthWebClienttId
 })
 
 const AUTHENTICATE_GOOGLE = gql`mutation AuthenticateExternalAuth($token: String, $email: String) {

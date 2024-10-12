@@ -8,6 +8,7 @@ import { AppContext } from "../AppContextProvider"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import MainResourceImage from "./MainResourceImage"
 import { Resource } from "@/lib/schema"
+import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 
 interface ResourceCartProps {
     onPress: ((event: GestureResponderEvent) => void) | undefined,
@@ -18,10 +19,10 @@ interface ResourceCartProps {
 export default ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
     const appContext = useContext(AppContext)
     return <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 10, 
-        paddingHorizontal: 8, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
-        borderRadius: 15 }} onPress={onPress}>
+        paddingHorizontal: 5, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
+        borderRadius: IMAGE_BORDER_RADIUS }} onPress={onPress}>
         <MainResourceImage resource={resource} />
-        <View style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <View style={{ display: 'flex', flexDirection: 'column', position: 'relative', flex: 1, marginRight: 2 }}>
             <Text variant="displaySmall" style={{ color: primaryColor, alignSelf: 'flex-end', fontSize: 10 }}>{`${t('published_at')} ${dayjs(resource.created).format(t('dateFormat'))}`}</Text>
             <View style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <Text variant="displayLarge">{resource.title}</Text>
@@ -31,7 +32,7 @@ export default ({ onPress, resource, onChatOpen }: ResourceCartProps) => {
                     { resource.canBeExchanged && <Text variant="bodySmall" style={{ textTransform: 'uppercase', fontSize: 10 }}>{t('canBeExchanged_label')}</Text>}
                 </View>
             </View>
-            { (!appContext.account || resource.account!.id != appContext.account.id) && <IconButton style={{ borderRadius: 0, alignSelf: 'flex-end' }} size={15} icon={Images.Chat}
+            { (!appContext.account || resource.account!.id != appContext.account.id) && <IconButton style={{ borderRadius: 0, position: 'absolute', bottom: 5, right: 5 }} size={15} icon={Images.Chat}
                 onPress={() => onChatOpen(resource)}/> }
         </View>
     </TouchableOpacity>

@@ -8,5 +8,9 @@ export default {
     ],
     "setupFilesAfterEnv": [
         "./tests/jestSetupAfterEnv.ts"
-    ]
+    ],
+    moduleNameMapper: {
+        "\\.svg": "<rootDir>/__mocks__/svgMock.js"
+    }
+    
 }

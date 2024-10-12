@@ -11,6 +11,7 @@ import { gql, useQuery } from "@apollo/client"
 import { userFriendlyTime } from "@/lib/utils"
 import { AppContext } from "../AppContextProvider"
 import NoConversationYet from "./NoConversationYet"
+import { ResourceImage } from "../resources/MainResourceImage"
 
 export const MY_CONVERSATIONS = gql`query MyConversations {
     myConversations {
@@ -76,17 +77,14 @@ const PastConversations = ({ onConversationSelected }: Props) => {
         <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} 
         error={error} noDataLabel={<NoConversationYet />}
             displayItem={(item, idx) => {
-                const imgSource = (item.conversation.resource.images && item.conversation.resource.images.length > 0) && item.conversation.resource.images[0].publicId ?
-                    { uri: urlFromPublicId(item.conversation.resource.images[0].publicId!)} : 
-                    require('@/assets/img/placeholder.png')
                 return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
-                    left={() => <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={imgSource} />} key={idx}
+                    left={() => <ResourceImage size={70} resource={item.conversation.resource} key={idx}/>}
                     onPress={() => {
                       onConversationSelected(item.conversation.resource, item.withUser.id)
                     }}
-                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end'}}>
-                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyTime(item.conversation.lastMessageTime) }</Text>
+                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end'}}>
                         { item.conversation.hasUnread && <Icon size={20} color={primaryColor} source="circle" /> }
+                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyTime(item.conversation.lastMessageTime) }</Text>
                       </View>}
                     title={() => <View style={{ flexDirection: 'column' }}>
                         <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>

@@ -11,13 +11,15 @@ import { compareVersions } from "compare-versions"
 import { nativeApplicationVersion } from 'expo-application'
 import dayjs from "dayjs"
 import { t } from "@/i18n"
-import { configureFonts } from "react-native-paper"
+import { configureFonts, DefaultTheme } from "react-native-paper"
 import { useFonts } from 'expo-font'
+import { ThemeProp } from "react-native-paper/lib/typescript/types"
+import { lightPrimaryColor } from "@/components/layout/constants"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
 export interface RouteProps {
-    route: { name: string }, 
+    route: { name: string, params: any }, 
     navigation: NavigationHelpers<ParamListBase>
 }
 
@@ -40,7 +42,7 @@ export enum ScreenSize {
 
 export const MAX_DISTANCE = 50
 
-export const getTheme = () => ({
+export const getTheme = (): ThemeProp => ({
   fonts: configureFonts({ config: { 
       bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
       bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
@@ -57,7 +59,11 @@ export const getTheme = () => ({
       titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
       titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
       titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
-  } })
+  } }),
+  colors: {
+    ...DefaultTheme.colors,
+    backdrop: 'rgba(227,94,30,0.3)'
+  }
 })
 
 export const getScreenSize = (): ScreenSize => {
@@ -119,7 +125,7 @@ export const getLanguage = (): string => {
       const deviceLocales = getLocales()
     
       // find the first supported language that is also installed on the device
-      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales.some(deviceLocale => deviceLocale.languageCode?.toLowerCase() === supportedLanguage))
+      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales && deviceLocales.some(deviceLocale => deviceLocale.languageCode?.toLowerCase() === supportedLanguage))
       
       // If the device is not installed with any comptible language, default to the first supported language
       language = firstCompatibleLanguage || supportedLanguages[0]

@@ -13,11 +13,11 @@ import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { AppContext } from "../AppContextProvider"
 import SupportModal from "../support/SupportModal"
 import Notifications from "../notifications/Notifications"
-import DealNavigator, { TabNavigatorTab } from "../DealNavigator"
+import DealNavigator, { TabNavigatorProps } from "../DealNavigator"
 import AppHeader from "../AppHeader"
 
 export interface DealBoardProps extends RouteProps {
-    tabs?: TabNavigatorTab[]
+    tabs?: TabNavigatorProps[]
 }
 
 const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {

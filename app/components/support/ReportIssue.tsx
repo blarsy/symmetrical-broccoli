@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { Dimensions, Linking, ScrollView } from "react-native"
 import { Text } from "react-native-paper"
 import * as yup from 'yup'
-import { ErrorText, OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
+import { ErrorText, Hr, OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
 import { graphQlApiUrl, clientVersion, linksUrl, subscriptionsUrl, apiUrl } from "@/lib/settings"
 import ViewField from "../ViewField"
 import { t } from "@/i18n"
@@ -50,9 +50,14 @@ export default () => {
                 <OrangeButton onPress={submitForm}>{t('send_buttonCaption')}</OrangeButton>
             </>}
         </Formik>
-        <Text style={{ marginVertical: 10 }} variant="headlineLarge">{t('support_info')}</Text>
+        <Text style={{ marginVertical: 10, textAlign: 'center' }} variant="headlineLarge">{t('support_info')}</Text>
         <LoadedZone loading={supportInfo.loading} error={supportInfo.error}>
-            { Object.entries(supportInfo.data).map((tuple, idx) => <ViewField titleOnOwnLine key={idx} title={tuple[0]} style={{ paddingBottom: 0, marginBottom: 0 }}><Text style={{ flexWrap: 'wrap' }}>{tuple[1] as string}</Text></ViewField>) }
+            { Object.entries(supportInfo.data).map((tuple, idx) => <>
+                <ViewField titleOnOwnLine key={idx} title={tuple[0]} style={{ paddingBottom: 0, marginBottom: 0 }}>
+                    <Text style={{ flexWrap: 'wrap' }}>{tuple[1] as string}</Text>
+                </ViewField>
+                <Hr thickness={2}/>
+            </>) }
         </LoadedZone>
     </ScrollView>
 }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator } from '@/lib/storiesUtil'
 import ViewResource from './ViewResource'
 import { GET_RESOURCE } from '@/lib/utils'
 
@@ -18,7 +18,7 @@ export default meta
 type Story = StoryObj<typeof ViewResource>
 
 const initialArgs = {
-  route: { params: { resourceId: 1 }},
+  route: { params: { resourceId: 1 }, name: 'Irrelevant'},
   addRequested: () => console.log('addrequested'),
   editRequested: () =>  console.log('editrequested'),
   viewRequested: (id: number) =>  console.log(`viewrequested, id ${id}`)
@@ -50,7 +50,9 @@ const oneImage = [
   }
 ]
 
-const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true, hasAddress: boolean = false) => ({
+const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true, 
+    hasAddress: boolean = false, title: string = 'Une super ressource', 
+    accountName: string = 'Artisan incroyable') => ({
     resourceById: {
         canBeDelivered: true,
         canBeExchanged: true,
@@ -61,13 +63,13 @@ const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true, 
         isProduct: true,
         isService: true,
         expiration: new Date(2025,1,1),
-        title: 'Une super ressource',
+        title,
         created: new Date(2022, 1, 1),
         deleted: isDeleted ? new Date() : null,
         accountByAccountId: {
             email: 'me@me.com',
             id: 12,
-            name: 'Artisan incroyable',
+            name: accountName,
             imageByAvatarImageId: { publicId: '' }
         },
         resourcesImagesByResourceId: {
@@ -143,4 +145,34 @@ export const WithSpecificAddress: Story = {
       }])
     ],
     args: initialArgs
-  }
+}
+
+export const WithLongTexts: Story = {
+  name: 'View resource with long texts',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: GET_RESOURCE,
+      variables: {
+        id: 1
+      },
+      result: simpleResource(false, false, true, 'Un titre de ressource abusé comme il est trop long', `Un nom d'activité déliramment trop long aussi`)
+    }])
+  ],
+  args: initialArgs
+}
+
+export const OwnResource: Story = {
+  name: 'View rown esource',
+  decorators: [
+    apolloClientMocksDecorator([ { 
+      query: GET_RESOURCE,
+      variables: {
+        id: 1
+      },
+      result: simpleResource(false, false, true, 'Un titre de ressource', 'Super artisan')
+    }]),
+    (StoryElement: React.ElementType) => 
+        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date() })
+  ],
+  args: initialArgs,
+}

@@ -36,7 +36,9 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => (StoryElement: React.ElementType) => makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => 
+    (StoryElement: React.ElementType) => 
+        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
 
 const defaultResourceCategories = [
     { code: 'cat1', name: 'category 1' },
@@ -45,7 +47,7 @@ const defaultResourceCategories = [
     { code: 'cat4', name: 'category 4' }
 ]
 
-const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
+export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
     newChatMessage: '', categories: fromData(defaultResourceCategories), account, numberOfUnreadNotifications: 0,
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
     messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined, unreadConversations: [],

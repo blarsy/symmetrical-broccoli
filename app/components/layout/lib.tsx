@@ -1,15 +1,14 @@
 import React, { useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
-import { primaryColor } from "./constants"
+import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { ColorValue, View } from "react-native"
+import { ColorValue, Platform, View } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { aboveMdWidth, getLanguage } from "@/lib/utils"
-import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -64,12 +63,13 @@ export const OrangeTextInput = (props: TextInputProps) => <TextInput
 
 interface TransparentTextInput extends TextInputProps {
     inlineMode?: boolean
+    disableEmojis? : boolean
 }
 
 export const TransparentTextInput = (props: TransparentTextInput) => {
-    return <TextInput dense={props.inlineMode}
+    return <TextInput keyboardType={props.disableEmojis ? Platform.OS == 'ios' ? "ascii-capable": "visible-password" : undefined } dense={props.inlineMode}
         placeholderTextColor="#222" mode="flat" textColor="#000" underlineColor={ props.inlineMode ? 'transparent' : "#222" }
-        activeUnderlineColor={ props.inlineMode ? 'transparent' : "#222" } selectionColor="transparent"
+        activeUnderlineColor={ props.inlineMode ? 'transparent' : "#222" } outlineColor={lightPrimaryColor} selectionColor="transparent"
         theme={{ colors: { onSurfaceVariant: '#222'} }}
         contentStyle={{
             color: '#000',
@@ -91,12 +91,13 @@ interface CheckboxGroupProps {
     onChanged: (values: { [name: string]: boolean }, oldValues: { [name: string]: boolean }) => void
     selectedColor?: ColorValue
     color?: ColorValue
+    testID: string
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
     { props.title && <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text> }
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-        { Object.entries(props.options).map((p, idx) => <OptionSelect selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
+        { Object.entries(props.options).map((p, idx) => <OptionSelect testID={`${props.testID}:${p[0]}`} selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
             const oldValues = {...props.values}
             props.values[p[0]] = newValue
             props.onChanged(props.values, oldValues)
@@ -141,5 +142,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
 }
 
 
-export const Hr = ({ color, thick }: { color?: ColorValue, thick?: boolean }) => 
-    <View style={{ backgroundColor: color || '#343434', height: thick ? 5 : 1, transform: 'scaleY(0.5)' }}></View>
+export const Hr = ({ color, thickness, margin }: { color?: ColorValue, thickness?: number, margin?: number }) => 
+    <View style={{ backgroundColor: color || '#343434', 
+        height: thickness || 1, transform: 'scaleY(0.5)', 
+        marginVertical: margin || 5 }}></View>

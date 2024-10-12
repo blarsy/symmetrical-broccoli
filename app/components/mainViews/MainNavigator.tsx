@@ -15,6 +15,8 @@ import { debug } from '@/lib/logger'
 import { fromData, fromError } from '@/lib/DataLoadState'
 import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppContextProvider'
 import ConnectionDialog from '../ConnectionDialog'
+import DealBoard from './DealBoard'
+import Profile from '../account/Profile'
 
 const StackNav = createNativeStackNavigator()
 
@@ -43,6 +45,7 @@ const getInitialURL = async () => {
     debug({ message: `Push notifications received in getInitialUrl, linking to ${response?.notification.request.content.data.url}` })
     return response?.notification.request.content.data.url
 }
+
 const subscribe = (listener: any) => {
     const onReceiveURL = ({ url }: { url: string }) => {
         debug({ message: `Push notifications received in Linking.addEventListener, linking to ${url}` })
@@ -101,7 +104,7 @@ interface Props {
     }[]
 }
 
-export default function Main ({ screens }: Props) {
+export function Main ({ screens }: Props) {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
@@ -164,3 +167,9 @@ export default function Main ({ screens }: Props) {
             }} />
     </Container>
 }
+
+export default () => <Main screens={[{
+    name: 'main', component: DealBoard
+  }, {
+    name: 'profile', component: Profile
+}]} />

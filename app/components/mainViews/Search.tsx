@@ -23,6 +23,7 @@ import Slider from "@react-native-community/slider"
 import LocationEdit from "../account/LocationEdit"
 import OptionSelect from "../OptionSelect"
 import useProfileAddress from "@/lib/useProfileAddress"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 
 const StackNav = createNativeStackNavigator()
 
@@ -32,7 +33,10 @@ interface SearchBoxProps {
 }
 const SearchBox = ({ onChange, value }: SearchBoxProps) => {
     return <View style={{ flex: 1 }}>
-        <TextInput dense placeholder={t('search_hint')} mode="outlined" onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} size={17} icon={Images.Search}/>}/>
+        <TextInput dense placeholder={t('search_hint')} mode="outlined" 
+            onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} 
+            size={17} icon={Images.Search}/>} outlineColor="#000" activeOutlineColor={primaryColor}
+            style={{ backgroundColor: '#fff' }}/>
     </View>
 }
 
@@ -57,7 +61,7 @@ const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
                 })
             }} />
         <Text variant="bodySmall" style={{ textAlign: 'center' }}>{t('max_distance_label', { distance: value.distanceToReferenceLocation.toLocaleString() })}</Text>
-        <Slider  style={{ paddingVertical: 20, width: '80%', alignSelf: 'center' }} 
+        <Slider thumbTintColor={primaryColor} maximumTrackTintColor={primaryColor} minimumTrackTintColor={primaryColor} style={{ paddingVertical: 20, width: '80%', alignSelf: 'center' }} 
             disabled={!value.referenceLocation} lowerLimit={1} 
             maximumValue={MAX_DISTANCE} step={5} upperLimit={MAX_DISTANCE} 
             onValueChange={val => {
@@ -100,7 +104,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
 
     return loadingAddress ? 
         <ActivityIndicator /> : 
-        <ScrollView style={{ flexDirection: 'column', margin: 10, flex:1 }}>
+        <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
                 <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
                 <IconButton style={{ margin: 2 }} icon="refresh" onPress={() => {
@@ -140,7 +144,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                     }} />
             </AccordionItem>
 
-            <LoadedList style={{ padding: 0 }} contentContainerStyle={{ gap: 20 }} 
+            <LoadedList style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 
                 error={searchFilterContext.results.error} data={searchFilterContext.results.data}
                 displayItem={(res, idx) => {
@@ -159,7 +163,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                             })
                         }}
                         onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
-                    }} />
+                }} />
         </ScrollView>
 }
 

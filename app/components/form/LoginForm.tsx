@@ -11,6 +11,7 @@ import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
 import { useAuthenticate } from "@/lib/backendFacade"
+import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
 
 interface Props {
     toggleRegistering: () => void
@@ -29,7 +30,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
             await login(jwtToken)
             onDone && onDone()
         }} />
-        <Formik initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
+        <KeyboardAvoidingForm initialValues={{ email: '', password: '' }} validationSchema={yup.object().shape({
             email: yup.string().email(t('invalid_email')).required(t('field_required')),
             password: yup.string().required(t('field_required'))
         })} onSubmit={async (values) => {
@@ -65,10 +66,10 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
                     {t('forgotPassword_label')}
                 </Button>
                 <Portal>
-                    <ErrorSnackbar error={authError} message={authError ? t('authentication_failed') : undefined} onDismissError={() => setAuthError(undefined)} />
+                    <ErrorSnackbar testID="authenticationError" error={authError} message={authError ? t('authentication_failed') : undefined} onDismissError={() => setAuthError(undefined)} />
                 </Portal>
             </View>)}
-        </Formik>
+        </KeyboardAvoidingForm>
     </View>
 }
 

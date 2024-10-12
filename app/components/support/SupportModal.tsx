@@ -22,9 +22,9 @@ export default ({ visible, onDismiss }: Props) => {
     return <Portal>
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15, maxHeight: Dimensions.get('window').height - 20 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderBottomWidth: 1, marginBottom: 10 }}>
-                <IconButton icon="close" onPress={onDismiss} />
-                { selectedTopic != -1 && <IconButton icon="chevron-left" onPress={() => setSelectedTopic(-1)} /> }
+                <IconButton icon="chevron-left" style={{ opacity: selectedTopic != -1 ? 1 : 0 }} onPress={() => setSelectedTopic(-1)} />
                 <Text variant="headlineLarge" style={{ textAlign: 'center', flex: 1, paddingVertical: 10, fontSize: 24 }}>{t('support_title')}</Text>
+                <IconButton icon="close" onPress={onDismiss} />
             </View>
             <ScrollView>
                 { selectedTopic != -1 ? 

@@ -11,11 +11,13 @@ interface ResourceViewFieldProps {
 
 const ViewField = ({ title, children, titleOnOwnLine, style }: ResourceViewFieldProps) => <View style={{ 
         flexDirection: titleOnOwnLine ? "column": "row", gap: titleOnOwnLine ? 0: 10, 
-        alignItems: titleOnOwnLine ?  'stretch' : 'center', borderBottomColor: '#000', borderBottomWidth: 1,
-        paddingBottom: 10, marginBottom: 10, ...(style as object)
+        alignItems: titleOnOwnLine ?  'stretch' : 'center',
+        ...(style as object)
     }}>
-    <Text variant="titleMedium" style={{ flexGrow: titleOnOwnLine ? 1: 0, flexShrink: titleOnOwnLine ? 1: 0, flexBasis: titleOnOwnLine ? 'auto' : '40%' }}>{title}</Text>
-    {children}
+    <Text variant="titleLarge" style={{ flexGrow: titleOnOwnLine ? 1: 0, flexShrink: titleOnOwnLine ? 1: 0, flexBasis: 'auto' }}>{title}</Text>
+    <View style={{ flex: 1, alignItems: titleOnOwnLine ? undefined : 'center' }}>
+        {children}
+    </View>
 </View>
 
 export default ViewField

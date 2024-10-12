@@ -130,7 +130,10 @@ const Conversation = ({ route }: RouteProps) => {
                   renderMessage={p => {
                     const fromOther = p.currentMessage?.user._id != p.user._id
                     return <View style={{ flex: 1, alignItems: fromOther ? 'flex-start': 'flex-end', gap: 5 }}>
-                      { p.previousMessage && dayjs(p.previousMessage.createdAt).format('DDMMYYYY') != dayjs(p.currentMessage?.createdAt).format('DDMMYYYY') && <Text variant="bodySmall" style={{ alignSelf: 'center', color: primaryColor, fontWeight: 'bold' }}>{dayjs(p.currentMessage?.createdAt).format('ddd DD, YY')}</Text> }
+                      { p.previousMessage && dayjs(p.previousMessage.createdAt).format('DDMMYYYY') != dayjs(p.currentMessage?.createdAt).format('DDMMYYYY') && 
+                        <Text variant="bodySmall" style={{ alignSelf: 'center', color: primaryColor, fontWeight: 'bold' }}>
+                          {dayjs(p.currentMessage?.createdAt).format('ddd DD, YY')}
+                        </Text> }
                       <View style={{ flexDirection: 'column', backgroundColor: fromOther ? lightPrimaryColor : primaryColor, padding: 15,
                           borderRadius: 15, margin: 5, alignItems: fromOther ? 'flex-start': 'flex-end'
                        }}>
@@ -138,7 +141,7 @@ const Conversation = ({ route }: RouteProps) => {
                           <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(p.currentMessage?.image)} />
                         </TouchableOpacity> }
                         <Text variant="displayMedium">{p.currentMessage?.text}</Text>
-                        <Text variant="bodySmall" style={{ marginTop: 5 }}>{dayjs(p.currentMessage?.createdAt).format('HH:mm')}</Text>
+                        <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(p.currentMessage?.createdAt).format('HH:mm')}</Text>
                       </View>
                     </View>}}
                   renderActions={p => <View style={{ flexDirection: 'row', paddingLeft: 5 }}>

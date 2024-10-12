@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { RouteProps } from "@/lib/utils"
 import { RouteProp, ParamListBase } from "@react-navigation/native"
 import { MaterialBottomTabNavigationOptions } from "react-native-paper"
@@ -23,17 +23,17 @@ const getViewTitleI18n = (screenName: string): string => {
     }
 }
 
-export interface TabNavigatorTab {
+export interface TabNavigatorProps {
     name: string
-    component: (r: RouteProps) => JSX.Element
-    options: MaterialBottomTabNavigationOptions | ((props: {
+    component: (r: RouteProps) => ReactNode
+    options?: MaterialBottomTabNavigationOptions | ((props: {
         route: RouteProp<ParamListBase, string>
         navigation: any
     }) => MaterialBottomTabNavigationOptions)
 }
 
 interface DealNavigatorProps {
-    tabs: TabNavigatorTab[]
+    tabs: TabNavigatorProps[]
     onTabSelected: (title: string) => void
 }
 
