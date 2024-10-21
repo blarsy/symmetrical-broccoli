@@ -2181,7 +2181,7 @@ type ResourcesResourceCategoriesConnection {
 type ResourcesResourceCategory {
   resourceId: Int!
   created: Datetime!
-  resourceCategoryCode: String!
+  resourceCategoryCode: Int!
 
   """
   Reads a single `Resource` that is related to this `ResourcesResourceCategory`.
@@ -2221,7 +2221,7 @@ input ResourcesResourceCategoryCondition {
   created: Datetime
 
   """Checks for equality with the object’s `resourceCategoryCode` field."""
-  resourceCategoryCode: String
+  resourceCategoryCode: Int
 }
 
 """A connection to a list of `Participant` values."""
@@ -2425,6 +2425,7 @@ type AccountsLink implements Node {
   label: String
   linkTypeId: Int!
   accountId: Int!
+  created: Datetime!
 
   """Reads a single `LinkType` that is related to this `AccountsLink`."""
   linkTypeByLinkTypeId: LinkType
@@ -2484,6 +2485,8 @@ enum AccountsLinksOrderBy {
   LINK_TYPE_ID_DESC
   ACCOUNT_ID_ASC
   ACCOUNT_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2507,6 +2510,9 @@ input AccountsLinkCondition {
 
   """Checks for equality with the object’s `accountId` field."""
   accountId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
 }
 
 """A `AccountsLink` edge in the connection."""
@@ -2865,13 +2871,13 @@ type Search implements Node {
   canBeExchanged: Boolean
   canBeDelivered: Boolean
   canBeTakenAway: Boolean
-  categoryCodes: [String]
   referenceLocationLatitude: BigFloat
   referenceLocationLongitude: BigFloat
   distanceToReferenceLocation: BigFloat
   excludeUnlocated: Boolean
   accountId: Int
   created: Datetime!
+  categoryCodes: [Int]
 
   """Reads a single `Account` that is related to this `Search`."""
   accountByAccountId: Account
@@ -2905,8 +2911,6 @@ enum SearchesOrderBy {
   CAN_BE_DELIVERED_DESC
   CAN_BE_TAKEN_AWAY_ASC
   CAN_BE_TAKEN_AWAY_DESC
-  CATEGORY_CODES_ASC
-  CATEGORY_CODES_DESC
   REFERENCE_LOCATION_LATITUDE_ASC
   REFERENCE_LOCATION_LATITUDE_DESC
   REFERENCE_LOCATION_LONGITUDE_ASC
@@ -2919,6 +2923,8 @@ enum SearchesOrderBy {
   ACCOUNT_ID_DESC
   CREATED_ASC
   CREATED_DESC
+  CATEGORY_CODES_ASC
+  CATEGORY_CODES_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2951,9 +2957,6 @@ input SearchCondition {
   """Checks for equality with the object’s `canBeTakenAway` field."""
   canBeTakenAway: Boolean
 
-  """Checks for equality with the object’s `categoryCodes` field."""
-  categoryCodes: [String]
-
   """
   Checks for equality with the object’s `referenceLocationLatitude` field.
   """
@@ -2977,6 +2980,9 @@ input SearchCondition {
 
   """Checks for equality with the object’s `created` field."""
   created: Datetime
+
+  """Checks for equality with the object’s `categoryCodes` field."""
+  categoryCodes: [Int]
 }
 
 """A `Account` edge in the connection."""
@@ -4154,7 +4160,7 @@ input CreateResourceInput {
   canBeExchanged: Boolean
   canBeGifted: Boolean
   imagesPublicIds: [String]
-  categoryCodes: [String]
+  categoryCodes: [Int]
   specificLocation: NewLocationInput
 }
 
@@ -4578,7 +4584,7 @@ input SuggestedResourcesInput {
   canBeExchanged: Boolean
   canBeDelivered: Boolean
   canBeTakenAway: Boolean
-  categoryCodes: [String]
+  categoryCodes: [Int]
   referenceLocationLatitude: BigFloat
   referenceLocationLongitude: BigFloat
   distanceToReferenceLocation: BigFloat
@@ -4760,7 +4766,7 @@ input UpdateResourceInput {
   canBeExchanged: Boolean
   canBeGifted: Boolean
   imagesPublicIds: [String]
-  categoryCodes: [String]
+  categoryCodes: [Int]
   specificLocation: NewLocationInput
 }
 

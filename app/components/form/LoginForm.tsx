@@ -10,8 +10,9 @@ import { aboveMdWidth } from "@/lib/utils"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
-import { useAuthenticate } from "@/lib/backendFacade"
+import { GraphQlLib, useAuthenticate } from "@/lib/backendFacade"
 import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
+import { useMutation } from "@apollo/client"
 
 interface Props {
     toggleRegistering: () => void
@@ -21,7 +22,7 @@ interface Props {
 }
 
 const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegistrationRequired }: Props) => {
-    const [authenticate, {loading}] = useAuthenticate()
+    const [authenticate, {loading}] = useMutation(GraphQlLib.mutations.AUTHENTICATE)
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
@@ -35,7 +36,7 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
             password: yup.string().required(t('field_required'))
         })} onSubmit={async (values) => {
             try {
-                const res = await authenticate(values.email, values.password)
+                const res = await authenticate({ variables: { email: values.email, password: values.password } } )
                 if(res.data && res.data.authenticate.jwtToken) {
                     await login(res.data.authenticate.jwtToken)
                     onDone && onDone()

@@ -94,7 +94,7 @@ export default ({ route, navigation }: RouteProps) => {
                         <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => submitForm()} loading={updating}>
                             {t('save_label')}
                         </WhiteButton>
-                        <OperationFeedback errorTestID="prefsError" successTestID="prefsSucess" error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={reset} />
+                        <OperationFeedback testID="prefsFeedback" error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={reset} />
                     </>
                 }}
             </Formik>

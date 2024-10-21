@@ -6,7 +6,7 @@ import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
 import ListOf from "../ListOf"
-import { ActivityIndicator, Button, Icon, IconButton, Portal, Snackbar, Text } from "react-native-paper"
+import { Button, Icon, IconButton, Portal, Text } from "react-native-paper"
 import { DimensionValue, FlexAlignType, Linking, StyleProp, View, ViewStyle } from "react-native"
 import { adaptToWidth, fontSizeSmall, mdScreenWidth } from "@/lib/utils"
 import { Hr } from "../layout/lib"
@@ -53,13 +53,13 @@ interface LinksEditProps {
 const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkRequested, style }: LinksEditProps) => <View style={{...{ alignItems: 'center' }, ...(style as object || {})}}>
     <ListOf data={links} noDataLabel={t('no_link')} noDataLabelStyle={{ color: '#fff' }}
         displayItem={(link, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' }}>
-        <Icon color="#fff" source={getIconForLink(link.type)} size={25}/>
-        <Button style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" 
+        <Icon testID={`link:${idx}:typeIcon`} color="#fff" source={getIconForLink(link.type)} size={25}/>
+        <Button testID={`link:${idx}:Button`} style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" 
             mode="text" onPress={() => Linking.openURL(link.url)}>{ link.label || t('link_button_default_label') }</Button>
-        <IconButton containerColor="#fff" iconColor="#000" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
-        <IconButton containerColor="#fff" iconColor="#000" icon="delete" onPress={() => deleteLinkRequested(link)} />
+        <IconButton testID={`link:${idx}:EditButton`} containerColor="#fff" iconColor="#000" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
+        <IconButton testID={`link:${idx}:DeleteButton`} containerColor="#fff" iconColor="#000" icon="delete" onPress={() => deleteLinkRequested(link)} />
     </View>} />
-    <Button style={{ backgroundColor: '#fff' }} textColor="#000" icon="link-plus" onPress={newLinkRequested}>{t('add_buttonLabel')}</Button>
+    <Button testID="addLinkButton" style={{ backgroundColor: '#fff' }} textColor="#000" icon="link-plus" onPress={newLinkRequested}>{t('add_buttonLabel')}</Button>
 </View>
 
 export default () => {
@@ -117,8 +117,8 @@ export default () => {
                     update(newPublicInfo)
                 }} 
                 orangeBackground />
-            <OperationFeedback errorTestID="publicInfoError" successTestID="publicInfoSuccess" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
-            <EditLinkModal visible={!!editedLink} initial={editedLink} onDismiss={link => {
+            <OperationFeedback testID="publicInfoFeedback" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
+            <EditLinkModal testID="editLinkModal" visible={!!editedLink} initial={editedLink} onDismiss={link => {
                 if(link) {
                     let newLinks: Link[]
                     if(link.id === 0) {

@@ -9,8 +9,7 @@ interface Props {
     successMessage?: string
     onDismissError: () => void
     onDismissSuccess?: () => void
-    successTestID: string
-    errorTestID: string
+    testID: string
 }
 
 interface ErrorSnackbarProps {
@@ -61,10 +60,10 @@ export const InfoSnackbar = ({ message }: { message: string}) => <Snackbar
         </View>
 </Snackbar>
 
-const OperationFeedback = ({ error, success, successMessage, onDismissError, onDismissSuccess, errorTestID, successTestID }: Props) => {
+const OperationFeedback = ({ error, success, successMessage, onDismissError, onDismissSuccess, testID }: Props) => {
     return <Portal>
-        <ErrorSnackbar testID={errorTestID} error={error} message={error && t('requestError')} onDismissError={onDismissError} />
-        { success && onDismissSuccess && <SuccessSnackbar testID={successTestID} message={successMessage || t('success_message')} onDismissSuccess={onDismissSuccess} /> }
+        <ErrorSnackbar testID={`${testID}:Error`} error={error} message={error && t('requestError')} onDismissError={onDismissError} />
+        { success && onDismissSuccess && <SuccessSnackbar testID={`${testID}:Success`} message={successMessage || t('success_message')} onDismissSuccess={onDismissSuccess} /> }
     </Portal>
 }
 

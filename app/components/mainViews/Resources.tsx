@@ -5,6 +5,7 @@ import SimpleBackHeader from "../layout/SimpleBackHeader"
 import EditResource from "../form/EditResource"
 import ViewResource from "../resources/ViewResource"
 import ResourcesList from "../resources/ResourcesList"
+import ViewAccount from "./ViewAccount"
 
 const StackNav = createNativeStackNavigator()
 
@@ -14,7 +15,8 @@ const Resources = ({ route, navigation }: RouteProps) => {
       <StackNav.Screen name="newResource" key="newResource" options={{ header: SimpleBackHeader }} component={EditResource} initialParams={{isNew: true}}/>
       <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
       <StackNav.Screen name="editResource" key="editResource" options={{ header: SimpleBackHeader }} component={EditResource} />
-  </StackNav.Navigator>
+      <StackNav.Screen name="viewAccount" key="viewAccount" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewAccount} />
+      </StackNav.Navigator>
 }
 
 export default Resources

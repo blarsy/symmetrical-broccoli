@@ -14,12 +14,13 @@ interface EditLinkModalProps {
     initial?: Link
     visible: boolean
     onDismiss: (link?: Link) => void
+    testID: string
 }
 
-export default ({ initial, visible, onDismiss }: EditLinkModalProps) => {
+export default ({ initial, visible, onDismiss, testID }: EditLinkModalProps) => {
     const [error, setError] = useState<Error | undefined>(undefined)
     return <Portal>
-        <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
+        <Modal testID={testID} visible={visible} onDismiss={onDismiss} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
             <Formik initialValues={initial || { id: 0, url: '', label: '', type: 4 }} 
                 validationSchema={yup.object().shape({
                     url: yup.string().required(t('field_required')).url(t('not_a_valid_url')),
@@ -35,21 +36,21 @@ export default ({ initial, visible, onDismiss }: EditLinkModalProps) => {
                 return <View>
                     <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('link_dialog_title')}</Text>
                     <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 5 }}>
-                        <TransparentTextInput label={<StyledLabel label={t('url_label') + ' *'} />} value={values.url} onChangeText={handleChange('url')} onBlur={handleBlur('url')}/>
+                        <TransparentTextInput testID="linkModal:url" label={<StyledLabel label={t('url_label') + ' *'} />} value={values.url} onChangeText={handleChange('url')} onBlur={handleBlur('url')}/>
                         <ErrorMessage component={ErrorText} name="url" />
-                        <TransparentTextInput label={<StyledLabel label={t('link_label_label') } />} value={values.label} onChangeText={handleChange('label')} onBlur={handleBlur('label')}/>
+                        <TransparentTextInput testID="linkModal:label" label={<StyledLabel label={t('link_label_label') } />} value={values.label} onChangeText={handleChange('label')} onBlur={handleBlur('label')}/>
                         <ErrorMessage component={ErrorText} name="label" />
-                        <LinkTypeSelect style={{ alignSelf: 'center' }} selected={values.type} onSelectedChanged={newType => setFieldValue('type', newType)} />
+                        <LinkTypeSelect testID={`linkModal:type`} style={{ alignSelf: 'center' }} selected={values.type} onSelectedChanged={newType => setFieldValue('type', newType)} />
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
                         <OrangeButton onPress={() => onDismiss()}>{t('close_buttonCaption')}</OrangeButton>
-                        <OrangeButton onPress={submitForm}>{t('done_buttonCaption')}</OrangeButton>
+                        <OrangeButton testID="linkModal:doneButton" onPress={submitForm}>{t('done_buttonCaption')}</OrangeButton>
                     </View>
                 </View>
             }}
             </Formik>
             <Portal>
-                <ErrorSnackbar error={error} message={error && t('requestError')} onDismissError={() => setError(undefined)} />
+                <ErrorSnackbar testID="editLinkError" error={error} message={error && t('requestError')} onDismissError={() => setError(undefined)} />
             </Portal>
         </Modal>
     </Portal>

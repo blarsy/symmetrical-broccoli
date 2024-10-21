@@ -50,7 +50,7 @@ const blankSearchFilter: SearchFilterState = {
   location: { distanceToReferenceLocation: MAX_DISTANCE, excludeUnlocated: false }
 }
 
-export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [String], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
+export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
   suggestedResources(
     input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm}
   ) {
@@ -114,7 +114,7 @@ const SearchFilterContextProvider = ({ children }: Props) => {
             setSearchResults(initial(true, [] as Resource[]))
             try {
                 const res = await suggestResources({ variables: {
-                    categoryCodes: searchFilterState.categories.map(cat => cat.code.toString()),
+                    categoryCodes: searchFilterState.categories.map(cat => cat.code),
                     searchTerm: searchFilterState.search,
                     ...searchFilterState.options,
                     excludeUnlocated: searchFilterState.location?.excludeUnlocated,
@@ -122,6 +122,7 @@ const SearchFilterContextProvider = ({ children }: Props) => {
                     referenceLocationLongitude: (searchFilterState.location && searchFilterState.location.referenceLocation) ? searchFilterState.location?.referenceLocation.longitude : 0,
                     distanceToReferenceLocation: searchFilterState.location?.distanceToReferenceLocation
                 }})
+
                 setSearchResults(fromData(fromServerGraphResources(res.data.suggestedResources.resources, categories)))
             }
             catch(e) {

@@ -17,6 +17,9 @@ import Images from "@/Images"
 import NoConversationYet from "../chat/NoConversationYet"
 import BareIconButton from "../layout/BareIconButton"
 import { ResourceImage } from "../resources/MainResourceImage"
+import SimpleBackHeader from "../layout/SimpleBackHeader"
+import ViewAccount from "./ViewAccount"
+import ViewResource from "../resources/ViewResource"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -76,6 +79,8 @@ const Chat = ({ route, navigation }: RouteProps) => {
                     onResourceShowRequested={id => p.navigation.navigate('viewResource', { resourceId: id })}
                     onAccountShowRequested={id => p.navigation.navigate('viewAccount', { id })} /> }}
                 component={Conversation} />
+            <StackNav.Screen name="viewAccount" key="viewAccount" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewAccount} />
+            <StackNav.Screen name="viewResource" key="viewResource" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewResource} />
         </StackNav.Navigator>
     </ConversationContextProvider>
 }

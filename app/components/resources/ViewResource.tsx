@@ -25,7 +25,7 @@ interface ImgMetadata {
     idx: number
 }
 
-const ResourceInfoChip = (p: any) => <Chip style={{ backgroundColor: lightPrimaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
+const ResourceInfoChip = (p: any) => <Chip testID={p.testID} style={{ backgroundColor: lightPrimaryColor, margin: 3 }} {...p}><Text variant="bodyMedium" style={{ textTransform: 'uppercase' }}>{p.children}</Text></Chip>
 
 const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImagePress: (imgSource: ImageSourcePropType) => void}) => {
     const [swipedToEnd, setSwipedToEnd] = useState(false)
@@ -70,6 +70,7 @@ const getSwiperData = (resource: Resource): ImgMetadata[] => {
 }
 
 const ViewResource = ({ route, navigation }:RouteProps) => {
+    const baseTestId = 'viewResource'
     const appState = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
     const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number(route.params.resourceId) }})
@@ -103,7 +104,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <ViewField style={{ flex: 1 }} title={t('brought_by_label')} titleOnOwnLine>
                     <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                         <View style={{ flex: 1, alignContent: 'flex-start', justifyContent: 'flex-start' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })}>
+                            <TouchableOpacity testID={`${baseTestId}:viewButton`} onPress={() => navigation.navigate('viewAccount', { id: resource.account?.id })}>
                                 <Text variant="bodyMedium" style={{ textDecorationLine: 'underline', fontFamily: 'Futura-std-heavy', color: primaryColor }}>{resource.account?.name}</Text>
                             </TouchableOpacity>
                         </View>
@@ -125,7 +126,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             <View style={{ flexDirection: 'row' }}>
                 <ViewField style={{ flex: 1 }} title={t('title_label')} titleOnOwnLine>
                     <View style={{ flexDirection: 'row', alignContent: 'stretch', justifyContent: 'center' }}>
-                        <Text style={{ flex: 1 }} variant="bodyMedium">{resource.title}</Text>
+                        <Text testID={`${baseTestId}:title`} style={{ flex: 1 }} variant="bodyMedium">{resource.title}</Text>
                     </View>
                 </ViewField>
                 { appState.account && resource.account!.id === appState.account!.id && <BareIconButton Image={Images.Modify} size={35} onPress={() => {
@@ -136,13 +137,13 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             </View>
             <Hr thickness={2}/>
             <ViewField title={t('description_label')} titleOnOwnLine>
-                <Text variant="bodyMedium">{resource.description}</Text>
+                <Text testID={`${baseTestId}:description`} variant="bodyMedium">{resource.description}</Text>
             </ViewField>
             <Hr thickness={2}/>
             <ViewField title={t('nature_label')} titleOnOwnLine>
                 <View style={{ flexDirection: 'row', gap: 1 }}>
-                    { resource.isProduct && <ResourceInfoChip>{t('isProduct_label')}</ResourceInfoChip>}
-                    { resource.isService && <ResourceInfoChip>{t('isService_label')}</ResourceInfoChip>}
+                    { resource.isProduct && <ResourceInfoChip testID={`${baseTestId}:isProduct`}>{t('isProduct_label')}</ResourceInfoChip>}
+                    { resource.isService && <ResourceInfoChip testID={`${baseTestId}:isService`}>{t('isService_label')}</ResourceInfoChip>}
                 </View>
             </ViewField>
             <Hr thickness={2}/>
@@ -150,7 +151,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <ViewField title={t('expiration_label')}>
                     <View style={{ flexDirection: 'column' }}>
                         <Text variant="bodyMedium">{expiration.text}</Text>
-                        <Text variant="bodyMedium">{expiration.date}</Text>
+                        <Text testID={`${baseTestId}:expiration`} variant="bodyMedium">{expiration.date}</Text>
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>
@@ -158,7 +159,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             { resource.categories && resource.categories.length > 0 && <>
                 <ViewField title={t('resourceCategories_label')} titleOnOwnLine>
                     <View style={{ flexDirection: "row", gap: 3, flexWrap: 'wrap' }}>
-                        { resource.categories.map((cat, idx) => <ResourceInfoChip key={idx}>{cat.name}</ResourceInfoChip>) }
+                        { resource.categories.map((cat, idx) => <ResourceInfoChip testID={`${baseTestId}:CategoryChip:${cat.code}`} key={idx}>{cat.name}</ResourceInfoChip>) }
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>
@@ -166,16 +167,16 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             { resource.isProduct && <>
                 <ViewField title={t('transport_label')} titleOnOwnLine>
                     <View style={{ flexDirection: 'row', gap: 1 }}>
-                        { resource.canBeTakenAway && <ResourceInfoChip>{t('canBeTakenAway_label')}</ResourceInfoChip>}
-                        { resource.canBeDelivered && <ResourceInfoChip>{t('canBeDelivered_label')}</ResourceInfoChip>}
+                        { resource.canBeTakenAway && <ResourceInfoChip testID={`${baseTestId}:canBeTakenAway`}>{t('canBeTakenAway_label')}</ResourceInfoChip>}
+                        { resource.canBeDelivered && <ResourceInfoChip testID={`${baseTestId}:canBeDelivered`}>{t('canBeDelivered_label')}</ResourceInfoChip>}
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>
             </> }
             <ViewField title={t('type_label')} titleOnOwnLine>
                 <View style={{ flexDirection: 'row', gap: 1 }}>
-                    { resource.canBeGifted && <ResourceInfoChip>{t('canBeGifted_label')}</ResourceInfoChip>}
-                    { resource.canBeExchanged && <ResourceInfoChip>{t('canBeExchanged_label')}</ResourceInfoChip>}
+                    { resource.canBeGifted && <ResourceInfoChip testID={`${baseTestId}:canBeGifted`}>{t('canBeGifted_label')}</ResourceInfoChip>}
+                    { resource.canBeExchanged && <ResourceInfoChip testID={`${baseTestId}:canBeExchanged`}>{t('canBeExchanged_label')}</ResourceInfoChip>}
                 </View>
             </ViewField>
             <Hr thickness={2}/>

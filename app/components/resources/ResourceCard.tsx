@@ -15,11 +15,12 @@ interface Props {
     resource: Resource
     isExample?: boolean
     style?: StyleProp<ViewStyle>
+    testID: string
 }
 
 const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
-export default ({ viewRequested, resource, editRequested, deleteRequested, isExample, style}: Props) => {
+export default ({ viewRequested, resource, editRequested, deleteRequested, isExample, style, testID}: Props) => {
     let size: number
     if(aboveMdWidth()) {
         size = percentOfWidth(31)
@@ -33,13 +34,13 @@ export default ({ viewRequested, resource, editRequested, deleteRequested, isExa
     return <View style={{ borderRadius: IMAGE_BORDER_RADIUS, flexBasis: size, 
         backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, padding: 10, 
         gap: 5, opacity: isExample ? 0.7 : 1, ...(style as object)}}>
-        <TouchableOpacity onPress={() => !isExample && viewRequested(resource.id) }>
+        <TouchableOpacity testID={`${testID}:ViewButton`} onPress={() => !isExample && viewRequested(resource.id) }>
             <FlexResourceImage resource={resource} />
         </TouchableOpacity>
         <Text variant="titleMedium" numberOfLines={2} style={{ textAlign: 'center' }}>{resource.title}</Text>
         { resource.deleted ? <Text style={{ fontStyle: "italic", textAlign: 'center' }}>{t('deleted')}</Text> : 
             <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                <IconButton style={{ alignSelf: 'center', margin: 0, padding: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
+                <IconButton testID={`${testID}:EditButton`} style={{ alignSelf: 'center', margin: 0, padding: 0 }} size={iconButtonsSize} iconColor="#000" icon="pencil-circle-outline" onPress={e => {
                     e.stopPropagation()
                     !isExample && editRequested()
                 }} />

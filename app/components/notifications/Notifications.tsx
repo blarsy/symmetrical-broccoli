@@ -14,6 +14,7 @@ import { NavigationHelpers, ParamListBase, useNavigation } from "@react-navigati
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 
 interface NotificationData {
+    id: number
     read: boolean
     created: Date
     headline1: string
@@ -90,6 +91,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
         data.myNotifications.nodes.forEach((rawNotification: any) => {
             if(rawNotification.data.resource_id) {
                 result.push({ 
+                    id: rawNotification.id,
                     created: rawNotification.created, 
                     headline1: t('newResourceFrom_notificationHeadline'),
                     headline2: resources[rawNotification.data.resource_id].accountByAccountId.name,
@@ -129,6 +131,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                 data.myNotifications.nodes.forEach((rawNotification: any) => {
                     if(rawNotification.data.info === 'COMPLETE_PROFILE') {
                         otherNotifs.push({
+                            id: rawNotification.id,
                             created: rawNotification.created, 
                             headline1: t('welcomeNotificationHeadline'),
                             headline2: t('completeProcessNotificationHeadline'),
@@ -185,7 +188,7 @@ export default ({ navigation }: RouteProps) => {
         }
     }, [])
 
-    return <ScrollView>
+    return <ScrollView testID="notifications">
         { appContext.account ?
             <LoadedList loading={loading} error={error} data={data} displayItem={(notif, idx) => <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
                     left={() =>
@@ -193,12 +196,12 @@ export default ({ navigation }: RouteProps) => {
                     } key={idx} onPress={notif.onPress}
                     right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
                             <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{ userFriendlyTime(notif.created) }</Text>
-                            { !notif.read && <Icon size={20} color={primaryColor} source="circle" /> }
+                            { !notif.read && <Icon testID={`notifications:${notif.id}:Unread`} size={20} color={primaryColor} source="circle" /> }
                         </View>}
                     title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
-                        <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
-                        <Text variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
-                    </View>} description={<Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />} />:
+                        <Text testID={`notifications:${notif.id}:Headline1`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
+                        <Text testID={`notifications:${notif.id}:HeadLine2`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
+                    </View>} description={<Text testID={`notifications:${notif.id}:Text`} variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />} />:
             <Text variant="labelLarge" style={{ textAlign: 'center', padding: 10 }}>{t('PleaseConnectLabel')}</Text>
         }
     </ScrollView>

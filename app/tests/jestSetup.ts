@@ -4,13 +4,12 @@ import 'react-native-gesture-handler/jestSetup'
 Object.assign(global, { TextDecoder, TextEncoder })
 
 jest.mock('expo-linking'), () => {
-    createURL: jest.fn().mockReturnValue('coucou gamin')
+  createURL: jest.fn().mockReturnValue('coucou gamin')
 }
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-    require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
-
 
 // include this section and the NativeAnimatedHelper section for mocking react-native-reanimated
 jest.mock('react-native-reanimated', () => {

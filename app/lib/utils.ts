@@ -14,7 +14,6 @@ import { t } from "@/i18n"
 import { configureFonts, DefaultTheme } from "react-native-paper"
 import { useFonts } from 'expo-font'
 import { ThemeProp } from "react-native-paper/lib/typescript/types"
-import { lightPrimaryColor } from "@/components/layout/constants"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
@@ -125,7 +124,7 @@ export const getLanguage = (): string => {
       const deviceLocales = getLocales()
     
       // find the first supported language that is also installed on the device
-      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales && deviceLocales.some(deviceLocale => deviceLocale.languageCode?.toLowerCase() === supportedLanguage))
+      const firstCompatibleLanguage = supportedLanguages.find(supportedLanguage => deviceLocales.some && deviceLocales.some(deviceLocale => deviceLocale.languageCode?.toLowerCase() === supportedLanguage))
       
       // If the device is not installed with any comptible language, default to the first supported language
       language = firstCompatibleLanguage || supportedLanguages[0]

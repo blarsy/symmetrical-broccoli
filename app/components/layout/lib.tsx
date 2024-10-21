@@ -24,6 +24,7 @@ interface SubmitButtonProps extends ButtonProps {
     isValid: boolean
     updating: boolean
     handleSubmit: () => void
+    testID: string
 }
 
 export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
@@ -111,19 +112,20 @@ interface DateTimePickerFieldProps {
     label: string
     textColor?: ColorValue | undefined
     backgroundColor?: ColorValue | undefined
+    testID: string
 }
 
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10 }}
+    return <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10 }}
         onPress={() => setDateOpen(true)}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
         <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
         <View style={{ marginRight: 14 }}>
             <Icon source="chevron-right" size={26} color="#000" />
         </View>
-        <DatePickerModal
+        <DatePickerModal testID={`${props.testID}:Picker`}
             locale={getLanguage()}
             mode="single"
             visible={dateOpen}

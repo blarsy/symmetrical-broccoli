@@ -23,17 +23,18 @@ import Slider from "@react-native-community/slider"
 import LocationEdit from "../account/LocationEdit"
 import OptionSelect from "../OptionSelect"
 import useProfileAddress from "@/lib/useProfileAddress"
-import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import { primaryColor } from "../layout/constants"
 
 const StackNav = createNativeStackNavigator()
 
 interface SearchBoxProps {
     onChange: (searchText: string) => void
     value: string
+    testID: string
 }
-const SearchBox = ({ onChange, value }: SearchBoxProps) => {
+const SearchBox = ({ onChange, value, testID }: SearchBoxProps) => {
     return <View style={{ flex: 1 }}>
-        <TextInput dense placeholder={t('search_hint')} mode="outlined" 
+        <TextInput testID={testID} dense placeholder={t('search_hint')} mode="outlined" 
             onChangeText={onChange} value={value} right={<TextInput.Icon style={{ borderRadius: 0, marginRight: 10 }} 
             size={17} icon={Images.Search}/>} outlineColor="#000" activeOutlineColor={primaryColor}
             style={{ backgroundColor: '#fff' }}/>
@@ -43,6 +44,7 @@ const SearchBox = ({ onChange, value }: SearchBoxProps) => {
 interface ProximitySelectorProps {
     value: LocationSearchOptions
     onChange: (newVal: LocationSearchOptions) => void
+    testID: string
 }
 
 const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
@@ -79,7 +81,7 @@ const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
     </View>
 }
 
-const SearchResults = ({ route, navigation }: RouteProps) => {
+export const SearchResults = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const { ensureConnected } = useUserConnectionFunctions()
@@ -106,30 +108,30 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
         <ActivityIndicator /> : 
         <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
-                <SearchBox onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
+                <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
                 <IconButton style={{ margin: 2 }} icon="refresh" onPress={() => {
                     searchFilterContext.actions.requery(appContext.categories.data!)
                 }} />
             </View>
-            <CategoriesSelect inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
+            <CategoriesSelect testID="categories" inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
                 onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} />
             <Hr />
-            <AccordionItem title={t('options_title')} style={{ paddingBottom: 10 }}>
+            <AccordionItem testID="attributesAccordion" title={t('options_title')} style={{ paddingBottom: 10 }}>
                 <View style={{ flexDirection: 'column' }}>
-                    <CheckboxGroup title={''} options={{
+                    <CheckboxGroup testID="nature" title={''} options={{
                             isProduct: t('isProduct_label'), isService: t('isService_label') }} values={searchFilterContext.filter.options as any}
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions, 
                             location: searchFilterContext.filter.location })} />
                     <Hr />
-                    <CheckboxGroup title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
+                    <CheckboxGroup testID="transport" title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions,
                             location: searchFilterContext.filter.location })} />
                     <Hr />
-                    <CheckboxGroup title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
+                    <CheckboxGroup testID="exchangeType" title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions,
@@ -149,7 +151,7 @@ const SearchResults = ({ route, navigation }: RouteProps) => {
                 error={searchFilterContext.results.error} data={searchFilterContext.results.data}
                 displayItem={(res, idx) => {
                     const resource = res as Resource
-                    return <FoundResourceCard
+                    return <FoundResourceCard testID={`FoundResource:${resource.id}`}
                         key={idx} resource={resource} 
                         onChatOpen={res => {
                             ensureConnected('introduce_yourself', '', () => {

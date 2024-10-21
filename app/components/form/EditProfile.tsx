@@ -93,7 +93,7 @@ export default function EditProfile () {
                     {t('save_label')}
                 </WhiteButton>
             </View>
-            <OperationFeedback errorTestID="editProfileError" successTestID="editProfileSuccess" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
+            <OperationFeedback testID="editProfileFeedback" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
         </View>)}
     </Formik>  
 }

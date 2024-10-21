@@ -42,7 +42,7 @@ export interface ImageInfo {
 }
 
 export interface Category {
-    code: string,
+    code: number,
     name: string
 }
 

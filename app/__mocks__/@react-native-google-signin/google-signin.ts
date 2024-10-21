@@ -1,5 +1,3 @@
-import { Text } from "react-native"
-
 export const GoogleSignin = {
     configure: jest.fn(),
     getCurrentUser: jest.fn().mockReturnValue({ user: { email: 'coucou@coucou.be' }}),

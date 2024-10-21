@@ -19,37 +19,14 @@ export const GraphQlLib = {
             authenticate(input: {email: $email, password: $password}) {
                 jwtToken
             }
+        }`,
+        CREATE_RESOURCE: gql`mutation CreateResource($categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}) {
+            createResource(
+              input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation}
+            ) {
+              integer
+            }
         }`
     },
     subscriptions: {}
-}
-
-export const useRegisterAccount = () => {
-    const [registerAccount, result] = useMutation(GraphQlLib.mutations.REGISTER_ACCOUNT)
-
-    return [
-        (name: string, email: string, password: string, language: string) => registerAccount({ variables: 
-            { email, name,  password, language } }),
-        result
-    ] as [(name: string, email: string, password: string, language: string) => Promise<FetchResult<any>>, MutationResult<any>]
-}
-
-export const useDeleteAccount = () => {
-    const [deleteAccount, result] = useMutation(GraphQlLib.mutations.DELETE_ACCOUNT)
-
-    return [
-        () => deleteAccount({ variables: {  } }),
-        result
-    ] as [() => Promise<FetchResult<any>>, MutationResult<any>]
-}
-
-export const useAuthenticate = () => {
-    const [authenticate, result] = useMutation(GraphQlLib.mutations.AUTHENTICATE)
-
-    return [
-        (email: string, password: string) => authenticate({ variables: 
-            { email,  password } }),
-        result
-    ] as [(email: string, password: string) => Promise<FetchResult<any>>, MutationResult<any>]
-
 }

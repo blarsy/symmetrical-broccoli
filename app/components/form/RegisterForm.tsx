@@ -1,15 +1,16 @@
-import { Formik, ErrorMessage } from "formik"
+import { ErrorMessage } from "formik"
 import i18n, { t } from "i18next"
 import React from "react"
 import * as yup from 'yup'
-import { KeyboardAvoidingView, Platform, View } from "react-native"
+import { View } from "react-native"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { isValidPassword } from "@/lib/utils"
 import OperationFeedback from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
-import { useRegisterAccount } from "@/lib/backendFacade"
 import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
+import { useMutation } from "@apollo/client"
+import { GraphQlLib } from "@/lib/backendFacade"
 
 interface Props {
     toggleRegistering: () => void
@@ -19,7 +20,7 @@ interface Props {
 
 const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistrationRequired }: Props) => {
     const { login } = useUserConnectionFunctions()
-    const [registerAccount, { loading, error, reset }] = useRegisterAccount()
+    const [registerAccount, { loading, error, reset }] = useMutation(GraphQlLib.mutations.REGISTER_ACCOUNT)
     return <>
         <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
             await login(jwtToken)
@@ -35,7 +36,8 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                 }),
                 repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
             })} onSubmit={async (values) => {
-                const res = await registerAccount(values.name, values.email, values.password, i18n.language.substring(0, 2).toLowerCase())
+                const res = await registerAccount({ variables: { name: values.name, email: values.email, 
+                    password: values.password, language: i18n.language.substring(0, 2).toLowerCase() }})
                 if(res.data) {
                     await login(res.data.registerAccount.jwtToken)
                     onAccountRegistered && onAccountRegistered()
@@ -59,7 +61,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                         <WhiteButton testID="ok" style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                             {t('ok_caption')}
                         </WhiteButton>
-                        <OperationFeedback errorTestID="registerError" successTestID="registerSuccess" error={error} onDismissError={reset}/>
+                        <OperationFeedback testID="registerFeedback" error={error} onDismissError={reset}/>
                         <WhiteButton testID="cancel" style={{ flex: 1 }} onPress={() => {
                             toggleRegistering()
                         }}>

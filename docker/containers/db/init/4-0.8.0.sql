@@ -615,6 +615,252 @@ ALTER TABLE IF EXISTS sb.mails
     ALTER COLUMN account_id SET DEFAULT null;
 ALTER TABLE IF EXISTS sb.mails DROP CONSTRAINT IF EXISTS mails_accounts_fk;
 
+ALTER TABLE IF EXISTS sb.resources_resource_categories
+    RENAME resource_category_code TO resource_category_code1;
+ALTER TABLE IF EXISTS sb.resources_resource_categories
+    ADD COLUMN resource_category_code integer NOT NULL DEFAULT 0;
+
+DO
+$body$
+BEGIN
+	UPDATE sb.resources_resource_categories
+	SET resource_category_code = CAST(resource_category_code1 AS INTEGER);
+END;
+$body$
+LANGUAGE 'plpgsql'; 
+
+ALTER TABLE IF EXISTS sb.resources_resource_categories
+    DROP COLUMN resource_category_code1;
+
+CREATE OR REPLACE FUNCTION sb.create_resource(
+	title character varying,
+	description character varying,
+	expiration timestamp without time zone,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id INTEGER;
+DECLARE location_id INTEGER = NULL;
+BEGIN
+	IF specific_location IS NOT NULL THEN
+		INSERT INTO sb.locations (address, latitude, longitude)
+		VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+		RETURNING id INTO location_id;
+	END IF;
+
+	INSERT INTO sb.resources(
+	title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, specific_location_id)
+	VALUES (create_resource.title, create_resource.description, create_resource.expiration, sb.current_account_id(),
+			NOW(), create_resource.is_service, create_resource.is_product, create_resource.can_be_delivered,
+			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted, location_id)
+	RETURNING id INTO inserted_id;
+	
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT inserted_id, UNNEST(category_codes);
+	
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+    -- Emit notification for push notification handling
+    PERFORM pg_notify('resource_created', json_build_object(
+        'resource_id', inserted_id
+    )::text);
+	
+	RETURN inserted_id;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.update_resource(
+	resource_id integer,
+	title character varying,
+	description character varying,
+	expiration timestamp without time zone,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE ids_images_to_delete INTEGER[];
+DECLARE location_id INTEGER = NULL;
+DECLARE location_to_delete_id INTEGER = NULL;
+BEGIN
+	--Detect attempt to update a resource owned by another account
+	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND account_id = sb.current_account_id()) THEN
+		RETURN 0;
+	END IF;
+	
+	--Detect attempt to update a resource already deleted
+	IF EXISTS(SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND deleted IS NOT NULL) THEN
+		RETURN -1;
+	END IF;
+	
+	SELECT specific_location_id INTO location_id
+	FROM sb.resources
+	WHERE id = resource_id;
+
+	IF specific_location IS NOT NULL THEN
+		IF location_id IS NULL THEN
+			INSERT INTO sb.locations (address, latitude, longitude)
+			VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+			RETURNING id INTO location_id;
+		ELSE
+			UPDATE sb.locations SET address = specific_location.address, latitude = specific_location.latitude, longitude = specific_location.longitude
+			WHERE id = location_id;
+		END IF;
+	ELSE
+		IF location_id IS NOT NULL THEN
+			SELECT location_id INTO location_to_delete_id;
+		END IF;
+		SELECT null INTO location_id;
+	END IF;
+
+	UPDATE sb.resources r SET title = update_resource.title, description = update_resource.description, 
+		expiration = update_resource.expiration, is_service = update_resource.is_service, 
+		is_product = update_resource.is_product, can_be_delivered = update_resource.can_be_delivered, 
+		can_be_taken_away = update_resource.can_be_taken_away, can_be_exchanged = update_resource.can_be_exchanged, 
+		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id
+	WHERE r.id = update_resource.resource_id;
+	
+	IF location_to_delete_id IS NOT NULL THEN
+		DELETE FROM sb.locations WHERE id = location_to_delete_id;
+	END IF;
+	DELETE FROM sb.resources_resource_categories rrc WHERE rrc.resource_id = update_resource.resource_id;
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT update_resource.resource_id, UNNEST(category_codes);
+	
+	ids_images_to_delete = ARRAY(SELECT image_id FROM sb.resources_images ri
+		WHERE ri.resource_id = update_resource.resource_id);
+	
+	DELETE FROM sb.resources_images ri WHERE ri.resource_id = update_resource.resource_id;
+	DELETE FROM sb.images i WHERE i.id IN (SELECT UNNEST(ids_images_to_delete));
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT update_resource.resource_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+	RETURN 1;
+END;
+$BODY$;
+
+DROP FUNCTION IF EXISTS sb.update_resource(integer, character varying, character varying, timestamp without time zone, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], character varying[], new_location);
+DROP FUNCTION IF EXISTS sb.create_resource(character varying, character varying, timestamp without time zone, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], character varying[], new_location);
+
+ALTER TABLE IF EXISTS sb.searches
+    RENAME category_codes TO category_codes1;
+
+ALTER TABLE IF EXISTS sb.searches
+    ADD COLUMN category_codes integer[];
+
+ALTER TABLE IF EXISTS sb.searches DROP COLUMN IF EXISTS category_codes1;
+
+DROP FUNCTION IF EXISTS sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], numeric, numeric, numeric, boolean);
+
+CREATE OR REPLACE FUNCTION sb.suggested_resources(
+	search_term text,
+	is_product boolean,
+	is_service boolean,
+	can_be_gifted boolean,
+	can_be_exchanged boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	category_codes integer[],
+	reference_location_latitude numeric,
+	reference_location_longitude numeric,
+	distance_to_reference_location numeric,
+	exclude_unlocated boolean)
+    RETURNS SETOF resources 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+	INSERT INTO sb.searches (term, is_product, is_service, can_be_gifted, 
+		can_be_exchanged, can_be_delivered, can_be_taken_away, category_codes, 
+		reference_location_latitude, reference_location_longitude, 
+		distance_to_reference_location, account_id, exclude_unlocated) 
+	VALUES
+		(suggested_resources.search_term, suggested_resources.is_product, suggested_resources.is_service, 
+		 suggested_resources.can_be_gifted, suggested_resources.can_be_exchanged, 
+		 suggested_resources.can_be_delivered, suggested_resources.can_be_taken_away, 
+		 suggested_resources.category_codes, suggested_resources.reference_location_latitude, 
+		 suggested_resources.reference_location_longitude, suggested_resources.distance_to_reference_location,
+		 sb.current_account_id(), suggested_resources.exclude_unlocated);
+
+	RETURN QUERY
+	SELECT r.*
+	  FROM sb.resources r
+	  LEFT JOIN sb.active_accounts a ON a.id = r.account_id
+	  LEFT JOIN sb.locations l ON l.id = r.specific_location_id
+	  WHERE r.expiration > LOCALTIMESTAMP
+	  AND r.deleted IS NULL
+	  AND (ARRAY_LENGTH(category_codes, 1) IS NULL OR EXISTS(
+		  SELECT * 
+		  FROM sb.resources_resource_categories rrc 
+		  WHERE r.id = rrc.resource_id AND rrc.resource_category_code IN (SELECT UNNEST(category_codes))))
+	  AND (r.account_id = sb.current_account_id() OR a.id IS NOT NULL)
+	  AND
+	  (NOT suggested_resources.is_product OR r.is_product)
+	  AND
+	  (NOT suggested_resources.is_service OR r.is_service)
+	  AND
+	  (NOT suggested_resources.can_be_gifted OR r.can_be_gifted)
+	  AND
+	  (NOT suggested_resources.can_be_exchanged OR r.can_be_exchanged)
+	  AND
+	  (NOT suggested_resources.can_be_delivered OR r.can_be_delivered)
+	  AND
+	  (NOT suggested_resources.can_be_taken_away OR r.can_be_taken_away)
+	  AND(
+		 distance_to_reference_location = 0 
+		 OR 
+		 (r.specific_location_id IS NULL AND NOT suggested_resources.exclude_unlocated)
+		 OR
+		 (select sb.geodistance(suggested_resources.reference_location_latitude, suggested_resources.reference_location_longitude, l.latitude, l.longitude) <= suggested_resources.distance_to_reference_location)
+	  )
+	  AND
+	  (search_term = '' OR 
+		(r.title ILIKE '%' || search_term || '%' OR 
+		 r.description ILIKE '%' || search_term || '%' OR
+		 a.name ILIKE '%' || search_term || '%'))
+	  ORDER BY created DESC, r.expiration DESC;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean)
+    OWNER TO sb;
+
+ALTER TABLE IF EXISTS sb.accounts_links
+    ADD COLUMN created timestamp with time zone NOT NULL DEFAULT now();
 
 DO
 $body$

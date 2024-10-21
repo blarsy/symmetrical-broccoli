@@ -8,12 +8,13 @@ interface Props {
     selected?: LinkTypes,
     onSelectedChanged: (newValue: number) => void
     style: StyleProp<ViewStyle>
+    testID: string
 }
 
-export default ({ selected, onSelectedChanged, style }: Props) => {
+export default ({ selected, onSelectedChanged, style, testID }: Props) => {
     return <View style={{...{ flexDirection: 'row' }, ...(style as Object)} }>
         { [1, 2, 3, 4].map(val => <View key={val} style={{ flexDirection: 'column', alignItems: 'center' }}>
-            <IconButton iconColor={primaryColor} style={{ margin: 0 }} icon={getIconForLink(val as LinkTypes)} onPress={() => onSelectedChanged(val)}/>
+            <IconButton testID={`${testID}:${val}`} iconColor={primaryColor} style={{ margin: 0 }} icon={getIconForLink(val as LinkTypes)} onPress={() => onSelectedChanged(val)}/>
             { val === selected && <Icon color={primaryColor} size={25} source="arrow-up-bold"/> }
         </View> )}
     </View>

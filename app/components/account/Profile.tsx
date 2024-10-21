@@ -14,7 +14,8 @@ import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import PublicInfo from "./PublicInfo"
 import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
-import { useDeleteAccount } from "@/lib/backendFacade"
+import { GraphQlLib } from "@/lib/backendFacade"
+import { useMutation } from "@apollo/client"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -23,7 +24,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [confirmedAccountDelete, setConfirmedAccountDelete] = useState(false)
     const [deleting, setDeleting] = useState(initial<null>(false, null))
-    const [deleteAccount] = useDeleteAccount()
+    const [deleteAccount] = useMutation(GraphQlLib.mutations.DELETE_ACCOUNT)
     const appDispatch = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
     const { logout } = useUserConnectionFunctions()

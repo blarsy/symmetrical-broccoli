@@ -59,7 +59,7 @@ const RegisterExternalAuthForm = ({ toggleRegisteringExternalAuth, onAccountRegi
                 <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>
                     {t('ok_caption')}
                 </WhiteButton>
-                <OperationFeedback errorTestID="registerExternalAuthError" successTestID="registerExternalAuthSuccess" error={error} onDismissError={reset}/>
+                <OperationFeedback testID="registerExternalAuthFeedback" error={error} onDismissError={reset}/>
                 <WhiteButton style={{ flex: 1 }} onPress={() => {
                     toggleRegisteringExternalAuth()
                 }}>

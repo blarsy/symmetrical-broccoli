@@ -16,16 +16,17 @@ interface CategoriesSelectModalProps {
     initialCategories: Category[]
     categories: Category[]
     onChange: (selectedCategories: Category[]) => void
+    testID: string
 }
 
-const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, onChange }: CategoriesSelectModalProps) => {
+const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, onChange, testID }: CategoriesSelectModalProps) => {
     const [selectedCategories, setSelectedCategories] = useState(initialCategories)
     return <Modal visible={open} onDismiss={() => setOpen(false)} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
         <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, fontSize: 24 }}>{t('resourceCategories_label')}</Text>
         <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 5 }}>
             {categories.map(cat => {
                 const isSelected = selectedCategories.some(selectedCat => selectedCat.code === cat.code )
-                return <TouchableOpacity onPress={() => {
+                return <TouchableOpacity testID={ `${testID}:Category:${cat.code}` } onPress={() => {
                     if(isSelected) {
                         setSelectedCategories(selectedCategories.filter(selectedCat => selectedCat.code != cat.code))
                     } else {
@@ -41,7 +42,7 @@ const CategoriesSelectModal = ({ open, setOpen, initialCategories, categories, o
         </View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
             <OrangeButton onPress={() => setOpen(false)}>{t('close_buttonCaption')}</OrangeButton>
-            <OrangeButton onPress={() => {
+            <OrangeButton testID={ `${testID}:ConfirmButton` } onPress={() => {
                 onChange(selectedCategories)
                 setOpen(false)
             }}>{t('done_buttonCaption')}</OrangeButton>
@@ -55,9 +56,10 @@ interface Props {
     label?: string
     labelVariant?: VariantProp<never> | undefined
     inline?: boolean
+    testID: string
 }
 
-const CategoriesSelect = ({ value, onChange, labelVariant, label, inline }: Props) => {
+const CategoriesSelect = ({ value, onChange, labelVariant, label, inline, testID }: Props) => {
     const appContext = useContext(AppContext)
     const [ open, setOpen ] = useState(false)
 
@@ -65,7 +67,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label, inline }: Prop
     
     return <LoadedZone loading={appContext.categories.loading} error={appContext.categories.error}>
         { appContext.categories.data ? <View>
-            <TouchableOpacity onPress={openModal}>
+            <TouchableOpacity testID={ `${testID}:Button` } onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                     <TransparentTextInput inlineMode={inline} label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
                         value={( value.map(cat => cat.name).join(', '))} right={<TextInput.Icon color="#000" onPress={openModal} size={26} icon="chevron-right"/>} 
@@ -73,7 +75,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label, inline }: Prop
                 </View>
             </TouchableOpacity>
             <Portal>
-                <CategoriesSelectModal categories={appContext.categories.data} initialCategories={value} open={open} setOpen={setOpen}
+                <CategoriesSelectModal testID={ `${testID}:Modal` }  categories={appContext.categories.data} initialCategories={value} open={open} setOpen={setOpen}
                     onChange={onChange} />
             </Portal>
         </View> : <></> }
