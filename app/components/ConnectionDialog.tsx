@@ -3,6 +3,7 @@ import { IconButton, Modal, Portal } from "react-native-paper"
 
 import Login from "./mainViews/Login"
 import { primaryColor } from "./layout/constants"
+import Images from "@/Images"
 
 interface Props {
     visible: boolean
@@ -14,7 +15,7 @@ interface Props {
 
 const ConnectionDialog = ({ visible, onDone, infoTextI18n, infoSubtextI18n, onCloseRequested }: Props) => <Portal>
     <Modal visible={visible} contentContainerStyle={{ shadowColor: primaryColor }} style={{ backgroundColor: primaryColor, margin: 5, borderRadius: 20, display: 'flex', justifyContent: 'space-around', flexDirection: 'column' }}>
-        <IconButton icon="close" style={{ alignSelf: 'flex-end' }} onPress={() => {
+        <IconButton size={15} icon={p => <Images.Cross fill={p.color} />} style={{ alignSelf: 'flex-end' }} onPress={() => {
             onCloseRequested()
             onDone && onDone()
         }} iconColor="#000"/>

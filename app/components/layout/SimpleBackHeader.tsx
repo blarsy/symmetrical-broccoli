@@ -4,13 +4,14 @@ import React from "react";
 import { View } from "react-native";
 import { Button, Icon } from "react-native-paper";
 import { primaryColor } from "./constants";
+import Images from "@/Images";
 
 interface SimpleBackHeaderProps extends NativeStackHeaderProps {
     goBack? : () => void
 }
 
 const SimpleBackHeader = (props: SimpleBackHeaderProps) => <View style={{ flexDirection: 'row', backgroundColor: '#fff' }}>
-    <Button textColor={primaryColor} icon={p => <Icon size={p.size} source="chevron-left" color={p.color} /> }
+    <Button textColor={primaryColor} icon={p => <Images.Caret fill={p.color} width={p.size} height={p.size} />}
         onPress={() => props.goBack ? props.goBack() : props.navigation.goBack() }>{t('back_label')}</Button>
 </View>
 

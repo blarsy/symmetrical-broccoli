@@ -10,7 +10,7 @@ import { aboveMdWidth } from "@/lib/utils"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
-import { GraphQlLib, useAuthenticate } from "@/lib/backendFacade"
+import { GraphQlLib } from "@/lib/backendFacade"
 import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
 import { useMutation } from "@apollo/client"
 

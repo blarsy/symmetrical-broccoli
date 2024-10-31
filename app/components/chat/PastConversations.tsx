@@ -1,12 +1,11 @@
 import { t } from "@/i18n"
 import { ConversationData, Resource, fromServerGraphConversations } from "@/lib/schema"
 import React, { useContext, useEffect } from "react"
-import { Image, View } from "react-native"
+import { View } from "react-native"
 import LoadedList from "../LoadedList"
 import ResponsiveListItem from "../ResponsiveListItem"
 import { Icon, Text } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
-import { urlFromPublicId } from "@/lib/images"
 import { gql, useQuery } from "@apollo/client"
 import { userFriendlyTime } from "@/lib/utils"
 import { AppContext } from "../AppContextProvider"
@@ -77,7 +76,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
         <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} 
         error={error} noDataLabel={<NoConversationYet />}
             displayItem={(item, idx) => {
-                return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
+                return <ResponsiveListItem key={idx} style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
                     left={() => <ResourceImage size={70} resource={item.conversation.resource} key={idx}/>}
                     onPress={() => {
                       onConversationSelected(item.conversation.resource, item.withUser.id)

@@ -1,7 +1,7 @@
 import React  from 'react'
 import { EditResourceContext } from '../components/resources/EditResourceContextProvider'
 import DataLoadState, { fromData, initial } from './DataLoadState'
-import { AccountInfo, Resource } from './schema'
+import { AccountInfo, Category, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
 import { PaperProvider, Text } from 'react-native-paper'
 import { MockedProvider, MockedResponse } from "@apollo/react-testing"
@@ -12,11 +12,12 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { NavigationContainer } from '@react-navigation/native'
 import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
-import { IMessage } from 'react-native-gifted-chat'
+
 import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { View } from 'react-native'
+import { IMessage } from '@/components/chat/Chat'
 
 export const editResourceContextDecorator = (initialResource?: Resource) => (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
     {
@@ -40,11 +41,11 @@ export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: b
     (StoryElement: React.ElementType) => 
         makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
 
-const defaultResourceCategories = [
-    { code: 'cat1', name: 'category 1' },
-    { code: 'cat2', name: 'category 2' },
-    { code: 'cat3', name: 'category 3' },
-    { code: 'cat4', name: 'category 4' }
+const defaultResourceCategories: Category[] = [
+    { code: 1, name: 'category 1' },
+    { code: 2, name: 'category 2' },
+    { code: 3, name: 'category 3' },
+    { code: 4, name: 'category 4' }
 ]
 
 export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
@@ -56,7 +57,7 @@ export const makeAppContextProvider = (StoryElement: React.ElementType, account?
 </AppContextProvider>
 
 export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]> = initial<Resource[]>(true, [])) => (StoryElement: React.ElementType) => <SearchFilterContext.Provider value={{ 
-    filter: { categories: [], options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
+    filter: { categories: [], location: { distanceToReferenceLocation: 50, excludeUnlocated: false }, options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
     actions: {
         requery: async() => {},
         setSearchFilter: () => {}

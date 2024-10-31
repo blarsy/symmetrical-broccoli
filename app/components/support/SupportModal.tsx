@@ -6,6 +6,7 @@ import ReportIssue from "./ReportIssue"
 import { t } from "@/i18n"
 import Faq from "./Faq"
 import { WhiteButton } from "../layout/lib"
+import Images from "@/Images"
 
 interface Props {
     visible: boolean
@@ -22,9 +23,9 @@ export default ({ visible, onDismiss }: Props) => {
     return <Portal>
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15, maxHeight: Dimensions.get('window').height - 20 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomColor: '#000', borderBottomWidth: 1, marginBottom: 10 }}>
-                <IconButton icon="chevron-left" style={{ opacity: selectedTopic != -1 ? 1 : 0 }} onPress={() => setSelectedTopic(-1)} />
+                <IconButton icon={Images.Caret} size={12} style={{ opacity: selectedTopic != -1 ? 1 : 0 }} onPress={() => setSelectedTopic(-1)} />
                 <Text variant="headlineLarge" style={{ textAlign: 'center', flex: 1, paddingVertical: 10, fontSize: 24 }}>{t('support_title')}</Text>
-                <IconButton icon="close" onPress={onDismiss} />
+                <IconButton icon={Images.Cross} size={12} onPress={onDismiss} />
             </View>
             <ScrollView>
                 { selectedTopic != -1 ? 

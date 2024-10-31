@@ -15,6 +15,8 @@ import TopperGardener from './img/toppers/gardener.svg'
 import TopperHandyman from './img/toppers/handyman.svg'
 import TopperPainter from './img/toppers/painter.svg'
 import TopperPastryChef from './img/toppers/pastry-chef.svg'
+import TopperScout from './img/toppers/scout.svg'
+import TopperJeweler from './img/toppers/jewelry-maker.svg'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from "next/link"
@@ -80,18 +82,24 @@ const ToppersBar = () => {
             <TopperPastryChef width={width} />
         </Box>
     </Box>, <Box key="2" style={{ position: 'relative', height: width, width }}>
-        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_2_1} 10s linear 0s infinite` }}>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_1} 15s linear 0s infinite` }}>
             <TopperGardener width={width} />
         </Box>
-        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_2_2} 10s linear 0s infinite` }}>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_2} 15s linear 0s infinite` }}>
             <TopperDev width={width} />
         </Box>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_3} 15s linear 0s infinite` }}>
+            <TopperJeweler width={width} />
+        </Box>
     </Box>, <Box key="3" style={{ position: 'relative', height: width, width }}>
-        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_2_1} 10s linear 0s infinite` }}>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_1} 15s linear 0s infinite` }}>
             <TopperBabysitter width={width} />
         </Box>
-        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_2_2} 10s linear 0s infinite` }}>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_2} 15s linear 0s infinite` }}>
             <TopperBikeRepairer width={width} />
+        </Box>
+        <Box sx={{ position: 'absolute', opacity: 0, animation: `${appear_3_3} 15s linear 0s infinite` }}>
+            <TopperScout width={width} />
         </Box>
     </Box> ]
 }

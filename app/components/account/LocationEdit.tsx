@@ -11,6 +11,7 @@ import Geocoder from 'react-native-geocoding'
 import { OrangeButton } from "../layout/lib"
 import { Location } from "@/lib/schema"
 import ConfirmDialog from "../ConfirmDialog"
+import Images from "@/Images"
 
 const DEFAUT_LOCATION: Location = {
     latitude: 50.60953016033429,
@@ -96,7 +97,7 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
             <View style={{ flexDirection: 'row' }}>
                 <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon="pencil" 
                     onPress={() => { setEditedLocation(currentLocation || DEFAUT_LOCATION)}} />
-                { currentLocation && <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon="delete" 
+                { currentLocation && <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon={p => <Images.Bin style={{ width: 25, height: 25 }} fill={p.color} />}
                     onPress={() => { setDeleteRequested(true)}} />}
             </View>
         </View>

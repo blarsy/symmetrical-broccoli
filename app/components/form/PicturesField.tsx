@@ -53,7 +53,7 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                             maximumValue={100} style={{ width: '70%' }} />
                     </View>
                 </Camera>
-                <IconButton style={{ borderRadius: 3 }} disabled={!cameraReady} icon={p => <Images.Camera />} onPress={async () => {
+                <IconButton style={{ borderRadius: 3 }} disabled={!cameraReady} icon={Images.Camera} onPress={async () => {
                     setProcessing(true)
                     try {
                         const img = await ref.current?.takePictureAsync({ skipProcessing: true })
@@ -96,7 +96,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 { images.map((image, idx) => {
                     return <View key={idx} style={{ flexDirection:'column', alignItems: 'center' }}>
                         <Image style={{ height: 100, width: 100 }} source={{ uri: image.path || urlFromPublicId(image.publicId!) }} />
-                        <IconButton size={20} icon="close-thick" iconColor={primaryColor} onPress={() => onImageDeleteRequested(image)}/>
+                        <IconButton size={20} icon={p => <Images.Cross fill={p.color} />} iconColor={primaryColor} onPress={() => onImageDeleteRequested(image)}/>
                     </View>
                 })}
             </View>

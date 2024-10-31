@@ -29,11 +29,11 @@ export default ({ viewRequested, resource, editRequested, deleteRequested, isExa
     } else if(hasMinWidth(1200)) {
         size = 400
     } else {
-        size = percentOfWidth(45)
+        size = percentOfWidth(44)
     }
     return <View style={{ borderRadius: IMAGE_BORDER_RADIUS, flexBasis: size, 
         backgroundColor: resource.deleted ? deletedGrayColor : lightPrimaryColor, padding: 10, 
-        gap: 5, opacity: isExample ? 0.7 : 1, ...(style as object)}}>
+        justifyContent: 'space-between', gap: 5, opacity: isExample ? 0.7 : 1, ...(style as object)}}>
         <TouchableOpacity testID={`${testID}:ViewButton`} onPress={() => !isExample && viewRequested(resource.id) }>
             <FlexResourceImage resource={resource} />
         </TouchableOpacity>

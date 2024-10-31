@@ -1,5 +1,5 @@
-const version = '0.8.1'
-const versionCode = 118
+const version = '0.8.3'
+const versionCode = 120
 
 let appSettings
 if(process.env.TARGET_ENV) {
@@ -39,6 +39,9 @@ module.exports = {
       "**/*"
     ],
     "ios": {
+      "infoPlist": {
+        "LSMinimumSystemVersion": "12.0"
+      },
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.topela",

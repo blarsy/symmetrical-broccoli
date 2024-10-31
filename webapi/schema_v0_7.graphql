@@ -4757,15 +4757,9 @@ The root subscription type: contains realtime events you can subscribe to with t
 """
 type Subscription {
   messageReceived: MessageSubscriptionPayload
-  notificationReceived: NotificationSubscriptionPayload
 }
 
 type MessageSubscriptionPayload {
   message: Message
-  event: String
-}
-
-type NotificationSubscriptionPayload {
-  notification: Notification
   event: String
 }

@@ -110,7 +110,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                         </View>
                     </View>
                 </ViewField>
-                { resource.account?.id === appState.account?.id && <BareIconButton size={35} onPress={() => {
+                { resource.account?.id != appState.account?.id && <BareIconButton size={35} onPress={() => {
                     ensureConnected('introduce_yourself', '', () => {
                         setTimeout(() => navigation.navigate('chat', {
                             screen: 'conversation',

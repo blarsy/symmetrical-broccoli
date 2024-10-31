@@ -42,7 +42,7 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
                     </> }
                 }, {
                     name: 'notifications', component: Notifications, options: { title: t('notifications_label'), tabBarIcon: p => <>
-                        <Icon source="bell" size={30} color={p.color}/>
+                        <Images.Bell fill={p.color}/>
                         { appContext.numberOfUnreadNotifications != 0 && <Badge style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.numberOfUnreadNotifications}</Badge>}
                     </> }
                 } ]} />

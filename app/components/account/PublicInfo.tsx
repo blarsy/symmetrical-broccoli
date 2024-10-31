@@ -13,6 +13,7 @@ import { Hr } from "../layout/lib"
 import { t } from "i18next"
 import { ScrollView } from "react-native-gesture-handler"
 import LocationEdit from "./LocationEdit"
+import Images from "@/Images"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
@@ -57,7 +58,7 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
         <Button testID={`link:${idx}:Button`} style={{ flex: 1 }} compact labelStyle={{ fontSize: fontSizeSmall }} textColor="#fff" 
             mode="text" onPress={() => Linking.openURL(link.url)}>{ link.label || t('link_button_default_label') }</Button>
         <IconButton testID={`link:${idx}:EditButton`} containerColor="#fff" iconColor="#000" icon="file-edit-outline" onPress={() => editLinkRequested(link)} />
-        <IconButton testID={`link:${idx}:DeleteButton`} containerColor="#fff" iconColor="#000" icon="delete" onPress={() => deleteLinkRequested(link)} />
+        <IconButton testID={`link:${idx}:DeleteButton`} containerColor="#fff" iconColor="#000" icon={p => <Images.Bin style={{ width: 25, height: 25 }} fill={p.color} />} onPress={() => deleteLinkRequested(link)} />
     </View>} />
     <Button testID="addLinkButton" style={{ backgroundColor: '#fff' }} textColor="#000" icon="link-plus" onPress={newLinkRequested}>{t('add_buttonLabel')}</Button>
 </View>

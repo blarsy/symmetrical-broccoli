@@ -2,6 +2,7 @@ import React from "react"
 import { View } from "react-native"
 import { List, IconButton } from "react-native-paper"
 import ListOf from "../ListOf"
+import Images from "@/Images"
 
 interface Props {
     newMessages: any[]
@@ -22,7 +23,7 @@ const NewChatMessages = ({ newMessages, onRequestConversationOpen, onClose }: Pr
                         )
                     }} />} />
         </View>
-        <IconButton icon="close" onPress={() => onClose()} />
+        <IconButton size={15} icon={p => <Images.Cross fill={p.color}/>} onPress={() => onClose()} />
     </View>
 }
 

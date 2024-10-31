@@ -16,6 +16,7 @@ import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { GraphQlLib } from "@/lib/backendFacade"
 import { useMutation } from "@apollo/client"
+import Images from "@/Images"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -65,7 +66,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                         </Portal>
                     </Dialog.Content>
                     <Dialog.Actions>
-                        <IconButton disabled={!confirmedAccountDelete} size={30} iconColor="#000" icon="check" onPress={async () => {
+                        <IconButton disabled={!confirmedAccountDelete} size={30} iconColor="#000" icon={p => <Images.Check fill={p.color}/>} onPress={async () => {
                             setDeleting(beginOperation())
                             try {
                                 await deleteAccount()
@@ -78,7 +79,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                                 setDeleting(fromError(e, t('requestError')))
                             }
                         } }/>
-                        <IconButton size={30} icon="close" iconColor={primaryColor} onPress={async () => { 
+                        <IconButton size={30} icon={p => <Images.Cross fill={p.color} />} iconColor={primaryColor} onPress={async () => { 
                             setDeletingAccount(false) 
                             setConfirmedAccountDelete(false)
                         } }/>

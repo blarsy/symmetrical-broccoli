@@ -1,10 +1,11 @@
 import React from "react"
-import { StyleProp, View, ViewStyle } from "react-native"
+import { Platform, StyleProp, View, ViewStyle } from "react-native"
 import { t } from "@/i18n"
 import LoadedList from "./LoadedList"
 import { WhiteButton } from "./layout/lib"
 import { LoadState, aboveMdWidth } from "@/lib/utils"
-import { IconButton } from "react-native-paper"
+import { Button, IconButton } from "react-native-paper"
+import Images from "@/Images"
 
 interface Props {
     state: LoadState | any[]
@@ -16,14 +17,15 @@ interface Props {
     noDataLabel?: string | JSX.Element
 }
 
-export const AddItemButton = ({ onAddRequested, style }: { onAddRequested: () => void, style?: ViewStyle }) => 
-    <WhiteButton style={{flex: 1, ...style}} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
+const AddItemButton = ({ onAddRequested, style }: { onAddRequested: () => void, style?: ViewStyle }) => 
+    <WhiteButton style={style} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
 
 function AppendableList ({ state, dataFromState, displayItem, onAddRequested, contentContainerStyle, onRefreshRequested, noDataLabel }:Props) {
     return <View style={{ flexDirection: 'column', margin: 10, flex: 1, alignItems: 'stretch' }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'relative'  }}>
-            <AddItemButton style={{ flexGrow: 0, flexShrink: 0, flexBasis: aboveMdWidth() ? '60%' : '70%' }} onAddRequested={onAddRequested} />
-            { onRefreshRequested && <IconButton style={{ margin: 2, position: 'absolute', right: 0 }} icon="refresh" onPress={onRefreshRequested} /> }
+            {/* Strange bug on IOS: flexBasis is applied on the wrong axis (thus we have a button covering 60% ... of the screen height). So, on IOS we give some vertical padding to make the button moretheless larger */}
+            <WhiteButton style={Platform.OS === "android" ? { flexGrow: 0, flexShrink: 0, flexBasis: aboveMdWidth() ? '60%' : '70%' } : { paddingHorizontal: '15%' }} mode="outlined" icon="plus" onPress={() => onAddRequested()}>{t('add_buttonLabel')}</WhiteButton>
+            { onRefreshRequested && <IconButton style={{ margin: 7, position: 'absolute', right: 0, borderRadius: 0}} size={15} icon={Images.Refresh} onPress={onRefreshRequested} /> }
         </View>
         { Array.isArray(state) ? <LoadedList contentContainerStyle={contentContainerStyle} loading={false} error={undefined} data={state}
             displayItem={displayItem}/> :

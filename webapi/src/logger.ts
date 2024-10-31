@@ -1,4 +1,4 @@
-import { createLogger, format, transports, LogCallback } from "winston"
+import { createLogger, format, transports } from "winston"
 import { getCommonConfig } from "./config"
 
 const logger: {
@@ -27,18 +27,19 @@ export const init = async () => {
                 new transports.File({ filename: config.logPath + 'combined.log', maxsize: 5000000, maxFiles: 3 }),
             ],
         })
-        logger.error =  (message: string, error: any, cb?: LogCallback) => {
+        logger.error =  (message: string, error: any) => {
             const content = `${message} ${parseError(error)}`
             if(!config.production) console.log(content)
-            winstonLogger.error(content, cb)
+            winstonLogger.error(content)
         }
-        logger.info = (message: string, cb?: LogCallback) => {
+        logger.info = (message: string) => {
             if(!config.production) console.log(message)
-            winstonLogger.info(message, cb)
+            winstonLogger.info(message)
+            
         }
-        logger.warn = (message: string, cb?: LogCallback) => {
+        logger.warn = (message: string) => {
             if(!config.production) console.log(message)
-            winstonLogger.warn(message, cb)
+            winstonLogger.warn(message)
         }
         logger.initialized = true
     }

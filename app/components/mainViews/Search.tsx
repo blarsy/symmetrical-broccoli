@@ -109,7 +109,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
         <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
                 <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
-                <IconButton style={{ margin: 2 }} icon="refresh" onPress={() => {
+                <IconButton style={{ margin: 6, borderRadius: 0 }} size={20} icon={Images.Refresh} onPress={() => {
                     searchFilterContext.actions.requery(appContext.categories.data!)
                 }} />
             </View>

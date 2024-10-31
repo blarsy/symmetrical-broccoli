@@ -34,8 +34,8 @@ const meta: Meta<typeof Profile> = {
           locationByLocationId: {
             address: 'Rue de la paix, 7',
             id: 1,
-            longitude: 50,
-            latitude: 3
+            latitude: 50.611820,
+            longitude: 3.416574,
           }
         }
       }
@@ -67,8 +67,8 @@ const meta: Meta<typeof Profile> = {
         locationByLocationId: {
           address: 'Rue de la vache, 3',
           id: 1,
-          longitude: 49,
-          latitude: 2
+          latitude: 50.591820,
+          longitude: 3.416574,
         }
       }
     }])

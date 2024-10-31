@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, Dialog, IconButton, Portal, Text } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./layout/constants"
 import { ErrorSnackbar } from "./OperationFeedback"
+import Images from "@/Images"
 
 interface Props {
     visible: boolean
@@ -25,7 +26,7 @@ const ConfirmDialog = ({ visible, onResponse, title, question }: Props) => {
                 </Portal>
             </Dialog.Content>
             <Dialog.Actions>
-                <IconButton size={30} iconColor="#000" icon="check" onPress={async () => {
+                <IconButton size={15} iconColor="#000" icon={ p => <Images.Check fill={p.color}/> } onPress={async () => {
                     setProcessing(beginOperation())
                     try {
                         await onResponse(true)
@@ -34,7 +35,7 @@ const ConfirmDialog = ({ visible, onResponse, title, question }: Props) => {
                         setProcessing(fromError(e, t('requestError')))
                     }
                 } }/>
-                <IconButton size={30} icon="close" iconColor={primaryColor} onPress={async () => { onResponse(false) } }/>
+                <IconButton size={15} icon={p => <Images.Cross fill={p.color} />} iconColor={primaryColor} onPress={async () => { onResponse(false) } }/>
             </Dialog.Actions>
         </Dialog>
     </Portal>
