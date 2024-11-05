@@ -84,8 +84,8 @@ const Roadmap = () => {
             <Typography color="#000" textAlign="center" variant="h1">Feuille de route</Typography>
             <StepStone leftText={'Avril 2024'} done rightTextTitle={'Version Alpha'}  rightTextDetail={'Création de compte et de ressources. Messagerie instantanée.'}/>
             <StepStone leftText={'Août 2024'} done rightTextTitle={'Version Bèta'}  rightTextDetail={'Customisation de compte. Notification de messages instantanés et nouvelles ressources.'}/>
-            <StepStone leftText={'Octobre 2024'} rightTextTitle={'Modèle économique'}  rightTextDetail={'Une rémunération juste pour la plateforme, collectée de manière équitable.'}/>
-            <StepStone leftText={'Novembre 2024'} rightTextTitle={'Campagne de lancement'}  rightTextDetail={`Uh subside à l'économie circulaire en démocratie directe.`}/>
+            <StepStone leftText={'Décembre 2024'} rightTextTitle={'Modèle économique'}  rightTextDetail={'Une rémunération juste pour la plateforme, collectée de manière équitable.'}/>
+            <StepStone leftText={'Janvier 2025'} rightTextTitle={'Campagne de lancement'}  rightTextDetail={`Uh subside à l'économie circulaire en démocratie directe.`}/>
             <StepStone leftText={'2025'} rightTextTitle={'Collectivisation'}  rightTextDetail={`Tope-là devient progressibement un projet 100% auto-géré par ses utilisateurs.`}/>
         </Stack>
     </Stack>
