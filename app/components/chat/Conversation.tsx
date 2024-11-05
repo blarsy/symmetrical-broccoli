@@ -5,11 +5,10 @@ import { RouteProps } from "@/lib/utils"
 import { ConversationContext, asIMessage } from "./ConversationContextProvider"
 import { useNavigation } from "@react-navigation/native"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import OperationFeedback from "../OperationFeedback"
 import PanZoomImage from "../PanZoomImage"
 import ChatBackground from "./ChatBackground"
 import Chat from "./Chat"
-import { initial } from "@/lib/DataLoadState"
+import LoadedZone from "../LoadedZone"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
@@ -34,7 +33,7 @@ const Conversation = ({ route }: RouteProps) => {
     const [focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const navigation = useNavigation()
     const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
-    const [createMessage, { error: createError, reset}] = useMutation(CREATE_MESSAGE)
+    const [createMessage] = useMutation(CREATE_MESSAGE)
 
     useEffect(() => {
       if(appContext.categories.data) {
@@ -43,12 +42,14 @@ const Conversation = ({ route }: RouteProps) => {
     }, [route.params, appContext.categories.data])
 
     const onSend = useCallback(async (newMessage: string, imagePublicId?: string) => {
+        try {
+
           await createMessage({ variables: { 
               text: newMessage, 
-              resourceId: new Number(conversationContext.consversationState.data?.resource?.id), 
-              otherAccountId: new Number(conversationContext.consversationState.data?.otherAccount.id),
-              imagePublicId } })
-  
+              resourceId: new Number(conversationContext.conversationState.data?.resource?.id), 
+              otherAccountId: new Number(conversationContext.conversationState.data?.otherAccount.id),
+              imagePublicId: imagePublicId || undefined } })
+
           conversationContext.actions.setMessages(prevMessages => [{ 
             createdAt: new Date(), 
             id: -1, 
@@ -57,8 +58,11 @@ const Conversation = ({ route }: RouteProps) => {
             image: imagePublicId, 
             received: false,
             sent: true
-           }, ...prevMessages])
-    }, [conversationContext.consversationState.data])
+            }, ...prevMessages])
+        } catch(e) {
+          appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+        }
+    }, [conversationContext.conversationState.data])
 
     const onMessageReceived = (msg: any) => {
       const receivedMsg = asIMessage(msg)
@@ -78,23 +82,26 @@ const Conversation = ({ route }: RouteProps) => {
     }, [])
 
     useEffect(() => {
-      if(conversationContext.consversationState.data?.resource && conversationContext.messagesState.messages.data) {
+      if(conversationContext.conversationState.data?.resource && conversationContext.messagesState.messages.data) {
         setParticipantRead({ variables: { 
-          resourceId: conversationContext.consversationState.data?.resource?.id, 
-          otherAccountId: conversationContext.consversationState.data?.otherAccount.id
+          resourceId: conversationContext.conversationState.data?.resource?.id, 
+          otherAccountId: conversationContext.conversationState.data?.otherAccount.id
          } })
-         appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.consversationState.data?.participantId })
+        appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.conversationState.data?.participantId })
       }
     }, [conversationContext.messagesState.messages.data])
 
     return <ChatBackground>
-        <Chat messages={conversationContext.messagesState.messages ? conversationContext.messagesState.messages : initial(true, [])} 
-          onSend={onSend} otherAccount={conversationContext.consversationState.data!.otherAccount}
-          onLoadEarlier={conversationContext.actions.loadEarlier} 
-          testID="conversation" 
-          loadingEarlier={conversationContext.messagesState.messages ? conversationContext.messagesState.messages.loading: false}
-          canLoadEarlier={!!conversationContext.messagesState.endCursor}/>
-        <OperationFeedback testID="conversationFeedback" error={conversationContext.consversationState.error || createError} onDismissError={reset} />
+        <LoadedZone loading={conversationContext.conversationState.loading} 
+          error={conversationContext.conversationState.error} 
+          containerStyle={{ flex: 1 }}>
+          <Chat messages={conversationContext.messagesState.messages} 
+            onSend={onSend} otherAccount={conversationContext.conversationState.data!.otherAccount}
+            onLoadEarlier={conversationContext.actions.loadEarlier} 
+            testID="conversation" 
+            loadingEarlier={conversationContext.messagesState.messages ? conversationContext.messagesState.messages.loading: false}
+            canLoadEarlier={!!conversationContext.messagesState.endCursor}/>
+          </LoadedZone>
         <PanZoomImage source={focusedImage} onDismess={() => setFocusedImage(undefined)} />
     </ChatBackground>
 }

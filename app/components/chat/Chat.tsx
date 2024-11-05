@@ -8,17 +8,18 @@ import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { adaptToWidth, pickImage } from "@/lib/utils"
 import { imgSourceFromPublicId, uploadImage } from "@/lib/images"
 import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import { FlatList, ScrollView } from "react-native-gesture-handler"
+import { ScrollView } from "react-native-gesture-handler"
 import BareIconButton from "../layout/BareIconButton"
 import DataLoadState from "@/lib/DataLoadState"
 import dayjs from "dayjs"
 import PanZoomImage from "../PanZoomImage"
 import { MESSAGES_PER_PAGE } from "./ConversationContextProvider"
+import LoadedZone from "../LoadedZone"
 
 const chatImageSize = adaptToWidth(130, 250, 400)
 
 interface BottomBarProps {
-    onSend: (text: string, imagePublicId: string) => void
+    onSend: (text: string, imagePublicId: string) => Promise<void>
     disabled?: boolean
     testID: string
 }
@@ -48,14 +49,15 @@ const BottomBar = ({ onSend, disabled, testID }: BottomBarProps) => {
             placeholder={!disabled ? t('type_message_here') : t('cannot_send_to_deleted_account')}  placeholderTextColor="#aaa"
             value={message} onChangeText={setMessage} multiline/>
         {sending && <ActivityIndicator color={primaryColor}/>}
-        <BareIconButton testID={`${testID}:SendMessage`} Image={Images.Send} 
+        <BareIconButton testID={`${testID}:SendButton`} Image={Images.Send} 
             disabled={disabled}
             size={35}
-            color={!disabled ? primaryColor : '#777'} onPress={() => {
+            color={!disabled ? primaryColor : '#777'} onPress={async () => {
                 if(message) {
                     setSending(true)
                     try {
-                        onSend(message, '')
+                        await onSend(message, '')
+                        setMessage('')
                     } catch (e) {
                         appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
                     } finally {
@@ -81,7 +83,7 @@ export interface IMessage {
 }
 
 interface Props {
-    onSend: (text: string, imagePublicId: string) => void
+    onSend: (text: string, imagePublicId: string) => Promise<void>
     testID: string
     messages: DataLoadState<IMessage[]>
     otherAccount: { id: number, name: string }
@@ -94,55 +96,70 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
     const [focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const scrollRef = useRef<ScrollView | null>(null)
     const [scrolledToBottom, setScrolledToBottom] = useState(false)
+    const [scrollsToTail, setScrollsToTail] = useState(true)
+    const [invertedMessages, setInvertedMessages] =useState<IMessage[]>([])
     
     useEffect(() => {
-        //console.log('messages.data && messages.data.length > 0', messages.data && messages.data.length > 0, messages.data)
         if(messages.data && messages.data.length > 0) {
+            setInvertedMessages(messages.data!.slice().reverse())
+            
             if(!scrolledToBottom){
-                scrollRef.current?.scrollToEnd()
-                setScrolledToBottom(true)
+                setTimeout(() => {
+                    scrollRef.current?.scrollToEnd()
+                    setScrolledToBottom(true)
+                }, 0)
+            }
+            console.log('scrollsToTail checked', scrollsToTail)
+            if(scrollsToTail) {
+                setTimeout(() => {
+                    scrollRef.current?.scrollToEnd()
+                }, 0)
             }
         }
     }, [messages])
 
-    const invertedMessages = messages.data!.slice().reverse()
-
     return <ChatBackground>
-        <ScrollView maintainVisibleContentPosition={{ minIndexForVisible: MESSAGES_PER_PAGE }} 
-            ref={scrollRef} 
-            onScroll={e => {
-                if(e.nativeEvent.contentOffset.y === 0) {
-                    onLoadEarlier()
-                }
-            }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    { canLoadEarlier && !loadingEarlier && <IconButton size={20} icon="arrow-up" iconColor={primaryColor} onPress={onLoadEarlier}/>}
-                    { loadingEarlier && <ActivityIndicator size={30} color={primaryColor}/> }
-                </View>
-                { invertedMessages.map((msg, index, arr) => {
-                    const fromOther = msg.user.id != otherAccount.id
-                    let dateToDisplay: string = ''
-                    
-                    if(index === 0 || (dayjs(msg.createdAt).format('DDMMYYYY') != dayjs(invertedMessages[index - 1].createdAt).format('DDMMYYYY'))) {
-                        dateToDisplay = dayjs(msg.createdAt).format('ddd DD MMM, YY')
+        <LoadedZone containerStyle={{ flex: 1 }} loading={messages.loading} error={messages.error}>
+            <ScrollView maintainVisibleContentPosition={{ minIndexForVisible: MESSAGES_PER_PAGE }} 
+                ref={scrollRef} scrollEventThrottle={100}
+                onScroll={e => {
+                    if(e.nativeEvent.contentOffset.y === 0) {
+                        onLoadEarlier()
                     }
-                    return <View key={msg.id} style={{ flex: 1, alignItems: fromOther ? 'flex-start': 'flex-end', gap: 5 }}>
-                        { dateToDisplay && 
-                        <Text variant="bodySmall" style={{ alignSelf: 'center', color: primaryColor, fontWeight: 'bold' }}>
-                            {dateToDisplay}
-                        </Text> }
-                        <View style={{ flexDirection: 'column', backgroundColor: fromOther ? lightPrimaryColor : primaryColor, padding: 15,
-                            borderRadius: 15, margin: 5, alignItems: fromOther ? 'flex-start': 'flex-end'
-                        }}>
-                        { msg.image && <TouchableOpacity onPress={() => setFocusedImage(imgSourceFromPublicId(msg.image!))}>
-                            <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(msg.image)} />
-                        </TouchableOpacity> }
-                        <Text variant="displayMedium">{msg.text}</Text>
-                        <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
-                        </View>
-                    </View>}) }
-        </ScrollView>
-        <BottomBar testID={testID} onSend={onSend} disabled={!otherAccount.name} />
+                    setScrollsToTail(e.nativeEvent.contentOffset.y + e.nativeEvent.layoutMeasurement.height > e.nativeEvent.contentSize.height - 20)
+                }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        { canLoadEarlier && !loadingEarlier && <IconButton size={20} icon="arrow-up" iconColor={primaryColor} onPress={onLoadEarlier}/>}
+                        { loadingEarlier && <ActivityIndicator size={30} color={primaryColor}/> }
+                    </View>
+                    { invertedMessages.map((msg, index, arr) => {
+                        const fromOther = msg.user.id != otherAccount.id
+                        let dateToDisplay: string = ''
+                        
+                        if(index === 0 || (dayjs(msg.createdAt).format('DDMMYYYY') != dayjs(invertedMessages[index - 1].createdAt).format('DDMMYYYY'))) {
+                            dateToDisplay = dayjs(msg.createdAt).format('ddd DD MMM, YY')
+                        }
+                        return <View key={index} style={{ flex: 1, alignItems: fromOther ? 'flex-start': 'flex-end', gap: 5 }}>
+                            { dateToDisplay && 
+                            <Text variant="bodySmall" style={{ alignSelf: 'center', color: primaryColor, fontWeight: 'bold' }}>
+                                {dateToDisplay}
+                            </Text> }
+                            <View style={{ flexDirection: 'column', backgroundColor: fromOther ? lightPrimaryColor : primaryColor, padding: 15,
+                                borderRadius: 15, margin: 5, alignItems: fromOther ? 'flex-start': 'flex-end'
+                            }}>
+                            { msg.image && <TouchableOpacity onPress={() => setFocusedImage(imgSourceFromPublicId(msg.image!))}>
+                                <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(msg.image)} />
+                            </TouchableOpacity> }
+                            <Text variant="displayMedium" testID={`${testID}:Messages:${index}`}>{msg.text}</Text>
+                            <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
+                            </View>
+                        </View>}) }
+            </ScrollView>
+            <BottomBar testID={testID} onSend={async (text, img) => {
+                await onSend(text, img)
+                scrollRef.current?.scrollToEnd()
+            }} disabled={!otherAccount.name || !!messages.loading} />
+        </LoadedZone>
         <PanZoomImage source={focusedImage} onDismess={() => setFocusedImage(undefined)} />
     </ChatBackground>
 }

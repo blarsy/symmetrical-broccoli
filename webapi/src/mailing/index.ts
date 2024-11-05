@@ -5,9 +5,10 @@ import { recordMail } from './recordMail'
 import getConfig,{ getCommonConfig, getConnectionString } from '../config'
 import initTranslations from '../i18n'
 import { runAndLog } from '../db_jobs/utils'
+import { Pool } from 'pg'
 
 
-export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string, connectionString: string) => {
+export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string, pool: Pool) => {
     const config = await getConfig(version)
 
     const msg = {
@@ -22,16 +23,15 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
         [sgMail.send(msg)] :
         [recordMail(msg)]
 
-    promises.push(persistMail(msg, connectionString))
+    promises.push(persistMail(msg, pool))
 
     await Promise.all(promises)
 }
 
-export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string, version: string) => {
+export const sendNoReplyMail = async (to: string, subject: string, plainText: string, htmlContent: string, version: string, pool: Pool) => {
     const config = await getConfig(version)
-    const connectionString = getConnectionString(config)
     
-    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent, version, connectionString)
+    await sendMail(config.noreplyEmail!, to, subject, plainText, htmlContent, version, pool)
 }
 
 let partialsPreparePromise: Promise<void> | null = null
@@ -61,7 +61,7 @@ const preparePartials = async () => {
     return partialsPreparePromise
 }
 
-export const sendEmailActivationCode = async (email: string, code: string, lang: string, version: string) => {
+export const sendEmailActivationCode = async (email: string, code: string, lang: string, version: string, pool: Pool) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('activate_email_subject')
@@ -80,10 +80,10 @@ export const sendEmailActivationCode = async (email: string, code: string, lang:
 
     await sendNoReplyMail(email, heading, 
         `${text}${link}`, 
-        htmlContent, version)
+        htmlContent, version, pool)
 }
 
-export const sendAccountRecoveryMail = async (email: string, code: string, lang: string, version: string) => {
+export const sendAccountRecoveryMail = async (email: string, code: string, lang: string, version: string, pool: Pool) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('recover_account_subject')
@@ -102,10 +102,10 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
 
     await sendNoReplyMail(email, heading, 
         `${text}${link}`, 
-        htmlContent, version)
+        htmlContent, version, pool)
 }
 
-export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string, version: string) => {
+export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string, version: string, pool: Pool) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
 
@@ -129,14 +129,14 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
 
     const htmlContent = template(data)
 
-    await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent, version )
+    await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent, version, pool )
 }
 
-const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, connectionString: string): Promise<void> => {
+const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, pool: Pool): Promise<void> => {
     runAndLog(`INSERT INTO sb.mails(
         account_id, email, sent_from, subject, text_content, html_content)
         VALUES ((SELECT id FROM sb.accounts WHERE email = '${msg.to}' ), '${msg.to}', '${msg.from}', 
-        $1, $2, $3);`, connectionString, 'Persisting mail', [
+        $1, $2, $3);`, pool, 'Persisting mail', [
             msg.subject, msg.text, msg.html
         ])
 }

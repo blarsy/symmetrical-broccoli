@@ -1,14 +1,12 @@
-import { Client } from "pg"
+import { Pool } from "pg"
 import logger from "../logger"
 
-export const runAndLog  = async (statement: string, connectionString: string, description: string, paramValues: any[] = []) => {
-    const pgClient = new Client({ connectionString })
+export const runAndLog  = async (statement: string, pool: Pool, description: string, paramValues: any[] = []) => {
+    const client = await pool.connect()
+    logger.info(`${description}: ${statement}`)
     try {
-        await pgClient.connect()
-        logger.info(`${description}: ${statement}`)
-        return await pgClient.query(statement, paramValues)
-    }
-    finally {
-        await pgClient.end()
+        return await client.query(statement, paramValues)
+    } finally {
+        client.release()
     }
 }

@@ -88,6 +88,21 @@ export const checkResourcePresent = async (accountEmail: string, title: string, 
         categoryCodes.forEach(code => expect((cats.rows as any[]).some(row => row.code === code)).toBe(true))
 }
 
+export const checkHasNotifications = async (email: string, uniquePropNames: string[]): Promise<{ notifId: number, uniquePropName: string, uniquePropValue: any }[]> => {
+    const notifs = await executeQuery(`select n.id, n.account_id, n.data from sb.notifications n
+        inner join sb.accounts a on a.id = n.account_id
+        where a.email = lower($1)`, [email])
+    
+    console.log('notifs.rowCount uniquePropNames.length', notifs.rowCount, uniquePropNames, uniquePropNames.length)
+    expect(notifs.rowCount).toEqual(uniquePropNames.length)
+
+    return uniquePropNames.map(name => {
+        const notif = notifs.rows.find(row => !!row.data[name])
+        if(!notif) throw new Error(`Could not find notification by data prop name '${name}' in ${notifs.rows}`)
+        return { notifId: notif.id, uniquePropName: name, uniquePropValue: notif.data[name] }
+    })
+}
+
 export const checkLastNotificationExists = async (email: string): Promise<any> => {
     const notif = await executeQuery(`select n.id, n.account_id from sb.notifications n
         inner join sb.accounts a on a.id = n.account_id

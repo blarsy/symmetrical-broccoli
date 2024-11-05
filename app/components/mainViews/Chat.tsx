@@ -30,29 +30,29 @@ interface ChatHeaderProps extends NativeStackHeaderProps {
 export const ChatHeader = (p: ChatHeaderProps) => {
     const conversationContext = useContext(ConversationContext)
 
-    const resourceDeleted = conversationContext.consversationState.data?.resource?.deleted
+    const resourceDeleted = conversationContext.conversationState.data?.resource?.deleted
     
-    return (<LoadedZone loading={conversationContext.consversationState.loading} error={conversationContext.consversationState.error}
+    return (<LoadedZone loading={conversationContext.conversationState.loading} error={conversationContext.conversationState.error}
         containerStyle={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', 
             backgroundColor: lightPrimaryColor, maxWidth: Dimensions.get('window').width, paddingVertical: 5 }} loadIndicatorColor={primaryColor}>
-            { conversationContext.consversationState.data?.resource && <>
-                <BareIconButton Image="chevron-left" size={40} onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
+            { conversationContext.conversationState.data?.resource && <>
+                <BareIconButton testID="backToConversationList" Image="chevron-left" size={40} onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
                 <View style={{ position: 'relative', width: 60, height: 60 }}>
-                    <ResourceImage size={ 50 } resource={conversationContext.consversationState.data!.resource} />
+                    <ResourceImage size={ 50 } resource={conversationContext.conversationState.data!.resource} />
                     <AccountAvatar style={{ position: 'absolute', top: -30, left: 20 }} 
                         onPress={p.onAccountShowRequested} 
-                        account={conversationContext.consversationState.data!.otherAccount} size={40} />
+                        account={conversationContext.conversationState.data!.otherAccount} size={40} />
                 </View>
                 <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6 }}>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ color: primaryColor, textTransform: 'uppercase' }}>
-                        <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.consversationState.data!.otherAccount.name || t('name_account_removed')}</Text>
+                        <Icon size={fontSizeMedium} color={primaryColor} source="account-circle" /> {conversationContext.conversationState.data!.otherAccount.name || t('name_account_removed')}</Text>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ textDecorationLine: resourceDeleted ? 'line-through' : 'none' }}>
-                            {conversationContext.consversationState.data!.resource?.title}</Text>
+                            {conversationContext.conversationState.data!.resource?.title}</Text>
                     { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
                 </View>
-                <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => p.onResourceShowRequested(conversationContext.consversationState.data!.resource!.id)} />
+                <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => p.onResourceShowRequested(conversationContext.conversationState.data!.resource!.id)} />
             </>}
     </LoadedZone>)
 }

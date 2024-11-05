@@ -17,7 +17,7 @@ export const asIMessage = (msg: any): IMessage => {
     user: {
         id: msg.participantByParticipantId.accountByAccountId.id,
         name: msg.participantByParticipantId.accountByAccountId.name,
-        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId.publicId
+        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId?.publicId
     },
     image: msg.imageByImageId?.publicId,
     received: !!msg.received,
@@ -127,7 +127,7 @@ interface ConversationActions {
 }
 
 interface ConversationContext {
-    consversationState: ConversationState
+    conversationState: ConversationState
     messagesState: conversationMessagesState
     actions: ConversationActions
 }
@@ -149,7 +149,7 @@ const blankMessagesState: conversationMessagesState = {
 }
 
 export const ConversationContext = createContext<ConversationContext>({
-    consversationState: blankConversationState,
+    conversationState: blankConversationState,
     messagesState: blankMessagesState,
     actions: {
         load: async() => {},
@@ -167,7 +167,7 @@ const ConversationContextProvider = ({ children }: Props) => {
         load: async (resourceId: number, otherAccountId: number, categories: Category[]) => {
           try {
             const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
-            
+    
             if(res.data) {
               const loadedMessages = fromData(asIMessages(res.data.conversationMessages.edges))
 
@@ -176,8 +176,8 @@ const ConversationContextProvider = ({ children }: Props) => {
                     res.data.conversationMessages.edges[0].node.participantByParticipantId.conversationByConversationId.id :
                     -1,
                   participantId: res.data.conversationMessages.edges.length > 0 ? 
-                  res.data.conversationMessages.edges[0].node.participantByParticipantId.id :
-                  -1,
+                    res.data.conversationMessages.edges[0].node.participantByParticipantId.id :
+                    -1,
                   otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name, avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId },
                   resource: fromServerGraphResource(res.data.resourceById, categories)
                 }
@@ -196,6 +196,7 @@ const ConversationContextProvider = ({ children }: Props) => {
         setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]): void => {
           setMessagesState(prevState => {
             const newMessagesList = fn(prevState.messages.data ? prevState.messages.data : [])
+            
             return {
               endCursor: prevState.endCursor,
               messages: fromData(newMessagesList)
@@ -232,7 +233,7 @@ const ConversationContextProvider = ({ children }: Props) => {
         }
     }
 
-    return <ConversationContext.Provider value={{ consversationState: conversationState, messagesState: messagesState, actions}}>
+    return <ConversationContext.Provider value={{ conversationState: conversationState, messagesState: messagesState, actions}}>
         {children}
     </ConversationContext.Provider>
 }

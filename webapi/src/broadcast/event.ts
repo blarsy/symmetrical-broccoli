@@ -5,11 +5,7 @@ import logger from "../logger"
 import initTranslations from '../i18n'
 import { TFunction } from "i18next"
 import { runAndLog } from "../db_jobs/utils"
-
-export enum EventType {
-    messageCreated = 1,
-    resourceCreated = 2
-}
+import { Pool } from "pg"
 
 interface NewMessageNotificationPayload {
     messageId: number
@@ -41,7 +37,7 @@ const toMessageNotification = (payload: MessagePayload): NewMessageNotificationP
     pushToken: payload.push_token
 })
 
-export const handleMessageCreated = async (notification: PgParsedNotification, config: Config) => {
+export const handleMessageCreated = async (notification: PgParsedNotification) => {
     if(!notification.payload) throw new Error('Expected payload on notification, got none')
 
     try {
@@ -55,20 +51,17 @@ export const handleMessageCreated = async (notification: PgParsedNotification, c
     }
 }
 
-export const handleResourceCreated = async (notification: PgParsedNotification, config: Config) => {
-
-    const connectionString = getConnectionString(config)
-
+export const handleResourceCreated = async (notification: PgParsedNotification, config: Config, pool: Pool) => {
     try {
         //Find all accounts that can be suggested the new resource
         const cmdResult = await runAndLog(`SELECT sb.get_accounts_to_notify_of_new_resource(${notification.payload.resource_id});`,
-            connectionString, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`)
+            pool, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`)
     
         const accountsToNotify = cmdResult.rows[0][Object.getOwnPropertyNames(cmdResult.rows[0])[0]]
 
         if(accountsToNotify.length > 0) {
             //Create a resource suggestion for all such accounts
-            await runAndLog(`SELECT sb.create_new_resource_notifications($1, $2);`, connectionString, 
+            await runAndLog(`SELECT sb.create_new_resource_notifications($1, $2);`, pool, 
                 `Creating notifications for new resource ${JSON.stringify(notification.payload)}, accounts ${accountsToNotify}`,
                 [notification.payload.resource_id, accountsToNotify]
             )
@@ -79,7 +72,7 @@ export const handleResourceCreated = async (notification: PgParsedNotification, 
                 INNER JOIN sb.accounts creator ON creator.id = r.account_id
                 INNER JOIN sb.accounts destinator ON destinator.id = apt.account_id
                 WHERE NOT EXISTS (SELECT * FROM sb.broadcast_prefs bp WHERE bp.account_id = apt.account_id)
-                AND apt.account_id = ANY($2)`, connectionString, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`,
+                AND apt.account_id = ANY($2)`, pool, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`,
                 [notification.payload.resource_id,accountsToNotify]
             )
         

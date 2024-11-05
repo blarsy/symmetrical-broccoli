@@ -79,6 +79,7 @@ export interface ConversationData {
     withUser: Account
     conversation: {
         id: number
+        participantId: number
         lastMessageExcerpt: string | undefined
         lastMessageTime: Date | undefined
         resource: Resource
@@ -131,6 +132,7 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                 id: rawConversation.id,
                 lastMessageExcerpt: rawConversation.messageByLastMessage.text,
                 lastMessageTime: rawConversation.messageByLastMessage.created,
+                participantId: rawConversation.participantsByConversationId.nodes.find((part: any) => part.accountByAccountId.id === loggedInAccountId).id,
                 resource: {
                     title: rawConversation.resourceByResourceId.title,
                     id: rawConversation.resourceByResourceId.id,

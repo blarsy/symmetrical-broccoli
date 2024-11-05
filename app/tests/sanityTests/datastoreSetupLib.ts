@@ -7,12 +7,8 @@ import { executeQuery } from "./lib"
 
 export const getToken = async (email: string, password: string) => {
     const client = getApolloClient('')
-    try {
-        const res = await client.mutate({ mutation: GraphQlLib.mutations.AUTHENTICATE, variables: { email, password } } )
-        return res.data.authenticate.jwtToken
-    } catch (e) {
-        console.debug('Error while trying to login', e)
-    }
+    const res = await client.mutate({ mutation: GraphQlLib.mutations.AUTHENTICATE, variables: { email, password } } )
+    return res.data.authenticate.jwtToken as string
 }
 
 const confirmAccount = async (email: string) => {
@@ -35,6 +31,18 @@ export const createAndLogIn = async (email: string, name: string, password: stri
     }
 }
 
+export const authenticate = async (email: string, password: string) => {
+    const client = getApolloClient('')
+    try {
+        const res = await client.mutate({ mutation: GraphQlLib.mutations.AUTHENTICATE, variables: { email, password } } )
+        //console.log('jwt', res.data.jwtToken, 'res.data', res.data)
+        return res.data.authenticate.jwtToken
+    } catch (e) {
+        console.debug('Error while trying to login', e)
+        throw e
+    }  
+}
+
 export const deleteAccount = async (email: string, password: string) => {
     try {
         const jwtToken = await getToken(email, password)
@@ -42,6 +50,7 @@ export const deleteAccount = async (email: string, password: string) => {
         if(jwtToken) {
             return await deleteAccountByToken(jwtToken)
         }
+        throw new Error(``)
     } catch(e) {
         console.debug('Error while trying to login, then delete account', e)
     }

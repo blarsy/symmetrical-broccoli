@@ -1,6 +1,6 @@
 import { Pool } from 'pg'
 import { postgraphile, PostGraphileOptions, makePluginHook } from "postgraphile"
-import { Config } from './config'
+import { Config, createPool } from './config'
 import SubscriptionPlugin from './SubscriptionPlugin'
 import PgPubsub from "@graphile/pg-pubsub"
 import logger from './logger'
@@ -8,13 +8,7 @@ import logger from './logger'
 const pluginHook = makePluginHook([PgPubsub])
 
 export default (config: Config) => {
-    const pool = new Pool({
-        user: config.user,
-        host: config.host,
-        database: config.db,
-        password: config.dbPassword,
-        port: config.port
-    })
+    const pool = createPool(config, 'postgraphile')
     
     const pgConfig: PostGraphileOptions = config.production ? {
         retryOnInitFail: true,

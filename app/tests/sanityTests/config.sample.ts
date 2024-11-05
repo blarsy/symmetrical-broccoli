@@ -1,8 +1,8 @@
 export default {
     user: 'user',
-    host: 'pgserver',
-    database: 'db',
-    password: 'pwd',
+    host: 'pgtestserver',
+    database: 'testdb',
+    password: 'testdbpwd',
     port: 5432,
     graphQlUrl: 'http://localhost:3001/graphql'
 }

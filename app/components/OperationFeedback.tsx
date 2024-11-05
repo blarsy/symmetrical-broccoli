@@ -21,7 +21,7 @@ interface ErrorSnackbarProps {
 export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarProps) => {
     useEffect(() => {
         if(error) {
-            console.log('Error shieded on UI', error)
+            console.log('Error shielded on UI', error)
         }
     }, [error])
 

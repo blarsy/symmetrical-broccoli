@@ -1,17 +1,17 @@
 import { json } from "express"
 import {Express} from "express-serve-static-core"
 import { OAuth2Client } from "google-auth-library"
-import { Config, getConnectionString } from "./config"
 import logger from "./logger"
 import { runAndLog } from "./db_jobs/utils"
+import { Pool } from "pg"
 const client = new OAuth2Client()
 
-export default (app: Express, config: Config) => {
+export default (app: Express, pool: Pool, googleAuthAudience: string) => {
     app.use(json())
     app.post(`/gauth`, async (req, res) => {
         try {
             // verify the userId at Google
-            const loginTicket = await client.verifyIdToken({ idToken: req.body.idToken, audience: config.googleAuthAudience })
+            const loginTicket = await client.verifyIdToken({ idToken: req.body.idToken, audience: googleAuthAudience })
             
             const payload = loginTicket.getPayload()
     
@@ -24,7 +24,7 @@ export default (app: Express, config: Config) => {
             const email = loginTicket.getPayload()!.email
 
             const qryRes = await runAndLog(`SELECT sb.update_google_auth_status ($1, $2)`, 
-                getConnectionString(config), 'Checking Google authentication status', 
+                pool, 'Checking Google authentication status', 
                 [email, req.body.idToken])
 
             if(qryRes.rows.length != 1 || !qryRes.rows[0].update_google_auth_status || ![1, 2].includes(qryRes.rows[0].update_google_auth_status)) {

@@ -5,11 +5,20 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react-nativ
 import '@testing-library/react-native/extend-expect'
 import React from 'react'
 import { Provider } from 'react-native-paper'
-import { deleteAccount, getTestNum, simulateActivation,  } from './datastoreSetupLib'
-import { checkAccountActivated, checkActivationEmailSent, checkAllAccountDataCreated } from './datastoreCheck'
+import { authenticate, deleteAccount, getTestNum, simulateActivation,  } from './datastoreSetupLib'
+import { checkAccountActivated, checkActivationEmailSent, checkAllAccountDataCreated, checkLastNotificationExists } from './datastoreCheck'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import Start from '@/components/mainViews/Start'
 import MainNavigator from '@/components/mainViews/MainNavigator'
+import { t } from '@/i18n'
+import { AppWithSingleScreen, checkBadge } from './lib'
+import Notifications from '@/components/notifications/Notifications'
+import utc from 'dayjs/plugin/utc'
+import dayjs from "dayjs"
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/fr'
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
 
 jest.useFakeTimers()
 
@@ -70,36 +79,19 @@ test('register new user, then log in and out', async () => {
     fireEvent.press(screen.getByTestId('openProfile'))
 
     await waitFor(() => expect(screen.getByTestId('logout')).toBeOnTheScreen())
+    await checkBadge('notificationUnreads', '1', screen)
 
     fireEvent.press(screen.getByTestId('logout'))
     
     await waitFor(() => expect(screen.getByTestId('openLoginScreen')).toBeOnTheScreen())
+    
+    const notif = await checkLastNotificationExists(email)
+    const token = await authenticate(email, password)
+    
+    const notifScreen = render(<AppWithSingleScreen component={Notifications} name="notifications" 
+        overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }} />)
+
+    await waitFor(() => expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toBeOnTheScreen())
+    expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
+
 }, 20000)
-
-// test('can log in and log out to new account', async() => {
-//     const e = render(<AppContextProvider>
-//         <Start splashScreenMinimumDuration={0} overrideSecureStore={inMemoryStore}>
-//             <MainNavigator />
-//         </Start>
-//     </AppContextProvider>)
-
-//     await waitFor(() => expect(e.getByTestId('openLoginScreen')).toBeOnTheScreen())
-
-//     fireEvent.press(e.getByTestId('openLoginScreen'))
-
-//     await waitFor(() => expect(e.getByTestId('email')).toBeOnTheScreen())
-//     fireEvent.changeText(e.getByTestId('email'), email)
-//     fireEvent.changeText(e.getByTestId('password'), password)
-    
-//     fireEvent.press(e.getByTestId('login'))
-
-//     await waitFor(() => expect(e.getByTestId('openProfile')).toBeOnTheScreen())
-
-//     fireEvent.press(e.getByTestId('openProfile'))
-
-//     await waitFor(() => expect(e.getByTestId('logout')).toBeOnTheScreen())
-
-//     fireEvent.press(e.getByTestId('logout'))
-    
-//     await waitFor(() => expect(e.getByTestId('openLoginScreen')).toBeOnTheScreen())
-// })

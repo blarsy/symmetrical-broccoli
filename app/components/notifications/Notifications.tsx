@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import React, { useContext, useEffect, useState } from "react"
 import { ScrollView } from "react-native-gesture-handler"
 import LoadedList from "../LoadedList"
@@ -68,7 +68,9 @@ const SET_NOTIFICATIONS_READ = gql`mutation setNotificationsRead {
   }`
 
 const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
-    const { data, loading, error, refetch } = useQuery(GET_NOTIFICATIONS, { fetchPolicy: 'network-only' })
+    const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
+    const [getNotifications, { data, loading, error, refetch }] = useLazyQuery(GET_NOTIFICATIONS, { fetchPolicy: 'network-only' })
     const [notificationData, setNotificationData] = useState<DataLoadState<NotificationData[]> & { refetch: () => void }>({ loading: true, data: undefined, error: undefined, refetch  })
     const [getResources, { error: resourcesError }]= useLazyQuery(GET_RESOURCES, { fetchPolicy: "network-only" })
     const [setNotificationRead] = useMutation(SET_NOTIFICATION_READ)
@@ -79,7 +81,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
         })
     }
 
-    const makeNotificationsData = (data: any, resourcesData: any) => {
+    const makeNotificationsData = (notificationsAboutResource: any, resourcesData: any) => {
         const result = [] as NotificationData[]
 
         const resources = {} as {
@@ -88,7 +90,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
 
         resourcesData.getResources.nodes.forEach((rawRes: any) => resources[rawRes.id] = rawRes)
 
-        data.myNotifications.nodes.forEach((rawNotification: any) => {
+        notificationsAboutResource.forEach((rawNotification: any) => {
             if(rawNotification.data.resource_id) {
                 result.push({ 
                     id: rawNotification.id,
@@ -103,6 +105,13 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     onPress: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.id } })
                         navigation.navigate('viewResource', { resourceId: rawNotification.data.resource_id })
+                        setNotificationData(previous => ({ ...previous, ...{ data: previous.data!.map(notif => {
+                            if (notif.id === rawNotification.id) {
+                                return { ...notif, ...{ read: true } }
+                            }
+                            return notif
+                        }) } }))
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: undefined })
                     }
                 })
             } else {
@@ -119,15 +128,18 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                 let newResourceNotifs: NotificationData[] = []
                 const otherNotifs: NotificationData[] = []
 
-                const resIds = data.myNotifications.nodes.filter((rawNotif: any) => rawNotif.data?.resource_id).map((rawNotif: any) => rawNotif.data?.resource_id)
+                // notifications about new resources
+                const notificationsAboutResource = data.myNotifications.nodes.filter((rawNotif: any) => rawNotif.data?.resource_id)
+                const resIds = notificationsAboutResource.map((rawNotif: any) => rawNotif.data?.resource_id)
 
                 if(resIds.length > 0) {
                     const resourcesData = await getResources({ variables: { resourceIds: resIds } })
-                    newResourceNotifs = makeNotificationsData(data, resourcesData.data)
+                    newResourceNotifs = makeNotificationsData(notificationsAboutResource, resourcesData.data)
                 } else {
                     setNotificationData({ loading: false, data: [], refetch: refetchResourcesAndNotifications })
                 }
 
+                // other notifications (for the moment, only 'welcome new user' notification)
                 data.myNotifications.nodes.forEach((rawNotification: any) => {
                     if(rawNotification.data.info === 'COMPLETE_PROFILE') {
                         otherNotifs.push({
@@ -140,6 +152,13 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             image: undefined,
                             onPress: async () => {
                                 navigation.navigate('profile')
+                                setNotificationData(previous => ({ ...previous, ...{ data: previous.data!.map(notif => {
+                                    if (notif.id === rawNotification.id) {
+                                        return { ...notif, ...{ read: true } }
+                                    }
+                                    return notif
+                                }) } }))
+                                appDispatch({ type: AppReducerActionType.NotificationRead, payload: undefined })
                             }
                         })
                     }
@@ -153,13 +172,17 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                 setNotificationData({ loading: false, error: e as Error, refetch: refetchResourcesAndNotifications })
             }
         } else {
-            setNotificationData({ loading, error: error || resourcesError, refetch: refetchResourcesAndNotifications })
+            if(appContext.account){
+                getNotifications()
+            } else {
+                setNotificationData({ loading, error: error || resourcesError, refetch: refetchResourcesAndNotifications })
+            }
         }
     }
 
     useEffect(() => {
         load()
-    }, [data, error, resourcesError])
+    }, [data, error, resourcesError, appContext.account])
 
     return notificationData
 }
@@ -172,13 +195,6 @@ export default ({ navigation }: RouteProps) => {
     const [setNotificationsRead] = useMutation(SET_NOTIFICATIONS_READ)
 
     useEffect(() => {
-        if(appContext.account) {
-            setNotificationsRead().then(() => {
-                appDispatch({ type: AppReducerActionType.NotificationsRead, payload: undefined })
-                refetch()
-            })
-        }
-        
         nativeNavigation.addListener('focus', () => {
             appDispatch({ type: AppReducerActionType.SetNewNotificationHandler, payload: { handler: refetch }})
         })

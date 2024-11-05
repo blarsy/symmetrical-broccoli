@@ -15,6 +15,7 @@ import { ResourceImage } from "../resources/MainResourceImage"
 export const MY_CONVERSATIONS = gql`query MyConversations {
     myConversations {
       nodes {
+        id
         created
         messageByLastMessage {
           text
@@ -22,6 +23,7 @@ export const MY_CONVERSATIONS = gql`query MyConversations {
         }
         participantsByConversationId {
           nodes {
+            id
             unreadMessagesByParticipantId {
               totalCount
             }
@@ -73,23 +75,23 @@ const PastConversations = ({ onConversationSelected }: Props) => {
     }, [ appContext.lastConversationChangeTimestamp ])
 
     return <View style={{ flex: 1 }}>
-        <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} 
+      <LoadedList loading={loading} data={(data && data.myConversations) ? fromServerGraphConversations(data.myConversations.nodes, appContext.account!.id) : [] as ConversationData[]} 
         error={error} noDataLabel={<NoConversationYet />}
-            displayItem={(item, idx) => {
-                return <ResponsiveListItem key={idx} style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
-                    left={() => <ResourceImage size={70} resource={item.conversation.resource} key={idx}/>}
-                    onPress={() => {
-                      onConversationSelected(item.conversation.resource, item.withUser.id)
-                    }}
-                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-                        { item.conversation.hasUnread && <Icon size={20} color={primaryColor} source="circle" /> }
-                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyTime(item.conversation.lastMessageTime) }</Text>
-                      </View>}
-                    title={() => <View style={{ flexDirection: 'column' }}>
-                        <Text variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>
-                        <Text variant="bodyMedium" style={{ fontWeight: 'normal', textTransform: 'uppercase' }}>{item.conversation.resource.title}</Text>
-                    </View>} description={<Text style={{ fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{item.conversation.lastMessageExcerpt}</Text>} />
-            }} />
+        displayItem={(item, idx) => {
+          return <ResponsiveListItem testID={`conversation:${idx}:Button`} key={idx} style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
+            left={() => <ResourceImage size={70} resource={item.conversation.resource} key={idx}/>}
+            onPress={() => {
+              onConversationSelected(item.conversation.resource, item.withUser.id)
+            }}
+            right={p => <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end'}}>
+                { item.conversation.hasUnread && <Icon testID={`conversation:${idx}:UnreadMarker`} size={20} color={primaryColor} source="circle" /> }
+                <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{ item.conversation.lastMessageTime && userFriendlyTime(item.conversation.lastMessageTime) }</Text>
+              </View>}
+            title={() => <View style={{ flexDirection: 'column' }}>
+                <Text testID={`conversation:${idx}:WithUserName`} variant="headlineMedium" style={{ color: primaryColor, fontWeight: 'normal' }}>{ item.withUser.name || t('name_account_removed')}</Text>
+                <Text testID={`conversation:${idx}:ResourceTitle`} variant="bodyMedium" style={{ fontWeight: 'normal', textTransform: 'uppercase' }}>{item.conversation.resource.title}</Text>
+            </View>} description={<Text testID={`conversation:${idx}:LastMessage`} style={{ fontWeight: item.conversation.hasUnread ? 'bold' : 'normal' }}>{item.conversation.lastMessageExcerpt}</Text>} />
+        }} />
     </View>
 }
 

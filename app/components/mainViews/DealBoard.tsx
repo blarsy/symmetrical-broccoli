@@ -36,14 +36,14 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
                 }, {
                     name: 'resource', component: Resources, options: { title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }
                 }, {
-                    name: 'chat', component: Chat, options: { title: t('chat_label'), tabBarIcon: p => <>
+                    name: 'chat', component: Chat, options: { tabBarButtonTestID: 'bottomBar:Chat', title: t('chat_label'), tabBarIcon: p => <>
                         <Images.Chat fill={p.color} />
-                        { appContext.unreadConversations.length != 0 && <Badge style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadConversations.length}</Badge>}
+                        { appContext.unreadConversations.length != 0 && <Badge testID="chatUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadConversations.length}</Badge>}
                     </> }
                 }, {
-                    name: 'notifications', component: Notifications, options: { title: t('notifications_label'), tabBarIcon: p => <>
+                    name: 'notifications', component: Notifications, options: { tabBarButtonTestID: 'bottomBar:Notifications', title: t('notifications_label'), tabBarIcon: p => <>
                         <Images.Bell fill={p.color}/>
-                        { appContext.numberOfUnreadNotifications != 0 && <Badge style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.numberOfUnreadNotifications}</Badge>}
+                        { appContext.numberOfUnreadNotifications != 0 && <Badge testID="notificationUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.numberOfUnreadNotifications}</Badge>}
                     </> }
                 } ]} />
                 <SupportModal visible={supportVisible} onDismiss={() => setSupportVisible(false)} />

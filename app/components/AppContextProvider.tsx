@@ -58,10 +58,12 @@ export enum AppReducerActionType {
   SetConversationRead,
   NotificationReceived,
   NotificationsRead,
+  NotificationRead,
   RefreshAccount
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
+    //console.debug('AppContext dispatch', 'previousState', previousState, 'action', action)
     switch(action.type) {
         case AppReducerActionType.SetAuthToken:
           return {...previousState, ...{ token: action.payload }}
@@ -104,9 +106,10 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
             if(!previousState.unreadConversations.includes(participantId)) {
               newState.unreadConversations = [ ...previousState.unreadConversations, participantId ]
             }
-
+            
             if(previousState.messageReceivedHandler) {
-              previousState.messageReceivedHandler(action.payload)
+              newState.newChatMessage = undefined
+              setTimeout(() => previousState.messageReceivedHandler!(action.payload), 0)
             }
           }
 
@@ -118,6 +121,8 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
           return { ...previousState, ...{ numberOfUnreadNotifications: previousState.numberOfUnreadNotifications + 1 } }
         case AppReducerActionType.NotificationsRead:
           return { ...previousState, ...{ numberOfUnreadNotifications: 0 } }
+        case AppReducerActionType.NotificationRead:
+          return { ...previousState, ...{ numberOfUnreadNotifications: previousState.numberOfUnreadNotifications - 1 } }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload } }
         case AppReducerActionType.SetConversationRead:

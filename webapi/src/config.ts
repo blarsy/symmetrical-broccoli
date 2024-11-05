@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import { readFile } from 'fs/promises'
+import { Pool } from 'pg'
 
 const rawConfig = dotenv.config({ path: `./.env`, debug: true })
 const configFile = process.env.CONFIG_FILE || rawConfig.parsed?.CONFIG_FILE
@@ -17,6 +18,17 @@ const getConfig = async(): Promise<Config> => {
 
 export const getConnectionString = (config: Config) => {
     return `postgres://${config.user}:${config.dbPassword}@${config.host}:${config.port}/${config.db}`
+}
+
+export const createPool = (config: Config, appName: string) => {
+    return new Pool({
+        application_name: appName,
+        user: config.user,
+        host: config.host,
+        database: config.db,
+        password: config.dbPassword,
+        port: config.port
+    })
 }
 
 export interface RawConfig {

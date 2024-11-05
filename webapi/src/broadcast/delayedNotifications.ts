@@ -4,6 +4,7 @@ import initTranslations from '../i18n'
 import { TFunction } from "i18next"
 import dayjs from "dayjs"
 import logger from "../logger"
+import { Pool } from "pg"
 
 const succinctDate = (date: Date, t: TFunction) => {
     const todayMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0)
@@ -98,7 +99,7 @@ const getAccountChatMessages = async (emailSummaryData: EmailSummaryData): Promi
     return chatMessagesList.concat(`</table>`)
 }
 
-const getChatMessageSummaryData = async (connectionString: string): Promise<ChatMessageSummaryData> => {
+const getChatMessageSummaryData = async (pool: Pool): Promise<ChatMessageSummaryData> => {
     const messages = await runAndLog(`SELECT m.text as messagetext,
             ad.id as destinatorid,
             ad.email as destinatoremail,
@@ -120,7 +121,7 @@ const getChatMessageSummaryData = async (connectionString: string): Promise<Chat
         INNER JOIN sb.broadcast_prefs bp ON bp.account_id = destinator.account_id AND bp.event_type = 1
         WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW())
         AND um.created > NOW() - interval '1 day' * bp.days_between_summaries
-        AND ad.email IS NOT NULL`, connectionString, 'Running delayed notifier')
+        AND ad.email IS NOT NULL`, pool, 'Running delayed notifier')
 
     const emails = {} as ChatMessageSummaryData
 
@@ -241,7 +242,7 @@ const getAccountNewResources = async (accountNewResourcesData: AccountNewResourc
     return newResourcesList.concat(`</table>`)
 }
 
-const getNewResourcesSummaryData = async (connectionString: string): Promise<NewResourcesSummaryData> => {
+const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSummaryData> => {
     const resources = await runAndLog(`SELECT r.id as resourceid, 
         r.title, 
         author.id as authorid, 
@@ -262,7 +263,7 @@ const getNewResourcesSummaryData = async (connectionString: string): Promise<New
         author.id <> notified.id AND
         notified.email IS NOT NULL AND
 		n.read IS NULL
-    ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, connectionString, `Querying new resources to notify`)
+    ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, pool, `Querying new resources to notify`)
 
     const resourcesSummaryData = {} as NewResourcesSummaryData
 
@@ -281,10 +282,10 @@ const getNewResourcesSummaryData = async (connectionString: string): Promise<New
     return resourcesSummaryData
 }
 
-export const sendSummaries = async (connectionString: string, version: string): Promise<void> => {
+export const sendSummaries = async (pool: Pool, version: string): Promise<void> => {
     const [resourcesSummaryData, chatMessagesSummaryData] = await Promise.all([
-        getNewResourcesSummaryData(connectionString),
-        getChatMessageSummaryData(connectionString)
+        getNewResourcesSummaryData(pool),
+        getChatMessageSummaryData(pool)
     ])
 
     logger.info(`Data objects for sending summaries by email:\nresourcesSummaryData: ${JSON.stringify(resourcesSummaryData)}\nchatMessagesSummaryData: ${JSON.stringify(chatMessagesSummaryData)}`)
@@ -327,9 +328,9 @@ export const sendSummaries = async (connectionString: string, version: string): 
         }
 
         postQuerieInfos.forEach(qry => {
-            runAndLog(makePostQuery(qry.eventType, qry.accountId), connectionString, `Setting last summary time.`)
+            runAndLog(makePostQuery(qry.eventType, qry.accountId), pool, `Setting last summary time.`)
         })
 
-        sendNotificationsSummaryMail(email, i18nMailSubject, [resourceSummaryContent, chatMessagesSummaryContent].join(''), language, version)
+        sendNotificationsSummaryMail(email, i18nMailSubject, [resourceSummaryContent, chatMessagesSummaryContent].join(''), language, version, pool)
     })
 }

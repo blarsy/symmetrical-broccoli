@@ -9,6 +9,7 @@ import { RouteProps } from "@/lib/utils";
 import { Client, QueryResult } from "pg";
 import React from "react";
 import config from "./config";
+import { RenderResult, waitFor } from "@testing-library/react-native";
 
 interface Props extends TabNavigatorProps {
     overrideSecureStore?: ISecureStore
@@ -18,7 +19,7 @@ const BoardWithSingleComponent = (t: TabNavigatorProps) => (r: RouteProps) => <D
     name: t.name, component: t.component
 }]} />
 
-const BoardWithComponents = (ts: TabNavigatorProps[]) => (r: RouteProps) => <DealBoard {...r} tabs={ ts.map(t => ({ name: t.name, component: t.component })) }/>
+const BoardWithComponents = (ts: TabNavigatorProps[] | undefined) => (r: RouteProps) => <DealBoard {...r} tabs={ ts && ts.map(t => ({ name: t.name, component: t.component })) }/>
 
 export const AppWithSingleScreen = (t: Props) => <AppContextProvider>
     <Start splashScreenMinimumDuration={0} overrideSecureStore={t.overrideSecureStore}>
@@ -31,7 +32,7 @@ export const AppWithSingleScreen = (t: Props) => <AppContextProvider>
 </AppContextProvider>
 
 interface MultiScreenProps {
-    screens: TabNavigatorProps[]
+    screens?: TabNavigatorProps[]
     overrideSecureStore?: ISecureStore
 }
 
@@ -64,4 +65,12 @@ export const executeQuery = async (query: string, parameters?: any[]): Promise<Q
     
     console.log('executing', query, parameters)
     return await client.query(query , parameters)
+}
+
+export const checkBadge = async (testID: string, textContent: string, screen : RenderResult) => {
+    //Oddly enough, Badge renders two items with the same testID, and the same content. As there is no way to change it, 
+    //we just work around it
+    await waitFor(async () => expect(await screen.findAllByTestId(testID, { includeHiddenElements: true })).toHaveLength(2))
+    const badges = await screen.findAllByTestId(testID, { includeHiddenElements: true })
+    expect(badges[0]).toHaveTextContent(textContent)
 }

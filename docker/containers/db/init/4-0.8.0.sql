@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION sb.create_resource(
 	can_be_exchanged boolean,
 	can_be_gifted boolean,
 	images_public_ids character varying[],
-	category_codes character varying[],
+	category_codes integer[],
 	specific_location new_location)
     RETURNS integer
     LANGUAGE 'plpgsql'
@@ -43,10 +43,12 @@ BEGIN
 	INSERT INTO sb.resources_images (resource_id, image_id)
 	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
 	
-    -- Emit notification for push notification handling
-    PERFORM pg_notify('resource_created', json_build_object(
-        'resource_id', inserted_id
-    )::text);
+	IF (SELECT activated FROM sb.accounts WHERE id = sb.current_account_id()) IS NOT NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('resource_created', json_build_object(
+			'resource_id', inserted_id
+		)::text);
+	END IF;
 	
 	RETURN inserted_id;
 end;
@@ -85,8 +87,9 @@ DECLARE results INTEGER[];
 BEGIN
 	results := ARRAY(SELECT 
 		id
-	FROM sb.active_accounts
-	WHERE id <> (SELECT account_id FROM sb.resources WHERE id = resource_id));
+	FROM sb.accounts
+	WHERE accounts.name::text <> ''::text AND accounts.name IS NOT NULL AND
+		id <> (SELECT account_id FROM sb.resources WHERE id = resource_id));
 	
 	RETURN results;
 end;
@@ -143,6 +146,7 @@ $BODY$;
 ALTER FUNCTION sb.my_notifications()
     OWNER TO sb;
 GRANT EXECUTE ON FUNCTION sb.my_notifications() TO identified_account;
+REVOKE ALL ON FUNCTION sb.my_notifications() FROM PUBLIC;
 
 CREATE OR REPLACE FUNCTION sb.get_resources(
 		resource_ids INTEGER[]
@@ -173,11 +177,6 @@ BEGIN
 	UPDATE sb.notifications SET read = NOW()
 	WHERE id = notification_id AND account_id = sb.current_account_id();
 
-	PERFORM pg_notify('graphql:notification_account:' || sb.current_account_id(), json_build_object(
-		'event', 'notifications_read',
-		'subject', notification_id
-	)::text);
-
 	RETURN 1;
 END;
 $BODY$;
@@ -188,6 +187,30 @@ ALTER FUNCTION sb.set_notification_read(integer)
 GRANT EXECUTE ON FUNCTION sb.set_notification_read(integer) TO identified_account;
 
 GRANT EXECUTE ON FUNCTION sb.set_notification_read(integer) TO sb;
+REVOKE ALL ON FUNCTION sb.set_notification_read(integer) FROM PUBLIC;
+
+CREATE OR REPLACE FUNCTION sb.set_notifications_read()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+BEGIN
+	UPDATE sb.notifications SET read = NOW()
+	WHERE account_id = sb.current_account_id();
+
+	RETURN 1;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.set_notifications_read()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.set_notifications_read() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.set_notifications_read() TO sb;
+REVOKE ALL ON FUNCTION sb.set_notifications_read() FROM PUBLIC;
+
 
 ALTER TYPE sb.session_data
     ADD ATTRIBUTE unread_conversations integer[];
@@ -861,6 +884,57 @@ ALTER FUNCTION sb.suggested_resources(text, boolean, boolean, boolean, boolean, 
 
 ALTER TABLE IF EXISTS sb.accounts_links
     ADD COLUMN created timestamp with time zone NOT NULL DEFAULT now();
+
+CREATE OR REPLACE FUNCTION sb.activate_account(
+	activation_code character varying)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE new_email text;
+DECLARE id_account_to_activate integer;
+DECLARE current_activated timestamp;
+DECLARE account_lang character varying;
+DECLARE res record;
+begin
+	SELECT ea.email, ea.account_id
+	INTO new_email, id_account_to_activate
+	FROM sb.email_activations ea
+	WHERE ea.activation_code = activate_account.activation_code;
+	
+	SELECT a.activated, a.language
+	INTO current_activated, account_lang
+	FROM sb.accounts a
+	WHERE a.id = id_account_to_activate;
+	
+	IF current_activated IS NULL THEN
+		UPDATE sb.accounts SET email = new_email, activated = NOW()
+		WHERE id = id_account_to_activate;
+		
+		FOR res IN
+			SELECT id 
+			FROM sb.resources
+			WHERE deleted IS NULL AND expiration > NOW()
+				AND account_id = id_account_to_activate
+		LOOP
+			-- Emit notification for push notification handling
+			PERFORM pg_notify('resource_created', json_build_object(
+				'resource_id', res.id
+			)::text);
+		END LOOP;
+	ELSE
+		UPDATE sb.accounts SET email = new_email
+		WHERE id = id_account_to_activate;
+	END IF;
+	
+	UPDATE sb.email_activations ea
+	SET activated = NOW()
+	WHERE ea.activation_code = activate_account.activation_code;
+	
+	RETURN account_lang;
+end;
+$BODY$;
 
 DO
 $body$
