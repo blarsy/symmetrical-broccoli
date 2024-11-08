@@ -62,22 +62,26 @@ const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
                     referenceLocation: undefined,
                 })
             }} />
-        <Text variant="bodySmall" style={{ textAlign: 'center' }}>{t('max_distance_label', { distance: value.distanceToReferenceLocation.toLocaleString() })}</Text>
-        <Slider thumbTintColor={primaryColor} maximumTrackTintColor={primaryColor} minimumTrackTintColor={primaryColor} style={{ paddingVertical: 20, width: '80%', alignSelf: 'center' }} 
-            disabled={!value.referenceLocation} lowerLimit={1} 
-            maximumValue={MAX_DISTANCE} step={5} upperLimit={MAX_DISTANCE} 
-            onValueChange={val => {
-                onChange({ distanceToReferenceLocation: val,
-                    excludeUnlocated: value.excludeUnlocated,
-                    referenceLocation: value.referenceLocation
-                })
-            }} value={value.distanceToReferenceLocation} />
-        <OptionSelect title={t('exclude_unlocated_label')} value={value.excludeUnlocated} onChange={val => {
-            onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation,
-                excludeUnlocated: val,
-                referenceLocation: value.referenceLocation
-            })
-        }} />
+        { value?.referenceLocation && 
+            <>
+                <Text variant="bodySmall" style={{ textAlign: 'center' }}>{t('max_distance_label', { distance: value.distanceToReferenceLocation.toLocaleString() })}</Text>
+                <Slider thumbTintColor={primaryColor} maximumTrackTintColor={primaryColor} minimumTrackTintColor={primaryColor} style={{ paddingVertical: 20, width: '80%', alignSelf: 'center' }} 
+                    disabled={!value.referenceLocation} lowerLimit={1} 
+                    maximumValue={MAX_DISTANCE} step={5} upperLimit={MAX_DISTANCE} 
+                    onValueChange={val => {
+                        onChange({ distanceToReferenceLocation: val,
+                            excludeUnlocated: value.excludeUnlocated,
+                            referenceLocation: value.referenceLocation
+                        })
+                    }} value={value.distanceToReferenceLocation} />
+                <OptionSelect title={t('exclude_unlocated_label')} value={value.excludeUnlocated} onChange={val => {
+                    onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation,
+                        excludeUnlocated: val,
+                        referenceLocation: value.referenceLocation
+                    })
+                }} />
+            </>
+        }
     </View>
 }
 
@@ -142,7 +146,8 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
             <AccordionItem title={t('proximity_title')}>
                 <ProximitySelector value={searchFilterContext.filter.location}
                     onChange={val => {
-                        searchFilterContext.actions.setSearchFilter({ ...searchFilterContext.filter, ...{ location: val } })
+                        const newFilter = { ...searchFilterContext.filter, ...{ location: val } }
+                        searchFilterContext.actions.setSearchFilter(newFilter)
                     }} />
             </AccordionItem>
 

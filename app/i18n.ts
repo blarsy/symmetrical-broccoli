@@ -180,7 +180,9 @@ const resources = {
       "welcomeNotificationHeadline": "Welcome !",
       "completeProcessNotificationHeadline": "Create a profile worthy of your activity",
       "completeProcessNotificationDetails": "Add a logo, your address, links to your contents on the web, ...",
-      "updateAccountSuccessful": "Account updated sucessfully"
+      "updateAccountSuccessful": "Account updated sucessfully",
+      "lessInfo": "Less info",
+      "moreInfo": "More info ..."
     }
   },
   fr: {
@@ -355,7 +357,9 @@ const resources = {
       "welcomeNotificationHeadline": "Bienvenue !",
       "completeProcessNotificationHeadline": "Crée un profil digne de ton activité",
       "completeProcessNotificationDetails": "Ajoute ton logo, l'adresse de ton activité, des liens vers tes contenus web, ...",
-      "updateAccountSuccessful": "Compte mis à jour avec succès"
+      "updateAccountSuccessful": "Compte mis à jour avec succès",
+      "lessInfo": "Moins d'info",
+      "moreInfo": "Plus d'info ..."
     }
   }
 }

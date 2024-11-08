@@ -109,7 +109,7 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
                     setScrolledToBottom(true)
                 }, 0)
             }
-            console.log('scrollsToTail checked', scrollsToTail)
+            
             if(scrollsToTail) {
                 setTimeout(() => {
                     scrollRef.current?.scrollToEnd()

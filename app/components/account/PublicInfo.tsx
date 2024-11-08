@@ -105,7 +105,7 @@ export default () => {
                 editLinkRequested={setEditedLink}
                 newLinkRequested={() => { setEditedLink({ id: 0, label: '', type: 4, url: '' }) }} />
             <Hr color="#fff" thickness={5} />
-            <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10, paddingTop: 20 }}>{t('publicInfo_address_title')}</Text>
+            <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 20, paddingTop: 20 }}>{t('publicInfo_address_title')}</Text>
             <LocationEdit location={publicInfo.location || undefined} 
                 onLocationChanged={newLocation => {
                     const newPublicInfo = { links: publicInfo.links, location: newLocation }

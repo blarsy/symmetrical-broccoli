@@ -21,7 +21,7 @@ export default ({ Image, size, onPress, color, testID, disabled }: Props) => {
             opacity: pressed ? 0.6 : 1
         }}>
         <View style={{ width: size }}>{ typeof Image === 'string' ?
-            <Icon size={size} source={Image} />
+            <Icon color={color as string} size={size} source={Image} />
             : <Image fill={color} style={{ width: size, height: size }} /> 
         }</View>
     </Pressable>

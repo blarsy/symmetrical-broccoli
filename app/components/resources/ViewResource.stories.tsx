@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 import ViewResource from './ViewResource'
 import { GET_RESOURCE } from '@/lib/utils'
 
@@ -77,10 +77,10 @@ const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true,
         },
         resourcesResourceCategoriesByResourceId: {
             nodes: [{
-              resourceCategoryCode: 'cat2'
+              resourceCategoryCode: 2
             },
             {
-                resourceCategoryCode: 'cat4'
+              resourceCategoryCode: 4
             }]
         },
         locationBySpecificLocationId: hasAddress ? {

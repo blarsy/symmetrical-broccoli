@@ -92,15 +92,22 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
     const iconButtonMode = orangeBackground ? 'contained' : 'outlined'
 
     return <View style={{ gap: 20, alignContent: 'stretch', ...(style as object)}}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text variant="headlineSmall" lineBreakMode="tail" numberOfLines={2} style={{ color, flexShrink: 1 }}>{currentLocation ? currentLocation.address : t('no_address_defined')}</Text>
-            <View style={{ flexDirection: 'row' }}>
-                <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon="pencil" 
-                    onPress={() => { setEditedLocation(currentLocation || DEFAUT_LOCATION)}} />
-                { currentLocation && <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon={p => <Images.Bin style={{ width: 25, height: 25 }} fill={p.color} />}
-                    onPress={() => { setDeleteRequested(true)}} />}
+        { currentLocation ?
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text variant="headlineSmall" lineBreakMode="tail" numberOfLines={2} style={{ color, flexShrink: 1 }}>{currentLocation.address}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon="pencil" 
+                        onPress={() => { setEditedLocation(currentLocation || DEFAUT_LOCATION)}} />
+                    <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon={p => <Images.Bin style={{ width: 25, height: 25 }} fill={p.color} />}
+                        onPress={() => { setDeleteRequested(true)}} />
+                </View>
             </View>
-        </View>
+        :
+            <View style={{ alignItems: 'center' }}>
+                <Text variant="headlineSmall" style={{ color }}>{t('no_address_defined')}</Text>
+                <IconButton icon="map-marker-plus" size={50} containerColor="#fff" iconColor="#000" onPress={() => setEditedLocation(DEFAUT_LOCATION)}/>
+            </View>
+        }
         { currentLocation && !small && <MapView region={regionFromLocation(currentLocation)} scrollEnabled={false} 
             zoomEnabled={false} style={{ flex: 1, height: adaptToWidth(200, 300, 550) }} provider={PROVIDER_GOOGLE}>
             <Marker coordinate={{latitude: currentLocation.latitude, longitude: currentLocation.longitude}}/>
