@@ -1,5 +1,5 @@
-const version = '0.8.4'
-const versionCode = 121
+const version = '0.8.5'
+const versionCode = 123
 
 let appSettings
 if(process.env.TARGET_ENV) {
@@ -90,7 +90,8 @@ module.exports = {
         "googleMaps": {
           "apiKey": appSettings.googleMapsApiKey
         }
-      }
+      },
+      "blockedPermissions": ['android.permission.READ_MEDIA_IMAGES', 'android.permission.READ_MEDIA_VIDEO']
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -441,6 +441,11 @@ ALTER TABLE IF EXISTS sb.accounts
 
 ALTER TABLE IF EXISTS sb.accounts
     ALTER COLUMN salt DROP NOT NULL;
+	
+ALTER TABLE IF EXISTS sb.accounts
+    ADD COLUMN can_be_showcased boolean NOT NULL DEFAULT false;
+	
+UPDATE sb.accounts SET can_be_showcased = true;
 
 CREATE OR REPLACE FUNCTION sb.register_account_external_auth(
 	email character varying,
@@ -631,6 +636,44 @@ ALTER FUNCTION sb.top_resources()
 GRANT EXECUTE ON FUNCTION sb.top_resources() TO PUBLIC;
 
 GRANT EXECUTE ON FUNCTION sb.top_resources() TO sb;
+
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language,
+    accounts.log_level,
+    accounts.location_id,
+	accounts.can_be_showcased
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION sb.top_accounts(
+	)
+    RETURNS SETOF accounts 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT *
+FROM sb.active_accounts aa
+WHERE aa.avatar_image_id IS NOT NULL AND
+aa.can_be_showcased AND
+(SELECT COUNT(*) FROM sb.resources WHERE account_id = aa.id) > 0
+ORDER BY aa.created DESC LIMIT 10;
+
+$BODY$;
 
 ALTER TABLE IF EXISTS sb.mails
     ALTER COLUMN account_id DROP NOT NULL;

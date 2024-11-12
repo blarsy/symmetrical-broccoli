@@ -14,7 +14,7 @@ const Support = () => {
                         <li>L&#x27;adresse email de votre compte Tope-l&#xE0;</li>
                         <li>Si pertinent, une capture de l&#x27;&#xE9;cran quand le probl&#xE8;me se pose</li>
                         <li>D&#xE9;crire ce que vous cherchiez &#xE0; accomplir</li>
-                        <li>Si ce n&#x27;est pas &#xE9;vident avec les captures d&#x27;&#xE9;cran, ce qui vous obtenez &#xE0; la place de votre objectif</li>
+                        <li>Si ce n&#x27;est pas &#xE9;vident avec les captures d&#x27;&#xE9;cran, ce que vous obtenez &#xE0; la place de votre objectif</li>
                     </ul>
                     </Typography>
             </Box>

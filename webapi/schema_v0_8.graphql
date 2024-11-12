@@ -1008,6 +1008,7 @@ type Account implements Node {
   language: String!
   logLevel: Int!
   locationId: Int
+  canBeShowcased: Boolean!
 
   """Reads a single `Image` that is related to this `Account`."""
   imageByAvatarImageId: Image
@@ -1942,6 +1943,8 @@ enum AccountsOrderBy {
   LOG_LEVEL_DESC
   LOCATION_ID_ASC
   LOCATION_ID_DESC
+  CAN_BE_SHOWCASED_ASC
+  CAN_BE_SHOWCASED_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -1988,6 +1991,9 @@ input AccountCondition {
 
   """Checks for equality with the object’s `locationId` field."""
   locationId: Int
+
+  """Checks for equality with the object’s `canBeShowcased` field."""
+  canBeShowcased: Boolean
 }
 
 """A connection to a list of `Conversation` values."""
@@ -3075,6 +3081,7 @@ type ActiveAccount {
   language: String
   logLevel: Int
   locationId: Int
+  canBeShowcased: Boolean
 }
 
 """A `ActiveAccount` edge in the connection."""
@@ -3115,6 +3122,8 @@ enum ActiveAccountsOrderBy {
   LOG_LEVEL_DESC
   LOCATION_ID_ASC
   LOCATION_ID_DESC
+  CAN_BE_SHOWCASED_ASC
+  CAN_BE_SHOWCASED_DESC
 }
 
 """
@@ -3160,6 +3169,9 @@ input ActiveAccountCondition {
 
   """Checks for equality with the object’s `locationId` field."""
   locationId: Int
+
+  """Checks for equality with the object’s `canBeShowcased` field."""
+  canBeShowcased: Boolean
 }
 
 """A connection to a list of `EmailActivation` values."""
