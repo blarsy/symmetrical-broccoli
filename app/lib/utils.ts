@@ -2,7 +2,6 @@ import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
 import { Dimensions } from "react-native"
 import { Location, Message } from "./schema"
 import { ApolloError, gql } from "@apollo/client"
-import { clientVersion } from "./settings"
 import { getLocales } from "expo-localization"
 import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
 import { ImageResult, manipulateAsync } from "expo-image-manipulator"
@@ -201,8 +200,8 @@ export const initials = (text: string) => {
 export const versionChecker = (serverVersion: string) => {
   if(nativeApplicationVersion === 'mock') return true
 
-  if(nativeApplicationVersion || clientVersion)
-    return compareVersions(nativeApplicationVersion || clientVersion, serverVersion) >= 0
+  if(nativeApplicationVersion)
+    return compareVersions(nativeApplicationVersion, serverVersion) >= 0
   
   return true
 }

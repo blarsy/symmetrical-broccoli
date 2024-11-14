@@ -26,6 +26,7 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
         try {
             setBusy(true)
             const minimumClientVersionData = await getMinimumClientVersion()
+            if(minimumClientVersionData.error) throw minimumClientVersionData.error
             if(!versionChecker(minimumClientVersionData.data.getMinimumClientVersion)) {
                 setOutdated(true)
             }
