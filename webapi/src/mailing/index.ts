@@ -2,25 +2,37 @@ import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
-import getConfig,{ getCommonConfig, getConnectionString } from '../config'
+import getConfig,{ getCommonConfig } from '../config'
 import initTranslations from '../i18n'
 import { runAndLog } from '../db_jobs/utils'
 import { Pool } from 'pg'
 
+interface MailData {
+    to: string,
+    from: string,
+    subject: string,
+    text: string,
+    html: string
+  }
 
 export const sendMail = async (from: string, to: string, subject: string, plainText: string, htmlContent: string, version: string, pool: Pool) => {
     const config = await getConfig(version)
 
-    const msg = {
-      to,
-      from,
-      subject,
-      text: plainText,
-      html: htmlContent
+    const msg: MailData = {
+        to,
+        from,
+        subject,
+        text: plainText,
+        html: htmlContent
+      }
+
+    const sendViaSendGrid = async (data: MailData):Promise<void> => {
+        sgMail.setApiKey(config.mailApiKey)
+        sgMail.send(data)
     }
 
-    const promises: Promise<any>[] = (config.production && !config.doNotSendMails) ?
-        [sgMail.send(msg)] :
+    const promises: Promise<void>[] = (config.production && !config.doNotSendMails) ?
+        [sendViaSendGrid(msg)] :
         [recordMail(msg)]
 
     promises.push(persistMail(msg, pool))

@@ -44,7 +44,7 @@ export const handleMessageCreated = async (notification: PgParsedNotification) =
         const messageNotif = toMessageNotification(notification.payload)
         const config = await getCommonConfig()
         await sendPushNotification([ { to: messageNotif.pushToken, body: messageNotif.text, title: messageNotif.sender, data: {
-            url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${messageNotif.otherAccountName}`
+            url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${encodeURIComponent(messageNotif.otherAccountName)}`
         }} ])
     } catch(e) {
         logger.error(`Error while sending push notification to Expo.`, e)
