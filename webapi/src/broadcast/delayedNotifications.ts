@@ -257,7 +257,7 @@ const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSumma
     INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id
     INNER JOIN sb.accounts notified ON notified.id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
-        n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
+        n.read IS NULL AND n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
         author.id <> notified.id AND

@@ -44,6 +44,8 @@ GRANT SELECT ON TABLE sb.accounts_topes_transactions TO identified_account;
 
 ALTER TABLE IF EXISTS sb.resources
     ADD COLUMN suspended timestamp with time zone;
+ALTER TABLE IF EXISTS sb.resources
+    ADD COLUMN paid_until timestamp with time zone;
 
 CREATE OR REPLACE FUNCTION sb.suggested_resources(
 	search_term text,
