@@ -432,6 +432,27 @@ begin
 end;
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.apply_resources_consumption()
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE r RECORD;
+BEGIN
+	FOR r IN
+		SELECT id FROM sb.accounts
+		WHERE email IS NOT NULL AND email <> '' AND
+			activated IS NOT NULL
+	LOOP
+		PERFORM sb.apply_resources_consumption(r.id);
+	END LOOP;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_resources_consumption()
+    OWNER TO sb;
+
 DO
 $body$
 BEGIN
