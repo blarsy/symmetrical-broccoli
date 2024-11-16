@@ -1008,6 +1008,7 @@ type Account implements Node {
   language: String!
   logLevel: Int!
   locationId: Int
+  canBeShowcased: Boolean!
 
   """Reads a single `Image` that is related to this `Account`."""
   imageByAvatarImageId: Image
@@ -1160,35 +1161,6 @@ type Account implements Node {
     condition: ClientLogCondition
   ): ClientLogsConnection!
 
-  """Reads and enables pagination through a set of `Participant`."""
-  participantsByAccountId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `Participant`."""
-    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ParticipantCondition
-  ): ParticipantsConnection!
-
   """Reads and enables pagination through a set of `Mail`."""
   mailByAccountId(
     """Only read the first `n` values of the set."""
@@ -1217,6 +1189,35 @@ type Account implements Node {
     """
     condition: MailCondition
   ): MailConnection!
+
+  """Reads and enables pagination through a set of `Participant`."""
+  participantsByAccountId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Participant`."""
+    orderBy: [ParticipantsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ParticipantCondition
+  ): ParticipantsConnection!
 
   """Reads and enables pagination through a set of `Notification`."""
   notificationsByAccountId(
@@ -1942,6 +1943,8 @@ enum AccountsOrderBy {
   LOG_LEVEL_DESC
   LOCATION_ID_ASC
   LOCATION_ID_DESC
+  CAN_BE_SHOWCASED_ASC
+  CAN_BE_SHOWCASED_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -1988,6 +1991,9 @@ input AccountCondition {
 
   """Checks for equality with the object’s `locationId` field."""
   locationId: Int
+
+  """Checks for equality with the object’s `canBeShowcased` field."""
+  canBeShowcased: Boolean
 }
 
 """A connection to a list of `Conversation` values."""
@@ -2135,7 +2141,7 @@ type ResourcesResourceCategoriesConnection {
 type ResourcesResourceCategory {
   resourceId: Int!
   created: Datetime!
-  resourceCategoryCode: String!
+  resourceCategoryCode: Int!
 
   """
   Reads a single `Resource` that is related to this `ResourcesResourceCategory`.
@@ -2175,7 +2181,7 @@ input ResourcesResourceCategoryCondition {
   created: Datetime
 
   """Checks for equality with the object’s `resourceCategoryCode` field."""
-  resourceCategoryCode: String
+  resourceCategoryCode: Int
 }
 
 """A connection to a list of `Participant` values."""
@@ -2379,6 +2385,7 @@ type AccountsLink implements Node {
   label: String
   linkTypeId: Int!
   accountId: Int!
+  created: Datetime!
 
   """Reads a single `LinkType` that is related to this `AccountsLink`."""
   linkTypeByLinkTypeId: LinkType
@@ -2438,6 +2445,8 @@ enum AccountsLinksOrderBy {
   LINK_TYPE_ID_DESC
   ACCOUNT_ID_ASC
   ACCOUNT_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2461,6 +2470,9 @@ input AccountsLinkCondition {
 
   """Checks for equality with the object’s `accountId` field."""
   accountId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
 }
 
 """A `AccountsLink` edge in the connection."""
@@ -2728,7 +2740,7 @@ type Mail implements Node {
   """
   nodeId: ID!
   id: Int!
-  accountId: Int!
+  accountId: Int
   email: String!
   sentFrom: String!
   subject: String!
@@ -2915,13 +2927,13 @@ type Search implements Node {
   canBeExchanged: Boolean
   canBeDelivered: Boolean
   canBeTakenAway: Boolean
-  categoryCodes: [String]
   referenceLocationLatitude: BigFloat
   referenceLocationLongitude: BigFloat
   distanceToReferenceLocation: BigFloat
   excludeUnlocated: Boolean
   accountId: Int
   created: Datetime!
+  categoryCodes: [Int]
 
   """Reads a single `Account` that is related to this `Search`."""
   accountByAccountId: Account
@@ -2955,8 +2967,6 @@ enum SearchesOrderBy {
   CAN_BE_DELIVERED_DESC
   CAN_BE_TAKEN_AWAY_ASC
   CAN_BE_TAKEN_AWAY_DESC
-  CATEGORY_CODES_ASC
-  CATEGORY_CODES_DESC
   REFERENCE_LOCATION_LATITUDE_ASC
   REFERENCE_LOCATION_LATITUDE_DESC
   REFERENCE_LOCATION_LONGITUDE_ASC
@@ -2969,6 +2979,8 @@ enum SearchesOrderBy {
   ACCOUNT_ID_DESC
   CREATED_ASC
   CREATED_DESC
+  CATEGORY_CODES_ASC
+  CATEGORY_CODES_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -3001,9 +3013,6 @@ input SearchCondition {
   """Checks for equality with the object’s `canBeTakenAway` field."""
   canBeTakenAway: Boolean
 
-  """Checks for equality with the object’s `categoryCodes` field."""
-  categoryCodes: [String]
-
   """
   Checks for equality with the object’s `referenceLocationLatitude` field.
   """
@@ -3027,6 +3036,9 @@ input SearchCondition {
 
   """Checks for equality with the object’s `created` field."""
   created: Datetime
+
+  """Checks for equality with the object’s `categoryCodes` field."""
+  categoryCodes: [Int]
 }
 
 """A `Account` edge in the connection."""
@@ -3069,6 +3081,7 @@ type ActiveAccount {
   language: String
   logLevel: Int
   locationId: Int
+  canBeShowcased: Boolean
 }
 
 """A `ActiveAccount` edge in the connection."""
@@ -3109,6 +3122,8 @@ enum ActiveAccountsOrderBy {
   LOG_LEVEL_DESC
   LOCATION_ID_ASC
   LOCATION_ID_DESC
+  CAN_BE_SHOWCASED_ASC
+  CAN_BE_SHOWCASED_DESC
 }
 
 """
@@ -3154,6 +3169,9 @@ input ActiveAccountCondition {
 
   """Checks for equality with the object’s `locationId` field."""
   locationId: Int
+
+  """Checks for equality with the object’s `canBeShowcased` field."""
+  canBeShowcased: Boolean
 }
 
 """A connection to a list of `EmailActivation` values."""
@@ -3665,12 +3683,6 @@ type Mutation {
     """
     input: CreateNotificationInput!
   ): CreateNotificationPayload
-  createNotificationsOnNewResource(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateNotificationsOnNewResourceInput!
-  ): CreateNotificationsOnNewResourcePayload
   createResource(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4085,31 +4097,6 @@ input CreateNotificationInput {
   data: JSON
 }
 
-"""The output of our `createNotificationsOnNewResource` mutation."""
-type CreateNotificationsOnNewResourcePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  integer: Int
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `createNotificationsOnNewResource` mutation."""
-input CreateNotificationsOnNewResourceInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  resourceId: Int
-}
-
 """The output of our `createResource` mutation."""
 type CreateResourcePayload {
   """
@@ -4142,7 +4129,7 @@ input CreateResourceInput {
   canBeExchanged: Boolean
   canBeGifted: Boolean
   imagesPublicIds: [String]
-  categoryCodes: [String]
+  categoryCodes: [Int]
   specificLocation: NewLocationInput
 }
 
@@ -4566,7 +4553,7 @@ input SuggestedResourcesInput {
   canBeExchanged: Boolean
   canBeDelivered: Boolean
   canBeTakenAway: Boolean
-  categoryCodes: [String]
+  categoryCodes: [Int]
   referenceLocationLatitude: BigFloat
   referenceLocationLongitude: BigFloat
   distanceToReferenceLocation: BigFloat
@@ -4748,7 +4735,7 @@ input UpdateResourceInput {
   canBeExchanged: Boolean
   canBeGifted: Boolean
   imagesPublicIds: [String]
-  categoryCodes: [String]
+  categoryCodes: [Int]
   specificLocation: NewLocationInput
 }
 
