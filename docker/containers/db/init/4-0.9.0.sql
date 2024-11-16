@@ -139,7 +139,298 @@ ORDER BY r.created DESC LIMIT 10;
 
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.apply_resources_consumption(
+	account_id integer)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE current_amount_of_topes INTEGER;
+DECLARE amount_to_burn INTEGER = 0;
+DECLARE idx INTEGER = 0;
+DECLARE r RECORD;
+BEGIN
+	SELECT amount_of_topes INTO current_amount_of_topes
+	FROM sb.accounts
+	WHERE activated IS NOT NULL AND 
+		id = apply_resources_consumption.account_id AND
+		(
+			SELECT COUNT(*) 
+			FROM sb.resources
+			WHERE account_id = apply_resources_consumption.account_id AND 
+				deleted IS NULL AND expiration > NOW()
+		) > 2;
 
+	IF current_amount_of_topes IS NOT NULL THEN
+		FOR r IN
+			SELECT id, paid_until, suspended FROM sb.resources
+			WHERE account_id = apply_resources_consumption.account_id AND 
+				deleted IS NULL AND expiration > NOW() AND 
+				paid_until > NOW()
+			ORDER BY created DESC
+		LOOP
+			-- skip free resources
+			IF idx > 1 THEN
+				IF amount_to_burn = amount_of_topes THEN
+					UPDATE sb.resources SET suspended = NOW()
+					WHERE id = r.id;
+				ELSE
+					IF r.suspended IS NULL THEN
+						UPDATE sb.resources SET paid_until = paid_until + '1 day'
+						WHERE id = r.id;
+					ELSE
+						UPDATE sb.resources SET paid_until = NOW() + '1 day', suspended = NULL
+						WHERE id = r.id;
+					END IF;
+					amount_to_burn = amount_to_burn + 1;
+				END IF;
+			ELSE
+				-- If the resource was suspended, make it available again
+				UPDATE sb.resources SET suspended = NOW()
+				WHERE id = r.id;
+			END IF;
+			
+			idx = idx + 1;
+		END LOOP;
+		
+		UPDATE sb.accounts SET amount_of_topes = amount_of_topes - amount_to_burn
+		WHERE id = apply_resources_consumption.account_id;
+	END IF;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_resources_consumption(integer)
+    OWNER TO sb;
+	
+GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.create_resource(
+	title character varying,
+	description character varying,
+	expiration timestamp without time zone,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id INTEGER;
+DECLARE location_id INTEGER = NULL;
+BEGIN
+	IF specific_location IS NOT NULL THEN
+		INSERT INTO sb.locations (address, latitude, longitude)
+		VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+		RETURNING id INTO location_id;
+	END IF;
+
+	INSERT INTO sb.resources(
+		title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, specific_location_id, paid_until)
+	VALUES (create_resource.title, create_resource.description, create_resource.expiration, sb.current_account_id(),
+			NOW(), create_resource.is_service, create_resource.is_product, create_resource.can_be_delivered,
+			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted, location_id, NOW())
+	RETURNING id INTO inserted_id;
+	
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT inserted_id, UNNEST(category_codes);
+	
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	
+	IF (SELECT activated FROM sb.accounts WHERE id = sb.current_account_id()) IS NOT NULL AND
+		(SELECT suspended FROM sb.resources WHERE id = inserted_id) IS NOT NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('resource_created', json_build_object(
+			'resource_id', inserted_id
+		)::text);
+	END IF;
+	
+	RETURN inserted_id;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.update_resource(
+	resource_id integer,
+	title character varying,
+	description character varying,
+	expiration timestamp without time zone,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE ids_images_to_delete INTEGER[];
+DECLARE location_id INTEGER = NULL;
+DECLARE location_to_delete_id INTEGER = NULL;
+BEGIN
+	--Detect attempt to update a resource owned by another account
+	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND account_id = sb.current_account_id()) THEN
+		RETURN 0;
+	END IF;
+	
+	--Detect attempt to update a resource already deleted
+	IF EXISTS(SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND deleted IS NOT NULL) THEN
+		RETURN -1;
+	END IF;
+	
+	SELECT specific_location_id INTO location_id
+	FROM sb.resources
+	WHERE id = resource_id;
+
+	IF specific_location IS NOT NULL THEN
+		IF location_id IS NULL THEN
+			INSERT INTO sb.locations (address, latitude, longitude)
+			VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+			RETURNING id INTO location_id;
+		ELSE
+			UPDATE sb.locations SET address = specific_location.address, latitude = specific_location.latitude, longitude = specific_location.longitude
+			WHERE id = location_id;
+		END IF;
+	ELSE
+		IF location_id IS NOT NULL THEN
+			SELECT location_id INTO location_to_delete_id;
+		END IF;
+		SELECT null INTO location_id;
+	END IF;
+
+	UPDATE sb.resources r SET title = update_resource.title, description = update_resource.description, 
+		expiration = update_resource.expiration, is_service = update_resource.is_service, 
+		is_product = update_resource.is_product, can_be_delivered = update_resource.can_be_delivered, 
+		can_be_taken_away = update_resource.can_be_taken_away, can_be_exchanged = update_resource.can_be_exchanged, 
+		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id
+	WHERE r.id = update_resource.resource_id;
+	
+	IF location_to_delete_id IS NOT NULL THEN
+		DELETE FROM sb.locations WHERE id = location_to_delete_id;
+	END IF;
+	DELETE FROM sb.resources_resource_categories rrc WHERE rrc.resource_id = update_resource.resource_id;
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT update_resource.resource_id, UNNEST(category_codes);
+	
+	ids_images_to_delete = ARRAY(SELECT image_id FROM sb.resources_images ri
+		WHERE ri.resource_id = update_resource.resource_id);
+	
+	DELETE FROM sb.resources_images ri WHERE ri.resource_id = update_resource.resource_id;
+	DELETE FROM sb.images i WHERE i.id IN (SELECT UNNEST(ids_images_to_delete));
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT update_resource.resource_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	
+	RETURN 1;
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.delete_resource(
+	resource_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE ids_images_to_delete INTEGER[];
+begin
+	--Detect attempt to delete a resource owned by another account
+	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = delete_resource.resource_id AND account_id = sb.current_account_id()) THEN
+		RETURN 0;
+	END IF;
+	
+	UPDATE sb.resources r
+	SET deleted = NOW()
+	WHERE r.id = delete_resource.resource_id;
+	
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	
+	RETURN 1;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.activate_account(
+	activation_code character varying)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE new_email text;
+DECLARE id_account_to_activate integer;
+DECLARE current_activated timestamp;
+DECLARE account_lang character varying;
+DECLARE res record;
+begin
+	SELECT ea.email, ea.account_id
+	INTO new_email, id_account_to_activate
+	FROM sb.email_activations ea
+	WHERE ea.activation_code = activate_account.activation_code;
+	
+	SELECT a.activated, a.language
+	INTO current_activated, account_lang
+	FROM sb.accounts a
+	WHERE a.id = id_account_to_activate;
+	
+	IF current_activated IS NULL THEN
+		UPDATE sb.accounts SET email = new_email, activated = NOW()
+		WHERE id = id_account_to_activate;
+		
+		UPDATE sb.resources SET paid_until = NOW()
+		WHERE deleted IS NULL AND expiration > NOW() AND 
+				account_id = id_account_to_activate
+		
+		PERFORM sb.apply_resources_consumption(sb.current_account_id());
+		
+		FOR res IN
+			SELECT id 
+			FROM sb.resources
+			WHERE deleted IS NULL AND expiration > NOW() AND 
+				account_id = id_account_to_activate AND
+				suspended IS NULL
+		LOOP
+			-- Emit notification for push notification handling
+			PERFORM pg_notify('resource_created', json_build_object(
+				'resource_id', res.id
+			)::text);
+		END LOOP;
+	ELSE
+		UPDATE sb.accounts SET email = new_email
+		WHERE id = id_account_to_activate;
+	END IF;
+	
+	UPDATE sb.email_activations ea
+	SET activated = NOW()
+	WHERE ea.activation_code = activate_account.activation_code;
+	
+	RETURN account_lang;
+end;
+$BODY$;
 
 DO
 $body$

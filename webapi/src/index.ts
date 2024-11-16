@@ -74,7 +74,7 @@ const launchJobWorker = async (pool: Pool, version: string) => {
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
-        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries',
+        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens',
         taskList : {
             mailPasswordRecovery: async (payload: any) => {
                 executeJob(async (payload) => {
@@ -107,6 +107,11 @@ const launchJobWorker = async (pool: Pool, version: string) => {
             },
             sendSummaries: async () => {
                 executeJob(() => sendSummaries(pool, version), 'sendSummaries')
+            },
+            burnTokens: async () => {
+                executeJob(async () => {
+                    await runAndLog(`SELECT sb.apply_resources_consumption()`, pool, 'Running burnTokens routine')
+                }, 'burnTokens')
             }
         },
         schema: 'worker'
