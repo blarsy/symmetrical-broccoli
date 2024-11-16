@@ -32,7 +32,7 @@ const createAccounts = async () => {
     //console.log('accountsInTest', accountsInTest)
 }
 
-const createResource = async (title: string, description: string, expiration: Date, targetScreen: RenderResult) => {
+export const createResourceThroughUI = async (title: string, description: string, expiration: Date, targetScreen: RenderResult, checkSuccess: Boolean = true) => {
     await waitFor(() => expect(targetScreen.getByTestId('categories:Button')).toBeOnTheScreen(), { timeout: 5000 })
 
     fireEvent.changeText(targetScreen.getByTestId('title'), title)
@@ -50,8 +50,9 @@ const createResource = async (title: string, description: string, expiration: Da
     fireEvent.press(targetScreen.getByTestId('categories:Modal:ConfirmButton'))
 
     fireEvent.press(targetScreen.getByTestId('submitButton'))
-
-    return waitFor(() => expect(targetScreen.getByTestId('resourceEditionFeedback:Success')).toBeOnTheScreen())
+    if(checkSuccess){
+        return waitFor(() => expect(targetScreen.getByTestId('resourceEditionFeedback:Success')).toBeOnTheScreen())
+    }
 }
 
 test('Create resource with unconfirmed account', async () => {
@@ -70,7 +71,7 @@ test('Create resource with unconfirmed account', async () => {
     const title = 'A title for this resource'
     const description = 'A description, potentially long.'
 
-    await createResource(title, description, someDate, screen)
+    await createResourceThroughUI(title, description, someDate, screen)
 
     await checkResourcePresent(accountsInTest[0].email, title, description, false, true, false, false, true, false, someDate, [2, 11])
     
@@ -109,7 +110,7 @@ test('Create resource with notification', async () => {
     const title = 'A title for this resource'
     const description = 'A description, potentially long.'
 
-    await createResource(title, description, someDate, screen)
+    await createResourceThroughUI(title, description, someDate, screen)
 
     await checkResourcePresent(accountsInTest[0].email, title, description, false, true, false, false, true, false, someDate, [2, 11])
 
