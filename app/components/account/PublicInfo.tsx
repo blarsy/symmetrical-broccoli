@@ -17,6 +17,7 @@ import Images from "@/Images"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
+      id
       accountsLinksByAccountId {
         nodes {
           label
