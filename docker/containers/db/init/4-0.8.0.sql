@@ -355,7 +355,7 @@ BEGIN
 	  AND
 	  (NOT suggested_resources.can_be_taken_away OR r.can_be_taken_away)
 	  AND(
-		 distance_to_reference_location = 0 
+		 (suggested_resources.reference_location_latitude = 0 AND suggested_resources.reference_location_longitude = 0)
 		 OR 
 		 (r.specific_location_id IS NULL AND NOT suggested_resources.exclude_unlocated)
 		 OR
@@ -743,10 +743,12 @@ BEGIN
 	INSERT INTO sb.resources_images (resource_id, image_id)
 	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
 	
-    -- Emit notification for push notification handling
-    PERFORM pg_notify('resource_created', json_build_object(
-        'resource_id', inserted_id
-    )::text);
+	IF (SELECT activated FROM sb.accounts WHERE id = sb.current_account_id()) IS NOT NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('resource_created', json_build_object(
+			'resource_id', inserted_id
+		)::text);
+	END IF;
 	
 	RETURN inserted_id;
 end;
