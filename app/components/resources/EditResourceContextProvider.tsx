@@ -161,8 +161,9 @@ const EditResourceContextProvider = ({ children }: Props) => {
             editResourceState.changeCallbacks.forEach(cb => cb())
         },
         reset: (accountLocation?: Location) => {
-            const newResourceState = {...editResourceState, ...{ editedResource: blankResource, imagesToAdd: [] }}
-            newResourceState.editedResource.specificLocation = accountLocation || null
+            const newResource = { ...blankResource }
+            newResource.specificLocation = accountLocation || null
+            const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [] }}
             setState( newResourceState )
         }
     }
