@@ -6,5 +6,6 @@
     "cloudinaryUploadPreset": "presetname",
     "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
     "googleMapsApiKey": "<ApiKey>",
-    "googleAuthWebClienttId": "<WebClientId>"
+    "googleAuthWebClienttId": "<WebClientId>",
+    "googleAuthIOSClientID": "<IOSClientId>"
 }

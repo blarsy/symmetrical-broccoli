@@ -1,7 +1,7 @@
 import EditResource from "@/components/form/EditResource"
-import { render, waitFor, screen, fireEvent, RenderResult } from "@testing-library/react-native"
+import { render, waitFor, screen } from "@testing-library/react-native"
 import { checkHasNotifications, checkResourcePresent } from "./datastoreCheck"
-import { AppWithSingleScreen } from "./lib"
+import { AppWithSingleScreen, createResourceThroughUI } from "./lib"
 import React from "react"
 import { createAndLogIn, deleteAccount, getTestNum } from "./datastoreSetupLib"
 import Notifications from "@/components/notifications/Notifications"
@@ -29,30 +29,7 @@ const createAccounts = async () => {
         account.token = token
         return account
     }))
-    //console.log('accountsInTest', accountsInTest)
-}
-
-export const createResourceThroughUI = async (title: string, description: string, expiration: Date, targetScreen: RenderResult, checkSuccess: Boolean = true) => {
-    await waitFor(() => expect(targetScreen.getByTestId('categories:Button')).toBeOnTheScreen(), { timeout: 5000 })
-
-    fireEvent.changeText(targetScreen.getByTestId('title'), title)
-    fireEvent.changeText(targetScreen.getByTestId('description'), description)
-    fireEvent.press(targetScreen.getByTestId('nature:isService:Button'))
-    fireEvent.press(targetScreen.getByTestId('exchangeType:canBeExchanged:Button'))
-
-    fireEvent.press(targetScreen.getByTestId('expiration:Button'))
-    fireEvent(targetScreen.getByTestId('expiration:Picker:date'), 'onChangeText', expiration.valueOf())
-
-    fireEvent.press(targetScreen.getByTestId('categories:Button'))
-    await waitFor(() => expect(targetScreen.getByTestId('categories:Modal:ConfirmButton')).toBeOnTheScreen())
-    fireEvent.press(targetScreen.getByTestId('categories:Modal:Category:2'))
-    fireEvent.press(targetScreen.getByTestId('categories:Modal:Category:11'))
-    fireEvent.press(targetScreen.getByTestId('categories:Modal:ConfirmButton'))
-
-    fireEvent.press(targetScreen.getByTestId('submitButton'))
-    if(checkSuccess){
-        return waitFor(() => expect(targetScreen.getByTestId('resourceEditionFeedback:Success')).toBeOnTheScreen())
-    }
+    
 }
 
 test('Create resource with unconfirmed account', async () => {

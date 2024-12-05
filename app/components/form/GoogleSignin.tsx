@@ -1,4 +1,4 @@
-import { apiUrl, googleAuthWebClienttId } from "@/lib/settings"
+import { apiUrl, googleAuthIOSClientID, googleAuthWebClienttId } from "@/lib/settings"
 import { GoogleSignin, GoogleSigninButton, User } from "@react-native-google-signin/google-signin"
 import React, { useEffect, useState } from "react"
 import { ErrorSnackbar } from "../OperationFeedback"
@@ -10,7 +10,7 @@ import { View } from "react-native"
 
 GoogleSignin.configure({
     webClientId: googleAuthWebClienttId,
-    iosClientId: googleAuthWebClienttId
+    iosClientId: googleAuthIOSClientID
 })
 
 const AUTHENTICATE_GOOGLE = gql`mutation AuthenticateExternalAuth($token: String, $email: String) {

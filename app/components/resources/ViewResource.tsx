@@ -1,6 +1,6 @@
 import { GET_RESOURCE, RouteProps, ScreenSize, aboveMdWidth, adaptToWidth, fontSizeMedium, getScreenSize, regionFromLocation } from "@/lib/utils"
 import React, { useContext, useState } from "react"
-import { Banner, Button, Chip, Icon, IconButton, Text } from "react-native-paper"
+import { Banner, Chip, Icon, Text } from "react-native-paper"
 import { Resource, fromServerGraphResource, parseLocationFromGraph } from "@/lib/schema"
 import { t } from "@/i18n"
 import { Dimensions, Image, ImageSourcePropType, ScrollView, TouchableOpacity, View } from "react-native"

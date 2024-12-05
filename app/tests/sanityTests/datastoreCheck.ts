@@ -44,6 +44,14 @@ export const checkActivationEmailSent = async (email: string): Promise<string> =
     return /"http(s?):\/\/.*activate\/([^"]*)"/.exec(result.rows[0].html_content)![2]
 }
 
+export const checkAccountWillingToContribute = async (email: string) => {
+    const result = await executeQuery(`select *
+        from sb.accounts
+        where email = lower($1) and willing_to_contribute and amount_of_topes = 30`, [email])
+
+    return result.rowCount && result.rowCount > 0
+}
+
 export const checkAccountActivated = async (email: string) => {
     const result = await executeQuery(`select *
         from sb.accounts
@@ -93,7 +101,6 @@ export const checkHasNotifications = async (email: string, uniquePropNames: stri
         inner join sb.accounts a on a.id = n.account_id
         where a.email = lower($1)`, [email])
     
-    console.log('notifs.rowCount uniquePropNames.length', notifs.rowCount, uniquePropNames, uniquePropNames.length)
     expect(notifs.rowCount).toEqual(uniquePropNames.length)
 
     return uniquePropNames.map(name => {

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react"
-import { Badge, Icon } from "react-native-paper"
+import { Badge } from "react-native-paper"
 import { primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'

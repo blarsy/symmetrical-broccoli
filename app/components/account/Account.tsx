@@ -16,62 +16,9 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import dayjs from "dayjs"
 import PanZoomImage from "../PanZoomImage"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import AccordionItem from "../AccordionItem"
 import { lightPrimaryColor } from "../layout/constants"
 import { WhiteButton } from "../layout/lib"
-
-export const GET_ACCOUNT = gql`query Account($id: Int!) {
-  accountById(id: $id) {
-    email
-    name
-    id
-    resourcesByAccountId(orderBy: CREATED_DESC) {
-      nodes {
-        id
-        canBeGifted
-        canBeExchanged
-        title
-        deleted
-        expiration
-        resourcesImagesByResourceId {
-          nodes {
-            imageByImageId {
-              publicId
-            }
-          }
-        }
-        resourcesResourceCategoriesByResourceId {
-          nodes {
-            resourceCategoryCode
-          }
-        }
-        accountByAccountId {
-          id
-        }
-      }
-    }
-    imageByAvatarImageId {
-      publicId
-    }
-    accountsLinksByAccountId {
-      nodes {
-        id
-        url
-        label
-        linkTypeByLinkTypeId {
-          id
-        }
-      }
-    }
-    locationByLocationId {
-      address
-      id
-      longitude
-      latitude
-    }
-  }
-}
-`
+import { GraphQlLib } from "@/lib/backendFacade"
 
 interface Props {
     id: number,
@@ -80,7 +27,7 @@ interface Props {
 }
 
 export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props) => {
-    const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id } })
+    const { data, loading, error } = useQuery(GraphQlLib.queries.GET_ACCOUNT, { variables: { id } })
     const [logoToZoom, setLogotoZoom] = useState<ImageSourcePropType | undefined>(undefined)
     const [accountResources, setAccountResources] = useState<Resource[]>([])
     const [moreInfo, setMoreInfo] = useState(false)

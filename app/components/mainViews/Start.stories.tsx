@@ -88,7 +88,8 @@ export const Outdated: Story = {
               activated: new Date(),
               logLevel: 2,
               numberOfUnreadNotifications: 2,
-              unreadConversations: [1, 2]
+              unreadConversations: [1, 2],
+              amountOfTopes: 0
           }
         }}))
         return client

@@ -18,6 +18,7 @@ import LocationEdit from "../account/LocationEdit"
 import PicturesField from "./PicturesField"
 import Icons from "@expo/vector-icons/FontAwesome"
 import CategoriesSelect from "./CategoriesSelect"
+import { primaryColor } from "../layout/constants"
 
 
 export default ({ route, navigation }:RouteProps) => {
@@ -35,6 +36,7 @@ export default ({ route, navigation }:RouteProps) => {
             await editResourceContext.actions.save(values)
             setSaveResourcestate(fromData(true))
             searchFilterContext.actions.requery(appContext.categories.data!)
+            
             if(navigation.canGoBack()) navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e, t('requestError')))
@@ -49,7 +51,7 @@ export default ({ route, navigation }:RouteProps) => {
     },  [defaultLocation])
 
     return <ScrollView style={{ backgroundColor: '#fff' }}>
-        { loadingAddress ? <ActivityIndicator /> :
+        { loadingAddress ? <ActivityIndicator color={primaryColor}/> :
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
@@ -67,7 +69,6 @@ export default ({ route, navigation }:RouteProps) => {
         })} onSubmit={async (values) => {
             ensureConnected('connect_to_create_ressource', 'resource_is_free', () => {
                 createResource(values)
-                
             })
         }}>
         {formikState => {

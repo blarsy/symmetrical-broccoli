@@ -127,4 +127,4 @@ test('edit account data: links', async () => {
     await checkLinksOnAccount(email, [
         { label: labelLink1Bis, url: urlLink1Bis, type: typeLink1Bis }, 
         { label: labelLink2, url: urlLink2, type: typeLink2 }])
-}, 20000)
+})

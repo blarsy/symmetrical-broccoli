@@ -16,6 +16,7 @@ export interface IAppState {
     apolloClient?: ApolloClient<NormalizedCacheObject>
     chatMessagesSubscription?: { unsubscribe: () => void }
     notificationSubscription?: { unsubscribe: () => void }
+    accountChangeSubscription?: { unsubscribe: () => void }
     unreadConversations: number[]
     categories: DataLoadState<Category[]>
     lastNotification?: AppNotification
@@ -59,7 +60,8 @@ export enum AppReducerActionType {
   NotificationReceived,
   NotificationsRead,
   NotificationRead,
-  RefreshAccount
+  RefreshAccount,
+  AccountChanged
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
@@ -68,20 +70,21 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.SetAuthToken:
           return {...previousState, ...{ token: action.payload }}
         case AppReducerActionType.Login:
-          return {...previousState, ...{ account: action.payload.account, 
+          return {...previousState, ...{ account: { ...action.payload.account, ...{ lastChangeTimestamp: new Date() }}, 
               chatMessagesSubscription: action.payload.chatMessagesSubscription, connecting: undefined, 
               apolloClient: action.payload.apolloClient, 
               notificationSubscription: action.payload.notificationSubscription,
+              accountChangeSubscription: action.payload.accountChangeSubscription,
               unreadConversations: action.payload.account.unreadConversations,
               numberOfUnreadNotifications: action.payload.account.numberOfUnreadNotifications
             }}
         case AppReducerActionType.Logout:
           return {...previousState, ...{ token: '', account: undefined, 
-              chatMessagesSubscription: undefined, notificationSubscription: undefined,
+              chatMessagesSubscription: undefined, notificationSubscription: undefined, accountChangeSubscription: undefined,
               unreadConversations: [], numberOfUnreadNotifications: 0, apolloClient: action.payload.apolloClient
             }}
         case AppReducerActionType.UpdateAccount:
-          return { ...previousState, ...{ account: action.payload, lastNotification: { message: t('updateAccountSuccessful') } } }
+          return { ...previousState, ...{ account: { ...action.payload.account, ...{ lastChangeTimestamp: new Date() }}, lastNotification: { message: t('updateAccountSuccessful') } } }
         case AppReducerActionType.DisplayNotification:
           return { ...previousState, ...{ lastNotification: { error: action.payload.error, message: action.payload.message } } }
         case AppReducerActionType.ClearNotification:
@@ -131,7 +134,9 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
             unreadConversations: previousState.unreadConversations.filter(val => val != action.payload)
           } }
         case AppReducerActionType.RefreshAccount:
-          return { ...previousState, account: action.payload }
+          return { ...previousState, account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } }}
+        case AppReducerActionType.AccountChanged:
+          return { ...previousState, account: {...action.payload, ...{ numberOfUnreadNotifications: previousState.numberOfUnreadNotifications, unreadConversations: previousState.unreadConversations }} }
         default:
           throw new Error(`Unexpected reducer action type ${action.type}`)
     }

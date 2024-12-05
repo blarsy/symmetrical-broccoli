@@ -17,6 +17,8 @@ import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navig
 import { GraphQlLib } from "@/lib/backendFacade"
 import { useMutation } from "@apollo/client"
 import Images from "@/Images"
+import TokenSettings from "../tokens/TokenSettings"
+import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -34,7 +36,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         if(!appContext.account) {
             navigation.navigate('main')
         }
-    })
+    }, [])
 
     const Main = () => (<ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <View style={{ gap: 30, width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth), margin: 10 }}>
@@ -89,6 +91,17 @@ export default function Profile ({ route, navigation }: RouteProps) {
         </View>
     </ScrollView>)
 
+    const fixedScreens: TabNavigatorProps[] = [
+        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }, component: Main },
+        { name:'publicInfo', options:{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }, component: PublicInfo },
+        { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }, component: Preferences },
+    ]
+
+    const actualScreens = appContext.account?.willingToContribute ? 
+        [fixedScreens[0], fixedScreens[1], { name:'tokens', options:{ title: t('tokens_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="hand-clap" /> }, component: TokenSettings }, fixedScreens[2]]
+        : 
+        fixedScreens
+
     return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch'}}>
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
             <Appbar.BackAction onPress={() => navigation.navigate('main')} />
@@ -105,9 +118,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
             theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
             activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }} >
-            <Tab.Screen name="main" options={{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }} component={Main} />
-            <Tab.Screen name="publicInfo" options={{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }} component={PublicInfo} />
-            <Tab.Screen name="preferences" options={{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }} component={Preferences} />
+            { actualScreens.map(screen => <Tab.Screen name={screen.name} options={screen.options} component={screen.component} />) }
         </Tab.Navigator>
     </PrimaryColoredContainer>
 }

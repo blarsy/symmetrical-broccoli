@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { ColorValue, Pressable, View } from "react-native"
+import { ColorValue, Pressable, StyleProp, View, ViewStyle } from "react-native"
 import { Icon } from "react-native-paper"
 import { SvgProps } from "react-native-svg"
 
@@ -10,9 +10,10 @@ interface Props {
     color?: ColorValue
     testID?: string
     disabled?: boolean
+    style?: StyleProp<ViewStyle>
 }
 
-export default ({ Image, size, onPress, color, testID, disabled }: Props) => {
+export default ({ Image, size, onPress, color, testID, disabled, style }: Props) => {
     const [pressed, setPressed] = useState(false)
 
     return <Pressable disabled={disabled} testID={testID} 
@@ -20,7 +21,7 @@ export default ({ Image, size, onPress, color, testID, disabled }: Props) => {
         onPress={onPress} style={{
             opacity: pressed ? 0.6 : 1
         }}>
-        <View style={{ width: size }}>{ typeof Image === 'string' ?
+        <View style={{ width: size, ...(style as object) }}>{ typeof Image === 'string' ?
             <Icon color={color as string} size={size} source={Image} />
             : <Image fill={color} style={{ width: size, height: size }} /> 
         }</View>

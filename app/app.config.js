@@ -40,7 +40,12 @@ module.exports = {
     ],
     "ios": {
       "infoPlist": {
-        "LSMinimumSystemVersion": "12.0"
+        "LSMinimumSystemVersion": "12.0",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.940052967066-sc7nhl39md08efgkca8i64076i5uskic"]
+          }
+        ]
       },
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",

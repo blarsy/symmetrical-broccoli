@@ -1,7 +1,7 @@
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import { appBarsTitleFontSize } from "@/lib/utils"
 import React, { useContext, useEffect } from "react"
-import { Appbar, Icon } from "react-native-paper"
+import { Appbar, Badge, Icon } from "react-native-paper"
 import { AppContext } from "./AppContextProvider"
 import { primaryColor, lightPrimaryColor } from "./layout/constants"
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"

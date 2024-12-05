@@ -19,11 +19,13 @@ const confirmAccount = async (email: string) => {
     return simulateActivation(res.rows[0].activation_code)
 }
 
-export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false): Promise<string> => {
-    const client = getApolloClient('')
+export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false, contributor: boolean = false): Promise<string> => {
+    let client = getApolloClient('')
     try {
         const res = await client.mutate({ mutation: GraphQlLib.mutations.REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
+        client = getApolloClient(res.data.registerAccount.jwtToken)
+        if(contributor) await client.mutate({ mutation: GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE })
         return (res.data.registerAccount.jwtToken as string)
     } catch (e) {
         console.debug('Error while trying to login', e)
@@ -38,7 +40,7 @@ export const authenticate = async (email: string, password: string) => {
         //console.log('jwt', res.data.jwtToken, 'res.data', res.data)
         return res.data.authenticate.jwtToken
     } catch (e) {
-        console.debug('Error while trying to login', e)
+        console.debug('Error while trying to authenticate', e)
         throw e
     }  
 }
@@ -52,7 +54,7 @@ export const deleteAccount = async (email: string, password: string) => {
         }
         throw new Error(``)
     } catch(e) {
-        console.debug('Error while trying to login, then delete account', e)
+        console.debug('Error while trying to delete account', e)
     }
 }
 
@@ -70,6 +72,14 @@ export const createResource = async (jwtToken: string, title: string, descriptio
         expiration, isProduct, isService, title
     } })
     return res.data.createResource.integer
+}
+
+export const setResourceData = async (id: number, dates:{ suspended?: Date, deleted?: Date, paid_until?: Date, created?: Date}) => {
+    const sets = Object.entries(dates).map(([name, date], idx) => `${name} = $${idx + 2}`)
+    const vals = Object.entries(dates).map(([name, date]) => date)
+    await executeQuery(`update sb.resources r
+        set ${sets.join(',')}
+        where r.id = $1`, [ id, ...vals])
 }
 
 const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
@@ -102,7 +112,7 @@ interface SearchableResources {
         name: string;
         token: string;
     }[];
-    resourceIds: [number, number, number, number, number, number];
+    resourceIds: [number, number, number, number, number, number, number];
 }
 
 export const setupSearchableResources = async (testNum: string): Promise<SearchableResources> => {
@@ -127,7 +137,9 @@ export const setupSearchableResources = async (testNum: string): Promise<Search
         createResource(tokens[1], `${name2}-1`, 'desc', false, true, false, true, false, false, new Date(), [2]),
         createResource(tokens[1], `${name2}-2`, 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
         createResource(tokens[1], `${name2}-3`, 'desc', true, true, true, true, true, true, dateInFuture, [10]),
+        createResource(tokens[1], `${name1}-suspended`, 'desc', true, false, true, false, true, false, dateInFuture, [10]),
     ])
+    await setResourceData(resourceIds[6], { suspended: new Date() })
 
     return { accounts, resourceIds }
 }
@@ -136,4 +148,10 @@ export const cleanupSearchableResources = async (data: SearchableResources) => {
     return Promise.all(data.accounts.map(account => {
         return deleteAccountByToken(account.token)
     }))
+}
+
+export const setAccountTokens = async (email: string, numberOfTokens: number) => {
+    await executeQuery(`update sb.accounts
+        set amount_of_topes = $1
+        where email = lower($2)`, [numberOfTokens, email])
 }

@@ -45,7 +45,7 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                 flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
                 <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
                 <Camera ref={ref} zoom={zoom} style={{ width: picSize, height: picSize, justifyContent: processing ? 'space-between' : 'flex-end', alignItems: 'center', padding: 10, gap: 5 }} onCameraReady={() => setCameraReady(true)}>
-                    { processing && <ActivityIndicator color="#fff" style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
+                    { processing && <ActivityIndicator color={primaryColor} style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
                     <View style={{ flexDirection: 'row' }}>
                         <Icon color="#fff" size={20} source="magnify"/>
                         <Slider thumbTintColor={primaryColor} maximumTrackTintColor={lightPrimaryColor} minimumTrackTintColor={lightPrimaryColor}

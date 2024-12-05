@@ -103,6 +103,8 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
       }
     }
     created
+    suspended
+    paidUntil
     deleted
   }
 }

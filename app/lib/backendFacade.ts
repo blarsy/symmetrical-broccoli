@@ -1,7 +1,61 @@
-import { FetchResult, gql, MutationResult, useMutation } from "@apollo/client"
+import { gql } from "@apollo/client"
 
 export const GraphQlLib = {
-    queryies: {},
+    queries: {
+      GET_ACCOUNT: gql`query Account($id: Int!) {
+        accountById(id: $id) {
+          email
+          name
+          id
+          resourcesByAccountId(orderBy: CREATED_DESC) {
+            nodes {
+              id
+              canBeGifted
+              canBeExchanged
+              title
+              deleted
+              expiration
+              suspended
+              paidUntil
+              resourcesImagesByResourceId {
+                nodes {
+                  imageByImageId {
+                    publicId
+                  }
+                }
+              }
+              resourcesResourceCategoriesByResourceId {
+                nodes {
+                  resourceCategoryCode
+                }
+              }
+              accountByAccountId {
+                id
+              }
+            }
+          }
+          imageByAvatarImageId {
+            publicId
+          }
+          accountsLinksByAccountId {
+            nodes {
+              id
+              url
+              label
+              linkTypeByLinkTypeId {
+                id
+              }
+            }
+          }
+          locationByLocationId {
+            address
+            id
+            longitude
+            latitude
+          }
+        }
+      }`
+    },
     mutations: {
         REGISTER_ACCOUNT: gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
             registerAccount(
@@ -26,6 +80,11 @@ export const GraphQlLib = {
             ) {
               integer
             }
+        }`,
+        SWITCH_TO_CONTRIBUTION_MODE: gql`mutation SwitchToContributionMode {
+          switchToContributionMode(input: {}) {
+            integer
+          }
         }`
     },
     subscriptions: {}

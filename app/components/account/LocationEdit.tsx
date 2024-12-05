@@ -125,6 +125,6 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
                     onDeleteRequested()
                 }
                 setDeleteRequested(false)
-            }} />
+            }} onDismiss={() => setDeleteRequested(false)} />
     </View>
 }

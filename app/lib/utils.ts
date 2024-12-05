@@ -185,6 +185,8 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       longitude
       id
     }
+    suspended
+    paidUntil
     created
     deleted
   }

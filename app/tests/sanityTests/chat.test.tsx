@@ -91,4 +91,4 @@ test('Send chat message about a resource', async () => {
 
     await waitFor(() => expect(screenReceiverAfter.getByTestId('searchText')).toBeOnTheScreen())
     expect(screenReceiverAfter.queryByTestId('chatUnreads')).not.toBeOnTheScreen()
-}, 10000)
+})

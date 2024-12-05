@@ -7,6 +7,7 @@ import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
 import { registerForPushNotificationsAsync } from "./pushNotifications"
 import secureStore from "./secureStore"
 import { getApolloClient } from "./apolloClient"
+import { AccountInfo } from "./schema"
 
 export const GET_SESSION_DATA = gql`query GetSessionData {
     getSessionData {
@@ -18,6 +19,8 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       logLevel
       unreadConversations
       numberOfUnreadNotifications
+      willingToContribute
+      amountOfTopes
     }
   }`
 
@@ -68,10 +71,34 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     }
 }`
 
-export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>) => {
+export const ACCOUNT_CHANGE = gql`subscription AccountChange {
+    accountChangeReceived {
+      account {
+        willingToContribute
+        name
+        language
+        email
+        avatarImageId
+        amountOfTopes
+        activated
+        id
+      }
+    }
+  }`
+
+let overrideSecureStore:ISecureStore
+let clientGetter: (token: string) => ApolloClient<NormalizedCacheObject>
+
+export const setOverrides = ( overrides: { clientGetter?: (token: string) => ApolloClient<NormalizedCacheObject>, secureStore?: ISecureStore }) => {
+    if(overrides.secureStore) overrideSecureStore = overrides.secureStore
+    if(overrides.clientGetter) clientGetter = overrides.clientGetter
+}
+
+export default () => {
     const appDispatch = useContext(AppDispatchContext)
     const appState = useContext(AppContext)
-    const { get, set, remove } = overrideSecureStore || secureStore
+    const actualStore = overrideSecureStore || secureStore
+    const { get, set, remove } = actualStore
 
     const TOKEN_KEY = 'token'
 
@@ -86,14 +113,17 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
 
         const res = await client.query({ query: GET_SESSION_DATA })
     
-        const account = {
+        const account: AccountInfo = {
             id: res.data.getSessionData.accountId, 
             name: res.data.getSessionData.name, 
             email: res.data.getSessionData.email, 
             avatarPublicId: res.data.getSessionData.avatarPublicId,
             activated: res.data.getSessionData.activated,
             unreadConversations: res.data.getSessionData.unreadConversations,
-            numberOfUnreadNotifications: res.data.getSessionData.numberOfUnreadNotifications
+            numberOfUnreadNotifications: res.data.getSessionData.numberOfUnreadNotifications,
+            willingToContribute: res.data.getSessionData.willingToContribute,
+            amountOfTopes: res.data.getSessionData.amountOfTopes,
+            lastChangeTimestamp: new Date()
         }
 
         return { res, account, client }
@@ -117,12 +147,30 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
             appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
         } })
         const notificationSubscription = client.subscribe({ query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
-            debug({ message: `Received in-app notification notification: ${payload.data.notificationReceived.notification}` })
+            debug({ message: `Received in-app notification: ${payload.data.notificationReceived.notification}` })
+            // Here comes the notification parsing
             appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
         } })
+        const accountChangeSubscription = client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
+            debug({ message: `Received in-app account change: ${payload.data.accountChangeReceived.account}` })
+            // Here comes the notification parsing
+            const updatedAccount: AccountInfo = {
+                activated: payload.data.accountChangeReceived.account.activated,
+                amountOfTopes: payload.data.accountChangeReceived.account.amountOfTopes,
+                lastChangeTimestamp: new Date(),
+                avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
+                email: payload.data.accountChangeReceived.account.email,
+                id: payload.data.accountChangeReceived.account.id,
+                name: payload.data.accountChangeReceived.account.name,
+                willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
+                unreadConversations: [],
+                numberOfUnreadNotifications: 0
+            }
+            appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
+        }})
         
         appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, 
-            chatMessagesSubscription: messageSubscription, notificationSubscription,
+            chatMessagesSubscription: messageSubscription, notificationSubscription, accountChangeSubscription,
             numberOfUnreadNotifications: account.numberOfUnreadNotifications,
             unreadConversations: account.unreadConversations
         } })
@@ -134,6 +182,7 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
       await remove(TOKEN_KEY)
       appState.chatMessagesSubscription?.unsubscribe()
       appState.notificationSubscription?.unsubscribe()
+      appState.accountChangeSubscription?.unsubscribe()
       appDispatch({ type: AppReducerActionType.Logout, payload: { apolloClient: getApolloClient('') } })
       info({ message: 'logged out' })
     }
@@ -164,4 +213,3 @@ export default (overrideSecureStore?: ISecureStore, clientGetter?: (token: strin
 
     return { logout, ensureConnected, tryRestoreToken, login, reloadAccount }
 }
-

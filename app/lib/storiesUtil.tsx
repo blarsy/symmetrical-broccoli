@@ -11,7 +11,7 @@ import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { NavigationContainer } from '@react-navigation/native'
-import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
+import { ConversationContext, conversationMessagesState, ConversationState } from '@/components/chat/ConversationContextProvider'
 
 import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
@@ -37,9 +37,13 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => 
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, willingToContribute: boolean = false) => 
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
+        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
+            activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
+            willingToContribute, amountOfTopes: willingToContribute ? 30 : 0, numberOfUnreadNotifications: 0, 
+            unreadConversations: [], lastChangeTimestamp: new Date()
+         })
 
 const defaultResourceCategories: Category[] = [
     { code: 1, name: 'category 1' },
@@ -65,10 +69,11 @@ export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]
     <StoryElement />
 </SearchFilterContext.Provider>
 
-export const conversationContextDecorator =  (initialConversationData: ConversationState) => {
+export const conversationContextDecorator =  (initialConversationData: ConversationState, initialMessagesState: conversationMessagesState) => {
     return (StoryElement: React.ElementType) => 
     <ConversationContext.Provider value={{ 
-        state: initialConversationData,
+        conversationState: initialConversationData,
+        messagesState: initialMessagesState,
         actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {}, loadEarlier: async () => {} }
     }}>
         <StoryElement />

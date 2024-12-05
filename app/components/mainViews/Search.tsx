@@ -109,7 +109,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
     }, [debouncedFilters])
 
     return loadingAddress ? 
-        <ActivityIndicator /> : 
+        <ActivityIndicator color={primaryColor} /> : 
         <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
                 <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
@@ -151,7 +151,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                     }} />
             </AccordionItem>
 
-            <LoadedList style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
+            <LoadedList testID="foundResources" style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 
                 error={searchFilterContext.results.error} data={searchFilterContext.results.data}
                 displayItem={(res, idx) => {

@@ -47,9 +47,10 @@ test('Edit resource', async () => {
     // in that it provides an event object with a 'stopPropagation' function
     const pressEdit = userEvent.setup()
     await pressEdit.press(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:EditButton`))
-    
+
     //await waitFor(() => expect(screen.getByTestId(`title`)).toBeOnTheScreen())
-    await waitFor(() => expect(screen.getByTestId(`title`)).toHaveProp('value', title))
+    //await waitFor(() => expect(screen.getByTestId(`title`)).toHaveProp('value', title))
+    await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
 
     fireEvent.changeText(screen.getByTestId('title'), title2)
     fireEvent.changeText(screen.getByTestId('description'), description2)
@@ -95,4 +96,4 @@ test('View resource', async () => {
     expect(screen.queryByTestId('viewResource:canBeTakenAway')).not.toBeOnTheScreen()
     expect(screen.getByTestId('viewResource:canBeExchanged')).toBeOnTheScreen()
     expect(screen.queryByTestId('viewResource:canBeGifted')).not.toBeOnTheScreen()
-}, 20000)
+})

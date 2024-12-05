@@ -4,7 +4,7 @@ import EditLinkModal from "./EditLinkModal"
 import { Link, Location, getIconForLink, parseLocationFromGraph } from "@/lib/schema"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
-import { AppContext } from "../AppContextProvider"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import ListOf from "../ListOf"
 import { Button, Icon, IconButton, Portal, Text } from "react-native-paper"
 import { DimensionValue, FlexAlignType, Linking, StyleProp, View, ViewStyle } from "react-native"
@@ -14,6 +14,7 @@ import { t } from "i18next"
 import { ScrollView } from "react-native-gesture-handler"
 import LocationEdit from "./LocationEdit"
 import Images from "@/Images"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
@@ -67,6 +68,7 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
 export default () => {
     const [success, setSuccess] = useState(false)
     const appContext = useContext(AppContext)
+    const { reloadAccount }= useUserConnectionFunctions()
     const [editedLink, setEditedLink] = useState<Link | undefined>(undefined)
     const [updateAccount, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
     const { data, loading, error } = useQuery(GET_ACCOUNT_INFO, { variables: { id: appContext.account!.id } })
@@ -113,14 +115,15 @@ export default () => {
                     setPublicInfo(newPublicInfo)
                     update(newPublicInfo)
                 }}
-                onDeleteRequested={() => {
+                onDeleteRequested={async () => {
                     const newPublicInfo = { location: null, links: publicInfo.links }
                     setPublicInfo(newPublicInfo)
-                    update(newPublicInfo)
+                    await update(newPublicInfo)
+                    reloadAccount()
                 }} 
                 orangeBackground />
             <OperationFeedback testID="publicInfoFeedback" error={updateError} success={success} onDismissError={reset} onDismissSuccess={() => setSuccess(false)} />
-            <EditLinkModal testID="editLinkModal" visible={!!editedLink} initial={editedLink} onDismiss={link => {
+            <EditLinkModal testID="editLinkModal" visible={!!editedLink} initial={editedLink} onDismiss={async link => {
                 if(link) {
                     let newLinks: Link[]
                     if(link.id === 0) {
@@ -139,7 +142,8 @@ export default () => {
                     }
                     const newPublicInfo = { links: newLinks, location: publicInfo.location }
                     setPublicInfo(newPublicInfo)
-                    update(newPublicInfo)
+                    await update(newPublicInfo)
+                    reloadAccount()
                 }
                 setEditedLink(undefined)
             }} />

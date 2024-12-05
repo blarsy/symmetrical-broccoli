@@ -7,5 +7,6 @@
     "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/"
     "googleMapsApiKey": "<ApiKey>",
     "googleAuthWebClienttId": "<WebClientId>",
+    "googleAuthIOSClientID": "<IOSClientId>",
     "diagnostic": true
 }

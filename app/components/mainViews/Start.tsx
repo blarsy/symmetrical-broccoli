@@ -8,8 +8,8 @@ import { ApolloClient, ApolloProvider, NormalizedCacheObject, gql, useLazyQuery 
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import secureStore, { ISecureStore } from "@/lib/secureStore"
+import useUserConnectionFunctions, { setOverrides } from "@/lib/useUserConnectionFunctions"
+import { ISecureStore } from "@/lib/secureStore"
 import { Provider } from "react-native-paper"
 
 export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
@@ -60,7 +60,10 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     const [startingUp, setStartingUp] = useState(true)
     const { checkingVersion, outdated } = useVersionCheck(overrideVersionChecker || versionChecker)
     const [fontsLoaded, fontError] = useCustomFonts()
-    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore, clientGetter)
+
+    setOverrides({ clientGetter, secureStore: overrideSecureStore })
+
+    const { tryRestoreToken } = useUserConnectionFunctions()
     
     const load = async () => {
         try {

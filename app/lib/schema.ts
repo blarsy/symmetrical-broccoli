@@ -34,6 +34,11 @@ export interface AccountInfo {
     email: string
     avatarPublicId: string
     activated: Date
+    willingToContribute: boolean
+    unreadConversations: number[]
+    numberOfUnreadNotifications: number
+    amountOfTopes: number
+    lastChangeTimestamp: Date
 }
 
 export interface ImageInfo {
@@ -70,6 +75,8 @@ export interface Resource {
     canBeDelivered: boolean,
     canBeGifted: boolean,
     canBeExchanged: boolean,
+    suspended?: Date,
+    paidUntil?: Date,
     created: Date,
     deleted: Date | null,
     specificLocation: Location | null
@@ -112,6 +119,8 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         categories: resourceCategories, 
         account: rawRes.accountByAccountId,
         deleted: rawRes.deleted,
+        suspended: rawRes.suspended,
+        paidUntil: rawRes.paidUntil,
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images
 } as Resource

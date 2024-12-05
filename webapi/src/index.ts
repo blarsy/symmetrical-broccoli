@@ -69,12 +69,17 @@ const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Pro
 }
 
 const launchJobWorker = async (pool: Pool, version: string) => {
+    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries'
+    if(version === 'v0_9'){
+        crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens'
+    }
+
     const runner = await run({
         pgPool: pool,
         concurrency: 5,
         // Install signal handlers for graceful shutdown on SIGINT, SIGTERM, etc
         noHandleSignals: false,
-        crontab: '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens',
+        crontab,
         taskList : {
             mailPasswordRecovery: async (payload: any) => {
                 executeJob(async (payload) => {

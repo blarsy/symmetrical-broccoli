@@ -80,9 +80,9 @@ export default ({ route, navigation }: RouteProps) => {
                     { eventType: 2, daysBetweenSummaries: values.newResourcesDaysSummary || -1 }
                 ] } })
             }}>
-                {({handleBlur, setFieldValue, submitForm, values, dirty }) => {
+                {({handleBlur, setFieldValue, submitForm, values }) => {
                     return <>
-                        <Text variant="headlineMedium" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 10 }}>{t('notifications_settings_title')}</Text>
+                        <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 20 }}>{t('notifications_settings_title')}</Text>
                         <PrefSelector title={t('chat_broadcast_prefs_title')} onChange={numberOfDays => {
                             setFieldValue('chatMessageDaysSummary', numberOfDays)
                         } } handleBlur={handleBlur} value={ values.chatMessageDaysSummary } fieldName="chatMessageDaysSummary" />

@@ -88,6 +88,8 @@ export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: 
         latitude
         longitude
       }
+      suspended
+      paidUntil
     }
   }
 }`

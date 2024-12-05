@@ -29,7 +29,7 @@ export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarP
         theme={{ colors: { inverseOnSurface: 'rgb(12, 19, 13)' } }}    
         icon="close" onIconPress={onDismissError} 
         style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', backgroundColor: 'rgb(244, 199, 199)' }} 
-        visible={!!message} onDismiss={onDismissError}>
+        visible={!!error} onDismiss={onDismissError}>
             <View style={{ display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center' }}>
                 { error && <Tooltip title={error?.message}><Icon source="information" size={20}/></Tooltip>}
                 <Text variant="bodySmall" testID="errorMsg">{message}</Text>

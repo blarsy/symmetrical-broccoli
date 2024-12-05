@@ -51,7 +51,7 @@ export default function EditProfile () {
         appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
 
-    if(!appContext.account) return <ActivityIndicator/>
+    if(!appContext.account) return <ActivityIndicator color="#fff"/>
 
     return <Formik initialValues={{ email: appContext.account!.email, 
         name: appContext.account!.name,

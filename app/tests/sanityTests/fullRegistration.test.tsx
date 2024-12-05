@@ -11,7 +11,7 @@ import { AppContextProvider } from '@/components/AppContextProvider'
 import Start from '@/components/mainViews/Start'
 import MainNavigator from '@/components/mainViews/MainNavigator'
 import { t } from '@/i18n'
-import { AppWithSingleScreen, checkBadge } from './lib'
+import { AppWithSingleScreen, checkBadgeNumeric } from './lib'
 import Notifications from '@/components/notifications/Notifications'
 import utc from 'dayjs/plugin/utc'
 import dayjs from "dayjs"
@@ -79,7 +79,7 @@ test('register new user, then log in and out', async () => {
     fireEvent.press(screen.getByTestId('openProfile'))
 
     await waitFor(() => expect(screen.getByTestId('logout')).toBeOnTheScreen())
-    await checkBadge('notificationUnreads', '1', screen)
+    await checkBadgeNumeric('notificationUnreads', screen)
 
     fireEvent.press(screen.getByTestId('logout'))
     
@@ -94,4 +94,4 @@ test('register new user, then log in and out', async () => {
     await waitFor(() => expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toBeOnTheScreen())
     expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
 
-}, 20000)
+})

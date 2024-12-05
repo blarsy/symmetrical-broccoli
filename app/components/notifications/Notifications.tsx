@@ -61,11 +61,11 @@ const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: 
     }
   }`
 
-const SET_NOTIFICATIONS_READ = gql`mutation setNotificationsRead {
-    setNotificationsRead(input: {}) {
-      integer
-    }
-  }`
+// const SET_NOTIFICATIONS_READ = gql`mutation setNotificationsRead {
+//     setNotificationsRead(input: {}) {
+//       integer
+//     }
+//   }`
 
 const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
     const appContext = useContext(AppContext)
@@ -192,7 +192,7 @@ export default ({ navigation }: RouteProps) => {
     const nativeNavigation = useNavigation()
     const appDispatch = useContext(AppDispatchContext)
     const { data, loading, error, refetch } = useNotifications(navigation)
-    const [setNotificationsRead] = useMutation(SET_NOTIFICATIONS_READ)
+    //const [setNotificationsRead] = useMutation(SET_NOTIFICATIONS_READ)
 
     useEffect(() => {
         nativeNavigation.addListener('focus', () => {

@@ -35,10 +35,10 @@ export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginT
 </View>
 
 export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff"
-    {...props} style={mergeWith({ borderRadius: 5 } , props.style )}/>
+    {...props} style={mergeWith({ borderRadius: 15 } , props.style )}/>
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
-    {...props} style={mergeWith({ borderRadius: 5 } , props.style )} />
+    {...props} style={mergeWith({ borderRadius: 15, padding: 10 } , props.style )} />
     
 export function ErrorText(props: TextProps<never>) {
     return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>

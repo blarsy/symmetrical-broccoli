@@ -150,6 +150,7 @@ DECLARE current_amount_of_topes INTEGER;
 DECLARE amount_to_burn INTEGER = 0;
 DECLARE idx INTEGER = 0;
 DECLARE r RECORD;
+DECLARE new_paid_until TIMESTAMPTZ;
 BEGIN
 	SELECT amount_of_topes INTO current_amount_of_topes
 	FROM sb.accounts
@@ -157,45 +158,54 @@ BEGIN
 		id = apply_resources_consumption.account_id AND
 		(
 			SELECT COUNT(*) 
-			FROM sb.resources r
-			WHERE r.account_id = apply_resources_consumption.account_id AND 
+			FROM sb.resources res
+			WHERE res.account_id = apply_resources_consumption.account_id AND 
 				deleted IS NULL AND expiration > NOW()
 		) > 2;
 
 	IF current_amount_of_topes IS NOT NULL THEN
 		FOR r IN
-			SELECT id, paid_until, suspended FROM sb.resources r
-			WHERE r.account_id = apply_resources_consumption.account_id AND 
+			SELECT id, paid_until, suspended FROM sb.resources res
+			WHERE res.account_id = apply_resources_consumption.account_id AND 
 				deleted IS NULL AND expiration > NOW() AND 
-				paid_until > NOW()
-			ORDER BY created DESC
+				(paid_until <= NOW() OR paid_until IS NULL)
+			ORDER BY created ASC
 		LOOP
 			-- skip free resources
 			IF idx > 1 THEN
-				IF amount_to_burn = amount_of_topes THEN
+				IF amount_to_burn = current_amount_of_topes THEN
 					UPDATE sb.resources SET suspended = NOW()
 					WHERE id = r.id;
 				ELSE
-					IF r.suspended IS NULL THEN
-						UPDATE sb.resources SET paid_until = paid_until + '1 day'
-						WHERE id = r.id;
+					IF r.paid_until < (NOW() - INTERVAL '1 day') OR r.paid_until IS NULL THEN
+						new_paid_until = NOW() + INTERVAL '1 day';
 					ELSE
-						UPDATE sb.resources SET paid_until = NOW() + '1 day', suspended = NULL
-						WHERE id = r.id;
+						new_paid_until = r.paid_until + INTERVAL '1 day';
 					END IF;
+
+					UPDATE sb.resources SET paid_until = new_paid_until, suspended = NULL
+					WHERE id = r.id;
 					amount_to_burn = amount_to_burn + 1;
 				END IF;
 			ELSE
 				-- If the resource was suspended, make it available again
-				UPDATE sb.resources SET suspended = NOW()
+				UPDATE sb.resources SET suspended = NULL
 				WHERE id = r.id;
 			END IF;
 			
 			idx = idx + 1;
 		END LOOP;
 		
-		UPDATE sb.accounts SET amount_of_topes = amount_of_topes - amount_to_burn
-		WHERE id = apply_resources_consumption.account_id;
+		IF amount_to_burn > 0 THEN
+			UPDATE sb.accounts SET amount_of_topes = amount_of_topes - amount_to_burn
+			WHERE id = apply_resources_consumption.account_id;
+			
+			PERFORM pg_notify('graphql:account_changed:' || account_id, json_build_object(
+				'event', 'account_changed',
+				'subject', apply_resources_consumption.account_id
+			)::text);
+		END IF;
+
 	END IF;
 END;
 $BODY$;
@@ -253,7 +263,7 @@ BEGIN
 	PERFORM sb.apply_resources_consumption(sb.current_account_id());
 	
 	IF (SELECT activated FROM sb.accounts WHERE id = sb.current_account_id()) IS NOT NULL AND
-		(SELECT suspended FROM sb.resources WHERE id = inserted_id) IS NOT NULL THEN
+		(SELECT suspended FROM sb.resources WHERE id = inserted_id) IS NULL THEN
 		-- Emit notification for push notification handling
 		PERFORM pg_notify('resource_created', json_build_object(
 			'resource_id', inserted_id
@@ -403,7 +413,7 @@ begin
 		
 		UPDATE sb.resources SET paid_until = NOW()
 		WHERE deleted IS NULL AND expiration > NOW() AND 
-				account_id = id_account_to_activate
+				account_id = id_account_to_activate;
 		
 		PERFORM sb.apply_resources_consumption(sb.current_account_id());
 		
@@ -427,6 +437,11 @@ begin
 	UPDATE sb.email_activations ea
 	SET activated = NOW()
 	WHERE ea.activation_code = activate_account.activation_code;
+	
+	PERFORM pg_notify('graphql:account_changed:' || id_account_to_activate, json_build_object(
+		'event', 'account_changed',
+		'subject', id_account_to_activate
+	)::text);
 	
 	RETURN account_lang;
 end;
@@ -452,6 +467,138 @@ $BODY$;
 
 ALTER FUNCTION sb.apply_resources_consumption()
     OWNER TO sb;
+
+ALTER TYPE sb.session_data
+    ADD ATTRIBUTE willing_to_contribute boolean;
+	
+ALTER TYPE sb.session_data
+    ADD ATTRIBUTE amount_of_topes integer;
+
+CREATE OR REPLACE FUNCTION sb.switch_to_contribution_mode()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+BEGIN
+	IF NOT EXISTS(SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND willing_to_contribute) THEN
+		UPDATE sb.accounts
+		SET willing_to_contribute = true, amount_of_topes = amount_of_topes + 30
+		WHERE id = sb.current_account_id();
+	
+		PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
+			'event', 'account_changed',
+			'subject', sb.current_account_id()
+		)::text);
+	
+		RETURN 1;
+	END IF;
+	
+	RETURN 0;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.switch_to_contribution_mode()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.get_session_data()
+    RETURNS session_data
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+AS $BODY$
+	SELECT a.id, a.name, a.email, sb.current_role(), 
+	i.public_id as avatar_public_id, a.activated, a.log_level,
+	ARRAY(
+		SELECT DISTINCT um.participant_id
+		FROM sb.unread_messages um
+		INNER JOIN sb.participants p ON p.id = um.participant_id
+		WHERE p.account_id = sb.current_account_id()
+	) as unread_conversations,
+	(
+		SELECT COUNT(*) 
+		FROM sb.notifications n 
+		WHERE n.account_id = sb.current_account_id() AND n.read IS NULL
+	) as number_of_unread_notifications,
+	a.willing_to_contribute, a.amount_of_topes
+
+	FROM sb.accounts a
+	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
+	WHERE a.id = sb.current_account_id()
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.get_my_resources_without_picture()
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT r.*
+	FROM sb.resources r
+	LEFT JOIN sb.resources_images ri ON ri.resource_id = r.id
+	WHERE r.account_id = sb.current_account_id() AND r.deleted IS NULL AND r.expiration > NOW()
+		AND ri.resource_id IS NULL;
+$BODY$;
+
+ALTER FUNCTION sb.get_my_resources_without_picture()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.get_my_resources_without_picture() TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.update_account(
+	name character varying,
+	email character varying,
+	avatar_public_id character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE current_email character varying;
+DECLARE activation_code character varying;
+DECLARE account_language character varying;
+BEGIN
+	SELECT a.email, a.language
+	INTO current_email, account_language
+	FROM sb.accounts a
+	WHERE a.id = sb.current_account_id();
+	
+	IF update_account.email IS NOT NULL AND update_account.email <> '' AND current_email <> LOWER(update_account.email) THEN
+		SELECT array_to_string(ARRAY(SELECT substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
+		INTO block.activation_code;
+		
+		INSERT INTO sb.email_activations (account_id, email, activation_code)
+		VALUES (sb.current_account_id(), LOWER(update_account.email), block.activation_code);
+		
+		PERFORM sb.add_job('mailActivation', 
+			json_build_object('email', LOWER(update_account.email), 'code', block.activation_code, 'lang', account_language));
+	
+	END IF;
+
+	IF avatar_public_id IS NOT NULL AND NOT EXISTS (SELECT * FROM sb.accounts a LEFT JOIN sb.images i ON a.avatar_image_id = i.id WHERE a.id = sb.current_account_id() AND i.public_id = avatar_public_id) THEN
+		INSERT INTO sb.images (public_id) VALUES (avatar_public_id);
+	END IF;
+	
+	UPDATE sb.accounts
+	SET name = update_account.name, avatar_image_id = (
+		SELECT id FROM sb.images i WHERE i.public_id = avatar_public_id
+	)
+	WHERE id = sb.current_account_id();
+	
+	PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
+		'event', 'account_changed',
+		'subject', sb.current_account_id()
+	)::text);
+	
+	RETURN 1;
+end;
+$BODY$;
 
 DO
 $body$
