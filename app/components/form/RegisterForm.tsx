@@ -49,7 +49,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                         onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="name" />
                     <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
-                        onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
+                        onChangeText={newText => handleChange('email')(newText.trim())} onBlur={handleBlur('email')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="email" />
                     <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                         onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
