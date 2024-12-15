@@ -13,8 +13,9 @@ import SearchFilterContextProvider from "../SearchFilterContextProvider"
 import { AppContext } from "../AppContextProvider"
 import SupportModal from "../support/SupportModal"
 import Notifications from "../notifications/Notifications"
-import DealNavigator, { TabNavigatorProps } from "../DealNavigator"
+import DealNavigator from "../DealNavigator"
 import AppHeader from "../AppHeader"
+import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
 
 export interface DealBoardProps extends RouteProps {
     tabs?: TabNavigatorProps[]
@@ -43,7 +44,7 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
                 }, {
                     name: 'notifications', component: Notifications, options: { tabBarButtonTestID: 'bottomBar:Notifications', title: t('notifications_label'), tabBarIcon: p => <>
                         <Images.Bell fill={p.color}/>
-                        { appContext.numberOfUnreadNotifications != 0 && <Badge testID="notificationUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.numberOfUnreadNotifications}</Badge>}
+                        { appContext.unreadNotifications.length != 0 && <Badge testID="notificationUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadNotifications.length}</Badge>}
                     </> }
                 } ]} />
                 <SupportModal visible={supportVisible} onDismiss={() => setSupportVisible(false)} />

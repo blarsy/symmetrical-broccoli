@@ -9,6 +9,7 @@ import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 import BareIconButton from "../layout/BareIconButton"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE } from "@/lib/settings"
 
 interface OneTimeTaskProps {
     text: string
@@ -61,6 +62,18 @@ const ReccurringTask = ({ text, remainingAmount, remainingText, loading, reward,
     return <View style={{ flexDirection: 'row', alignItems: 'center' }}>{content}</View>
 }
 
+interface PermanentTaskProps {
+    text: string
+    reward: number
+    onPress: () => void
+}
+
+const PermanentTask = ({ text, reward, onPress }: PermanentTaskProps) => <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text variant="headlineMedium" style={{ flex: 1 }}>{text}</Text>
+    <Text variant="headlineMedium" style={{ minWidth: 35 }}>+ {reward}</Text>
+    <BareIconButton Image="arrow-right" size={35} onPress={onPress} style={{ margin: 0 }}/>
+</View>
+
 export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture {
     getMyResourcesWithoutPicture {
       nodes {
@@ -87,18 +100,24 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
     
     return <Card style={{ backgroundColor: lightPrimaryColor, margin: 10, padding: 10 }}
         contentStyle={{ gap: 15 }}>
+        <OneTimeTask text={t('howToGet_switchToContributionMode')} 
+            checked={!!appContext.account?.willingToContribute} 
+            onPress={() => {}} reward={SWITCH_TO_CONTRIBUTION_MODE}/>
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
-            onPress={() => navigation.navigate('main')} reward={20}/>
+            onPress={() => navigation.navigate('main')} reward={ADD_LOGO_REWARD}/>
         <OneTimeTask text={t('howToGet_addLocation')} 
             checked={data && data.accountById?.locationByLocationId?.address} 
-            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={20}/>
+            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={ADD_LOCATION_REWARD}/>
         <OneTimeTask text={t('howToGet_addLink')} 
             checked={data && data.accountById?.accountsLinksByAccountId?.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0} 
-            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={20}/>
+            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={ADD_LINK_REWARD}/>
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
-            remainingText={ t('resourcesWithoutPic') } reward={5} loading={resWithoutPicsLoading} 
+            remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
+            onPress={() => navigation.navigate('resources')} />
+        <PermanentTask text={t('howToGet_addNewResource')} 
+            reward={CREATE_RESOURCE_REWARD}
             onPress={() => navigation.navigate('resources')} />
 
     </ Card>

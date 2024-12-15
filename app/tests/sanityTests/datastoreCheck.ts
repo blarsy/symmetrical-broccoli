@@ -47,7 +47,7 @@ export const checkActivationEmailSent = async (email: string): Promise<string> =
 export const checkAccountWillingToContribute = async (email: string) => {
     const result = await executeQuery(`select *
         from sb.accounts
-        where email = lower($1) and willing_to_contribute and amount_of_topes = 30`, [email])
+        where email = lower($1) and willing_to_contribute and amount_of_tokens = 30`, [email])
 
     return result.rowCount && result.rowCount > 0
 }

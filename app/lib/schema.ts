@@ -36,8 +36,8 @@ export interface AccountInfo {
     activated: Date
     willingToContribute: boolean
     unreadConversations: number[]
-    numberOfUnreadNotifications: number
-    amountOfTopes: number
+    unreadNotifications: number[]
+    amountOfTokens: number
     lastChangeTimestamp: Date
 }
 

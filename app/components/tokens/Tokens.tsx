@@ -20,7 +20,7 @@ const Tokens = ({ account, style, testID }: Props) => {
     const [tokenHowToGetShown, setTokenHowToGetShown] = useState(false)
     const navigation = useNavigation()
     return <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', ...(style as object) }}>
-        <Text variant="labelMedium" testID={`${testID}:amount`}>{`${account.amountOfTopes} Tope${account.amountOfTopes > 1 ? 's': ''}`}</Text>
+        <Text variant="labelMedium" testID={`${testID}:amount`}>{`${account.amountOfTokens} Tope${account.amountOfTokens > 1 ? 's': ''}`}</Text>
         <BareIconButton style={{ top: -4 }} Image="help" size={20} onPress={() => setTokenInfoShown(true)} />
         <IconButton mode="outlined" size={25} icon="plus" onPress={() => setTokenHowToGetShown(true)} style={{ margin: 2 }}/>
         <InfoDialog onDismiss={() => setTokenInfoShown(false)} title={t('tokenInfoDialogTitle')} visible={tokenInfoShown}

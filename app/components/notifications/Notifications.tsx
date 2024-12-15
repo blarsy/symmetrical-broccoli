@@ -111,7 +111,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             }
                             return notif
                         }) } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: undefined })
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.id })
                     }
                 })
             } else {
@@ -158,7 +158,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                     }
                                     return notif
                                 }) } }))
-                                appDispatch({ type: AppReducerActionType.NotificationRead, payload: undefined })
+                                appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.id })
                             }
                         })
                     }

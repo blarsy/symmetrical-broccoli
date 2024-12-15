@@ -70,8 +70,12 @@ const getOpenConnection = async () => {
 export const executeQuery = async (query: string, parameters?: any[]): Promise<QueryResult<any>> => {
     const client = await getOpenConnection()
     
-    console.log('executing', query, parameters)
-    return await client.query(query , parameters)
+    try {
+        return await client.query(query , parameters)
+    } catch(e) {
+        console.error(`Error while executing ${query} with params ${parameters}`, e)
+        throw(e)
+    }
 }
 
 export const checkBadge = async (testID: string, textContent: string, screen : RenderResult) => {

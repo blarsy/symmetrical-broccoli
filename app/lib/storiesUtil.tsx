@@ -41,7 +41,7 @@ export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: b
     (StoryElement: React.ElementType) => 
         makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
             activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
-            willingToContribute, amountOfTopes: willingToContribute ? 30 : 0, numberOfUnreadNotifications: 0, 
+            willingToContribute, amountOfTokens: willingToContribute ? 30 : 0, unreadNotifications: [], 
             unreadConversations: [], lastChangeTimestamp: new Date()
          })
 
@@ -53,7 +53,7 @@ const defaultResourceCategories: Category[] = [
 ]
 
 export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
-    newChatMessage: '', categories: fromData(defaultResourceCategories), account, numberOfUnreadNotifications: 0,
+    newChatMessage: '', categories: fromData(defaultResourceCategories), account, unreadNotifications: [],
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
     messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined, unreadConversations: [],
     notificationReceivedHandler: undefined }}>

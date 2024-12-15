@@ -2,50 +2,174 @@ ALTER TABLE IF EXISTS sb.accounts
     ADD COLUMN willing_to_contribute boolean NOT NULL DEFAULT false;
 
 ALTER TABLE IF EXISTS sb.accounts
-    ADD COLUMN amount_of_topes integer NOT NULL DEFAULT 0;
+    ADD COLUMN amount_of_tokens integer NOT NULL DEFAULT 0;
 
-CREATE TABLE sb.topes_transaction_types
+CREATE TABLE sb.token_transaction_types
 (
-    id integer NOT NULL,
+    id serial NOT NULL,
     code character varying NOT NULL,
     created timestamp with time zone NOT NULL DEFAULT now(),
     PRIMARY KEY (id)
 );
 
-ALTER TABLE IF EXISTS sb.topes_transaction_types
+ALTER TABLE IF EXISTS sb.token_transaction_types
     OWNER to sb;
 	
-GRANT SELECT ON TABLE sb.topes_transaction_types TO identified_account;
+GRANT SELECT ON TABLE sb.token_transaction_types TO identified_account;
 
-CREATE TABLE sb.accounts_topes_transactions
+DO
+$body$
+BEGIN
+	INSERT INTO sb.token_transaction_types(code) VALUES ('ADD_LOGO');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('ADD_LOCATION');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('ADD_LINK');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('ADD_RESOURCE_PICTURE');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('CREATE_RESOURCE');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('RESOURCE_BURN_TOKEN');
+	INSERT INTO sb.token_transaction_types(code) VALUES ('BECOME_CONTRIBUTOR');
+END;
+$body$
+LANGUAGE 'plpgsql'; 
+
+CREATE TABLE sb.accounts_token_transactions
 (
     id serial NOT NULL,
     account_id integer NOT NULL,
-    topes_transaction_type_id integer NOT NULL,
+    token_transaction_type_id integer NOT NULL,
     movement integer NOT NULL,
     created timestamp with time zone NOT NULL DEFAULT now(),
     PRIMARY KEY (id),
-    CONSTRAINT fk_accounts_topes_transactions_accounts FOREIGN KEY (account_id)
+    CONSTRAINT fk_accounts_token_transactions_accounts FOREIGN KEY (account_id)
         REFERENCES sb.accounts (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
-    CONSTRAINT fk_accounts_topes_transactions_topes_transaction_types FOREIGN KEY (topes_transaction_type_id)
-        REFERENCES sb.topes_transaction_types (id) MATCH SIMPLE
+    CONSTRAINT fk_accounts_token_transactions_token_transaction_types FOREIGN KEY (token_transaction_type_id)
+        REFERENCES sb.token_transaction_types (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
 );
 
-ALTER TABLE IF EXISTS sb.accounts_topes_transactions
+ALTER TABLE IF EXISTS sb.accounts_token_transactions
     OWNER to sb;
 
-GRANT SELECT ON TABLE sb.accounts_topes_transactions TO identified_account;
+GRANT SELECT, INSERT ON TABLE sb.accounts_token_transactions TO identified_account;
+
+GRANT USAGE ON SEQUENCE sb.accounts_token_transactions_id_seq TO identified_account;
+
+CREATE TABLE sb.resources_accounts_token_transactions
+(
+    id serial NOT NULL,
+    accounts_token_transaction_id integer NOT NULL,
+    resource_id integer NOT NULL,
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    PRIMARY KEY (id),
+    CONSTRAINT fk_resources_accounts_token_transactions_resources FOREIGN KEY (resource_id)
+        REFERENCES sb.resources (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT fk_resources_accounts_token_transactions_accounts_token_transactions FOREIGN KEY (accounts_token_transaction_id)
+        REFERENCES sb.accounts_token_transactions (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS sb.resources_accounts_token_transactions
+    OWNER to sb;
+
+GRANT INSERT, SELECT ON TABLE sb.resources_accounts_token_transactions TO identified_account;
 
 ALTER TABLE IF EXISTS sb.resources
     ADD COLUMN suspended timestamp with time zone;
 ALTER TABLE IF EXISTS sb.resources
     ADD COLUMN paid_until timestamp with time zone;
+
+CREATE OR REPLACE FUNCTION sb.apply_resources_rewards(
+	resource_id integer)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE amount_to_add integer = 0;
+DECLARE att_id integer;
+BEGIN
+	-- Check account is activated, and resource is not expired, not deleted, and least 1 day old
+	IF EXISTS (SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND activated IS NOT NULL) 
+		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = resource_id AND account_id = sb.current_account_id() AND (
+			deleted IS NOT NULL OR expiration < NOW() OR created < (NOW() + INTERVAL '1 day' )))
+	THEN
+		-- If there has not been any reward for creating it, grant it
+		IF NOT EXISTS ( SELECT * 
+						FROM sb.resources_accounts_token_transactions ratt
+						INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 5
+						WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
+			amount_to_add = amount_to_add + 20;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (sb.current_account_id(), 5, 20)
+			RETURNING id INTO att_id;
+			
+			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
+			VALUES (att_id, apply_resources_rewards.resource_id);
+		END IF;
+		
+		-- If a resource image has been added, give the reward
+		IF (SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = apply_resources_rewards.resource_id) > 0 
+			AND NOT EXISTS (SELECT * 
+							FROM sb.resources_accounts_token_transactions ratt
+							INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 4
+							WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
+			amount_to_add = amount_to_add + 20;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (sb.current_account_id(), 4, 20)
+			RETURNING id INTO att_id;
+			
+			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
+			VALUES (att_id, apply_resources_rewards.resource_id);
+		END IF;
+		
+		IF amount_to_add > 0 THEN
+			UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + amount_to_add
+			WHERE id = sb.current_account_id();
+		END IF;
+	END IF;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_resources_rewards(integer)
+    OWNER TO sb;
+	
+GRANT EXECUTE ON FUNCTION sb.apply_resources_rewards(integer) TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.apply_my_resources_rewards()
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE res record;
+BEGIN
+	FOR res IN
+		SELECT id 
+		FROM sb.resources
+		WHERE deleted IS NULL AND expiration > NOW() AND 
+			account_id = sb.current_account_id()
+	-- Loop through active resources - including suspended - to award applicable token rewards
+	LOOP
+		PERFORM sb.apply_resources_rewards(res.id);
+	END LOOP;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_my_resources_rewards()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.apply_my_resources_rewards() TO identified_account;
 
 CREATE OR REPLACE FUNCTION sb.suggested_resources(
 	search_term text,
@@ -117,7 +241,8 @@ BEGIN
 		(r.title ILIKE '%' || search_term || '%' OR 
 		 r.description ILIKE '%' || search_term || '%' OR
 		 a.name ILIKE '%' || search_term || '%'))
-	  ORDER BY created DESC, r.expiration DESC;
+	  ORDER BY created DESC, r.expiration DESC
+	  LIMIT 50;
 END;
 $BODY$;
 
@@ -146,13 +271,16 @@ CREATE OR REPLACE FUNCTION sb.apply_resources_consumption(
     COST 100
     VOLATILE SECURITY DEFINER PARALLEL UNSAFE
 AS $BODY$
-DECLARE current_amount_of_topes INTEGER;
+DECLARE current_amount_of_tokens INTEGER;
 DECLARE amount_to_burn INTEGER = 0;
+DECLARE amount_to_add INTEGER = 0;
 DECLARE idx INTEGER = 0;
 DECLARE r RECORD;
 DECLARE new_paid_until TIMESTAMPTZ;
 BEGIN
-	SELECT amount_of_topes INTO current_amount_of_topes
+	-- Make sure current_amount_of_tokens is not null when the account is active, and it has at
+	-- least 3 active resources
+	SELECT amount_of_tokens INTO current_amount_of_tokens
 	FROM sb.accounts
 	WHERE activated IS NOT NULL AND 
 		id = apply_resources_consumption.account_id AND
@@ -163,7 +291,7 @@ BEGIN
 				deleted IS NULL AND expiration > NOW()
 		) > 2;
 
-	IF current_amount_of_topes IS NOT NULL THEN
+	IF current_amount_of_tokens IS NOT NULL THEN
 		FOR r IN
 			SELECT id, paid_until, suspended FROM sb.resources res
 			WHERE res.account_id = apply_resources_consumption.account_id AND 
@@ -173,7 +301,7 @@ BEGIN
 		LOOP
 			-- skip free resources
 			IF idx > 1 THEN
-				IF amount_to_burn = current_amount_of_topes THEN
+				IF amount_to_burn = current_amount_of_tokens THEN
 					UPDATE sb.resources SET suspended = NOW()
 					WHERE id = r.id;
 				ELSE
@@ -197,8 +325,11 @@ BEGIN
 		END LOOP;
 		
 		IF amount_to_burn > 0 THEN
-			UPDATE sb.accounts SET amount_of_topes = amount_of_topes - amount_to_burn
+			UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens - amount_to_burn
 			WHERE id = apply_resources_consumption.account_id;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (sb.current_account_id(), 6, -amount_to_burn);
 			
 			PERFORM pg_notify('graphql:account_changed:' || account_id, json_build_object(
 				'event', 'account_changed',
@@ -212,7 +343,7 @@ $BODY$;
 
 ALTER FUNCTION sb.apply_resources_consumption(integer)
     OWNER TO sb;
-	
+
 GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO identified_account;
 
 CREATE OR REPLACE FUNCTION sb.create_resource(
@@ -355,6 +486,7 @@ BEGIN
 	SELECT update_resource.resource_id, inserted_images.inserted_image_id FROM inserted_images;
 	
 	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	PERFORM sb.apply_resources_rewards(update_resource.resource_id);
 	
 	RETURN 1;
 END;
@@ -417,6 +549,7 @@ begin
 		
 		PERFORM sb.apply_resources_consumption(sb.current_account_id());
 		
+		-- Loop through active resources to send notifications
 		FOR res IN
 			SELECT id 
 			FROM sb.resources
@@ -429,6 +562,8 @@ begin
 				'resource_id', res.id
 			)::text);
 		END LOOP;
+		
+		PERFORM sb.apply_my_resources_rewards();
 	ELSE
 		UPDATE sb.accounts SET email = new_email
 		WHERE id = id_account_to_activate;
@@ -447,7 +582,7 @@ begin
 end;
 $BODY$;
 
-CREATE OR REPLACE FUNCTION sb.apply_resources_consumption()
+CREATE OR REPLACE FUNCTION sb.apply_resources_token_transactions()
     RETURNS void
     LANGUAGE 'plpgsql'
     COST 100
@@ -465,14 +600,19 @@ BEGIN
 END;
 $BODY$;
 
-ALTER FUNCTION sb.apply_resources_consumption()
+ALTER FUNCTION sb.apply_resources_token_transactions()
     OWNER TO sb;
 
 ALTER TYPE sb.session_data
     ADD ATTRIBUTE willing_to_contribute boolean;
 	
 ALTER TYPE sb.session_data
-    ADD ATTRIBUTE amount_of_topes integer;
+    ADD ATTRIBUTE amount_of_tokens integer;
+	
+ALTER TYPE sb.session_data
+    RENAME ATTRIBUTE number_of_unread_notifications TO unread_notifications;
+ALTER TYPE sb.session_data
+        ALTER ATTRIBUTE unread_notifications SET DATA TYPE integer[];
 
 CREATE OR REPLACE FUNCTION sb.switch_to_contribution_mode()
     RETURNS integer
@@ -483,9 +623,13 @@ AS $BODY$
 <<block>>
 BEGIN
 	IF NOT EXISTS(SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND willing_to_contribute) THEN
+		-- When switching to contribution mode: 30 topes reward
 		UPDATE sb.accounts
-		SET willing_to_contribute = true, amount_of_topes = amount_of_topes + 30
+		SET willing_to_contribute = true, amount_of_tokens = amount_of_tokens + 30
 		WHERE id = sb.current_account_id();
+		
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 6, 30);
 	
 		PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
 			'event', 'account_changed',
@@ -504,7 +648,8 @@ ALTER FUNCTION sb.switch_to_contribution_mode()
 
 GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO identified_account;
 
-CREATE OR REPLACE FUNCTION sb.get_session_data()
+CREATE OR REPLACE FUNCTION sb.get_session_data(
+	)
     RETURNS session_data
     LANGUAGE 'sql'
     COST 100
@@ -518,12 +663,12 @@ AS $BODY$
 		INNER JOIN sb.participants p ON p.id = um.participant_id
 		WHERE p.account_id = sb.current_account_id()
 	) as unread_conversations,
-	(
-		SELECT COUNT(*) 
+	ARRAY(
+		SELECT n.id
 		FROM sb.notifications n 
 		WHERE n.account_id = sb.current_account_id() AND n.read IS NULL
-	) as number_of_unread_notifications,
-	a.willing_to_contribute, a.amount_of_topes
+	) as unread_notifications,
+	a.willing_to_contribute, a.amount_of_tokens
 
 	FROM sb.accounts a
 	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
@@ -581,8 +726,21 @@ BEGIN
 	
 	END IF;
 
-	IF avatar_public_id IS NOT NULL AND NOT EXISTS (SELECT * FROM sb.accounts a LEFT JOIN sb.images i ON a.avatar_image_id = i.id WHERE a.id = sb.current_account_id() AND i.public_id = avatar_public_id) THEN
+	IF avatar_public_id IS NOT NULL AND NOT EXISTS (
+		SELECT *
+		FROM sb.accounts a
+		LEFT JOIN sb.images i ON a.avatar_image_id = i.id
+		WHERE a.id = sb.current_account_id() AND i.public_id = avatar_public_id) THEN
+
 		INSERT INTO sb.images (public_id) VALUES (avatar_public_id);
+		
+		IF NOT EXISTS( SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 1) THEN
+		
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (sb.current_account_id(), 1, 20);
+			
+		END IF;
+		
 	END IF;
 	
 	UPDATE sb.accounts
@@ -595,6 +753,78 @@ BEGIN
 		'event', 'account_changed',
 		'subject', sb.current_account_id()
 	)::text);
+	
+	RETURN 1;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.update_account_public_info(
+	links account_link[],
+	location new_location DEFAULT NULL::new_location)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE location_id integer;
+DECLARE amount_tokens_to_add integer = 0;
+BEGIN
+	-- If we detect this is the first time a link is created, grant reward
+	IF (SELECT COUNT(*) FROM sb.accounts_links
+		WHERE account_id = sb.current_account_id()) = 0 AND
+		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 3)
+	THEN
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 3, 20);
+		
+		amount_tokens_to_add = amount_tokens_to_add + 20;
+	END IF;
+	
+	DELETE FROM sb.accounts_links
+	WHERE account_id = sb.current_account_id();
+	
+	INSERT INTO sb.accounts_links(url, label, link_type_id, account_id)
+	SELECT l.url, l.label, l.link_type_id, sb.current_account_id()
+	FROM UNNEST(links) l;
+	
+	SELECT a.location_id INTO block.location_id
+	FROM sb.accounts a
+	WHERE id = sb.current_account_id();
+	
+	-- If we detect this is the first time a location is linked, grant reward
+	IF block.location_id AND 
+		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 2)
+	THEN
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 2, 20);
+		
+		amount_tokens_to_add = amount_tokens_to_add + 20;
+	END IF;
+	
+	IF location IS NULL THEN
+		IF block.location_id IS NOT NULL THEN
+			UPDATE sb.accounts SET location_id = null WHERE id = sb.current_account_id();
+			
+			DELETE FROM sb.locations WHERE id = block.location_id;
+		END IF;
+	ELSE
+		IF block.location_id IS NULL THEN
+			INSERT INTO sb.locations (address, latitude, longitude)
+			VALUES (location.address, location.latitude, location.longitude)
+			RETURNING id INTO block.location_id;
+			
+			UPDATE sb.accounts SET location_id = block.location_id WHERE id = sb.current_account_id();
+		ELSE
+			UPDATE sb.locations SET address = location.address, latitude = location.latitude, longitude = location.longitude
+			WHERE id = block.location_id;
+		END IF;
+	END IF;
+	
+	IF amount_tokens_to_add > 0 THEN
+		UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + amount_tokens_to_add
+		WHERE id = sb.current_account_id();
+	END IF;
 	
 	RETURN 1;
 end;

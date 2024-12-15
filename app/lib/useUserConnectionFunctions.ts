@@ -18,9 +18,9 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       activated
       logLevel
       unreadConversations
-      numberOfUnreadNotifications
+      unreadNotifications
       willingToContribute
-      amountOfTopes
+      amountOfTokens
     }
   }`
 
@@ -79,7 +79,7 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
         language
         email
         avatarImageId
-        amountOfTopes
+        amountOfTokens
         activated
         id
       }
@@ -120,9 +120,9 @@ export default () => {
             avatarPublicId: res.data.getSessionData.avatarPublicId,
             activated: res.data.getSessionData.activated,
             unreadConversations: res.data.getSessionData.unreadConversations,
-            numberOfUnreadNotifications: res.data.getSessionData.numberOfUnreadNotifications,
+            unreadNotifications: res.data.getSessionData.unreadNotifications,
             willingToContribute: res.data.getSessionData.willingToContribute,
-            amountOfTopes: res.data.getSessionData.amountOfTopes,
+            amountOfTokens: res.data.getSessionData.amountOfTokens,
             lastChangeTimestamp: new Date()
         }
 
@@ -156,7 +156,7 @@ export default () => {
             // Here comes the notification parsing
             const updatedAccount: AccountInfo = {
                 activated: payload.data.accountChangeReceived.account.activated,
-                amountOfTopes: payload.data.accountChangeReceived.account.amountOfTopes,
+                amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
                 lastChangeTimestamp: new Date(),
                 avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
                 email: payload.data.accountChangeReceived.account.email,
@@ -164,14 +164,14 @@ export default () => {
                 name: payload.data.accountChangeReceived.account.name,
                 willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
                 unreadConversations: [],
-                numberOfUnreadNotifications: 0
+                unreadNotifications: []
             }
             appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
         }})
         
         appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, 
             chatMessagesSubscription: messageSubscription, notificationSubscription, accountChangeSubscription,
-            numberOfUnreadNotifications: account.numberOfUnreadNotifications,
+            unreadNotifications: account.unreadNotifications,
             unreadConversations: account.unreadConversations
         } })
 

@@ -152,6 +152,6 @@ export const cleanupSearchableResources = async (data: SearchableResources) => {
 
 export const setAccountTokens = async (email: string, numberOfTokens: number) => {
     await executeQuery(`update sb.accounts
-        set amount_of_topes = $1
+        set amount_of_tokens = $1
         where email = lower($2)`, [numberOfTokens, email])
 }

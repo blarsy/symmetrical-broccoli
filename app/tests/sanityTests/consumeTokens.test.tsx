@@ -78,7 +78,7 @@ test('Consuming function handles accurately each resource context', async () => 
 
     await setAccountTokens(email, 2)
 
-    await executeQuery(`SELECT sb.apply_resources_consumption()`)
+    await executeQuery(`SELECT sb.apply_resources_token_transactions()`)
 
     const resAfterActState = await executeQuery(`SELECT id, title,suspended, deleted, paid_until, created
         FROM sb.resources r
