@@ -120,6 +120,7 @@ export interface ConversationState extends DataLoadState<{
 export interface conversationMessagesState {
     endCursor: string
     messages: DataLoadState<IMessage[]>
+    loadingEarlier: boolean
 }
 
 interface ConversationActions {
@@ -147,7 +148,8 @@ const blankConversationState: ConversationState = initial(true, {
 
 const blankMessagesState: conversationMessagesState = {
   endCursor: '',
-  messages: initial(true, [])
+  messages: initial(true, []),
+  loadingEarlier: false
 }
 
 export const ConversationContext = createContext<ConversationContext>({
@@ -186,7 +188,8 @@ const ConversationContextProvider = ({ children }: Props) => {
               ))
               setMessagesState({
                 endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : '',
-                messages: loadedMessages
+                messages: loadedMessages,
+                loadingEarlier: false
               })
             } else {
               throw new Error('Unexpected data from API call')
@@ -210,7 +213,8 @@ const ConversationContextProvider = ({ children }: Props) => {
             if(messagesState.endCursor) {
               setMessagesState(prevValue => ({
                 endCursor: prevValue.endCursor,
-                messages: { loading: true, data: prevValue.messages.data }
+                messages: prevValue.messages,
+                loadingEarlier: true
               }))
               try {
                 const res = await getMessages({ variables: { resourceId: conversationState.data.resource?.id,
@@ -222,12 +226,14 @@ const ConversationContextProvider = ({ children }: Props) => {
       
                 setMessagesState(prevValue => ({
                   endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : '',
-                  messages: fromData([...prevValue.messages.data!, ...nextMessages])
+                  messages: fromData([...prevValue.messages.data!, ...nextMessages]),
+                  loadingEarlier: false
                 }))
               } catch(e) {
                 setMessagesState(prevValue => ({
                   endCursor: prevValue.endCursor,
-                  messages: { ...fromError(e, t('requestError')), ...{loading: false, data: prevValue.messages.data}}
+                  messages: { ...fromError(e, t('requestError')), ...{loading: false, data: prevValue.messages.data}},
+                  loadingEarlier: false
                 }))
               }
             }

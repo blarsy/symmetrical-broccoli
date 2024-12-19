@@ -99,7 +99,7 @@ const Conversation = ({ route }: RouteProps) => {
             onSend={onSend} otherAccount={conversationContext.conversationState.data!.otherAccount}
             onLoadEarlier={conversationContext.actions.loadEarlier} 
             testID="conversation" 
-            loadingEarlier={conversationContext.messagesState.messages ? conversationContext.messagesState.messages.loading: false}
+            loadingEarlier={conversationContext.messagesState.loadingEarlier}
             canLoadEarlier={!!conversationContext.messagesState.endCursor}/>
           </LoadedZone>
         <PanZoomImage source={focusedImage} onDismess={() => setFocusedImage(undefined)} />

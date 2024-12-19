@@ -9,7 +9,7 @@ import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 import BareIconButton from "../layout/BareIconButton"
-import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE } from "@/lib/settings"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/settings"
 
 interface OneTimeTaskProps {
     text: string
@@ -101,8 +101,8 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
     return <Card style={{ backgroundColor: lightPrimaryColor, margin: 10, padding: 10 }}
         contentStyle={{ gap: 15 }}>
         <OneTimeTask text={t('howToGet_switchToContributionMode')} 
-            checked={!!appContext.account?.willingToContribute} 
-            onPress={() => {}} reward={SWITCH_TO_CONTRIBUTION_MODE}/>
+            checked={true} 
+            onPress={() => {}} reward={SWITCH_TO_CONTRIBUTION_MODE_REWARD}/>
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
             onPress={() => navigation.navigate('main')} reward={ADD_LOGO_REWARD}/>

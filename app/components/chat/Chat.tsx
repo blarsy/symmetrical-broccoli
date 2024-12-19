@@ -123,7 +123,7 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
             <ScrollView maintainVisibleContentPosition={{ minIndexForVisible: MESSAGES_PER_PAGE }} 
                 ref={scrollRef} scrollEventThrottle={100}
                 onScroll={e => {
-                    if(e.nativeEvent.contentOffset.y === 0) {
+                    if(e.nativeEvent.contentOffset.y < 50) {
                         onLoadEarlier()
                     }
                     setScrollsToTail(e.nativeEvent.contentOffset.y + e.nativeEvent.layoutMeasurement.height > e.nativeEvent.contentSize.height - 20)

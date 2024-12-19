@@ -132,6 +132,7 @@ const resources = {
       "main_profile_label": "Main",
       "publicInfo_profile_label": "Public",
       "preferences_profile_label": "Preferences",
+      "tokensProfileLabel": "Contribution",
       "min_1_day_message": "At least 1 day",
       "max_30_days_message": "At most 30 days",
       "newResources_broadcast_prefs_title": "New resources for me",
@@ -198,9 +199,10 @@ const resources = {
       "resourcesWithoutPic": "resources w/o picture",
       "howToGet_addLink": "Add a link to your content",
       "howToGet_addLocation": "Enter your address on your profile",
-      "howToGet_addLogo": "add a profile picture or logo",
+      "howToGet_addLogo": "Add a profile picture or logo",
       "howToGet_addPictureToResource": "Add a picture to your resources",
       "howToGet_addNewResource": "Add a new resource (and leave it for at least 1 day)",
+      "howToGet_switchToContributionMode": "Become a contributor",
       "youHave": "You have",
       "tokenName": "Tope(s)",
       "token_settings_title": "Contribution",
@@ -210,7 +212,15 @@ const resources = {
       "tokenHowToGetDialogTitle": "Earn Topes",
       "suspended": "Suspended",
       "suspensionExplanationDialogTitle": "Suspended resource ?",
-      "whySuspended": "When you run out of Topes, some of your resources may be \'suspended\', thus not shown to other accounts. Earn some Topes in order to restore your resources !"
+      "whySuspended": "When you run out of Topes, some of your resources may be \'suspended\', thus not shown to other accounts. Earn some Topes in order to restore your resources !",
+      "addedLogo": "Added profile picture",
+      "addedLocation": "Added an address to the profile",
+      "addedLink": "Added a profile link",
+      "addedSomeResourcePicture": "Added a resource picture",
+      "createdNewResource": "New resource available for 24h",
+      "tokenConsumed": "Topes consumed by resources",
+      "becameContributor": "Contribution mode activated",
+      "loadMore": "Load older"
     }
   },
   fr: {
@@ -337,6 +347,7 @@ const resources = {
       "main_profile_label": "Principal",
       "publicInfo_profile_label": "Public",
       "preferences_profile_label": "Preférences",
+      "tokensProfileLabel": "Contribution",
       "min_1_day_message": "Au moins 1 jour",
       "max_30_days_message": "Au plus 30 jours",
       "newResources_broadcast_prefs_title": "Nouvelles ressources pour moi",
@@ -406,6 +417,7 @@ const resources = {
       "howToGet_addLogo": "Ajouter votre logo ou photo",
       "howToGet_addPictureToResource": "Ajouter une photo à vos ressources",
       "howToGet_addNewResource": "Ajouter une nouvelle ressource (et la laisser disponible au moins un jour)",
+      "howToGet_switchToContributionMode": "Devenir contributeur",
       "youHave": "Vous avez",
       "tokenName": "Tope(s)",
       "token_settings_title": "Contribution",
@@ -415,7 +427,15 @@ const resources = {
       "tokenHowToGetDialogTitle": "Gagner des Topes",
       "suspended": "Suspendu",
       "suspensionExplanationDialogTitle": "Une ressource suspendue ?",
-      "whySuspended": "Quand tu n'as plus assez de Topes pour afficher toutes tes ressources actives, Tope-là les \'suspend\'. Récupère des Topes pour les rétablir !"
+      "whySuspended": "Quand tu n'as plus assez de Topes pour afficher toutes tes ressources actives, Tope-là les \'suspend\'. Récupère des Topes pour les rétablir !",
+      "addedLogo": "Photo de profil ajoutée",
+      "addedLocation": "Adresse profil ajoutée",
+      "addedLink": "Ajout de lien promotionnel",
+      "addedSomeResourcePicture": "Ajout d'une photo de ressource",
+      "createdNewResource": "Nouvelle ressource disponible 24h",
+      "tokenConsumed": "Topes consommés par les ressources",
+      "becameContributor": "Mode contribution activé",
+      "loadMore": "Plus ancien"
     }
   }
 }

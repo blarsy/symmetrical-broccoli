@@ -8,7 +8,7 @@ import { RouteProps } from "@/lib/utils"
 import { Client, QueryResult } from "pg"
 import React from "react"
 import config from "./config"
-import { fireEvent, RenderResult, waitFor } from "@testing-library/react-native"
+import { fireEvent, RenderResult, userEvent, waitFor } from "@testing-library/react-native"
 import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
 
 expect.extend({
@@ -96,7 +96,8 @@ export const checkBadgeNumeric = async (testID: string, screen : RenderResult) =
 
 export const waitForThenPress = async (testId: string, screen: RenderResult) => {
     await waitFor(() => expect(screen.getByTestId(testId)).toBeOnTheScreen())
-    fireEvent.press(screen.getByTestId(testId))
+    const uv = userEvent.setup()
+    uv.press(screen.getByTestId(testId))
 }
 
 export const daysFromNow = (days: number) => new Date(new Date().valueOf() + days * 24 * 60 * 60 * 1000)

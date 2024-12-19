@@ -5,6 +5,7 @@ import { paperProviderDecorator, gestureHandlerDecorator, navigationContainerDec
 import TokenSettings from './TokenSettings'
 import { GET_RESOURCES_WITHOUT_PIC } from './InfoHowToGet'
 import { GraphQlLib } from '@/lib/backendFacade'
+import { GET_TOKENS_HISTORY } from './History'
 
 const meta: Meta<typeof TokenSettings> = {
   component: TokenSettings,
@@ -37,6 +38,57 @@ const meta: Meta<typeof TokenSettings> = {
               },
               locationByLocationId: null
           }
+      }
+    }, {
+      query: GET_TOKENS_HISTORY,
+      variables: { first: 5 },
+      result: {
+        getTokensHistory: {
+          edges: [{
+            node: { id: 123, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24), movement: 12, tokenTransactionTypeByTokenTransactionTypeId: { id: 3, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 124, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 2), movement: -2, tokenTransactionTypeByTokenTransactionTypeId: { id: 1, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 125, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 3), movement: 4, tokenTransactionTypeByTokenTransactionTypeId: { id: 4, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 126, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 4), movement: 7, tokenTransactionTypeByTokenTransactionTypeId: { id: 6, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 127, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 5), movement: -4, tokenTransactionTypeByTokenTransactionTypeId: { id: 2, code: '' } },
+            cursor: 'cur1'
+          }],
+          pageInfo: {
+            hasNextPage: true,
+            endCursor: 'cur1'
+          }
+        }
+      }
+    }, {
+      query: GET_TOKENS_HISTORY,
+      variables: { first: 5, after: 'cur1' },
+      result: {
+        getTokensHistory: {
+          edges: [{
+            node: { id: 133, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 2), movement: 12, tokenTransactionTypeByTokenTransactionTypeId: { id: 3, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 134, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 3), movement: -2, tokenTransactionTypeByTokenTransactionTypeId: { id: 1, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 135, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 4), movement: 4, tokenTransactionTypeByTokenTransactionTypeId: { id: 4, code: '' } },
+            cursor: 'cur1'
+          }, {
+            node: { id: 136, created: new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 5), movement: 7, tokenTransactionTypeByTokenTransactionTypeId: { id: 6, code: '' } },
+            cursor: 'cur1'
+          }],
+          pageInfo: {
+            hasNextPage: false,
+            endCursor: 'cur2'
+          }
+        }
       }
     }])
   ]

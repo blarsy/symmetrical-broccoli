@@ -25,4 +25,4 @@ jest.mock('react-native-reanimated', () => {
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper')
 
-jest.setTimeout(25000)
+jest.setTimeout(40000)

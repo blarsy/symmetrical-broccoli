@@ -123,10 +123,10 @@ BEGIN
 							FROM sb.resources_accounts_token_transactions ratt
 							INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 4
 							WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
-			amount_to_add = amount_to_add + 20;
+			amount_to_add = amount_to_add + 5;
 			
 			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-			VALUES (sb.current_account_id(), 4, 20)
+			VALUES (sb.current_account_id(), 4, 5)
 			RETURNING id INTO att_id;
 			
 			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
@@ -170,6 +170,31 @@ ALTER FUNCTION sb.apply_my_resources_rewards()
     OWNER TO sb;
 
 GRANT EXECUTE ON FUNCTION sb.apply_my_resources_rewards() TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.apply_account_resources_rewards(
+	account_id integer) RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE res record;
+BEGIN
+	FOR res IN
+		SELECT id 
+		FROM sb.resources r
+		WHERE deleted IS NULL AND expiration > NOW() AND 
+			r.account_id = apply_account_resources_rewards.account_id
+	-- Loop through active resources - including suspended - to award applicable token rewards
+	LOOP
+		PERFORM sb.apply_resources_rewards(res.id);
+	END LOOP;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_account_resources_rewards(integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.apply_account_resources_rewards(integer) TO sb;
 
 CREATE OR REPLACE FUNCTION sb.suggested_resources(
 	search_term text,
@@ -329,7 +354,7 @@ BEGIN
 			WHERE id = apply_resources_consumption.account_id;
 			
 			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-			VALUES (sb.current_account_id(), 6, -amount_to_burn);
+			VALUES (apply_resources_consumption.account_id, 6, -amount_to_burn);
 			
 			PERFORM pg_notify('graphql:account_changed:' || account_id, json_build_object(
 				'event', 'account_changed',
@@ -345,6 +370,7 @@ ALTER FUNCTION sb.apply_resources_consumption(integer)
     OWNER TO sb;
 
 GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO identified_account;
+GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO sb;
 
 CREATE OR REPLACE FUNCTION sb.create_resource(
 	title character varying,
@@ -596,6 +622,7 @@ BEGIN
 			activated IS NOT NULL
 	LOOP
 		PERFORM sb.apply_resources_consumption(r.id);
+		PERFORM sb.apply_account_resources_rewards(r.id);
 	END LOOP;
 END;
 $BODY$;
@@ -614,6 +641,57 @@ ALTER TYPE sb.session_data
 ALTER TYPE sb.session_data
         ALTER ATTRIBUTE unread_notifications SET DATA TYPE integer[];
 
+CREATE OR REPLACE FUNCTION sb.grant_applicable_rewards()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE amount_tokens_to_add integer = 0;
+BEGIN
+	IF (SELECT COUNT(*) FROM sb.accounts_links
+		WHERE account_id = sb.current_account_id()) > 0  AND
+		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 3)
+	THEN
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 3, 20);
+		
+		amount_tokens_to_add = amount_tokens_to_add + 20;
+	END IF;
+		
+	IF EXISTS(SELECT * FROM sb.accounts
+		WHERE id = sb.current_account_id() AND location_id IS NOT NULL)  AND
+		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 2)
+	THEN
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 2, 20);
+		
+		amount_tokens_to_add = amount_tokens_to_add + 20;
+	END IF;
+	
+	IF EXISTS(SELECT * FROM sb.accounts
+		WHERE id = sb.current_account_id() AND avatar_image_id IS NOT NULL)  AND
+		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 1)
+	THEN
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 1, 20);
+		
+		amount_tokens_to_add = amount_tokens_to_add + 20;
+	END IF;
+	
+	IF amount_tokens_to_add > 0 THEN
+		UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + amount_tokens_to_add
+		WHERE id = sb.current_account_id();
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.grant_applicable_rewards()
+    OWNER TO sb;
+
 CREATE OR REPLACE FUNCTION sb.switch_to_contribution_mode()
     RETURNS integer
     LANGUAGE 'plpgsql'
@@ -623,13 +701,15 @@ AS $BODY$
 <<block>>
 BEGIN
 	IF NOT EXISTS(SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND willing_to_contribute) THEN
+		PERFORM sb.grant_applicable_rewards();
+		
 		-- When switching to contribution mode: 30 topes reward
 		UPDATE sb.accounts
 		SET willing_to_contribute = true, amount_of_tokens = amount_of_tokens + 30
 		WHERE id = sb.current_account_id();
 		
 		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-		VALUES (sb.current_account_id(), 6, 30);
+		VALUES (sb.current_account_id(), 7, 30);
 	
 		PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
 			'event', 'account_changed',
@@ -829,6 +909,25 @@ BEGIN
 	RETURN 1;
 end;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION sb.get_tokens_history()
+    RETURNS SETOF accounts_token_transactions
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT *
+	FROM sb.accounts_token_transactions
+	WHERE account_id = sb.current_account_id()
+	ORDER BY created DESC;
+$BODY$;
+
+ALTER FUNCTION sb.get_tokens_history()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.get_tokens_history() TO identified_account;
 
 DO
 $body$

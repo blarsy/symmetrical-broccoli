@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react-native"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { createAndLogIn, createResource, deleteAccount, getTestNum, setAccountTokens, setResourceData } from "./datastoreSetupLib"
 import { AppWithSingleScreen, createResourceThroughUI, daysFromNow, executeQuery, waitForThenPress } from "./lib"
 import React from "react"
@@ -36,6 +36,15 @@ test('Third ressource consumes a token per day', async() => {
     await waitFor(() => expect(screen.getByTestId('Tokens:amount')).toBeOnTheScreen())
 
     expect(screen.getByTestId('Tokens:amount')).toHaveTextContent('29 Topes')
+
+    fireEvent.press(screen.getByTestId('tokensProfileScreenButton'))
+
+    await waitForThenPress('HistoryAccordion:Button', screen)
+
+    await waitFor(() => expect(screen.getByTestId('tokenHistory:0:movement')).toHaveTextContent('-1'))
+    expect(screen.getByTestId('tokenHistory:0:title')).toHaveTextContent('Topes consommés par les ressources')
+    expect(screen.getByTestId('tokenHistory:1:movement')).toHaveTextContent('+30')
+    expect(screen.getByTestId('tokenHistory:1:title')).toHaveTextContent('Mode contribution activé')
 })
 
 test('Consuming function handles accurately each resource context', async () => {
@@ -64,7 +73,7 @@ test('Consuming function handles accurately each resource context', async () => 
         createResource(token, resName + 'deleted', 'description2', true, false, true, true, true, false, notExpired, [2]),
         createResource(token, resName + 'new', 'description2', true, false, true, true, true, false, notExpired, [2]),
         createResource(token, resName + 'old', 'description2', true, false, true, true, true, false, notExpired, [2])
-    ]) 
+    ])
 
     await Promise.all([
         setResourceData(resIds[0], { suspended: daysFromNow(-10), paid_until: daysFromNow(-2), created: daysFromNow(-12) }),

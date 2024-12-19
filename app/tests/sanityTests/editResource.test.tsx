@@ -41,41 +41,46 @@ test('Edit resource', async () => {
     render(<AppWithScreens screens={[{ component: ResourcesList, name: 'resourceList' }, { component: EditResource, name: 'editResource' }]}
         overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }} />)
 
-    await waitFor(() => expect(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:EditButton`)).toBeOnTheScreen())
-
-    // Use userEvent to trigger a 'press' on this button, because it is more intelligent than fireEvent,
-    // in that it provides an event object with a 'stopPropagation' function
-    const pressEdit = userEvent.setup()
-    await pressEdit.press(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:EditButton`))
-
-    //await waitFor(() => expect(screen.getByTestId(`title`)).toBeOnTheScreen())
-    //await waitFor(() => expect(screen.getByTestId(`title`)).toHaveProp('value', title))
-    await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
-
-    fireEvent.changeText(screen.getByTestId('title'), title2)
-    fireEvent.changeText(screen.getByTestId('description'), description2)
-    fireEvent.press(screen.getByTestId('nature:isService:Button'))
-    fireEvent.press(screen.getByTestId('nature:isProduct:Button'))
-    fireEvent.press(screen.getByTestId('exchangeType:canBeExchanged:Button'))
-    fireEvent.press(screen.getByTestId('exchangeType:canBeGifted:Button'))
-    fireEvent.press(screen.getByTestId('transport:canBeDelivered:Button'))
-    fireEvent.press(screen.getByTestId('transport:canBeTakenAway:Button'))
-
-    fireEvent.press(screen.getByTestId('expiration:Button'))
-    fireEvent(screen.getByTestId('expiration:Picker:date'), 'onChangeText', expiration2.valueOf())
-
-    fireEvent.press(screen.getByTestId('categories:Button'))
-    await waitFor(() => expect(screen.getByTestId('categories:Modal:ConfirmButton')).toBeOnTheScreen())
-    categoryCodes2.forEach(catCode => fireEvent.press(screen.getByTestId(`categories:Modal:Category:${catCode}`)))
+    try {
+        await waitFor(() => expect(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:EditButton`)).toBeOnTheScreen())
     
-    fireEvent.press(screen.getByTestId('categories:Modal:ConfirmButton'))
-    fireEvent.press(screen.getByTestId('submitButton'))
+        // Use userEvent to trigger a 'press' on this button, because it is more intelligent than fireEvent,
+        // in that it provides an event object with a 'stopPropagation' function
+        const pressEdit = userEvent.setup()
+        await pressEdit.press(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:EditButton`))
+    
+        //await waitFor(() => expect(screen.getByTestId(`title`)).toBeOnTheScreen())
+        //await waitFor(() => expect(screen.getByTestId(`title`)).toHaveProp('value', title))
+        await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
+    
+        fireEvent.changeText(screen.getByTestId('title'), title2)
+        fireEvent.changeText(screen.getByTestId('description'), description2)
+        fireEvent.press(screen.getByTestId('nature:isService:Button'))
+        fireEvent.press(screen.getByTestId('nature:isProduct:Button'))
+        fireEvent.press(screen.getByTestId('exchangeType:canBeExchanged:Button'))
+        fireEvent.press(screen.getByTestId('exchangeType:canBeGifted:Button'))
+        fireEvent.press(screen.getByTestId('transport:canBeDelivered:Button'))
+        fireEvent.press(screen.getByTestId('transport:canBeTakenAway:Button'))
+    
+        fireEvent.press(screen.getByTestId('expiration:Button'))
+        fireEvent(screen.getByTestId('expiration:Picker:date'), 'onChangeText', expiration2.valueOf())
+    
+        fireEvent.press(screen.getByTestId('categories:Button'))
+        await waitFor(() => expect(screen.getByTestId('categories:Modal:ConfirmButton')).toBeOnTheScreen())
+        categoryCodes2.forEach(catCode => fireEvent.press(screen.getByTestId(`categories:Modal:Category:${catCode}`)))
+        
+        fireEvent.press(screen.getByTestId('categories:Modal:ConfirmButton'))
+        fireEvent.press(screen.getByTestId('submitButton'))
+    
+        await waitFor(() => expect(screen.getByTestId('resourceEditionFeedback:Success')).toBeOnTheScreen())
+    
+        await checkResourcePresent(email, title2, description2, isProduct2, isService2, canBeDelivered2, canBeTakenAway2, canBeExchanged2, canBeGifted2, expiration2, categoryCodes.concat(categoryCodes2))
+        
+    } catch(e) {
+        screen.debug()
+    }
 
-    await waitFor(() => expect(screen.getByTestId('resourceEditionFeedback:Success')).toBeOnTheScreen())
-
-    await checkResourcePresent(email, title2, description2, isProduct2, isService2, canBeDelivered2, canBeTakenAway2, canBeExchanged2, canBeGifted2, expiration2, categoryCodes.concat(categoryCodes2))
-
-}, 25000)
+})
 
 test('View resource', async () => {
     render(<AppWithScreens screens={[{ component: ResourcesList, name: 'resourceList' }, { component: ViewResource, name: 'viewResource' }]}

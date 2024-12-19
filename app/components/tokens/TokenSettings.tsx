@@ -8,11 +8,12 @@ import InfoHowItWorks from "./InfoHowItWorks"
 import History from "./History"
 import InfoHowToGet from "./InfoHowToGet"
 import { primaryColor } from "../layout/constants"
+import { ScrollView } from "react-native-gesture-handler"
 
 const TokenSettings = () => {
     const appContext = useContext(AppContext)
 
-    return <View style={{ backgroundColor: primaryColor }}>
+    return <ScrollView style={{ backgroundColor: primaryColor }}>
         <Text variant="headlineLarge" style={{ color: '#fff', textAlign: 'center', paddingBottom: 20 }}>{t('token_settings_title')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, paddingVertical: 15 }}>
             <Text variant="headlineMedium" style={{ color: '#fff' }}>{t('youHave')}</Text>
@@ -22,11 +23,11 @@ const TokenSettings = () => {
         <AccordionItem textColor="#fff" big testID="HowItWorks" title={t('howItWorksAccordionTitle')}>
             <InfoHowItWorks />
         </AccordionItem>
-        <AccordionItem style={{ marginBottom: 20 }} textColor="#fff" big testID="History" title={t('tokenHistoryAccordionTitle')}>
+        <AccordionItem style={{ marginBottom: 20 }} textColor="#fff" big testID="HistoryAccordion" title={t('tokenHistoryAccordionTitle')}>
             <History />
         </AccordionItem>
         <InfoHowToGet />
-    </View>
+    </ScrollView>
 }
 
 export default TokenSettings

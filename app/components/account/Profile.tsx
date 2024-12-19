@@ -98,7 +98,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
     ]
 
     const actualScreens = appContext.account?.willingToContribute ? 
-        [fixedScreens[0], fixedScreens[1], { name:'tokens', options:{ title: t('tokens_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="hand-clap" /> }, component: TokenSettings }, fixedScreens[2]]
+        [fixedScreens[0], fixedScreens[1], { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: p => <Icon testID="contributionIcon" size={30} color={p.color} source="hand-clap" /> }, component: TokenSettings }, fixedScreens[2]]
         : 
         fixedScreens
 
