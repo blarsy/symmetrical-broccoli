@@ -189,6 +189,7 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
     paidUntil
     created
     deleted
+    subjectiveValue
   }
 }`
 
@@ -211,8 +212,8 @@ export const versionChecker = (serverVersion: string) => {
 export const userFriendlyTime = (time: Date) => {
   const djTime = dayjs.utc(time)
   const millisecondsEllapsed = Math.abs(djTime.diff())
-  const epoch = time.valueOf()
-  
+  const epoch = djTime.valueOf()
+
   if(millisecondsEllapsed < 10 * 60 * 1000)
     return djTime.local().fromNow()
   else if (millisecondsEllapsed < Math.abs(djTime.startOf('day').diff(djTime))) {

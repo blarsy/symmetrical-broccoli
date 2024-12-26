@@ -55,7 +55,7 @@ const resources = {
       "title_label": "Title",
       "brought_by_label": "Brought by",
       "description_label": "Description",
-      "noDate": "No date selected",
+      "noDate": "Permanent",
       "dateFormat": "MM/DD/YYYY",
       "condensedDateFormat": "DD/MM/YY",
       "shortDateFormat": "MM/DD",
@@ -220,7 +220,10 @@ const resources = {
       "createdNewResource": "New resource available for 24h",
       "tokenConsumed": "Topes consumed by resources",
       "becameContributor": "Contribution mode activated",
-      "loadMore": "Load older"
+      "loadMore": "Load older",
+      "mustBeAnInteger": "Must be an integer",
+      "subjectiveValueLabel": "Subjective value",
+      "mustBeAValidNumber": "Must be a valid number"
     }
   },
   fr: {
@@ -270,7 +273,7 @@ const resources = {
       "title_label": "Titre",
       "brought_by_label": "Proposé par",
       "description_label": "Description",
-      "noDate": "Aucune date sélectionnée",
+      "noDate": "Permanent",
       "dateFormat": "DD/MM/YYYY",
       "condensedDateFormat": "DD/MM/YY",
       "shortDateFormat": "DD/MM",
@@ -435,7 +438,10 @@ const resources = {
       "createdNewResource": "Nouvelle ressource disponible 24h",
       "tokenConsumed": "Topes consommés par les ressources",
       "becameContributor": "Mode contribution activé",
-      "loadMore": "Plus ancien"
+      "loadMore": "Plus ancien",
+      "mustBeAnInteger": "Doit être un nombre entier",
+      "subjectiveValueLabel": "Valeur subjective (€)",
+      "mustBeAValidNumber": "Doit être un nombre valide"
     }
   }
 }

@@ -86,9 +86,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             const dateObj = dayjs(resource.expiration)
             expiration = { text: dateObj.fromNow(), date: dateObj.format(t('dateFormat'))}
         } else {
-            expiration = { text: '', date: ''}
+            expiration = { text: t('noDate'), date: ''}
         }
     }
+    
     return <ScrollView style={{ flex: 1, flexDirection: 'column', padding: 10, backgroundColor: '#fff' }}>
         <LoadedZone loading={loading} error={error} containerStyle={{ marginBottom: 15 }}>
         { resource && <>
@@ -131,8 +132,9 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </ViewField>
                 { appState.account && resource.account!.id === appState.account!.id && <BareIconButton Image={Images.Modify} size={35} onPress={() => {
                     editResourceContext.actions.setResource(resource)
-                    navigation.goBack()
-                    navigation.navigate('editResource')
+                    navigation.navigate('resource', {
+                        screen: 'editResource'
+                    })
                 }}/>}
             </View>
             <Hr thickness={2}/>
@@ -151,11 +153,19 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <ViewField title={t('expiration_label')}>
                     <View style={{ flexDirection: 'column' }}>
                         <Text variant="bodyMedium">{expiration.text}</Text>
-                        <Text testID={`${baseTestId}:expiration`} variant="bodyMedium">{expiration.date}</Text>
+                        { expiration.date && <Text testID={`${baseTestId}:expiration`} variant="bodyMedium">{expiration.date}</Text> }
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>
             </View>}
+            {resource.subjectiveValue && <>
+                <ViewField title={t('subjectiveValueLabel')}>
+                    <View style={{ flexDirection: 'column' }}>
+                        <Text variant="bodyMedium">{`${resource.subjectiveValue}€`}</Text>
+                    </View>
+                </ViewField>
+                <Hr thickness={2}/>
+            </>}
             { resource.categories && resource.categories.length > 0 && <>
                 <ViewField title={t('resourceCategories_label')} titleOnOwnLine>
                     <View style={{ flexDirection: "row", gap: 3, flexWrap: 'wrap' }}>

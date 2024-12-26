@@ -34,6 +34,7 @@ export const RESOURCES = gql`query MyResources {
       canBeGifted
       canBeDelivered
       deleted
+      subjectiveValue
       accountByAccountId {
         id
         name

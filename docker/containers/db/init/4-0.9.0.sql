@@ -86,6 +86,10 @@ ALTER TABLE IF EXISTS sb.resources
     ADD COLUMN suspended timestamp with time zone;
 ALTER TABLE IF EXISTS sb.resources
     ADD COLUMN paid_until timestamp with time zone;
+ALTER TABLE IF EXISTS sb.resources
+    ALTER COLUMN expiration DROP NOT NULL;
+ALTER TABLE IF EXISTS sb.resources
+    ADD COLUMN subjective_value integer;
 
 CREATE OR REPLACE FUNCTION sb.apply_resources_rewards(
 	resource_id integer)
@@ -100,7 +104,7 @@ BEGIN
 	-- Check account is activated, and resource is not expired, not deleted, and least 1 day old
 	IF EXISTS (SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND activated IS NOT NULL) 
 		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = resource_id AND account_id = sb.current_account_id() AND (
-			deleted IS NOT NULL OR expiration < NOW() OR created < (NOW() + INTERVAL '1 day' )))
+			deleted IS NOT NULL OR (expiration IS NOT NULL AND expiration < NOW()) OR created < (NOW() + INTERVAL '1 day' )))
 	THEN
 		-- If there has not been any reward for creating it, grant it
 		IF NOT EXISTS ( SELECT * 
@@ -157,7 +161,7 @@ BEGIN
 	FOR res IN
 		SELECT id 
 		FROM sb.resources
-		WHERE deleted IS NULL AND expiration > NOW() AND 
+		WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 			account_id = sb.current_account_id()
 	-- Loop through active resources - including suspended - to award applicable token rewards
 	LOOP
@@ -182,7 +186,7 @@ BEGIN
 	FOR res IN
 		SELECT id 
 		FROM sb.resources r
-		WHERE deleted IS NULL AND expiration > NOW() AND 
+		WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 			r.account_id = apply_account_resources_rewards.account_id
 	-- Loop through active resources - including suspended - to award applicable token rewards
 	LOOP
@@ -234,7 +238,7 @@ BEGIN
 	  FROM sb.resources r
 	  LEFT JOIN sb.active_accounts a ON a.id = r.account_id
 	  LEFT JOIN sb.locations l ON l.id = r.specific_location_id
-	  WHERE r.expiration > LOCALTIMESTAMP
+	  WHERE (r.expiration > LOCALTIMESTAMP OR r.expiration IS NULL)
 	  AND r.deleted IS NULL
 	  AND r.suspended IS NULL
 	  AND (ARRAY_LENGTH(category_codes, 1) IS NULL OR EXISTS(
@@ -283,7 +287,7 @@ AS $BODY$
 
 SELECT *
 FROM sb.resources r
-WHERE deleted IS NULL AND suspended IS NULL AND expiration > NOW() AND
+WHERE deleted IS NULL AND suspended IS NULL AND (expiration IS NULL OR expiration > NOW()) AND
 (SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = r.id) > 0
 ORDER BY r.created DESC LIMIT 10;
 
@@ -313,14 +317,14 @@ BEGIN
 			SELECT COUNT(*) 
 			FROM sb.resources res
 			WHERE res.account_id = apply_resources_consumption.account_id AND 
-				deleted IS NULL AND expiration > NOW()
+				deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
 		) > 2;
 
 	IF current_amount_of_tokens IS NOT NULL THEN
 		FOR r IN
 			SELECT id, paid_until, suspended FROM sb.resources res
 			WHERE res.account_id = apply_resources_consumption.account_id AND 
-				deleted IS NULL AND expiration > NOW() AND 
+				deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 				(paid_until <= NOW() OR paid_until IS NULL)
 			ORDER BY created ASC
 		LOOP
@@ -372,10 +376,13 @@ ALTER FUNCTION sb.apply_resources_consumption(integer)
 GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO identified_account;
 GRANT EXECUTE ON FUNCTION sb.apply_resources_consumption(integer) TO sb;
 
+DROP FUNCTION IF EXISTS sb.create_resource(character varying, character varying, timestamp without time zone, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location);
+
 CREATE OR REPLACE FUNCTION sb.create_resource(
 	title character varying,
 	description character varying,
 	expiration timestamp without time zone,
+	subjective_value integer,
 	is_service boolean,
 	is_product boolean,
 	can_be_delivered boolean,
@@ -400,10 +407,13 @@ BEGIN
 	END IF;
 
 	INSERT INTO sb.resources(
-		title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, specific_location_id, paid_until)
+		title, description, expiration, account_id, created, is_service, is_product, 
+		can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, 
+		specific_location_id, paid_until, subjective_value)
 	VALUES (create_resource.title, create_resource.description, create_resource.expiration, sb.current_account_id(),
 			NOW(), create_resource.is_service, create_resource.is_product, create_resource.can_be_delivered,
-			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted, location_id, NOW())
+			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted, 
+			location_id, NOW(), create_resource.subjective_value)
 	RETURNING id INTO inserted_id;
 	
 	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
@@ -431,11 +441,14 @@ BEGIN
 end;
 $BODY$;
 
+DROP FUNCTION IF EXISTS sb.update_resource(integer, character varying, character varying, timestamp without time zone, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location);
+
 CREATE OR REPLACE FUNCTION sb.update_resource(
 	resource_id integer,
 	title character varying,
 	description character varying,
 	expiration timestamp without time zone,
+	subjective_value integer,
 	is_service boolean,
 	is_product boolean,
 	can_be_delivered boolean,
@@ -488,7 +501,8 @@ BEGIN
 		expiration = update_resource.expiration, is_service = update_resource.is_service, 
 		is_product = update_resource.is_product, can_be_delivered = update_resource.can_be_delivered, 
 		can_be_taken_away = update_resource.can_be_taken_away, can_be_exchanged = update_resource.can_be_exchanged, 
-		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id
+		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id,
+		subjective_value = update_resource.subjective_value
 	WHERE r.id = update_resource.resource_id;
 	
 	IF location_to_delete_id IS NOT NULL THEN
@@ -570,7 +584,7 @@ begin
 		WHERE id = id_account_to_activate;
 		
 		UPDATE sb.resources SET paid_until = NOW()
-		WHERE deleted IS NULL AND expiration > NOW() AND 
+		WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 				account_id = id_account_to_activate;
 		
 		PERFORM sb.apply_resources_consumption(sb.current_account_id());
@@ -579,7 +593,7 @@ begin
 		FOR res IN
 			SELECT id 
 			FROM sb.resources
-			WHERE deleted IS NULL AND expiration > NOW() AND 
+			WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 				account_id = id_account_to_activate AND
 				suspended IS NULL
 		LOOP
@@ -651,7 +665,7 @@ AS $BODY$
 DECLARE amount_tokens_to_add integer = 0;
 BEGIN
 	IF (SELECT COUNT(*) FROM sb.accounts_links
-		WHERE account_id = sb.current_account_id()) > 0  AND
+		WHERE account_id = sb.current_account_id()) > 0 AND
 		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 3)
 	THEN
 		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
@@ -766,7 +780,7 @@ AS $BODY$
 	SELECT r.*
 	FROM sb.resources r
 	LEFT JOIN sb.resources_images ri ON ri.resource_id = r.id
-	WHERE r.account_id = sb.current_account_id() AND r.deleted IS NULL AND r.expiration > NOW()
+	WHERE r.account_id = sb.current_account_id() AND r.deleted IS NULL AND (r.expiration IS NULL OR r.expiration > NOW())
 		AND ri.resource_id IS NULL;
 $BODY$;
 
@@ -873,7 +887,7 @@ BEGIN
 	WHERE id = sb.current_account_id();
 	
 	-- If we detect this is the first time a location is linked, grant reward
-	IF block.location_id AND 
+	IF block.location_id IS NOT NULL AND 
 		NOT EXISTS (SELECT * FROM sb.accounts_token_transactions WHERE account_id = sb.current_account_id() AND token_transaction_type_id = 2)
 	THEN
 		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)

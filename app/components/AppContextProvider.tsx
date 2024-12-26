@@ -125,7 +125,6 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
         case AppReducerActionType.NotificationsRead:
           return { ...previousState, ...{ unreadNotifications: [] } }
         case AppReducerActionType.NotificationRead:
-          console.log('read', action.payload)
           return { ...previousState, ...{ unreadNotifications: previousState.unreadNotifications.filter((currentId => currentId != action.payload)) } }
         case AppReducerActionType.SetConnectingStatus:
           return { ...previousState, ...{ connecting: action.payload } }

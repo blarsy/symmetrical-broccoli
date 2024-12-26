@@ -33,6 +33,9 @@ export default ({ route, navigation }:RouteProps) => {
     const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
         try {
+            const subjectiveValue = new Number(values.subjectiveValue).valueOf()
+            values.subjectiveValue = isNaN(subjectiveValue) ? null : subjectiveValue
+
             await editResourceContext.actions.save(values)
             setSaveResourcestate(fromData(true))
             searchFilterContext.actions.requery(appContext.categories.data!)
@@ -55,7 +58,8 @@ export default ({ route, navigation }:RouteProps) => {
         <Formik enableReinitialize initialValues={editResourceContext.state.editedResource} validationSchema={yup.object().shape({
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
-            expiration: yup.date().required(t('field_required')).min(new Date(), t('date_mustBeFuture')),
+            expiration: yup.date().nullable().min(new Date(), t('date_mustBeFuture')),
+            subjectiveValue: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber')),
             categories: yup.array().min(1, t('field_required')),
             isProduct: yup.bool().test('natureIsPresent', t('nature_required'), (val, ctx) => {
                 return val || ctx.parent.isService
@@ -75,7 +79,7 @@ export default ({ route, navigation }:RouteProps) => {
             const appDispatch = useContext(AppDispatchContext)
             const { handleChange, handleBlur, values, setFieldValue, setTouched, handleSubmit } = formikState
             const editResourceContext = useContext(EditResourceContext)
-            
+
             return <ScrollView style={{ margin: 10 }}>
                 <PicturesField images={values.images} 
                     onImageSelected={async img => {
@@ -106,10 +110,13 @@ export default ({ route, navigation }:RouteProps) => {
                 }} />
                 <ErrorMessage component={ErrorText} name="isProduct" />
                 <Hr />
+                <TransparentTextInput testID="subjectiveValue" label={<StyledLabel label={t('subjectiveValueLabel')} />} value={values.subjectiveValue?.toString()}
+                    onChangeText={handleChange('subjectiveValue')} onBlur={handleBlur('subjectiveValue')} />
+                <ErrorMessage component={ErrorText} name="subjectiveValue" />
                 <DateTimePickerField testID="expiration" textColor="#000" value={values.expiration} onChange={async d => {
                     await setFieldValue('expiration', d)
                     setTouched({ expiration: true })
-                }} label={t('expiration_label') + ' *'} />
+                }} label={t('expiration_label')} />
                 <ErrorMessage component={ErrorText} name="expiration" />
                 <Hr />
                 <CategoriesSelect testID="categories" inline label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
@@ -161,7 +168,10 @@ export default ({ route, navigation }:RouteProps) => {
                     <OperationFeedback testID="resourceEditionFeedback" error={saveResourceState.error}
                         onDismissError={() => setSaveResourcestate(initial(false, false))}
                         success={saveResourceState.data}
-                        onDismissSuccess={() => editResourceContext.actions.reset(defaultLocation || undefined)} />
+                        onDismissSuccess={() => {
+                            editResourceContext.actions.reset(defaultLocation || undefined)
+                            setSaveResourcestate(initial(false, false))
+                        }} />
                 </Portal>
             </ScrollView>
         }}

@@ -21,7 +21,8 @@ const createRes = (id: number, account: Account, title: string, description: str
     categories,
     canBeDelivered: true,
     deleted: null,
-    specificLocation: null
+    specificLocation: null,
+    subjectiveValue: undefined
 })
 
 const account1 = { id: 1, name: 'Super artisan', email: 'me@me.com', avatarImageUrl: undefined, avatarPublicId: 'cwd3apntbv1z2jdf1ocf' } as Account & { avatarPublicId?: string }

@@ -13,7 +13,6 @@ import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
 
 expect.extend({
     toHaveNumericTextContentGreaterOrEqual(received, expected) {
-        console.log('received', received)
         return { message: () => 'test', pass: false }
     }
 })
