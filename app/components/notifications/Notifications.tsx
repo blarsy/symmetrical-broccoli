@@ -1,5 +1,5 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import ResponsiveListItem from "../ResponsiveListItem"
 import { Image, View } from "react-native"
@@ -151,7 +151,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
             const resourcesData = await getResources({ variables: { resourceIds: resIds } })
             newResourceNotifs = makeNotificationsData(notificationsAboutResource, resourcesData.data)
         } else {
-            setNotificationData(prev => ({ loading: false, data: undefined, loadEarlier: prev.loadEarlier, refetch: prev.refetch }))
+            setNotificationData({ loading: false, data: undefined })
         }
 
         // other notifications (for the moment, only 'welcome new user' notification)
