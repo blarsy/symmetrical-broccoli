@@ -13,6 +13,7 @@ import { t } from "@/i18n"
 import { configureFonts, DefaultTheme } from "react-native-paper"
 import { useFonts } from 'expo-font'
 import { ThemeProp } from "react-native-paper/lib/typescript/types"
+import { info } from "./logger"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
@@ -141,11 +142,22 @@ export const pickImage = async (success: ((img: ImageResult)=> void), height: nu
     })
     
     if(!result.canceled && result.assets.length > 0) {
-        const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height }}])
+        const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height, width: height }}])
 
         success(img)
     }
-}             
+}
+
+export const cropImageCenterVertically = async (uri: string, size: number, currentHeight: number, currentWidth: number) => {
+  info({ message: `manipulations on ${JSON.stringify({uri, currentHeight, currentWidth})} : ${JSON.stringify([
+    { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
+    { resize: { height: size, width: size } }
+  ])}` })
+  return await manipulateAsync(uri, [
+    { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
+    { resize: { height: size, width: size } }
+  ])
+}
 
 export const GET_RESOURCE = gql`query GetResource($id: Int!) {
   resourceById(id: $id) {
