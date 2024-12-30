@@ -7,14 +7,17 @@ import { t } from "@/i18n"
 import Images from "@/Images"
 import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
-import { pickImage } from "@/lib/utils"
+import { cropImageCenterVertically, pickImage } from "@/lib/utils"
 import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import { Camera } from "expo-camera"
+import { Camera, CameraCapturedPicture } from "expo-camera"
 import Slider from '@react-native-community/slider'
+import { error } from "@/lib/logger"
+
+const PICTURE_SIZE = 400
 
 interface CameraButtonProps {
     children: ReactNode
-    onDone: (imgUri: string) => void
+    onDone: (img: CameraCapturedPicture) => Promise<void>
 }
 
 const CameraButton = ({ children, onDone }: CameraButtonProps) => {
@@ -44,7 +47,8 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                 backgroundColor: lightPrimaryColor, justifyContent: 'center', alignItems: 'center',
                 flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
                 <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
-                <Camera ref={ref} zoom={zoom} style={{ width: picSize, height: picSize, justifyContent: processing ? 'space-between' : 'flex-end', alignItems: 'center', padding: 10, gap: 5 }} onCameraReady={() => setCameraReady(true)}>
+                <Camera ref={ref} zoom={zoom} style={{ width: picSize, height: picSize, justifyContent: processing ? 'space-between' : 'flex-end', alignItems: 'center', padding: 10, gap: 5 }}
+                    onCameraReady={() => setCameraReady(true)}>
                     { processing && <ActivityIndicator color="#fff" style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
                     <View style={{ flexDirection: 'row' }}>
                         <Icon color="#fff" size={20} source="magnify"/>
@@ -60,8 +64,10 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                         await ref.current?.pausePreview()
                         setTakingPicture(false)
                         if(img) {
-                            onDone(img?.uri)
+                            await onDone(img)
                         }
+                    } catch(e) {
+                        error({ message: (e as Error).message }, true)
                     } finally {
                         setProcessing(false)
                     }
@@ -102,7 +108,10 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
             </View>
         }
         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'stretch', justifyContent: 'space-around', padding: 15 }}>
-            <CameraButton onDone={addPicture}>
+            <CameraButton onDone={async img => {
+                    const resizedPic = await cropImageCenterVertically(img.uri, PICTURE_SIZE, img.height, img.width)
+                    addPicture(resizedPic.uri)
+                }}>
                 <View style={{ flexDirection: 'row', flex: 1, alignContent: 'center', justifyContent: 'space-around' }}>
                     <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                         <Images.Camera style={{ height: 80, width: 100, marginBottom: 25, marginTop: 10 }} fill="#fff" />
@@ -117,7 +126,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
             <TouchableOpacity onPress={async () => {
                 pickImage(img => {
                     addPicture(img.uri)
-                }, 400)
+                }, PICTURE_SIZE)
             }}>
                 <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     <Images.Photos style={{ height: 100, width: 100, marginBottom: 15 }} fill="#fff" />

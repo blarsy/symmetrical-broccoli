@@ -105,9 +105,9 @@ type Query implements Node {
   ): AccountsPushTokensConnection
 
   """
-  Reads and enables pagination through a set of `AccountsTopesTransaction`.
+  Reads and enables pagination through a set of `AccountsTokenTransaction`.
   """
-  allAccountsTopesTransactions(
+  allAccountsTokenTransactions(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -126,14 +126,14 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering `AccountsTopesTransaction`."""
-    orderBy: [AccountsTopesTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `AccountsTokenTransaction`."""
+    orderBy: [AccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: AccountsTopesTransactionCondition
-  ): AccountsTopesTransactionsConnection
+    condition: AccountsTokenTransactionCondition
+  ): AccountsTokenTransactionsConnection
 
   """Reads and enables pagination through a set of `ActiveAccount`."""
   allActiveAccounts(
@@ -250,35 +250,6 @@ type Query implements Node {
     """
     condition: ConversationCondition
   ): ConversationsConnection
-
-  """Reads and enables pagination through a set of `CurrentAmountOfTope`."""
-  allCurrentAmountOfTopes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `CurrentAmountOfTope`."""
-    orderBy: [CurrentAmountOfTopesOrderBy!] = [NATURAL]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CurrentAmountOfTopeCondition
-  ): CurrentAmountOfTopesConnection
 
   """Reads and enables pagination through a set of `EmailActivation`."""
   allEmailActivations(
@@ -599,6 +570,37 @@ type Query implements Node {
     condition: ResourceCondition
   ): ResourcesConnection
 
+  """
+  Reads and enables pagination through a set of `ResourcesAccountsTokenTransaction`.
+  """
+  allResourcesAccountsTokenTransactions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesAccountsTokenTransaction`."""
+    orderBy: [ResourcesAccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesAccountsTokenTransactionCondition
+  ): ResourcesAccountsTokenTransactionsConnection
+
   """Reads and enables pagination through a set of `ResourcesImage`."""
   allResourcesImages(
     """Only read the first `n` values of the set."""
@@ -717,8 +719,8 @@ type Query implements Node {
     condition: SystemCondition
   ): SystemsConnection
 
-  """Reads and enables pagination through a set of `TopesTransactionType`."""
-  allTopesTransactionTypes(
+  """Reads and enables pagination through a set of `TokenTransactionType`."""
+  allTokenTransactionTypes(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -737,14 +739,14 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering `TopesTransactionType`."""
-    orderBy: [TopesTransactionTypesOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `TokenTransactionType`."""
+    orderBy: [TokenTransactionTypesOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: TopesTransactionTypeCondition
-  ): TopesTransactionTypesConnection
+    condition: TokenTransactionTypeCondition
+  ): TokenTransactionTypesConnection
 
   """Reads and enables pagination through a set of `UnreadMessage`."""
   allUnreadMessages(
@@ -778,7 +780,7 @@ type Query implements Node {
   accountByEmail(email: String!): Account
   accountsLinkById(id: Int!): AccountsLink
   accountsPushTokenByAccountIdAndToken(accountId: Int!, token: String!): AccountsPushToken
-  accountsTopesTransactionById(id: Int!): AccountsTopesTransaction
+  accountsTokenTransactionById(id: Int!): AccountsTokenTransaction
   broadcastPrefById(id: Int!): BroadcastPref
   conversationById(id: Int!): Conversation
   emailActivationByAccountIdAndActivationCodeAndEmail(accountId: Int!, activationCode: String!, email: String!): EmailActivation
@@ -792,8 +794,9 @@ type Query implements Node {
   participantById(id: Int!): Participant
   resourceCategoryByLocaleAndCode(locale: String!, code: Int!): ResourceCategory
   resourceById(id: Int!): Resource
+  resourcesAccountsTokenTransactionById(id: Int!): ResourcesAccountsTokenTransaction
   searchById(id: Int!): Search
-  topesTransactionTypeById(id: Int!): TopesTransactionType
+  tokenTransactionTypeById(id: Int!): TokenTransactionType
   unreadMessageByParticipantIdAndMessageId(participantId: Int!, messageId: Int!): UnreadMessage
 
   """Reads and enables pagination through a set of `Message`."""
@@ -866,6 +869,29 @@ type Query implements Node {
     after: Cursor
   ): ResourcesConnection
   getSessionData: SessionDatum
+
+  """
+  Reads and enables pagination through a set of `AccountsTokenTransaction`.
+  """
+  getTokensHistory(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AccountsTokenTransactionsConnection
 
   """Reads and enables pagination through a set of `Conversation`."""
   myConversations(
@@ -995,14 +1021,14 @@ type Query implements Node {
   ): AccountsPushToken
 
   """
-  Reads a single `AccountsTopesTransaction` using its globally unique `ID`.
+  Reads a single `AccountsTokenTransaction` using its globally unique `ID`.
   """
-  accountsTopesTransaction(
+  accountsTokenTransaction(
     """
-    The globally unique `ID` to be used in selecting a single `AccountsTopesTransaction`.
+    The globally unique `ID` to be used in selecting a single `AccountsTokenTransaction`.
     """
     nodeId: ID!
-  ): AccountsTopesTransaction
+  ): AccountsTokenTransaction
 
   """Reads a single `BroadcastPref` using its globally unique `ID`."""
   broadcastPref(
@@ -1080,19 +1106,29 @@ type Query implements Node {
     nodeId: ID!
   ): Resource
 
+  """
+  Reads a single `ResourcesAccountsTokenTransaction` using its globally unique `ID`.
+  """
+  resourcesAccountsTokenTransaction(
+    """
+    The globally unique `ID` to be used in selecting a single `ResourcesAccountsTokenTransaction`.
+    """
+    nodeId: ID!
+  ): ResourcesAccountsTokenTransaction
+
   """Reads a single `Search` using its globally unique `ID`."""
   search(
     """The globally unique `ID` to be used in selecting a single `Search`."""
     nodeId: ID!
   ): Search
 
-  """Reads a single `TopesTransactionType` using its globally unique `ID`."""
-  topesTransactionType(
+  """Reads a single `TokenTransactionType` using its globally unique `ID`."""
+  tokenTransactionType(
     """
-    The globally unique `ID` to be used in selecting a single `TopesTransactionType`.
+    The globally unique `ID` to be used in selecting a single `TokenTransactionType`.
     """
     nodeId: ID!
-  ): TopesTransactionType
+  ): TokenTransactionType
 }
 
 """An object with a globally unique `ID`."""
@@ -1140,7 +1176,7 @@ type Account implements Node {
   locationId: Int
   canBeShowcased: Boolean!
   willingToContribute: Boolean!
-  amountOfTopes: Int!
+  amountOfTokens: Int!
 
   """Reads a single `Image` that is related to this `Account`."""
   imageByAvatarImageId: Image
@@ -1410,9 +1446,9 @@ type Account implements Node {
   ): SearchesConnection!
 
   """
-  Reads and enables pagination through a set of `AccountsTopesTransaction`.
+  Reads and enables pagination through a set of `AccountsTokenTransaction`.
   """
-  accountsTopesTransactionsByAccountId(
+  accountsTokenTransactionsByAccountId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1431,14 +1467,14 @@ type Account implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering `AccountsTopesTransaction`."""
-    orderBy: [AccountsTopesTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering `AccountsTokenTransaction`."""
+    orderBy: [AccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: AccountsTopesTransactionCondition
-  ): AccountsTopesTransactionsConnection!
+    condition: AccountsTokenTransactionCondition
+  ): AccountsTokenTransactionsConnection!
 }
 
 """
@@ -1767,7 +1803,7 @@ type Resource implements Node {
   id: Int!
   title: String!
   description: String!
-  expiration: Datetime!
+  expiration: Datetime
   accountId: Int!
   created: Datetime!
   isService: Boolean!
@@ -1780,6 +1816,7 @@ type Resource implements Node {
   specificLocationId: Int
   suspended: Datetime
   paidUntil: Datetime
+  subjectiveValue: Int
 
   """Reads a single `Account` that is related to this `Resource`."""
   accountByAccountId: Account
@@ -1875,6 +1912,37 @@ type Resource implements Node {
     """
     condition: ResourcesResourceCategoryCondition
   ): ResourcesResourceCategoriesConnection!
+
+  """
+  Reads and enables pagination through a set of `ResourcesAccountsTokenTransaction`.
+  """
+  resourcesAccountsTokenTransactionsByResourceId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesAccountsTokenTransaction`."""
+    orderBy: [ResourcesAccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesAccountsTokenTransactionCondition
+  ): ResourcesAccountsTokenTransactionsConnection!
 }
 
 type Location implements Node {
@@ -2031,6 +2099,8 @@ enum ResourcesOrderBy {
   SUSPENDED_DESC
   PAID_UNTIL_ASC
   PAID_UNTIL_DESC
+  SUBJECTIVE_VALUE_ASC
+  SUBJECTIVE_VALUE_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2087,6 +2157,9 @@ input ResourceCondition {
 
   """Checks for equality with the object’s `paidUntil` field."""
   paidUntil: Datetime
+
+  """Checks for equality with the object’s `subjectiveValue` field."""
+  subjectiveValue: Int
 }
 
 """Methods to use when ordering `Account`."""
@@ -2122,8 +2195,8 @@ enum AccountsOrderBy {
   CAN_BE_SHOWCASED_DESC
   WILLING_TO_CONTRIBUTE_ASC
   WILLING_TO_CONTRIBUTE_DESC
-  AMOUNT_OF_TOPES_ASC
-  AMOUNT_OF_TOPES_DESC
+  AMOUNT_OF_TOKENS_ASC
+  AMOUNT_OF_TOKENS_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2177,8 +2250,8 @@ input AccountCondition {
   """Checks for equality with the object’s `willingToContribute` field."""
   willingToContribute: Boolean
 
-  """Checks for equality with the object’s `amountOfTopes` field."""
-  amountOfTopes: Int
+  """Checks for equality with the object’s `amountOfTokens` field."""
+  amountOfTokens: Int
 }
 
 """A connection to a list of `Conversation` values."""
@@ -2367,6 +2440,250 @@ input ResourcesResourceCategoryCondition {
 
   """Checks for equality with the object’s `resourceCategoryCode` field."""
   resourceCategoryCode: Int
+}
+
+"""A connection to a list of `ResourcesAccountsTokenTransaction` values."""
+type ResourcesAccountsTokenTransactionsConnection {
+  """A list of `ResourcesAccountsTokenTransaction` objects."""
+  nodes: [ResourcesAccountsTokenTransaction!]!
+
+  """
+  A list of edges which contains the `ResourcesAccountsTokenTransaction` and cursor to aid in pagination.
+  """
+  edges: [ResourcesAccountsTokenTransactionsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ResourcesAccountsTokenTransaction` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type ResourcesAccountsTokenTransaction implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  accountsTokenTransactionId: Int!
+  resourceId: Int!
+  created: Datetime!
+
+  """
+  Reads a single `AccountsTokenTransaction` that is related to this `ResourcesAccountsTokenTransaction`.
+  """
+  accountsTokenTransactionByAccountsTokenTransactionId: AccountsTokenTransaction
+
+  """
+  Reads a single `Resource` that is related to this `ResourcesAccountsTokenTransaction`.
+  """
+  resourceByResourceId: Resource
+}
+
+type AccountsTokenTransaction implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  accountId: Int!
+  tokenTransactionTypeId: Int!
+  movement: Int!
+  created: Datetime!
+
+  """
+  Reads a single `Account` that is related to this `AccountsTokenTransaction`.
+  """
+  accountByAccountId: Account
+
+  """
+  Reads a single `TokenTransactionType` that is related to this `AccountsTokenTransaction`.
+  """
+  tokenTransactionTypeByTokenTransactionTypeId: TokenTransactionType
+
+  """
+  Reads and enables pagination through a set of `ResourcesAccountsTokenTransaction`.
+  """
+  resourcesAccountsTokenTransactionsByAccountsTokenTransactionId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `ResourcesAccountsTokenTransaction`."""
+    orderBy: [ResourcesAccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ResourcesAccountsTokenTransactionCondition
+  ): ResourcesAccountsTokenTransactionsConnection!
+}
+
+type TokenTransactionType implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  code: String!
+  created: Datetime!
+
+  """
+  Reads and enables pagination through a set of `AccountsTokenTransaction`.
+  """
+  accountsTokenTransactionsByTokenTransactionTypeId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `AccountsTokenTransaction`."""
+    orderBy: [AccountsTokenTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccountsTokenTransactionCondition
+  ): AccountsTokenTransactionsConnection!
+}
+
+"""A connection to a list of `AccountsTokenTransaction` values."""
+type AccountsTokenTransactionsConnection {
+  """A list of `AccountsTokenTransaction` objects."""
+  nodes: [AccountsTokenTransaction!]!
+
+  """
+  A list of edges which contains the `AccountsTokenTransaction` and cursor to aid in pagination.
+  """
+  edges: [AccountsTokenTransactionsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `AccountsTokenTransaction` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `AccountsTokenTransaction` edge in the connection."""
+type AccountsTokenTransactionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AccountsTokenTransaction` at the end of the edge."""
+  node: AccountsTokenTransaction!
+}
+
+"""Methods to use when ordering `AccountsTokenTransaction`."""
+enum AccountsTokenTransactionsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNT_ID_ASC
+  ACCOUNT_ID_DESC
+  TOKEN_TRANSACTION_TYPE_ID_ASC
+  TOKEN_TRANSACTION_TYPE_ID_DESC
+  MOVEMENT_ASC
+  MOVEMENT_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `AccountsTokenTransaction` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input AccountsTokenTransactionCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `accountId` field."""
+  accountId: Int
+
+  """Checks for equality with the object’s `tokenTransactionTypeId` field."""
+  tokenTransactionTypeId: Int
+
+  """Checks for equality with the object’s `movement` field."""
+  movement: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""Methods to use when ordering `ResourcesAccountsTokenTransaction`."""
+enum ResourcesAccountsTokenTransactionsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  ACCOUNTS_TOKEN_TRANSACTION_ID_ASC
+  ACCOUNTS_TOKEN_TRANSACTION_ID_DESC
+  RESOURCE_ID_ASC
+  RESOURCE_ID_DESC
+  CREATED_ASC
+  CREATED_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `ResourcesAccountsTokenTransaction` object types.
+All fields are tested for equality and combined with a logical ‘and.’
+"""
+input ResourcesAccountsTokenTransactionCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """
+  Checks for equality with the object’s `accountsTokenTransactionId` field.
+  """
+  accountsTokenTransactionId: Int
+
+  """Checks for equality with the object’s `resourceId` field."""
+  resourceId: Int
+
+  """Checks for equality with the object’s `created` field."""
+  created: Datetime
+}
+
+"""A `ResourcesAccountsTokenTransaction` edge in the connection."""
+type ResourcesAccountsTokenTransactionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ResourcesAccountsTokenTransaction` at the end of the edge."""
+  node: ResourcesAccountsTokenTransaction!
 }
 
 """A connection to a list of `Participant` values."""
@@ -3226,135 +3543,6 @@ input SearchCondition {
   categoryCodes: [Int]
 }
 
-"""A connection to a list of `AccountsTopesTransaction` values."""
-type AccountsTopesTransactionsConnection {
-  """A list of `AccountsTopesTransaction` objects."""
-  nodes: [AccountsTopesTransaction!]!
-
-  """
-  A list of edges which contains the `AccountsTopesTransaction` and cursor to aid in pagination.
-  """
-  edges: [AccountsTopesTransactionsEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `AccountsTopesTransaction` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type AccountsTopesTransaction implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  accountId: Int!
-  topesTransactionTypeId: Int!
-  movement: Int!
-  created: Datetime!
-
-  """
-  Reads a single `Account` that is related to this `AccountsTopesTransaction`.
-  """
-  accountByAccountId: Account
-
-  """
-  Reads a single `TopesTransactionType` that is related to this `AccountsTopesTransaction`.
-  """
-  topesTransactionTypeByTopesTransactionTypeId: TopesTransactionType
-}
-
-type TopesTransactionType implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  code: String!
-  created: Datetime!
-
-  """
-  Reads and enables pagination through a set of `AccountsTopesTransaction`.
-  """
-  accountsTopesTransactionsByTopesTransactionTypeId(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering `AccountsTopesTransaction`."""
-    orderBy: [AccountsTopesTransactionsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AccountsTopesTransactionCondition
-  ): AccountsTopesTransactionsConnection!
-}
-
-"""Methods to use when ordering `AccountsTopesTransaction`."""
-enum AccountsTopesTransactionsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  ACCOUNT_ID_ASC
-  ACCOUNT_ID_DESC
-  TOPES_TRANSACTION_TYPE_ID_ASC
-  TOPES_TRANSACTION_TYPE_ID_DESC
-  MOVEMENT_ASC
-  MOVEMENT_DESC
-  CREATED_ASC
-  CREATED_DESC
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-}
-
-"""
-A condition to be used against `AccountsTopesTransaction` object types. All
-fields are tested for equality and combined with a logical ‘and.’
-"""
-input AccountsTopesTransactionCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `accountId` field."""
-  accountId: Int
-
-  """Checks for equality with the object’s `topesTransactionTypeId` field."""
-  topesTransactionTypeId: Int
-
-  """Checks for equality with the object’s `movement` field."""
-  movement: Int
-
-  """Checks for equality with the object’s `created` field."""
-  created: Datetime
-}
-
-"""A `AccountsTopesTransaction` edge in the connection."""
-type AccountsTopesTransactionsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AccountsTopesTransaction` at the end of the edge."""
-  node: AccountsTopesTransaction!
-}
-
 """A `Account` edge in the connection."""
 type AccountsEdge {
   """A cursor for use in pagination."""
@@ -3486,54 +3674,6 @@ input ActiveAccountCondition {
 
   """Checks for equality with the object’s `canBeShowcased` field."""
   canBeShowcased: Boolean
-}
-
-"""A connection to a list of `CurrentAmountOfTope` values."""
-type CurrentAmountOfTopesConnection {
-  """A list of `CurrentAmountOfTope` objects."""
-  nodes: [CurrentAmountOfTope!]!
-
-  """
-  A list of edges which contains the `CurrentAmountOfTope` and cursor to aid in pagination.
-  """
-  edges: [CurrentAmountOfTopesEdge!]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `CurrentAmountOfTope` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type CurrentAmountOfTope {
-  amountOfTopes: Int
-}
-
-"""A `CurrentAmountOfTope` edge in the connection."""
-type CurrentAmountOfTopesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `CurrentAmountOfTope` at the end of the edge."""
-  node: CurrentAmountOfTope!
-}
-
-"""Methods to use when ordering `CurrentAmountOfTope`."""
-enum CurrentAmountOfTopesOrderBy {
-  NATURAL
-  AMOUNT_OF_TOPES_ASC
-  AMOUNT_OF_TOPES_DESC
-}
-
-"""
-A condition to be used against `CurrentAmountOfTope` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input CurrentAmountOfTopeCondition {
-  """Checks for equality with the object’s `amountOfTopes` field."""
-  amountOfTopes: Int
 }
 
 """A connection to a list of `EmailActivation` values."""
@@ -3969,36 +4109,36 @@ input SystemCondition {
   minimumClientVersion: String
 }
 
-"""A connection to a list of `TopesTransactionType` values."""
-type TopesTransactionTypesConnection {
-  """A list of `TopesTransactionType` objects."""
-  nodes: [TopesTransactionType!]!
+"""A connection to a list of `TokenTransactionType` values."""
+type TokenTransactionTypesConnection {
+  """A list of `TokenTransactionType` objects."""
+  nodes: [TokenTransactionType!]!
 
   """
-  A list of edges which contains the `TopesTransactionType` and cursor to aid in pagination.
+  A list of edges which contains the `TokenTransactionType` and cursor to aid in pagination.
   """
-  edges: [TopesTransactionTypesEdge!]!
+  edges: [TokenTransactionTypesEdge!]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """
-  The count of *all* `TopesTransactionType` you could get from the connection.
+  The count of *all* `TokenTransactionType` you could get from the connection.
   """
   totalCount: Int!
 }
 
-"""A `TopesTransactionType` edge in the connection."""
-type TopesTransactionTypesEdge {
+"""A `TokenTransactionType` edge in the connection."""
+type TokenTransactionTypesEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `TopesTransactionType` at the end of the edge."""
-  node: TopesTransactionType!
+  """The `TokenTransactionType` at the end of the edge."""
+  node: TokenTransactionType!
 }
 
-"""Methods to use when ordering `TopesTransactionType`."""
-enum TopesTransactionTypesOrderBy {
+"""Methods to use when ordering `TokenTransactionType`."""
+enum TokenTransactionTypesOrderBy {
   NATURAL
   ID_ASC
   ID_DESC
@@ -4011,10 +4151,10 @@ enum TopesTransactionTypesOrderBy {
 }
 
 """
-A condition to be used against `TopesTransactionType` object types. All fields
+A condition to be used against `TokenTransactionType` object types. All fields
 are tested for equality and combined with a logical ‘and.’
 """
-input TopesTransactionTypeCondition {
+input TokenTransactionTypeCondition {
   """Checks for equality with the object’s `id` field."""
   id: Int
 
@@ -4034,9 +4174,9 @@ type SessionDatum {
   activated: Datetime
   logLevel: Int
   unreadConversations: [Int]
-  numberOfUnreadNotifications: Int
+  unreadNotifications: [Int]
   willingToContribute: Boolean
-  amountOfTopes: Int
+  amountOfTokens: Int
 }
 
 """
@@ -4055,6 +4195,36 @@ type Mutation {
     """
     input: AddJobInput!
   ): AddJobPayload
+  applyAccountResourcesRewards(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyAccountResourcesRewardsInput!
+  ): ApplyAccountResourcesRewardsPayload
+  applyMyResourcesRewards(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyMyResourcesRewardsInput!
+  ): ApplyMyResourcesRewardsPayload
+  applyResourcesConsumption(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyResourcesConsumptionInput!
+  ): ApplyResourcesConsumptionPayload
+  applyResourcesRewards(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyResourcesRewardsInput!
+  ): ApplyResourcesRewardsPayload
+  applyResourcesTokenTransactions(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyResourcesTokenTransactionsInput!
+  ): ApplyResourcesTokenTransactionsPayload
   authenticate(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4145,6 +4315,12 @@ type Mutation {
     """
     input: GetPasswordHashSaltInput!
   ): GetPasswordHashSaltPayload
+  grantApplicableRewards(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: GrantApplicableRewardsInput!
+  ): GrantApplicableRewardsPayload
   isPasswordValid(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4304,6 +4480,124 @@ input AddJobInput {
   priority: Int
   flags: [String]
   jobKeyMode: String
+}
+
+"""The output of our `applyAccountResourcesRewards` mutation."""
+type ApplyAccountResourcesRewardsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyAccountResourcesRewards` mutation."""
+input ApplyAccountResourcesRewardsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  accountId: Int
+}
+
+"""The output of our `applyMyResourcesRewards` mutation."""
+type ApplyMyResourcesRewardsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyMyResourcesRewards` mutation."""
+input ApplyMyResourcesRewardsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `applyResourcesConsumption` mutation."""
+type ApplyResourcesConsumptionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyResourcesConsumption` mutation."""
+input ApplyResourcesConsumptionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  accountId: Int
+}
+
+"""The output of our `applyResourcesRewards` mutation."""
+type ApplyResourcesRewardsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyResourcesRewards` mutation."""
+input ApplyResourcesRewardsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  resourceId: Int
+}
+
+"""The output of our `applyResourcesTokenTransactions` mutation."""
+type ApplyResourcesTokenTransactionsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyResourcesTokenTransactions` mutation."""
+input ApplyResourcesTokenTransactionsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 }
 
 """The output of our `authenticate` mutation."""
@@ -4548,6 +4842,7 @@ input CreateResourceInput {
   title: String
   description: String
   expiration: Datetime
+  subjectiveValue: Int
   isService: Boolean
   isProduct: Boolean
   canBeDelivered: Boolean
@@ -4717,6 +5012,30 @@ input GetPasswordHashSaltInput {
   """
   clientMutationId: String
   password: String
+}
+
+"""The output of our `grantApplicableRewards` mutation."""
+type GrantApplicableRewardsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  integer: Int
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `grantApplicableRewards` mutation."""
+input GrantApplicableRewardsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 }
 
 """The output of our `isPasswordValid` mutation."""
@@ -5178,6 +5497,7 @@ input UpdateResourceInput {
   title: String
   description: String
   expiration: Datetime
+  subjectiveValue: Int
   isService: Boolean
   isProduct: Boolean
   canBeDelivered: Boolean
