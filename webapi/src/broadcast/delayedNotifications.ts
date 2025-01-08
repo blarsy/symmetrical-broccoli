@@ -285,7 +285,8 @@ const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSumma
 export const sendSummaries = async (pool: Pool, version: string): Promise<void> => {
     const [resourcesSummaryData, chatMessagesSummaryData] = await Promise.all([
         getNewResourcesSummaryData(pool),
-        getChatMessageSummaryData(pool)
+        getChatMessageSummaryData(pool),
+        
     ])
 
     logger.info(`Data objects for sending summaries by email:\nresourcesSummaryData: ${JSON.stringify(resourcesSummaryData)}\nchatMessagesSummaryData: ${JSON.stringify(chatMessagesSummaryData)}`)

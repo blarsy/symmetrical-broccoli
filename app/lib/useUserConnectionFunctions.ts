@@ -21,6 +21,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       unreadNotifications
       willingToContribute
       amountOfTokens
+      unlimitedUntil
     }
   }`
 
@@ -123,6 +124,7 @@ export default () => {
             unreadNotifications: res.data.getSessionData.unreadNotifications,
             willingToContribute: res.data.getSessionData.willingToContribute,
             amountOfTokens: res.data.getSessionData.amountOfTokens,
+            unlimitedUntil: res.data.getSessionData.unlimitedUntil || null,
             lastChangeTimestamp: new Date()
         }
 
@@ -164,7 +166,8 @@ export default () => {
                 name: payload.data.accountChangeReceived.account.name,
                 willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
                 unreadConversations: [],
-                unreadNotifications: []
+                unreadNotifications: [],
+                unlimitedUntil: payload.data.unlimitedUntil || null
             }
             appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
         }})

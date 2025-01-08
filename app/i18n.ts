@@ -223,7 +223,10 @@ const resources = {
       "loadMore": "Load older",
       "mustBeAnInteger": "Must be an integer",
       "subjectiveValueLabel": "Subjective value",
-      "mustBeAValidNumber": "Must be a valid number"
+      "mustBeAValidNumber": "Must be a valid number",
+      "resourcesSuspendedNotificationHeadline": "Some resources suspended",
+      "checkTokensNotificationHeadline": "In order to reactivate them, check if you can add some Topes to your account.",
+      "checkTokensNotificationDetails": "Check resource list"
     }
   },
   fr: {
@@ -441,7 +444,10 @@ const resources = {
       "loadMore": "Plus ancien",
       "mustBeAnInteger": "Doit être un nombre entier",
       "subjectiveValueLabel": "Valeur subjective (€)",
-      "mustBeAValidNumber": "Doit être un nombre valide"
+      "mustBeAValidNumber": "Doit être un nombre valide",
+      "resourcesSuspendedNotificationHeadline": "Des resources suspendues",
+      "checkTokensNotificationHeadline": "Voyez si vous pouvez ajouter des Topes à votre compte pour les réactiver.",
+      "checkTokensNotificationDetails": "Voir la liste de ressources"
     }
   }
 }

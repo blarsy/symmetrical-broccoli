@@ -39,6 +39,7 @@ export interface AccountInfo {
     unreadNotifications: number[]
     amountOfTokens: number
     lastChangeTimestamp: Date
+    unlimitedUntil: Date | null
 }
 
 export interface ImageInfo {

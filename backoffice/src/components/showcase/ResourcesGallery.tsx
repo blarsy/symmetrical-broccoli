@@ -30,7 +30,7 @@ const ResourcesGallery = () => {
     const { loading, data, error } = useQuery(TOP_RESOURCES)
     const theme = useTheme()
 
-    return <LoadedZone loading={loading} error={error}>
+    return <LoadedZone loading={loading} error={error} containerStyle={{ alignSelf: 'stretch' }}>
         <Stack flexDirection="row" flexWrap="wrap" gap="1rem" justifyContent="center">
             { data && data.topResources.nodes.map((rawRes:any, idx: number) => <Box key={idx} sx={{ 
                 borderWidth: 2,

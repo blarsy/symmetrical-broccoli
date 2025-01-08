@@ -17,8 +17,6 @@ import TopperPainter from './img/toppers/painter.svg'
 import TopperPastryChef from './img/toppers/pastry-chef.svg'
 import TopperScout from './img/toppers/scout.svg'
 import TopperJeweler from './img/toppers/jewelry-maker.svg'
-import 'swiper/css'
-import 'swiper/css/navigation'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { Button } from "@mui/material"
@@ -273,7 +271,5 @@ const Page = () => {
         </ThemeProvider>
     </ApolloProvider>
 }
-
-    
 
 export default Page

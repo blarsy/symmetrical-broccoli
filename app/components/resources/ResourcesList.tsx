@@ -34,6 +34,7 @@ export const RESOURCES = gql`query MyResources {
       canBeGifted
       canBeDelivered
       deleted
+      suspended
       subjectiveValue
       accountByAccountId {
         id
@@ -119,7 +120,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
       if(resources.filter((res => !res.deleted && (res.expiration && new Date(res.expiration) > new Date()))).length < NUMBER_OF_FREE_RESOURCES){
         addRequested()
       } else {
-        if(!appContext.account!.willingToContribute) {
+        if(!appContext.account!.willingToContribute && (!appContext.account?.unlimitedUntil || appContext.account?.unlimitedUntil < new Date())) {
           setAskingSwitchToContributionMode(true)
         } else {
           addRequested()

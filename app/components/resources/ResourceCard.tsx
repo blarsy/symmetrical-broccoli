@@ -10,6 +10,7 @@ import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import BareIconButton from "../layout/BareIconButton"
 import { InfoDialog } from "../ConfirmDialog"
 import InfoSuspension from "../tokens/InfoSuspension"
+import { useNavigation } from "@react-navigation/native"
 
 interface Props {
     viewRequested:  (resourceId: number) => void
@@ -24,6 +25,7 @@ interface Props {
 const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
 export default ({ viewRequested, resource, editRequested, deleteRequested, isExample, style, testID}: Props) => {
+    const navigation = useNavigation()
     const [suspensionExplanation, setSuspensionExplanation] = useState(false)
     let size: number
     if(aboveMdWidth()) {
@@ -67,6 +69,6 @@ export default ({ viewRequested, resource, editRequested, deleteRequested, isExa
         </View>}
         <InfoDialog onDismiss={() => setSuspensionExplanation(false)} visible={ suspensionExplanation }
             title={t('suspensionExplanationDialogTitle')} buttonCaptionI18n="ok_caption" 
-            content={<InfoSuspension />} />
+            content={<InfoSuspension navigation={navigation} />} />
     </View>
 }

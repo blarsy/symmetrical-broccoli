@@ -23,7 +23,7 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     {
         editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null, specificLocation: null, expiration: new Date() },
+            isService: false, deleted: null, specificLocation: null, expiration: new Date(), subjectiveValue: null },
         changeCallbacks: [], imagesToAdd: []},
         actions: {
             setResource: () => {},
@@ -42,7 +42,7 @@ export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: b
         makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
             activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
             willingToContribute, amountOfTokens: willingToContribute ? 30 : 0, unreadNotifications: [], 
-            unreadConversations: [], lastChangeTimestamp: new Date()
+            unreadConversations: [], lastChangeTimestamp: new Date(), unlimitedUntil: null
          })
 
 const defaultResourceCategories: Category[] = [

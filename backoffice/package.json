@@ -42,7 +42,7 @@
     "i18next": "^23.8.1",
     "i18next-browser-languagedetector": "^7.2.0",
     "jsonwebtoken": "^9.0.0",
-    "next": "next-14",
+    "next": "latest",
     "nocodb-sdk": "^0.108.1",
     "pg": "^8.11.3",
     "postgraphile": "^4.13.0",
@@ -52,7 +52,6 @@
     "react-qr-code": "^2.0.12",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
-    "swiper": "^10.3.1",
     "typescript": "5.1.3",
     "usehooks-ts": "^2.9.1",
     "utf-8-validate": "^6.0.3",
@@ -60,7 +59,9 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@apollo/react-testing": "^4.0.0",
     "@chromatic-com/storybook": "^3.2.3",
+    "@newhighsco/storybook-addon-svgr": "^2.0.39",
     "@storybook/addon-essentials": "^8.4.7",
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-mdx-gfm": "^8.4.7",

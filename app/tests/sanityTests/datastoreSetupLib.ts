@@ -19,13 +19,14 @@ const confirmAccount = async (email: string) => {
     return simulateActivation(res.rows[0].activation_code)
 }
 
-export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false, contributor: boolean = false): Promise<string> => {
+export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false, contributor: boolean = false, unlimited: boolean = false): Promise<string> => {
     let client = getApolloClient('')
     try {
         const res = await client.mutate({ mutation: GraphQlLib.mutations.REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
         client = getApolloClient(res.data.registerAccount.jwtToken)
         if(contributor) await client.mutate({ mutation: GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE })
+        if(unlimited) await executeQuery('UPDATE sb.accounts SET unlimited_until = $1 WHERE email = $2', [new Date(new Date().valueOf() + 1000 * 50 * 50 * 24 * 365), email])
         return (res.data.registerAccount.jwtToken as string)
     } catch (e) {
         console.debug('Error while trying to login', e)

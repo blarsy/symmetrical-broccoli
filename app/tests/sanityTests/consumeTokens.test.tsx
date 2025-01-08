@@ -4,6 +4,9 @@ import { AppWithSingleScreen, createResourceThroughUI, daysFromNow, executeQuery
 import React from "react"
 import Resources from "@/components/mainViews/Resources"
 import '@testing-library/react-native/extend-expect'
+import Notifications from "@/components/notifications/Notifications"
+import { checkLastNotificationExists } from "./datastoreCheck"
+import { t } from "@/i18n"
 
 const testNum = getTestNum()
 const email = `me${testNum}@me.com`, password= 'Password1!', name = `me${testNum}`
@@ -15,7 +18,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-    return deleteAccount(email, password)
+    //return deleteAccount(email, password)
 })
 
 test('Third ressource consumes a token per day', async() => {
@@ -89,6 +92,13 @@ test('Consuming function handles accurately each resource context', async () => 
 
     await executeQuery(`SELECT sb.apply_resources_token_transactions()`)
 
+    // const notif = await checkLastNotificationExists(email)
+    // const notifScreen = render(<AppWithSingleScreen component={Notifications} name="notifications" 
+    //     overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }} />)
+
+    // await waitFor(() => expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toBeOnTheScreen())
+    // expect(notifScreen.getByTestId(`notifications:${notif.id}:Text`)).toHaveTextContent(t('checkTokensNotificationDetails'))
+
     const resAfterActState = await executeQuery(`SELECT id, title,suspended, deleted, paid_until, created
         FROM sb.resources r
         WHERE r.account_id = (SELECT id FROM sb.accounts WHERE email = LOWER($1)) ORDER BY created`, [email])
@@ -109,6 +119,7 @@ test('Consuming function handles accurately each resource context', async () => 
     checkResourceSpecialFields(resAfterActState.rows, resIds[1], -1, false)
     // The existing resource is still in paid period and should not have been changed
     checkResourceSpecialFields(resAfterActState.rows, resIds[8], 0, false)
+
 })
 
 const checkResourceSpecialFields = (rows: any[], resId: number, paidUntilWithinDays: number, isSuspended: boolean) => {

@@ -154,7 +154,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
             setNotificationData({ loading: false, data: undefined })
         }
 
-        // other notifications (for the moment, only 'welcome new user' notification)
+        // other notifications
         rawNotifications.data.myNotifications.edges.forEach((rawNotification: any) => {
             if(rawNotification.node.data.info === 'COMPLETE_PROFILE') {
                 otherNotifs.push({
@@ -166,7 +166,31 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     text: t('completeProcessNotificationDetails'),
                     image: undefined,
                     onPress: async () => {
+                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
                         navigation.navigate('profile')
+                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                            if (notif.id === rawNotification.node.id) {
+                                return { ...notif, ...{ read: true } }
+                            }
+                            return notif
+                        }) } } }))
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                    }
+                })
+            } else if(rawNotification.node.data.info === 'SOME_RESOURCES_SUSPENDED') {
+                otherNotifs.push({
+                    id: rawNotification.node.id,
+                    created: rawNotification.node.created, 
+                    headline1: t('resourcesSuspendedNotificationHeadline'),
+                    headline2: t('checkTokensNotificationHeadline'),
+                    read: rawNotification.node.read,
+                    text: t('checkTokensNotificationDetails'),
+                    image: undefined,
+                    onPress: async () => {
+                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                        navigation.navigate('resource', {
+                            screen: 'resources'
+                        })
                         setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
                             if (notif.id === rawNotification.node.id) {
                                 return { ...notif, ...{ read: true } }

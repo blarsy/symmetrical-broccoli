@@ -71,7 +71,7 @@ const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Pro
 const launchJobWorker = async (pool: Pool, version: string) => {
     let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries'
     if(version === 'v0_9'){
-        crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens'
+        crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications'
     }
 
     const runner = await run({
@@ -107,7 +107,7 @@ const launchJobWorker = async (pool: Pool, version: string) => {
                 const daysOfNotificationsToKeep = 5
                 executeJob(async () => {
                     await runAndLog(`DELETE FROM sb.notifications
-                        WHERE created < to_timestamp(extract(epoch from now() - interval '${daysOfNotificationsToKeep} day'));`, pool, 'Running notifications cleanup')
+                        WHERE read IS NOT NULL AND created < to_timestamp(extract(epoch from now() - interval '${daysOfNotificationsToKeep} day'));`, pool, 'Running notifications cleanup')
                 }, 'cleanOldClientLogs')
             },
             sendSummaries: async () => {
@@ -122,10 +122,10 @@ const launchJobWorker = async (pool: Pool, version: string) => {
         schema: 'worker'
       })
     
-      // Immediately await (or otherwise handled) the resulting promise, to avoid
-      // "unhandled rejection" errors causing a process crash in the event of
-      // something going wrong.
-      await runner.promise
+    // Immediately await (or otherwise handled) the resulting promise, to avoid
+    // "unhandled rejection" errors causing a process crash in the event of
+    // something going wrong.
+    await runner.promise
 }
 
 const launchPushNotificationsSender = async (connectionString: string, config: Config, pool: Pool) => {

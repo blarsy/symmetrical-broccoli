@@ -4,6 +4,9 @@ ALTER TABLE IF EXISTS sb.accounts
 ALTER TABLE IF EXISTS sb.accounts
     ADD COLUMN amount_of_tokens integer NOT NULL DEFAULT 0;
 
+ALTER TABLE IF EXISTS sb.accounts
+    ADD COLUMN unlimited_until timestamp with time zone NULL;
+
 CREATE TABLE sb.token_transaction_types
 (
     id serial NOT NULL,
@@ -102,11 +105,12 @@ DECLARE amount_to_add integer = 0;
 DECLARE att_id integer;
 BEGIN
 	-- Check account is activated, and resource is not expired, not deleted, and least 1 day old
-	IF EXISTS (SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND activated IS NOT NULL) 
+	IF EXISTS (SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND activated IS NOT NULL 
+		AND (unlimited_until IS NULL OR unlimited_until < NOW())) 
 		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = resource_id AND account_id = sb.current_account_id() AND (
 			deleted IS NOT NULL OR (expiration IS NOT NULL AND expiration < NOW()) OR created < (NOW() + INTERVAL '1 day' )))
 	THEN
-		-- If there has not been any reward for creating it, grant it
+		-- If there has not been any reward for creating the resource, grant it
 		IF NOT EXISTS ( SELECT * 
 						FROM sb.resources_accounts_token_transactions ratt
 						INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 5
@@ -302,19 +306,19 @@ CREATE OR REPLACE FUNCTION sb.apply_resources_consumption(
 AS $BODY$
 DECLARE current_amount_of_tokens INTEGER;
 DECLARE amount_to_burn INTEGER = 0;
-DECLARE amount_to_add INTEGER = 0;
 DECLARE idx INTEGER = 0;
 DECLARE r RECORD;
 DECLARE new_paid_until TIMESTAMPTZ;
+DECLARE some_resource_suspended BOOLEAN = false;
 BEGIN
 	-- Make sure current_amount_of_tokens is not null when the account is active, and it has at
 	-- least 3 active resources
 	SELECT amount_of_tokens INTO current_amount_of_tokens
 	FROM sb.accounts
-	WHERE activated IS NOT NULL AND 
+	WHERE (unlimited_until IS NULL OR unlimited_until < NOW()) AND activated IS NOT NULL AND 
 		id = apply_resources_consumption.account_id AND
 		(
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM sb.resources res
 			WHERE res.account_id = apply_resources_consumption.account_id AND 
 				deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
@@ -330,22 +334,27 @@ BEGIN
 		LOOP
 			-- skip free resources
 			IF idx > 1 THEN
-				IF amount_to_burn = current_amount_of_tokens THEN
+				IF amount_to_burn = current_amount_of_tokens AND
+					(SELECT suspended FROM sb.resources WHERE id = r.id) IS NULL THEN
 					UPDATE sb.resources SET suspended = NOW()
 					WHERE id = r.id;
+					
+					some_resource_suspended = true;
 				ELSE
-					IF r.paid_until < (NOW() - INTERVAL '1 day') OR r.paid_until IS NULL THEN
-						new_paid_until = NOW() + INTERVAL '1 day';
-					ELSE
-						new_paid_until = r.paid_until + INTERVAL '1 day';
-					END IF;
+					IF(current_amount_of_tokens - amount_to_burn > 0) THEN
+						IF r.paid_until < (NOW() - INTERVAL '1 day') OR r.paid_until IS NULL THEN
+							new_paid_until = NOW() + INTERVAL '1 day';
+						ELSE
+							new_paid_until = r.paid_until + INTERVAL '1 day';
+						END IF;
 
-					UPDATE sb.resources SET paid_until = new_paid_until, suspended = NULL
-					WHERE id = r.id;
-					amount_to_burn = amount_to_burn + 1;
+						UPDATE sb.resources SET paid_until = new_paid_until, suspended = NULL
+						WHERE id = r.id;
+						amount_to_burn = amount_to_burn + 1;
+					END IF;
 				END IF;
 			ELSE
-				-- If the resource was suspended, make it available again
+				-- If the free resource was suspended, make it available again
 				UPDATE sb.resources SET suspended = NULL
 				WHERE id = r.id;
 			END IF;
@@ -365,6 +374,13 @@ BEGIN
 				'subject', apply_resources_consumption.account_id
 			)::text);
 		END IF;
+		
+		IF some_resource_suspended THEN
+			-- create notification
+			PERFORM sb.create_notification(apply_resources_consumption.account_id, json_build_object(
+				'info', 'SOME_RESOURCES_SUSPENDED'
+			));
+		END IF;
 
 	END IF;
 END;
@@ -381,7 +397,7 @@ DROP FUNCTION IF EXISTS sb.create_resource(character varying, character varying,
 CREATE OR REPLACE FUNCTION sb.create_resource(
 	title character varying,
 	description character varying,
-	expiration timestamp without time zone,
+	expiration timestamp with time zone,
 	subjective_value integer,
 	is_service boolean,
 	is_product boolean,
@@ -447,7 +463,7 @@ CREATE OR REPLACE FUNCTION sb.update_resource(
 	resource_id integer,
 	title character varying,
 	description character varying,
-	expiration timestamp without time zone,
+	expiration timestamp with time zone,
 	subjective_value integer,
 	is_service boolean,
 	is_product boolean,
@@ -525,9 +541,9 @@ BEGIN
 	INSERT INTO sb.resources_images (resource_id, image_id)
 	SELECT update_resource.resource_id, inserted_images.inserted_image_id FROM inserted_images;
 	
-	PERFORM sb.apply_resources_consumption(sb.current_account_id());
 	PERFORM sb.apply_resources_rewards(update_resource.resource_id);
-	
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+
 	RETURN 1;
 END;
 $BODY$;
@@ -550,6 +566,8 @@ begin
 	SET deleted = NOW()
 	WHERE r.id = delete_resource.resource_id;
 	
+	-- In case a free resource was deleted, run apply_resources_consumption,
+	-- which could un-suspend a suspended resource
 	PERFORM sb.apply_resources_consumption(sb.current_account_id());
 	
 	RETURN 1;
@@ -587,6 +605,7 @@ begin
 		WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
 				account_id = id_account_to_activate;
 		
+		PERFORM sb.apply_my_resources_rewards();
 		PERFORM sb.apply_resources_consumption(sb.current_account_id());
 		
 		-- Loop through active resources to send notifications
@@ -602,8 +621,6 @@ begin
 				'resource_id', res.id
 			)::text);
 		END LOOP;
-		
-		PERFORM sb.apply_my_resources_rewards();
 	ELSE
 		UPDATE sb.accounts SET email = new_email
 		WHERE id = id_account_to_activate;
@@ -628,15 +645,15 @@ CREATE OR REPLACE FUNCTION sb.apply_resources_token_transactions()
     COST 100
     VOLATILE SECURITY DEFINER PARALLEL UNSAFE
 AS $BODY$
-DECLARE r RECORD;
+DECLARE acc RECORD;
 BEGIN
-	FOR r IN
+	FOR acc IN
 		SELECT id FROM sb.accounts
 		WHERE email IS NOT NULL AND email <> '' AND
-			activated IS NOT NULL
+			activated IS NOT NULL AND (unlimited_until IS NULL OR unlimited_until < NOW())
 	LOOP
-		PERFORM sb.apply_resources_consumption(r.id);
-		PERFORM sb.apply_account_resources_rewards(r.id);
+		PERFORM sb.apply_account_resources_rewards(acc.id);
+		PERFORM sb.apply_resources_consumption(acc.id);
 	END LOOP;
 END;
 $BODY$;
@@ -649,6 +666,9 @@ ALTER TYPE sb.session_data
 	
 ALTER TYPE sb.session_data
     ADD ATTRIBUTE amount_of_tokens integer;
+	
+ALTER TYPE sb.session_data
+    ADD ATTRIBUTE unlimited_until timestamp with time zone;
 	
 ALTER TYPE sb.session_data
     RENAME ATTRIBUTE number_of_unread_notifications TO unread_notifications;
@@ -762,7 +782,7 @@ AS $BODY$
 		FROM sb.notifications n 
 		WHERE n.account_id = sb.current_account_id() AND n.read IS NULL
 	) as unread_notifications,
-	a.willing_to_contribute, a.amount_of_tokens
+	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until
 
 	FROM sb.accounts a
 	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
@@ -942,6 +962,54 @@ ALTER FUNCTION sb.get_tokens_history()
     OWNER TO sb;
 
 GRANT EXECUTE ON FUNCTION sb.get_tokens_history() TO identified_account;
+
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT *
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+
+DROP VIEW sb.active_accounts;
+
+ALTER TABLE sb.accounts
+    ALTER COLUMN recovery_code_expiration TYPE timestamp with time zone ;
+
+ALTER TABLE sb.accounts
+    ALTER COLUMN activated TYPE timestamp with time zone ;
+	
+ALTER TABLE sb.accounts_push_tokens
+    ALTER COLUMN created TYPE timestamp with time zone ;
+
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language,
+    accounts.log_level,
+    accounts.location_id,
+    accounts.can_be_showcased,
+    accounts.willing_to_contribute,
+    accounts.amount_of_tokens,
+    accounts.unlimited_until
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+ALTER TABLE sb.active_accounts
+    OWNER TO sb;
+
+GRANT SELECT ON TABLE sb.active_accounts TO anonymous;
+GRANT SELECT ON TABLE sb.active_accounts TO identified_account;
+GRANT ALL ON TABLE sb.active_accounts TO sb;
+
 
 DO
 $body$
