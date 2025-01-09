@@ -4,7 +4,8 @@ import { IconButton, Modal, Portal, Text, TextInput, useTheme } from "react-nati
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { language, t } from "@/i18n"
 import { adaptToWidth, regionFromLocation } from "@/lib/utils"
-import { GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from 'react-native-google-places-autocomplete'
+import 'react-native-get-random-values'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { lightPrimaryColor } from "../layout/constants"
 import { googleMapsApiKey } from "@/lib/settings"
 import Geocoder from 'react-native-geocoding'
