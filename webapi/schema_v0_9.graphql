@@ -1177,6 +1177,7 @@ type Account implements Node {
   canBeShowcased: Boolean!
   willingToContribute: Boolean!
   amountOfTokens: Int!
+  unlimitedUntil: Datetime
 
   """Reads a single `Image` that is related to this `Account`."""
   imageByAvatarImageId: Image
@@ -2197,6 +2198,8 @@ enum AccountsOrderBy {
   WILLING_TO_CONTRIBUTE_DESC
   AMOUNT_OF_TOKENS_ASC
   AMOUNT_OF_TOKENS_DESC
+  UNLIMITED_UNTIL_ASC
+  UNLIMITED_UNTIL_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2252,6 +2255,9 @@ input AccountCondition {
 
   """Checks for equality with the object’s `amountOfTokens` field."""
   amountOfTokens: Int
+
+  """Checks for equality with the object’s `unlimitedUntil` field."""
+  unlimitedUntil: Datetime
 }
 
 """A connection to a list of `Conversation` values."""
@@ -3584,6 +3590,9 @@ type ActiveAccount {
   logLevel: Int
   locationId: Int
   canBeShowcased: Boolean
+  willingToContribute: Boolean
+  amountOfTokens: Int
+  unlimitedUntil: Datetime
 }
 
 """A `ActiveAccount` edge in the connection."""
@@ -3626,6 +3635,12 @@ enum ActiveAccountsOrderBy {
   LOCATION_ID_DESC
   CAN_BE_SHOWCASED_ASC
   CAN_BE_SHOWCASED_DESC
+  WILLING_TO_CONTRIBUTE_ASC
+  WILLING_TO_CONTRIBUTE_DESC
+  AMOUNT_OF_TOKENS_ASC
+  AMOUNT_OF_TOKENS_DESC
+  UNLIMITED_UNTIL_ASC
+  UNLIMITED_UNTIL_DESC
 }
 
 """
@@ -3674,6 +3689,15 @@ input ActiveAccountCondition {
 
   """Checks for equality with the object’s `canBeShowcased` field."""
   canBeShowcased: Boolean
+
+  """Checks for equality with the object’s `willingToContribute` field."""
+  willingToContribute: Boolean
+
+  """Checks for equality with the object’s `amountOfTokens` field."""
+  amountOfTokens: Int
+
+  """Checks for equality with the object’s `unlimitedUntil` field."""
+  unlimitedUntil: Datetime
 }
 
 """A connection to a list of `EmailActivation` values."""
@@ -4177,6 +4201,7 @@ type SessionDatum {
   unreadNotifications: [Int]
   willingToContribute: Boolean
   amountOfTokens: Int
+  unlimitedUntil: Datetime
 }
 
 """

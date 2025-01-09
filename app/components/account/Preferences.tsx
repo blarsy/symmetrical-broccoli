@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext } from "react"
 import LoadedZone from "../LoadedZone"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
@@ -14,6 +14,7 @@ import { Text } from "react-native-paper"
 
 export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
     accountById(id: $id) {
+      id
       broadcastPrefsByAccountId {
         nodes {
           eventType
