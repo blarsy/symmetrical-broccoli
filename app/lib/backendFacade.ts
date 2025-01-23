@@ -69,6 +69,11 @@ export const GraphQlLib = {
                 integer
             }
         }`,
+        DELETE_RESOURCE: gql`mutation DeleteResource($resourceId: Int) {
+          deleteResource(input: {resourceId: $resourceId}) {
+            integer
+          }
+        }`,
         AUTHENTICATE: gql`mutation Authenticate($email: String, $password: String) {
             authenticate(input: {email: $email, password: $password}) {
                 jwtToken

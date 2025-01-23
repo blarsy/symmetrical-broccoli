@@ -1,5 +1,5 @@
 import { PgParsedNotification } from "pg-listen"
-import { Config, getCommonConfig, getConnectionString } from "../config"
+import { Config, getCommonConfig } from "../config"
 import { sendPushNotification } from "../pushNotifications"
 import logger from "../logger"
 import initTranslations from '../i18n'
@@ -60,7 +60,7 @@ export const handleResourceCreated = async (notification: PgParsedNotification, 
         const accountsToNotify = cmdResult.rows[0][Object.getOwnPropertyNames(cmdResult.rows[0])[0]]
 
         if(accountsToNotify.length > 0) {
-            //Create a resource suggestion for all such accounts
+            //Create a resource notification for all such accounts
             await runAndLog(`SELECT sb.create_new_resource_notifications($1, $2);`, pool, 
                 `Creating notifications for new resource ${JSON.stringify(notification.payload)}, accounts ${accountsToNotify}`,
                 [notification.payload.resource_id, accountsToNotify]

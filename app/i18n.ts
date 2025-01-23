@@ -180,8 +180,8 @@ const resources = {
       "editResourceButton": "Edit",
       "wantToEditYourResourceQuestion": "This is one of your resources, you may edit it from here.",
       "welcomeNotificationHeadline": "Welcome !",
-      "completeProcessNotificationHeadline": "Create a profile that stands out",
-      "completeProcessNotificationDetails": "Add a logo or a picture, your address, links to your contents on the web, ...",
+      "completeProcessNotificationDetails": "Create a profile that stands out",
+      "completeProcessNotificationHeadline": "Add a logo or a picture, your address, links to your contents on the web, ...",
       "updateAccountSuccessful": "Account updated sucessfully",
       "lessInfo": "Less info",
       "moreInfo": "More info ...",
@@ -226,7 +226,11 @@ const resources = {
       "mustBeAValidNumber": "Must be a valid number",
       "resourcesSuspendedNotificationHeadline": "Some resources suspended",
       "checkTokensNotificationHeadline": "In order to reactivate them, check if you can add some Topes to your account.",
-      "checkTokensNotificationDetails": "Check resource list"
+      "checkTokensNotificationDetails": "Check resource list",
+      "lowAmountOfTokenNotificationHeadline": "You are running low on Topes",
+      "lowAmountOfTokenNotificationHeadline2": "Avoid the suspension of your resources by making sure you have enough Topes for them.",
+      "lowAmountOfTokenNotificationDetails": "See how to grab some Topes"
+      
     }
   },
   fr: {
@@ -401,8 +405,8 @@ const resources = {
       "editResourceButton": "Editer",
       "wantToEditYourResourceQuestion": "Ceci est une de vos ressources. Vous pouvez la changer d'ici.",
       "welcomeNotificationHeadline": "Bienvenue !",
-      "completeProcessNotificationHeadline": "Crée un profil qui envoie du lourd",
-      "completeProcessNotificationDetails": "Ajoute ton logo ou ta photo, ton adresse (ou celle de ton activité), des liens vers tes contenus web, ...",
+      "completeProcessNotificationDetails": "Crée un profil qui envoie du lourd",
+      "completeProcessNotificationHeadline": "Ajoute ton logo ou ta photo, ton adresse (ou celle de ton activité), des liens vers tes contenus web, ...",
       "updateAccountSuccessful": "Compte mis à jour avec succès",
       "lessInfo": "Moins d'info",
       "moreInfo": "Plus d'info ...",
@@ -447,7 +451,10 @@ const resources = {
       "mustBeAValidNumber": "Doit être un nombre valide",
       "resourcesSuspendedNotificationHeadline": "Des resources suspendues",
       "checkTokensNotificationHeadline": "Voyez si vous pouvez ajouter des Topes à votre compte pour les réactiver.",
-      "checkTokensNotificationDetails": "Voir la liste de ressources"
+      "checkTokensNotificationDetails": "Voir la liste de ressources",
+      "lowAmountOfTokenNotificationHeadline": "Votre réserve de Topes est basse",
+      "lowAmountOfTokenNotificationHeadline2": "Assurez-vous d'avoir assez de Topes pour éviter la suspension de certaines de vos ressources.",
+      "lowAmountOfTokenNotificationDetails": "Voir comment en gagner"
     }
   }
 }

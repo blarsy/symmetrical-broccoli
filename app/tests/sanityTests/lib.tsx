@@ -74,6 +74,8 @@ export const executeQuery = async (query: string, parameters?: any[]): Promise<Q
     } catch(e) {
         console.error(`Error while executing ${query} with params ${parameters}`, e)
         throw(e)
+    } finally {
+        client.end()
     }
 }
 
@@ -98,8 +100,6 @@ export const waitForThenPress = async (testId: string, screen: RenderResult) => 
     const uv = userEvent.setup()
     uv.press(screen.getByTestId(testId))
 }
-
-export const daysFromNow = (days: number) => new Date(new Date().valueOf() + days * 24 * 60 * 60 * 1000)
 
 export const createResourceThroughUI = async (title: string, description: string, expiration: Date, targetScreen: RenderResult, checkSuccess: Boolean = true) => {
     await waitFor(() => expect(targetScreen.getByTestId('categories:Button')).toBeOnTheScreen(), { timeout: 5000 })

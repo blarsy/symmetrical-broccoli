@@ -250,3 +250,5 @@ export const regionFromLocation = (loc : Location) => ({
   longitude: loc.longitude,
   latitude: loc.latitude
 })
+
+export const daysFromNow = (days: number) => new Date(new Date().valueOf() + days * 24 * 60 * 60 * 1000)

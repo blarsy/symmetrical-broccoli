@@ -28,7 +28,7 @@ interface NotificationPage {
     data: NotificationData[]
 }
 
-const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: Cursor) {
+export const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: Cursor) {
     myNotifications(first: $first, after: $after) {
       edges {
         node {
@@ -45,7 +45,7 @@ const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: Cursor)
     }
   }`
 
-const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
+export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
     getResources(resourceIds: $resourceIds) {
       nodes {
         id
@@ -191,6 +191,27 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                         navigation.navigate('resource', {
                             screen: 'resources'
                         })
+                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                            if (notif.id === rawNotification.node.id) {
+                                return { ...notif, ...{ read: true } }
+                            }
+                            return notif
+                        }) } } }))
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                    }
+                })
+            } else if (rawNotification.node.data.info === 'WARNING_LOW_TOKEN_AMOUNT') {
+                otherNotifs.push({
+                    id: rawNotification.node.id,
+                    created: rawNotification.node.created, 
+                    headline1: t('lowAmountOfTokenNotificationHeadline'),
+                    headline2: t('lowAmountOfTokenNotificationHeadline2'),
+                    read: rawNotification.node.read,
+                    text: t('lowAmountOfTokenNotificationDetails'),
+                    image: undefined,
+                    onPress: async () => {
+                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                        navigation.navigate('profile')
                         setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
                             if (notif.id === rawNotification.node.id) {
                                 return { ...notif, ...{ read: true } }

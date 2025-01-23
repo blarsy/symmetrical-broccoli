@@ -1,34 +1,31 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { createAndLogIn, createResource, deleteAccount, getTestNum } from "./datastoreSetupLib"
+import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
 import { AppWithSingleScreen } from "./lib"
 import React from "react"
 import '@testing-library/react-native/extend-expect'
 import { checkAccountWillingToContribute } from "./datastoreCheck"
 import Resources from "@/components/mainViews/Resources"
 
-const testNum = getTestNum()
-const email = `me${testNum}@me.com`, password= 'Password1!', name = `me${testNum}`
-const resName = `${name}-res`
-let res1Id: number
-let token: string
+let account: TestAccount, res1Id: number
 
 beforeEach(async () => {
-    token = await createAndLogIn(email, name, password, true)
+    [account] = await makeTestAccounts([{ confirm: true }])
 
+    const resName = `${account.info.name}-res`
     await Promise.all([
-        (async() => res1Id = await createResource(token, resName, 'description', true, false, true, true, true, false, new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30), [1]))(),
-        createResource(token, resName + '2', 'description2', true, false, true, true, true, false, new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30), [2]),
+        (async() => res1Id = await createResource(account.data.token, resName, 'description', true, false, true, true, true, false, new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30), [1]))(),
+        createResource(account.data.token, resName + '2', 'description2', true, false, true, true, true, false, new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30), [2]),
     ])
 })
 
 afterAll(async () => {
-    await deleteAccount(email, password)
+    await cleanupTestAccounts([account])
 })
 
 test(`become contributor when creating one's 3rd resource`, async () => {
     render(<AppWithSingleScreen component={Resources} name="resources" 
         overrideSecureStore={{ get: async () => {
-            return token
+            return account.data.token
         }, set: async () => {}, remove: async () => {} }} />)
 
     await waitFor(() => expect(screen.getByTestId(`resourceList:ResourceCard:${res1Id}:EditButton`)).toBeOnTheScreen(), { timeout: 3000 })
@@ -42,7 +39,7 @@ test(`become contributor when creating one's 3rd resource`, async () => {
     await waitFor(() => expect(screen.getByTestId(`BackButton`)).toBeOnTheScreen(), { timeout: 4000 })
 
     //Check account updated
-    expect(checkAccountWillingToContribute(email)).toBeTruthy()
+    expect(checkAccountWillingToContribute(account.info.email)).toBeTruthy()
     
     //Check UI adapts to contribution mode
     fireEvent.press(screen.getByTestId('BackButton'))

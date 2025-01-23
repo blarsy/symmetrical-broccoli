@@ -23,7 +23,6 @@ export const getApolloClient = (token: string) => {
     if(typeof WebSocket  === 'undefined') {
       // This is required to run Jest tests under NodeJs
       const ws = require('ws')
-      //console.debug('ws', ws)
       webSocketImpl = ws
     }
     if(typeof fetch === 'undefined') {

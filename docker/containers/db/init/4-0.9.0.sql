@@ -6,6 +6,26 @@ ALTER TABLE IF EXISTS sb.accounts
 
 ALTER TABLE IF EXISTS sb.accounts
     ADD COLUMN unlimited_until timestamp with time zone NULL;
+	
+ALTER TABLE IF EXISTS sb.accounts
+    ADD COLUMN last_suspension_warning timestamp with time zone;
+
+ALTER TABLE IF EXISTS sb.system
+    ADD COLUMN amount_hours_to_warn_before_suspension integer;
+
+ALTER TABLE IF EXISTS sb.system
+    ADD COLUMN amount_free_resources integer;
+	
+UPDATE sb.system SET amount_hours_to_warn_before_suspension = 48, amount_free_resources = 2;
+
+ALTER TABLE IF EXISTS sb.system
+    ALTER COLUMN minimum_client_version SET NOT NULL;
+
+ALTER TABLE IF EXISTS sb.system
+    ALTER COLUMN amount_hours_to_warn_before_suspension SET NOT NULL;
+
+ALTER TABLE IF EXISTS sb.system
+    ALTER COLUMN amount_free_resources SET NOT NULL;
 
 CREATE TABLE sb.token_transaction_types
 (
@@ -103,12 +123,15 @@ CREATE OR REPLACE FUNCTION sb.apply_resources_rewards(
 AS $BODY$
 DECLARE amount_to_add integer = 0;
 DECLARE att_id integer;
+DECLARE resource_account_id integer;
 BEGIN
+	SELECT account_id FROM sb.resources WHERE id = apply_resources_rewards.resource_id INTO resource_account_id;
+	
 	-- Check account is activated, and resource is not expired, not deleted, and least 1 day old
-	IF EXISTS (SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND activated IS NOT NULL 
+	IF EXISTS (SELECT * FROM sb.accounts WHERE id = resource_account_id AND activated IS NOT NULL 
 		AND (unlimited_until IS NULL OR unlimited_until < NOW())) 
-		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = resource_id AND account_id = sb.current_account_id() AND (
-			deleted IS NOT NULL OR (expiration IS NOT NULL AND expiration < NOW()) OR created < (NOW() + INTERVAL '1 day' )))
+		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = apply_resources_rewards.resource_id AND (
+			deleted IS NOT NULL OR (expiration IS NOT NULL AND expiration < NOW()) OR created > (NOW() - INTERVAL '1 day')))
 	THEN
 		-- If there has not been any reward for creating the resource, grant it
 		IF NOT EXISTS ( SELECT * 
@@ -118,7 +141,7 @@ BEGIN
 			amount_to_add = amount_to_add + 20;
 			
 			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-			VALUES (sb.current_account_id(), 5, 20)
+			VALUES (resource_account_id, 5, 20)
 			RETURNING id INTO att_id;
 			
 			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
@@ -126,7 +149,7 @@ BEGIN
 		END IF;
 		
 		-- If a resource image has been added, give the reward
-		IF (SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = apply_resources_rewards.resource_id) > 0 
+		IF (SELECT COUNT(*) FROM sb.resources_images ri WHERE ri.resource_id = apply_resources_rewards.resource_id) > 0 
 			AND NOT EXISTS (SELECT * 
 							FROM sb.resources_accounts_token_transactions ratt
 							INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 4
@@ -134,7 +157,7 @@ BEGIN
 			amount_to_add = amount_to_add + 5;
 			
 			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-			VALUES (sb.current_account_id(), 4, 5)
+			VALUES (resource_account_id, 4, 5)
 			RETURNING id INTO att_id;
 			
 			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
@@ -143,7 +166,7 @@ BEGIN
 		
 		IF amount_to_add > 0 THEN
 			UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + amount_to_add
-			WHERE id = sb.current_account_id();
+			WHERE id = resource_account_id;
 		END IF;
 	END IF;
 END;
@@ -310,19 +333,25 @@ DECLARE idx INTEGER = 0;
 DECLARE r RECORD;
 DECLARE new_paid_until TIMESTAMPTZ;
 DECLARE some_resource_suspended BOOLEAN = false;
+DECLARE free_resources INTEGER;
+DECLARE number_of_resources INTEGER;
+DECLARE hours_before_warning INTEGER;
 BEGIN
+	SELECT amount_free_resources, amount_hours_to_warn_before_suspension 
+	FROM sb.system INTO free_resources, hours_before_warning;
+
+	SELECT COUNT(*)
+	FROM sb.resources res
+	WHERE res.account_id = apply_resources_consumption.account_id AND 
+		deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
+	INTO number_of_resources;
 	-- Make sure current_amount_of_tokens is not null when the account is active, and it has at
 	-- least 3 active resources
 	SELECT amount_of_tokens INTO current_amount_of_tokens
 	FROM sb.accounts
 	WHERE (unlimited_until IS NULL OR unlimited_until < NOW()) AND activated IS NOT NULL AND 
 		id = apply_resources_consumption.account_id AND
-		(
-			SELECT COUNT(*)
-			FROM sb.resources res
-			WHERE res.account_id = apply_resources_consumption.account_id AND 
-				deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
-		) > 2;
+		number_of_resources > free_resources;
 
 	IF current_amount_of_tokens IS NOT NULL THEN
 		FOR r IN
@@ -333,7 +362,7 @@ BEGIN
 			ORDER BY created ASC
 		LOOP
 			-- skip free resources
-			IF idx > 1 THEN
+			IF idx > (free_resources - 1) THEN
 				IF amount_to_burn = current_amount_of_tokens AND
 					(SELECT suspended FROM sb.resources WHERE id = r.id) IS NULL THEN
 					UPDATE sb.resources SET suspended = NOW()
@@ -362,6 +391,18 @@ BEGIN
 			idx = idx + 1;
 		END LOOP;
 		
+		--Warn if the account is at risk of running out of tokens within the configured amount of hours
+		IF NOT some_resource_suspended AND number_of_resources > free_resources AND EXISTS (
+			SELECT * FROM sb.accounts 
+			WHERE id = apply_resources_consumption.account_id 
+				AND (last_suspension_warning IS NULL OR last_suspension_warning < (NOW() - hours_before_warning * INTERVAL '1 hour'))
+		) AND ((number_of_resources - free_resources) * (hours_before_warning / 24)) > number_of_resources THEN
+			PERFORM sb.create_notification(apply_resources_consumption.account_id, json_build_object(
+				'info', 'WARNING_LOW_TOKEN_AMOUNT'
+			));
+			UPDATE sb.accounts SET last_suspension_warning = NOW() WHERE id = apply_resources_consumption.account_id;
+		END IF;
+		
 		IF amount_to_burn > 0 THEN
 			UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens - amount_to_burn
 			WHERE id = apply_resources_consumption.account_id;
@@ -376,7 +417,6 @@ BEGIN
 		END IF;
 		
 		IF some_resource_suspended THEN
-			-- create notification
 			PERFORM sb.create_notification(apply_resources_consumption.account_id, json_build_object(
 				'info', 'SOME_RESOURCES_SUSPENDED'
 			));

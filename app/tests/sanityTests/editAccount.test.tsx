@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { createAndLogIn, deleteAccount, getTestNum, simulateActivation } from "./datastoreSetupLib"
-import React, { createContext, useContext } from "react"
+import { cleanupTestAccounts, makeTestAccounts, simulateActivation, TestAccount } from "./datastoreSetupLib"
+import React, { useContext } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import { checkActivationEmailSent, checkAccountData, checkLinksOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
@@ -11,29 +11,25 @@ import PublicInfo from "@/components/account/PublicInfo"
 jest.useFakeTimers()
 jest.mock('react-native-paper-dates')
 
-const testNum = getTestNum()
-const email = `me${testNum}@me.com`, password= 'Password1!'
-const name = `me${testNum}`
-let token: string
-
-afterEach(async () => {
-    await deleteAccount(email, password)
+let account: TestAccount
+beforeEach(async () => {
+    [account] = await makeTestAccounts([{ confirm: true, contributor: true }])
 })
 
-beforeEach(async () => {
-    token = await createAndLogIn(email, name, password)
+afterEach(async () => {
+    await cleanupTestAccounts([account])
 })
 
 test('edit account data', async () => {
-    const newName = `me${testNum} modified`
+    const newName = `${account.info.name} m`
     render(
         <AppContextProvider>
-            <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }}>
+            <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
                 <EditProfile />
             </Start>
         </AppContextProvider>)
 
-    await waitFor(() => expect(screen.getByTestId('name')).toHaveProp('value', name))
+    await waitFor(() => expect(screen.getByTestId('name')).toHaveProp('value', account.info.name))
         
     fireEvent.changeText(screen.getByTestId('name'), newName)
     fireEvent.press(screen.getByTestId('save'))
@@ -41,18 +37,18 @@ test('edit account data', async () => {
     await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
     expect(screen.getByTestId('emailChangingBanner')).not.toBeVisible()
 
-    await checkAccountData (email, newName)
+    await checkAccountData (account.info.email, newName)
 })
 
 test('edit account data: email', async () => {
-    const newEmail = `new${email}`
+    const newEmail = `new${account.info.email}`
     render(<AppContextProvider>
-        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }}>
+        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
             <EditProfile />
         </Start>
     </AppContextProvider>)
 
-    await waitFor(() => expect(screen.getByTestId('email')).toHaveProp('value', email))
+    await waitFor(() => expect(screen.getByTestId('email')).toHaveProp('value', account.info.email))
         
     fireEvent.changeText(screen.getByTestId('email'), newEmail)
     fireEvent.press(screen.getByTestId('save'))
@@ -60,12 +56,12 @@ test('edit account data: email', async () => {
     await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
     await waitFor(() => expect(screen.getByTestId('emailChangingBanner')).toBeVisible())
 
-    await checkAccountData (email, name)
+    await checkAccountData (account.info.email, account.info.name)
     const activationCode = await checkActivationEmailSent(newEmail)
 
     simulateActivation(activationCode)
     
-    await checkAccountData(newEmail, name)
+    await checkAccountData(newEmail, account.info.name)
 })
 
 const addLink = async (label: string, url: string, type: number) => {
@@ -111,7 +107,7 @@ test('edit account data: links', async () => {
         typeLink1= 2, typeLink2= 3, typeLink3 = 1, typeLink1Bis = 4
 
     render(<AppContextProvider>
-        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => token, set: async () => {}, remove: async () => {} }}>
+        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
             <Dut />
         </Start>
     </AppContextProvider>)
@@ -124,7 +120,7 @@ test('edit account data: links', async () => {
     await modifyLink(labelLink1Bis, urlLink1Bis, typeLink1Bis, 0)
     await deleteLink(2, 3)
 
-    await checkLinksOnAccount(email, [
+    await checkLinksOnAccount(account.info.email, [
         { label: labelLink1Bis, url: urlLink1Bis, type: typeLink1Bis }, 
         { label: labelLink2, url: urlLink2, type: typeLink2 }])
 })

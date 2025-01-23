@@ -65,12 +65,6 @@ export const RESOURCES = gql`query MyResources {
   }
 }`
 
-export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
-  deleteResource(input: {resourceId: $resourceId}) {
-    integer
-  }
-}`
-
 export const SEND_AGAIN = gql`mutation SendAgain {
   sendActivationAgain(input: {}) {
       integer
@@ -94,7 +88,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const [deleteResource] = useMutation(DELETE_RESOURCE)
+    const [deleteResource] = useMutation(GraphQlLib.mutations.DELETE_RESOURCE)
     const [sendAgain] = useMutation(SEND_AGAIN)
     const [hideBanner, setHideBanner] = useState(false)
     const { reloadAccount } = useUserConnectionFunctions()

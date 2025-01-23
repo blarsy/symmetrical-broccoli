@@ -65,7 +65,6 @@ export enum AppReducerActionType {
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
-    //console.debug('AppContext dispatch', 'previousState', previousState, 'action', action)
     switch(action.type) {
         case AppReducerActionType.SetAuthToken:
           return {...previousState, ...{ token: action.payload }}

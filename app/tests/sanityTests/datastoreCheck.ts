@@ -103,11 +103,21 @@ export const checkHasNotifications = async (email: string, uniquePropNames: stri
     
     expect(notifs.rowCount).toEqual(uniquePropNames.length)
 
+    const alreadyReturned: number[] = []
     return uniquePropNames.map(name => {
-        const notif = notifs.rows.find(row => !!row.data[name])
+        const notif = notifs.rows.find(row => !!row.data[name] && !alreadyReturned.includes(row.id))
         if(!notif) throw new Error(`Could not find notification by data prop name '${name}' in ${notifs.rows}`)
+        alreadyReturned.push(notif.id)
         return { notifId: notif.id, uniquePropName: name, uniquePropValue: notif.data[name] }
     })
+}
+
+export const checkHasNoNotification = async (email: string) => {
+    const notifs = await executeQuery(`select n.id from sb.notifications n
+        inner join sb.accounts a on a.id = n.account_id
+        where a.email = lower($1)`, [email])
+    
+    expect(notifs.rowCount).toEqual(0)
 }
 
 export const checkLastNotificationExists = async (email: string): Promise<any> => {
@@ -119,4 +129,11 @@ export const checkLastNotificationExists = async (email: string): Promise<any> =
     expect(notif.rowCount).toBeGreaterThan(0)
 
     return notif.rows[0]
+}
+
+export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {
+    const result = await executeQuery(`select amount_of_tokens from sb.accounts
+        where email = lower($1)`, [email])
+    
+    expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
 }

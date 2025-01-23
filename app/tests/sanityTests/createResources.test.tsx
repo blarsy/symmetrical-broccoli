@@ -3,7 +3,7 @@ import { render, waitFor, screen } from "@testing-library/react-native"
 import { checkHasNotifications, checkResourcePresent } from "./datastoreCheck"
 import { AppWithSingleScreen, createResourceThroughUI } from "./lib"
 import React from "react"
-import { createAndLogIn, deleteAccount, getTestNum } from "./datastoreSetupLib"
+import { cleanupTestAccounts, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
 import Notifications from "@/components/notifications/Notifications"
 import { t } from "@/i18n"
 import '@testing-library/react-native/extend-expect'
@@ -14,35 +14,17 @@ import 'dayjs/locale/fr'
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-let accountsInTest: {
-    email: string, name: string, password: string, token?: string, confirm?: boolean
-}[] = []
+let accounts: TestAccount[]
 
-afterEach(async () => {
-    return Promise.all(
-        accountsInTest.map(account => deleteAccount(account.email, account.password)))
+afterEach( async () => {
+    await cleanupTestAccounts(accounts)
 })
 
-const createAccounts = async () => {
-    accountsInTest = await Promise.all(accountsInTest.map(async account => {
-        const token = await createAndLogIn(account.email, account.name, account.password, account.confirm)
-        account.token = token
-        return account
-    }))
-    
-}
-
 test('Create resource with unconfirmed account', async () => {
-    const testNum = getTestNum()
-
-    accountsInTest = [
-        { email: `me${testNum}@me.com`, name: `me${testNum}`, password: 'Password1!' },
-        { email: `me${testNum}-2@me.com`, name: `me${testNum}-2`, password: 'Password1!' },
-    ]
-    await createAccounts()
+    accounts = await makeTestAccounts([{}, {}])
 
     render(<AppWithSingleScreen component={EditResource} name="editResource" 
-        overrideSecureStore={{ get: async () => accountsInTest[0].token!, set: async () => {}, remove: async () => {} }} />)
+        overrideSecureStore={{ get: async () => accounts[0].data.token, set: async () => {}, remove: async () => {} }} />)
 
     const someDate = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24)
     const title = 'A title for this resource'
@@ -50,21 +32,21 @@ test('Create resource with unconfirmed account', async () => {
 
     await createResourceThroughUI(title, description, someDate, screen)
 
-    await checkResourcePresent(accountsInTest[0].email, title, description, false, true, false, false, true, false, someDate, [2, 11])
+    await checkResourcePresent(accounts[0].info.email, title, description, false, true, false, false, true, false, someDate, [2, 11])
     
-    const notifs = await checkHasNotifications(accountsInTest[1].email, ['info'])
+    const notifs = await checkHasNotifications(accounts[1].info.email, ['info'])
     const notif = notifs[0]
     
     const notifScreen = render(<AppWithSingleScreen component={Notifications} name="notifications" 
-        overrideSecureStore={{ get: async () => accountsInTest[1].token!, set: async () => {}, remove: async () => {} }} />)
+        overrideSecureStore={{ get: async () => accounts[1].data.token, set: async () => {}, remove: async () => {} }} />)
 
     await waitFor(() => expect(notifScreen.getByTestId(`notifications:${notif.notifId}:Text`)).toBeOnTheScreen())
     expect(notifScreen.getByTestId(`notifications:${notif.notifId}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
     
     const notifOtherAccountScreen = render(<AppWithSingleScreen component={Notifications} name="notifications" 
-        overrideSecureStore={{ get: async () => accountsInTest[0].token!, set: async () => {}, remove: async () => {} }} />)
+        overrideSecureStore={{ get: async () => accounts[0].data.token, set: async () => {}, remove: async () => {} }} />)
 
-    const notifsOtherAccount = await checkHasNotifications(accountsInTest[0].email, ['info'])
+    const notifsOtherAccount = await checkHasNotifications(accounts[0].info.email, ['info'])
     const notifOtherAccount = notifsOtherAccount[0]
     
     await waitFor(() => expect(notifOtherAccountScreen.getByTestId(`notifications:${notifOtherAccount.notifId}:Text`)).toBeOnTheScreen())
@@ -72,16 +54,10 @@ test('Create resource with unconfirmed account', async () => {
 })
 
 test('Create resource with notification', async () => {
-    const testNum = getTestNum()
-
-    accountsInTest = [
-        { email: `me${testNum}@me.com`, name: `me${testNum}`, password: 'Password1!', confirm: true },
-        { email: `me${testNum}-2@me.com`, name: `me${testNum}-2`, password: 'Password1!' },
-    ]
-    await createAccounts()
+    accounts = await makeTestAccounts([{ confirm: true }, {}])
 
     render(<AppWithSingleScreen component={EditResource} name="editResource" 
-        overrideSecureStore={{ get: async () => accountsInTest[0].token!, set: async () => {}, remove: async () => {} }} />)
+        overrideSecureStore={{ get: async () => accounts[0].data.token, set: async () => {}, remove: async () => {} }} />)
 
     const someDate = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24)
     const title = 'A title for this resource'
@@ -89,12 +65,12 @@ test('Create resource with notification', async () => {
 
     await createResourceThroughUI(title, description, someDate, screen)
 
-    await checkResourcePresent(accountsInTest[0].email, title, description, false, true, false, false, true, false, someDate, [2, 11])
+    await checkResourcePresent(accounts[0].info.email, title, description, false, true, false, false, true, false, someDate, [2, 11])
 
-    const notifs = await checkHasNotifications(accountsInTest[1].email, ['info', 'resource_id'])
+    const notifs = await checkHasNotifications(accounts[1].info.email, ['info', 'resource_id'])
 
     render(<AppWithSingleScreen component={Notifications} name="notifications" 
-        overrideSecureStore={{ get: async () => accountsInTest[1].token!, set: async () => {}, remove: async () => {} }} />)
+        overrideSecureStore={{ get: async () => accounts[1].data.token, set: async () => {}, remove: async () => {} }} />)
 
     await waitFor(() => expect(screen.getByTestId(`notifications:${notifs[0].notifId}:Text`)).toBeOnTheScreen())
 
