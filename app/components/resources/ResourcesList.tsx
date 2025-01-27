@@ -150,7 +150,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
                 borderColor: 'yellow', borderWidth: 0
               }}
-              displayItem={(resource, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`}
+              displayItem={(resource: any, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`}
                 key={idx} resource={resource}
                 viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
                 editRequested={() => {

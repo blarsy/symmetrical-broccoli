@@ -131,3 +131,74 @@ export const gestureHandlerDecorator = (Story: React.ElementType) =>
     <GestureHandlerRootView style={{ flex: 1 }}>
         <Story />
     </GestureHandlerRootView>
+
+const threeImages = [        
+    { 
+      imageByImageId: {
+        publicId: 'cwhkuoqezdqyrot6hoez'
+      }
+    },
+    { 
+      imageByImageId: {
+        publicId: 'pwb8arnohwpjahnebyxj'
+      }
+    },
+    { 
+      imageByImageId: {
+        publicId: 'occysgyx6m8kk5y51myu'
+      }
+    }
+  ]
+  
+const oneImage = [
+    { 
+      imageByImageId: {
+        publicId: 'cwhkuoqezdqyrot6hoez'
+      }
+    }
+]
+
+export const singleResource = (id?: number, isDeleted: boolean = false, threeImage: boolean = true, 
+    hasAddress: boolean = false, title: string = 'Une super ressource', 
+    accountName: string = 'Artisan incroyable') => {
+    return {
+        canBeDelivered: true,
+        canBeExchanged: true,
+        canBeGifted: true,
+        canBeTakenAway: true,
+        description: 'description de la ressource',
+        id: id || 1,
+        isProduct: true,
+        isService: true,
+        expiration: new Date(2025,1,1),
+        title,
+        created: new Date(2022, 1, 1),
+        deleted: isDeleted ? new Date() : null,
+        suspended: null,
+        subjectiveValue: null,
+        paidUntil: null,
+        accountByAccountId: {
+            email: 'me@me.com',
+            id: 12,
+            name: accountName,
+            imageByAvatarImageId: { publicId: 'sboopci7bbre34jezxu8' }
+        },
+        resourcesImagesByResourceId: {
+            nodes: threeImage ? threeImages : oneImage
+        },
+        resourcesResourceCategoriesByResourceId: {
+            nodes: [{
+                resourceCategoryCode: 2
+            },
+            {
+                resourceCategoryCode: 4
+            }]
+        },
+        locationBySpecificLocationId: hasAddress ? {
+            address: 'Rue de la resource, 123',
+            latitude: 50,
+            longitude: 3,
+            id: 1
+        }: null
+    }
+}

@@ -24,6 +24,7 @@ export const Simple: Story = {
       variables: { id: 1 },
       result: {
         accountById: {
+          id: 1,
           accountsLinksByAccountId: {
             nodes: [{
               label: 'label',

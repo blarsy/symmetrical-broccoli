@@ -27,7 +27,6 @@ const config: StorybookConfig = {
   webpackFinal: async (config) => {
     config.module = config.module || {};
     config.module.rules = config.module.rules || [];
-    console.log('config.module', JSON.stringify(config.module))
   
     config.module.rules
       .filter(rule => rule && rule['test'] && rule['test'].test('.svg'))

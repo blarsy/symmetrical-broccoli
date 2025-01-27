@@ -51,7 +51,7 @@ function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, 
         </>}
         {/* Give some height to the element hosting snackbar, because otherwise it will not have any, as it a div with absolute position */}
         { error && <View style={{ height: 60 }}>
-            <ErrorSnackbar testID="ListLoadError" message={error.message} onDismissError={() => {}} />
+            <ErrorSnackbar testID="ListLoadError" message={error.message} error={error} onDismissError={() => {}} />
         </View> }
     </ScrollView>
 }

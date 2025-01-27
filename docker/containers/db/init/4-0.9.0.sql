@@ -818,9 +818,9 @@ AS $BODY$
 		WHERE p.account_id = sb.current_account_id()
 	) as unread_conversations,
 	ARRAY(
-		SELECT n.id
-		FROM sb.notifications n 
-		WHERE n.account_id = sb.current_account_id() AND n.read IS NULL
+		SELECT id
+		FROM sb.my_notifications()
+		WHERE read IS NULL
 	) as unread_notifications,
 	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until
 
@@ -1050,6 +1050,31 @@ GRANT SELECT ON TABLE sb.active_accounts TO anonymous;
 GRANT SELECT ON TABLE sb.active_accounts TO identified_account;
 GRANT ALL ON TABLE sb.active_accounts TO sb;
 
+CREATE OR REPLACE FUNCTION sb.my_notifications()
+    RETURNS SETOF notifications 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT n.*
+	FROM sb.notifications n
+	LEFT JOIN sb.resources r ON r.id = (data ->>'resource_id')::INTEGER
+	WHERE n.account_id = sb.current_account_id() AND
+	-- filter out 'new resource' notifications of deleted resources
+	((data ->>'resource_id') IS NULL OR r.deleted IS NULL)
+	ORDER BY created DESC;
+$BODY$;
+
+ALTER FUNCTION sb.my_notifications()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.my_notifications() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.my_notifications() TO sb;
+
+REVOKE ALL ON FUNCTION sb.my_notifications() FROM PUBLIC;
 
 DO
 $body$

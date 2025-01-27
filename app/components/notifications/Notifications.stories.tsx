@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import Notifications, { GET_NOTIFICATIONS, GET_RESOURCES } from './Notifications'
 import React  from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator, singleResource } from '@/lib/storiesUtil'
 import { daysFromNow } from '@/lib/utils'
 
 const meta: Meta<typeof Notifications> = {
@@ -56,35 +56,7 @@ const meta: Meta<typeof Notifications> = {
     } },
     { query: GET_RESOURCES, variables: { resourceIds: [123, 321]}, result: {
         getResources: {
-            nodes: [{
-                id: 123,
-                title: 'res-1',
-                resourcesImagesByResourceId: {
-                    nodes: [{
-                        imageByImageId: {
-                            publicId: 'w2nelofqkkbr5w2cedcc'
-                        }
-                    }]
-                },
-                created: daysFromNow(-0.1),
-                accountByAccountId: {
-                    name: 'account-res-1'
-                }
-            }, {
-                id: 321,
-                title: 'res-2',
-                resourcesImagesByResourceId: {
-                    nodes: [{
-                        imageByImageId: {
-                            publicId: 'xyunbxpd8rq08g9a8sim'
-                        }
-                    }]
-                },
-                created: daysFromNow(-0.2),
-                accountByAccountId: {
-                    name: 'account-res-2'
-                }
-            }]
+            nodes: [ singleResource(123), singleResource(321)]
         }
     } }
   ])]
@@ -95,6 +67,6 @@ type Story = StoryObj<typeof Notifications>
 
 export const Default: Story = {
   args: {
-    
+
   }
 }

@@ -36,7 +36,7 @@ export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginT
     </props.Component>
 </View>
 
-export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff"
+export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor={lightPrimaryColor}
     {...props} style={mergeWith({ borderRadius: 15 } , props.style )}/>
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}

@@ -20,6 +20,7 @@ import { ResourceImage } from "../resources/MainResourceImage"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewAccount from "./ViewAccount"
 import ViewResource from "../resources/ViewResource"
+import ResourceImageWithCreator from "../ResourceImageWithAuthor"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -37,12 +38,8 @@ export const ChatHeader = (p: ChatHeaderProps) => {
             backgroundColor: lightPrimaryColor, maxWidth: Dimensions.get('window').width, paddingVertical: 5 }} loadIndicatorColor={primaryColor}>
             { conversationContext.conversationState.data?.resource && <>
                 <BareIconButton testID="backToConversationList" Image="chevron-left" size={40} onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
-                <View style={{ position: 'relative', width: 60, height: 60 }}>
-                    <ResourceImage size={ 50 } resource={conversationContext.conversationState.data!.resource} />
-                    <AccountAvatar style={{ position: 'absolute', top: -30, left: 20 }} 
-                        onPress={p.onAccountShowRequested} 
-                        account={conversationContext.conversationState.data!.otherAccount} size={40} />
-                </View>
+                <ResourceImageWithCreator authorInfo={conversationContext.conversationState.data!.otherAccount}
+                    resource={conversationContext.conversationState.data!.resource} onAccountPress={p.onAccountShowRequested} />
                 <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6 }}>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ color: primaryColor, textTransform: 'uppercase' }}>

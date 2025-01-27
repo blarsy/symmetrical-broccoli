@@ -118,7 +118,11 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
-        account: rawRes.accountByAccountId,
+        account: { 
+            name: rawRes.accountByAccountId.name,
+            id: rawRes.accountByAccountId.id,
+            email: rawRes.accountByAccountId.email,
+            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId)}, //rawRes.accountByAccountId,
         deleted: rawRes.deleted,
         suspended: rawRes.suspended,
         paidUntil: rawRes.paidUntil,

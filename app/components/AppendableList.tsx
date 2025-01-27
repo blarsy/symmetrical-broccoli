@@ -7,9 +7,9 @@ import { LoadState, aboveMdWidth } from "@/lib/utils"
 import { IconButton } from "react-native-paper"
 import Images from "@/Images"
 
-interface Props {
-    state: LoadState | any[]
-    dataFromState?: (state: LoadState) => any[]
+interface Props<I> {
+    state: LoadState | I[]
+    dataFromState?: (state: LoadState) => I[]
     displayItem: (item: I, index: number) => JSX.Element
     onAddRequested: () => void
     contentContainerStyle?: StyleProp<ViewStyle>
@@ -18,7 +18,7 @@ interface Props {
     testID?: string
 }
 
-function AppendableList ({ state, dataFromState, displayItem, onAddRequested, contentContainerStyle, onRefreshRequested, noDataLabel, testID }:Props) {
+function AppendableList<I> ({ state, dataFromState, displayItem, onAddRequested, contentContainerStyle, onRefreshRequested, noDataLabel, testID }:Props<I>) {
     return <View style={{ flexDirection: 'column', margin: 10, flex: 1, alignItems: 'stretch' }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'relative'  }}>
             {/* Strange bug on IOS: flexBasis is applied on the wrong axis (thus we have a button covering 60% ... of the screen height). So, on IOS we give some vertical padding to make the button moretheless larger */}

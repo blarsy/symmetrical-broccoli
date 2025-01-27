@@ -44,7 +44,7 @@ const someMessages = [{
 export const LoadingView: Story = {
     name: 'Loading messages',
     args: {
-      onSend: (text, imagePublicId) => {
+      onSend: async (text, imagePublicId) => {
           console.log('sending message', text, imagePublicId)
       },
       otherAccount: user1,
@@ -55,7 +55,7 @@ export const LoadingView: Story = {
   export const SimpleView: Story = {
     name: 'Some messages',
     args: {
-      onSend: (text, imagePublicId) => {
+      onSend: async (text, imagePublicId) => {
           console.log('sending message', text, imagePublicId)
       },
       otherAccount: user1,
@@ -67,7 +67,7 @@ export const LoadingView: Story = {
   export const DisabledView: Story = {
     name: 'Some messages, cannot send because account deleted',
     args: {
-      onSend: (text, imagePublicId) => {
+      onSend: async (text, imagePublicId) => {
           console.log('sending message', text, imagePublicId)
       },
       otherAccount: user2Deleted,

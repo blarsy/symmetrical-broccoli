@@ -8,9 +8,11 @@ import { primaryColor } from "../layout/constants"
 import { RouteProps, userFriendlyTime } from "@/lib/utils"
 import DataLoadState from "@/lib/DataLoadState"
 import { t } from "@/i18n"
-import { urlFromPublicId } from "@/lib/images"
 import { NavigationHelpers, ParamListBase, useNavigation } from "@react-navigation/native"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import ResourceImageWithCreator from "../ResourceImageWithAuthor"
+import { AvatarIconAccountInfo } from "../mainViews/AccountAvatar"
+import { fromServerGraphResource, Resource } from "@/lib/schema"
 
 interface NotificationData {
     id: number
@@ -19,7 +21,7 @@ interface NotificationData {
     headline1: string
     headline2: string
     text: string
-    image?: string
+    image?: string | { resource: Resource, account: AvatarIconAccountInfo }
     onPress: () => void
 }
 
@@ -48,19 +50,47 @@ export const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: 
 export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
     getResources(resourceIds: $resourceIds) {
       nodes {
-        id
-        title
-        resourcesImagesByResourceId(first: 1) {
-          nodes {
-            imageByImageId {
-              publicId
-            }
-          }
-        }
-        created
         accountByAccountId {
-          name
+            email
+            id
+            name
+            imageByAvatarImageId {
+                publicId
+            }
         }
+        canBeDelivered
+        canBeExchanged
+        canBeGifted
+        canBeTakenAway
+        description
+        id
+        isProduct
+        isService
+        expiration
+        title
+        resourcesResourceCategoriesByResourceId {
+            nodes {
+                resourceCategoryCode
+            }
+        }
+        resourcesImagesByResourceId {
+            nodes {
+                imageByImageId {
+                publicId
+                }
+            }
+        }
+        locationBySpecificLocationId {
+            address
+            latitude
+            longitude
+            id
+        }
+        suspended
+        paidUntil
+        created
+        deleted
+        subjectiveValue
       }
     }
 }`
@@ -108,9 +138,10 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
         }
 
         resourcesData.getResources.nodes.forEach((rawRes: any) => resources[rawRes.id] = rawRes)
-
+        
         notificationsAboutResource.forEach((rawNotification: any) => {
             if(rawNotification.node.data.resource_id) {
+                const resource = fromServerGraphResource(resources[rawNotification.node.data.resource_id], appContext.categories.data!)
                 result.push({ 
                     id: rawNotification.node.id,
                     created: rawNotification.node.created, 
@@ -118,9 +149,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     headline2: resources[rawNotification.node.data.resource_id].accountByAccountId.name,
                     read: rawNotification.node.read,
                     text: resources[rawNotification.node.data.resource_id].title,
-                    image: resources[rawNotification.node.data.resource_id].resourcesImagesByResourceId.nodes.length > 0 ? 
-                        urlFromPublicId(resources[rawNotification.node.data.resource_id].resourcesImagesByResourceId.nodes[0].imageByImageId.publicId) : 
-                        undefined,
+                    image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImageUrl: resource.account!.avatarImageUrl } },
                     onPress: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
                         navigation.navigate('viewResource', { resourceId: rawNotification.node.data.resource_id })
@@ -244,11 +273,25 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
     }
 
     useEffect(() => {
-        if(appContext.account)
+        if(appContext.account){
             load()
+        }
     }, [appContext.account])
 
     return { ...notificationData, loadEarlier, refetch: refetchResourcesAndNotifications }
+}
+
+const NotificationImage = ({ image } : { image: string | {
+    resource: Resource;
+    account: AvatarIconAccountInfo;
+} | undefined }) => {
+    if(typeof image === 'string') {
+        return <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={{ uri: image }} />
+    } else if (!image) {
+        return <Icon size={70} source="creation" />
+    } else {
+        return <ResourceImageWithCreator size={70} resource={image.resource} authorInfo={image.account} onAccountPress={() => {}} />
+    }
 }
 
 export default ({ navigation }: RouteProps) => {
@@ -267,22 +310,24 @@ export default ({ navigation }: RouteProps) => {
         }
     }, [])
 
+
     return <View testID="notifications">
         { appContext.account ?
             <LoadedList loading={loading} error={error} data={data?.data} 
-                loadEarlier={loadEarlier}
-                displayItem={(notif, idx) => <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
-                    left={() =>
-                        notif.image ? <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={{ uri: notif.image }} /> : <Icon size={70} source="creation" />
-                    } key={idx} onPress={notif.onPress}
-                    right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
-                            <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{ userFriendlyTime(notif.created) }</Text>
-                            { !notif.read && <Icon testID={`notifications:${notif.id}:Unread`} size={20} color={primaryColor} source="circle" /> }
-                        </View>}
-                    title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
-                        <Text testID={`notifications:${notif.id}:Headline1`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
-                        <Text testID={`notifications:${notif.id}:HeadLine2`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
-                    </View>} description={<Text testID={`notifications:${notif.id}:Text`} variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />} />:
+            loadEarlier={loadEarlier}
+            displayItem={(notif, idx) => {
+                return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
+                left={() => <NotificationImage image={notif.image} />}
+                key={idx} onPress={notif.onPress}
+                right={p => <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+                        <Text variant="bodySmall" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{ userFriendlyTime(notif.created) }</Text>
+                        { !notif.read && <Icon testID={`notifications:${notif.id}:Unread`} size={20} color={primaryColor} source="circle" /> }
+                    </View>}
+                title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
+                    <Text testID={`notifications:${notif.id}:Headline1`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
+                    <Text testID={`notifications:${notif.id}:HeadLine2`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
+                </View>} description={<Text testID={`notifications:${notif.id}:Text`} variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />
+            }} />:
             <Text variant="labelLarge" style={{ textAlign: 'center', padding: 10 }}>{t('PleaseConnectLabel')}</Text>
         }
     </View>

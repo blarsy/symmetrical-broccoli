@@ -39,7 +39,6 @@ test('notification sent to account when low amount of token', async () => {
     await executeQuery(`SELECT sb.apply_resources_token_transactions()`)
 
     const notifs = await checkHasNotifications(account.info.email, ['info', 'info'])
-    console.log('notifs', notifs)
     expect(notifs[1].uniquePropValue).toBe('WARNING_LOW_TOKEN_AMOUNT')
 })
 
@@ -67,6 +66,5 @@ test('notification sent to account when resources suspended', async () => {
     await executeQuery(`SELECT sb.apply_resources_token_transactions()`)
 
     const notifs = await checkHasNotifications(account.info.email, ['info', 'info'])
-    console.log('notifs', notifs)
     expect(notifs[1].uniquePropValue).toBe('SOME_RESOURCES_SUSPENDED')
 })
