@@ -1,14 +1,14 @@
-import React, { useState } from "react"
+import React, { LegacyRef, ReactNode, RefObject, useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { ColorValue, Platform, View } from "react-native"
+import { ColorValue, Platform, StyleProp, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { aboveMdWidth, getLanguage } from "@/lib/utils"
+import { aboveMdWidth, getLanguage, SMALL_IMAGEBUTTON_SIZE } from "@/lib/utils"
 import BareIconButton from "./BareIconButton"
 import Images from "@/Images"
 
@@ -52,22 +52,42 @@ export const OrangeBackedErrorText = (props: TextProps<never>) => <Text variant=
 
 export const StyledLabel = ({ label, color, variant }: { label: string, color?: ColorValue, variant?: VariantProp<never> | undefined }) => <Text variant={variant || 'labelSmall'} style={{ color: color }}>{label}</Text>
 
-export const OrangeTextInput = (props: TextInputProps) => <TextInput 
+interface TextInputWithRefProps extends TextInputProps {
+    innerRef?: RefObject<TextInput> | null
+}
+
+export const OrangeTextInput = (props: TextInputWithRefProps) => <TextInput 
+    underlineColor="#fff"
+    activeUnderlineColor="#fff"
     {...props}
-    placeholderTextColor="#ddd" mode="flat" textColor="#fff" underlineColor="#fff"
-    activeUnderlineColor="#fff" selectionColor="#fff"
     theme={{ colors: { onSurfaceVariant: '#ddd'} }}
-    contentStyle={{
-        color: '#fff'
-    }} style={Object.assign({
+    placeholderTextColor="#ddd" mode="flat" textColor="#fff" selectionColor="#fff"
+    contentStyle={{ color: '#fff' }} style={Object.assign({
         backgroundColor: primaryColor,
         marginTop: 10,
-    }, props.style)}/>
+    }, props.style)}
+    ref={props.innerRef} />
 
 interface TransparentTextInput extends TextInputProps {
     inlineMode?: boolean
     disableEmojis? : boolean
 }
+
+interface WhiteReadOnlyFieldProps {
+    label: string
+    value: string | ReactNode
+    style?: StyleProp<ViewStyle>
+    testID?: string
+}
+
+export const WhiteReadOnlyField = (p: WhiteReadOnlyFieldProps) => <View style={{ paddingTop: 22, paddingLeft: 16, paddingBottom: 4, paddingRight: 16, ...(p.style as object) }}>
+    <StyledLabel label={p.label} color="#ffa38b"/>
+    { typeof p.value === 'string' ?
+        <Text testID={p.testID} variant="bodyMedium" style={{ color: '#fff' }}>{p.value}</Text>
+        :
+        p.value
+    }
+</View>
 
 export const TransparentTextInput = (props: TransparentTextInput) => {
     return <TextInput keyboardType={props.disableEmojis ? Platform.OS == 'ios' ? "ascii-capable": "visible-password" : undefined } dense={props.inlineMode}
@@ -94,7 +114,7 @@ interface CheckboxGroupProps {
     onChanged: (values: { [name: string]: boolean }, oldValues: { [name: string]: boolean }) => void
     selectedColor?: ColorValue
     color?: ColorValue
-    testID: string
+    testID?: string
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
@@ -106,6 +126,33 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexD
             props.onChanged(props.values, oldValues)
         }}/>) }
     </View>
+</View>
+
+interface RightAlignedModifyButtonsProps {
+    editing: boolean
+    onEditRequested: () => void
+    saveButtonDisabled: boolean
+    saveButtonColor?: ColorValue
+    onSave: () => void
+    onDelete?: () => void
+    onCancelEdit?: () => void
+    testID?: string
+}
+
+export const RightAlignedModifyButtons = (p: RightAlignedModifyButtonsProps) => <View style={{ position: 'absolute', flexDirection: 'row', right: 0, bottom: 5, gap: 3 }}>
+    { !p.editing && <BareIconButton testID={`${p.testID}:Modify`} Image={Images.ModifyInCircle} size={SMALL_IMAGEBUTTON_SIZE} color="#000" 
+        onPress={p.onEditRequested}/> }
+    { p.editing && <BareIconButton testID={`${p.testID}:Save`} disabled={p.saveButtonDisabled} Image={Images.Check} size={SMALL_IMAGEBUTTON_SIZE} 
+        color={p.saveButtonColor || '#000'} onPress={p.onSave}/> }
+    { ((p.onDelete && !p.editing) || p.editing) && <BareIconButton Image={Images.Remove} size={SMALL_IMAGEBUTTON_SIZE} 
+                                                    color={lightPrimaryColor} 
+                                                    onPress={() => {
+                                                        if(p.editing && p.onCancelEdit) {
+                                                            p.onCancelEdit()
+                                                        } else {
+                                                            p.onDelete!()
+                                                        }
+                                                    }} />}
 </View>
 
 interface DateTimePickerFieldProps {
@@ -121,34 +168,34 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
     return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
-            <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-            { props.value && <BareIconButton Image={p => <Images.Cross fill="red"/>} color={primaryColor} size={20} onPress={e => {
-                e.stopPropagation()
-                props.onChange(undefined)
-            }} />}
-            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
-                onPress={() => setDateOpen(true)}>
-                <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
-                <View style={{ marginRight: 14 }}>
-                    <Icon source="chevron-right" size={26} color="#000" />
-                </View>
-            </TouchableOpacity>
-            <DatePickerModal testID={`${props.testID}:Picker`}
-                locale={getLanguage()}
-                mode="single"
-                visible={dateOpen}
-                onDismiss={() => setDateOpen(false)}
-                date={props.value}
-                onConfirm={val => {
-                    if(val.date && props.value) {
-                        val.date.setHours(props.value.getHours())
-                        val.date.setMinutes(props.value.getMinutes())
-                    }
-                    props.onChange(val.date)
-                    setDateOpen(false)
-                }}
-            />
-        </View>
+        <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
+        { props.value && <BareIconButton Image={p => <Images.Cross fill="red"/>} color={primaryColor} size={20} onPress={e => {
+            e.stopPropagation()
+            props.onChange(undefined)
+        }} />}
+        <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
+            onPress={() => setDateOpen(true)}>
+            <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
+            <View style={{ marginRight: 14 }}>
+                <Icon source="chevron-right" size={26} color="#000" />
+            </View>
+        </TouchableOpacity>
+        <DatePickerModal testID={`${props.testID}:Picker`}
+            locale={getLanguage()}
+            mode="single"
+            visible={dateOpen}
+            onDismiss={() => setDateOpen(false)}
+            date={props.value}
+            onConfirm={val => {
+                if(val.date && props.value) {
+                    val.date.setHours(props.value.getHours())
+                    val.date.setMinutes(props.value.getMinutes())
+                }
+                props.onChange(val.date)
+                setDateOpen(false)
+            }}
+        />
+    </View>
 }
 
 

@@ -849,9 +849,10 @@ ALTER FUNCTION sb.get_my_resources_without_picture()
 
 GRANT EXECUTE ON FUNCTION sb.get_my_resources_without_picture() TO identified_account;
 
+DROP FUNCTION IF EXISTS sb.update_account(character varying, character varying, character varying);
+
 CREATE OR REPLACE FUNCTION sb.update_account(
 	name character varying,
-	email character varying,
 	avatar_public_id character varying)
     RETURNS integer
     LANGUAGE 'plpgsql'
@@ -859,27 +860,7 @@ CREATE OR REPLACE FUNCTION sb.update_account(
     VOLATILE PARALLEL UNSAFE
 AS $BODY$
 <<block>>
-DECLARE current_email character varying;
-DECLARE activation_code character varying;
-DECLARE account_language character varying;
 BEGIN
-	SELECT a.email, a.language
-	INTO current_email, account_language
-	FROM sb.accounts a
-	WHERE a.id = sb.current_account_id();
-	
-	IF update_account.email IS NOT NULL AND update_account.email <> '' AND current_email <> LOWER(update_account.email) THEN
-		SELECT array_to_string(ARRAY(SELECT substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
-		INTO block.activation_code;
-		
-		INSERT INTO sb.email_activations (account_id, email, activation_code)
-		VALUES (sb.current_account_id(), LOWER(update_account.email), block.activation_code);
-		
-		PERFORM sb.add_job('mailActivation', 
-			json_build_object('email', LOWER(update_account.email), 'code', block.activation_code, 'lang', account_language));
-	
-	END IF;
-
 	IF avatar_public_id IS NOT NULL AND NOT EXISTS (
 		SELECT *
 		FROM sb.accounts a
@@ -911,6 +892,44 @@ BEGIN
 	RETURN 1;
 end;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION sb.update_account_email(
+	new_email character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE current_email character varying;
+DECLARE activation_code character varying;
+DECLARE account_language character varying;
+BEGIN
+	SELECT a.email, a.language
+	INTO current_email, account_language
+	FROM sb.accounts a
+	WHERE a.id = sb.current_account_id();
+	
+	IF new_email IS NOT NULL AND new_email <> '' AND current_email <> LOWER(new_email) THEN
+		SELECT array_to_string(ARRAY(SELECT substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
+		INTO block.activation_code;
+		
+		INSERT INTO sb.email_activations (account_id, email, activation_code)
+		VALUES (sb.current_account_id(), LOWER(new_email), block.activation_code);
+		
+		PERFORM sb.add_job('mailActivation', 
+			json_build_object('email', LOWER(new_email), 'code', block.activation_code, 'lang', account_language));
+	
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+GRANT EXECUTE ON FUNCTION sb.update_account_email(character varying) TO identified_account;
+
+ALTER FUNCTION sb.update_account_email(character varying)
+    OWNER TO sb;
 
 CREATE OR REPLACE FUNCTION sb.update_account_public_info(
 	links account_link[],
@@ -1003,13 +1022,6 @@ ALTER FUNCTION sb.get_tokens_history()
 
 GRANT EXECUTE ON FUNCTION sb.get_tokens_history() TO identified_account;
 
-CREATE OR REPLACE VIEW sb.active_accounts
- AS
- SELECT *
-   FROM accounts
-  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
-
-
 DROP VIEW sb.active_accounts;
 
 ALTER TABLE sb.accounts
@@ -1039,7 +1051,8 @@ CREATE OR REPLACE VIEW sb.active_accounts
     accounts.can_be_showcased,
     accounts.willing_to_contribute,
     accounts.amount_of_tokens,
-    accounts.unlimited_until
+    accounts.unlimited_until,
+	accounts.last_suspension_warning
    FROM accounts
   WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
 

@@ -1,4 +1,4 @@
-import { createLogger, format, transports, LogCallback } from "winston"
+import { createLogger, format, transports } from "winston"
 let logger: {
     error: (message: string, err: any) => void
     info: (message: string) => void
@@ -18,11 +18,11 @@ if(typeof window === 'undefined') {
             ],
         })
         logger = {
-            error: (message: string, error: any, cb?: LogCallback) => {
-                winstonLogger.error(`${message} ${parseError(error)}`, cb)
+            error: (message: string, error: any) => {
+                winstonLogger.error(`${message} ${parseError(error)}`)
             },
-            info: (message: string, cb?: LogCallback) => {
-                winstonLogger.info(message, cb)
+            info: (message: string) => {
+                winstonLogger.info(message)
             }
         }
     }

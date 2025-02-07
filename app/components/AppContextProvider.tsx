@@ -83,7 +83,7 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
               unreadConversations: [], unreadNotifications: [], apolloClient: action.payload.apolloClient
             }}
         case AppReducerActionType.UpdateAccount:
-          return { ...previousState, ...{ account: { ...action.payload.account, ...{ lastChangeTimestamp: new Date() }}, lastNotification: { message: t('updateAccountSuccessful') } } }
+          return { ...previousState, ...{ account: { ...action.payload, ...{ lastChangeTimestamp: new Date() }}, lastNotification: { message: t('updateAccountSuccessful') } } }
         case AppReducerActionType.DisplayNotification:
           return { ...previousState, ...{ lastNotification: { error: action.payload.error, message: action.payload.message } } }
         case AppReducerActionType.ClearNotification:

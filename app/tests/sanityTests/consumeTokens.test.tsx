@@ -31,11 +31,7 @@ test('Third ressource consumes a token per day', async() => {
 
     await createResourceThroughUI('some title', 'some description', new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30), screen, false)
 
-    await waitFor(() => expect(screen.getByTestId('Tokens:amount')).toBeOnTheScreen())
-
-    expect(screen.getByTestId('Tokens:amount')).toHaveTextContent('29 Topes')
-
-    fireEvent.press(screen.getByTestId('tokensProfileScreenButton'))
+    fireEvent.press(screen.getByTestId('TokenCounter'))
 
     await waitForThenPress('HistoryAccordion:Button', screen)
 
@@ -43,6 +39,7 @@ test('Third ressource consumes a token per day', async() => {
     expect(screen.getByTestId('tokenHistory:0:title')).toHaveTextContent('Topes consommés par les ressources')
     expect(screen.getByTestId('tokenHistory:1:movement')).toHaveTextContent('+30')
     expect(screen.getByTestId('tokenHistory:1:title')).toHaveTextContent('Mode contribution activé')
+    expect(screen.getByTestId('AmountOfTokens')).toHaveTextContent('29')
 })
 
 test('Consuming function handles accurately each resource context', async () => {

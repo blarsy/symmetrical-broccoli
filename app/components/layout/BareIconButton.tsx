@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { ColorValue, GestureResponderEvent, Pressable, StyleProp, View, ViewStyle } from "react-native"
 import { Icon } from "react-native-paper"
 import { SvgProps } from "react-native-svg"
+import { lightPrimaryColor } from "./constants"
 
 interface Props {
     Image: React.FC<SvgProps> | string
@@ -23,7 +24,7 @@ export default ({ Image, size, onPress, color, testID, disabled, style }: Props)
         }}>
         <View style={{ width: size, height: size, ...(style as object) }}>{ typeof Image === 'string' ?
             <Icon color={color as string} size={size} source={Image} />
-            : <Image fill={color} style={{ width: size, height: size }} /> 
+            : <Image fill={color} width={size} height={size} /> 
         }</View>
     </Pressable>
 }

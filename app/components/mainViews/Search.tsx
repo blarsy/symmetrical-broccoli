@@ -44,7 +44,7 @@ const SearchBox = ({ onChange, value, testID }: SearchBoxProps) => {
 interface ProximitySelectorProps {
     value: LocationSearchOptions
     onChange: (newVal: LocationSearchOptions) => void
-    testID: string
+    testID?: string
 }
 
 const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
@@ -59,7 +59,7 @@ const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
             onDeleteRequested={() => {
                 onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation, 
                     excludeUnlocated: value.excludeUnlocated,
-                    referenceLocation: undefined,
+                    referenceLocation: null,
                 })
             }} />
         { value?.referenceLocation && 
@@ -96,7 +96,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
             searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                 categories: searchFilterContext.filter.categories, 
                 options: searchFilterContext.filter.options,
-                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress === null ? undefined : defaultAddress } } })
+                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress! } } })
         }
     }, [loadingAddress])
 

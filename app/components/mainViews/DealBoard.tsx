@@ -31,7 +31,8 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
             <View style={{ flex: 1 }}>
                 <AppHeader currentTabTitle={currentTabTitle} 
                     onProfileScreenRequested={() => navigation.navigate('profile')}
-                    onSupportScreenRequested={() => setSupportVisible(true )}/>
+                    onSupportScreenRequested={() => setSupportVisible(true )}
+                    onTokenCounterPressed={() => navigation.navigate('profile',  { screen: 'tokens'  }) }/>
                 <DealNavigator onTabSelected={setCurrentTabTitle} tabs={tabs || [{
                     name: 'search', component: Search, options: { title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }
                 }, {

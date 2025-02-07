@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React  from 'react'
 import Profile from './Profile'
 import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
-import { GET_ACCOUNT_INFO } from './PublicInfo'
+import { GET_ACCOUNT_INFO } from './useProfile'
 import { GET_PREFERENCES } from './Preferences'
 
 const meta: Meta<typeof Profile> = {

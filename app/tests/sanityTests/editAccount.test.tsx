@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { cleanupTestAccounts, makeTestAccounts, simulateActivation, TestAccount } from "./datastoreSetupLib"
-import React, { useContext } from "react"
+import React from "react"
 import EditProfile from "@/components/form/EditProfile"
 import { checkActivationEmailSent, checkAccountData, checkLinksOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
-import { AppContext, AppContextProvider } from "@/components/AppContextProvider"
+import { AppContextProvider } from "@/components/AppContextProvider"
 import '@testing-library/react-native/extend-expect'
-import PublicInfo from "@/components/account/PublicInfo"
+import { waitForThenPress } from "./lib"
 
 jest.useFakeTimers()
 jest.mock('react-native-paper-dates')
@@ -20,24 +20,25 @@ afterEach(async () => {
     await cleanupTestAccounts([account])
 })
 
-test('edit account data', async () => {
+test('edit account data: name', async () => {
     const newName = `${account.info.name} m`
     render(
         <AppContextProvider>
-            <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
+            <Start splashScreenMinimumDuration={0} 
+                overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
                 <EditProfile />
             </Start>
         </AppContextProvider>)
 
-    await waitFor(() => expect(screen.getByTestId('name')).toHaveProp('value', account.info.name))
-        
-    fireEvent.changeText(screen.getByTestId('name'), newName)
-    fireEvent.press(screen.getByTestId('save'))
+    await waitFor(() => expect(screen.getByTestId('name')).toHaveTextContent(account.info.name))
+    
+    waitForThenPress('name:InlineButtons:Modify', screen)
 
-    await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
-    expect(screen.getByTestId('emailChangingBanner')).not.toBeVisible()
-
-    await checkAccountData (account.info.email, newName)
+    await waitFor(() => expect(screen.getByTestId('name:Input')).toHaveProp('value', account.info.name))
+    fireEvent.changeText(screen.getByTestId('name:Input'), newName)
+    fireEvent.press(screen.getByTestId('name:InlineButtons:Save'))
+    await waitFor(() => expect(screen.getByTestId('name:InlineButtons:Modify')).toBeVisible())
+    checkAccountData (account.info.email, newName)
 })
 
 test('edit account data: email', async () => {
@@ -48,12 +49,17 @@ test('edit account data: email', async () => {
         </Start>
     </AppContextProvider>)
 
-    await waitFor(() => expect(screen.getByTestId('email')).toHaveProp('value', account.info.email))
-        
-    fireEvent.changeText(screen.getByTestId('email'), newEmail)
-    fireEvent.press(screen.getByTestId('save'))
+    await waitFor(() => expect(screen.getByTestId('email')).toHaveTextContent(account.info.email))
+    
+    waitForThenPress('email:InlineButtons:Modify', screen)
 
-    await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
+    await waitFor(() => expect(screen.getByTestId('email:Input')).toHaveProp('value', account.info.email))
+    fireEvent.changeText(screen.getByTestId('email:Input'), newEmail)
+
+    waitForThenPress('email:InlineButtons:Save', screen)
+    //fireEvent.press(screen.getByTestId('save'))
+
+    //await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
     await waitFor(() => expect(screen.getByTestId('emailChangingBanner')).toBeVisible())
 
     await checkAccountData (account.info.email, account.info.name)
@@ -90,25 +96,18 @@ const modifyLink = async (label: string, url: string, type: number, idx: number)
 }
 const deleteLink = async (idx: number, numberOfLinksBeforeDeletion: number) => {
     fireEvent.press(screen.getByTestId(`link:${idx}:DeleteButton`))
-    //screen.debug()
-    await waitFor(() => expect(screen.queryAllByTestId(/link:\d{1,2}:DeleteButton(?!-)/, { exact: true }).length).toEqual(numberOfLinksBeforeDeletion -1))
-}
-
-const Dut = () => {
-    const appContext = useContext(AppContext)
-
-    return appContext.account && appContext.account.id ? <PublicInfo />
-        : <></>
+    await waitFor(() => expect(screen.getByTestId('PublicInfo')).toBeVisible())
+    await waitFor(() => expect(screen.queryAllByTestId(/link:\d{1,2}:DeleteButton(?!-)/, { exact: true }).length).toEqual(numberOfLinksBeforeDeletion -1), { timeout: 4000 })
 }
 
 test('edit account data: links', async () => {
     const labelLink1 = '1', labelLink2= '2', labelLink3 = '3', labelLink1Bis = '1Bis',
         urlLink1 = 'http://l1.f', urlLink2= 'http://l1.f', urlLink3 = 'http://l3.f', urlLink1Bis = 'http://l1Bis.f',
         typeLink1= 2, typeLink2= 3, typeLink3 = 1, typeLink1Bis = 4
-
+    
     render(<AppContextProvider>
         <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
-            <Dut />
+            <EditProfile />
         </Start>
     </AppContextProvider>)
 

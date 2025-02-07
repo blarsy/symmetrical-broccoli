@@ -27,7 +27,7 @@ export default () => {
             }
             setSupportInfo(fromData(supportInfo))
         } catch (e) {
-            setSupportInfo(fromError(e, t('requestError')))
+            setSupportInfo(fromError(e))
         }
     }
 

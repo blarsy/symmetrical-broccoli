@@ -6,7 +6,7 @@ import { Icon, Text } from "react-native-paper";
 type AccordionItemProps = PropsWithChildren<{
     title: string,
     style?: StyleProp<ViewStyle>
-    testID: string
+    testID?: string
     big?: boolean
     textColor?: string
   }>

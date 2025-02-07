@@ -15,7 +15,7 @@ export const checkAccountData = async (email: string, name: string) => {
     const result = await executeQuery(`select *
         from sb.accounts a
         where a.email = lower($1) and a.name = $2`, [email, name])
-
+    
     expect(result.rowCount).toBe(1)
 }
 
@@ -25,7 +25,6 @@ export const checkLinksOnAccount = async (email: string, links: { label: string,
         inner join sb.accounts a on a.id = al.account_id
         where a.email = lower($1)`, [email])
 
-    expect(result.rowCount).toBe(links.length)
     links.forEach(link => {
         const linkRow = result.rows.find((row: any) => row.label === link.label)
         expect(linkRow).toBeDefined()

@@ -17,7 +17,7 @@ export interface SearchOptions {
 
 export interface LocationSearchOptions {
   excludeUnlocated: boolean
-  referenceLocation?: Location
+  referenceLocation: Location | null
   distanceToReferenceLocation: number
 }
 
@@ -47,7 +47,7 @@ const blankSearchFilter: SearchFilterState = {
   categories: [], 
   options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, 
   search: '',
-  location: { distanceToReferenceLocation: MAX_DISTANCE, excludeUnlocated: false }
+  location: { distanceToReferenceLocation: MAX_DISTANCE, excludeUnlocated: false, referenceLocation: null }
 }
 
 export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
@@ -128,7 +128,7 @@ const SearchFilterContextProvider = ({ children }: Props) => {
                 setSearchResults(fromData(fromServerGraphResources(res.data.suggestedResources.resources, categories)))
             }
             catch(e) {
-                setSearchResults(fromError(e, t('requestError')))
+                setSearchResults(fromError(e))
             }
         }
     }

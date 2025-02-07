@@ -16,7 +16,7 @@ interface Props<T> {
 function ListOf<T>({data, displayItem, noDataLabel, noDataLabelStyle, testID, loadingEarlier}: Props<T>) {
     if(data && data.length > 0) {
         const elements = data.map((item, idx) => displayItem(item, idx))
-        if(loadingEarlier) elements.push(<ActivityIndicator color={primaryColor}/>)
+        if(loadingEarlier) elements.push(<ActivityIndicator testID={testID} color={primaryColor}/>)
         return elements
     } else if(typeof noDataLabel === 'string' || !noDataLabel) {
         return <Text testID={`${testID}:NoData`} style={{ ...{ textAlign: 'center', textTransform: 'uppercase', margin:10 }, ...(noDataLabelStyle as object)}}>{noDataLabel || t('noData')}</Text>

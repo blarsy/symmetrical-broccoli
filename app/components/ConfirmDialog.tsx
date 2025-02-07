@@ -76,7 +76,7 @@ const ConfirmDialog = ({ visible, onResponse, title, question, content, testID, 
                     await onResponse(true)
                     setProcessing(fromData(null))
                 } catch(e) {
-                    setProcessing(fromError(e, t('requestError')))
+                    setProcessing(fromError(e))
                 }
             } }/>,
             <IconButton key="no" testID={`${testID}:NoButton`} size={15} icon={p => <Images.Cross fill={p.color} />} iconColor={primaryColor} onPress={async () => { onResponse(false) } }/>

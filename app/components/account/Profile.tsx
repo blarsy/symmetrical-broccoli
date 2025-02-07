@@ -11,7 +11,6 @@ import { ErrorSnackbar } from "../OperationFeedback"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import PublicInfo from "./PublicInfo"
 import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { GraphQlLib } from "@/lib/backendFacade"
@@ -78,7 +77,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                                 ], index: 0 })
                                 setDeleting(fromData(null))
                             } catch(e) {
-                                setDeleting(fromError(e, t('requestError')))
+                                setDeleting(fromError(e))
                             }
                         } }/>
                         <IconButton size={30} icon={p => <Images.Cross fill={p.color} />} iconColor={primaryColor} onPress={async () => { 
@@ -92,13 +91,16 @@ export default function Profile ({ route, navigation }: RouteProps) {
     </ScrollView>)
 
     const fixedScreens: TabNavigatorProps[] = [
-        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="account" /> }, component: Main },
-        { name:'publicInfo', options:{ title: t('publicInfo_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="bullhorn" /> }, component: PublicInfo },
-        { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Icon size={30} color={p.color} source="cog" /> }, component: Preferences },
+        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Images.Profile height="30" width="30" fill={p.color} /> }, component: Main },
+        { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Images.Preferences height="30" width="30" fill={p.color} /> }, component: Preferences },
     ]
 
     const actualScreens = appContext.account?.willingToContribute ? 
-        [fixedScreens[0], fixedScreens[1], { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: p => <Icon testID="contributionIcon" size={30} color={p.color} source="hand-clap" /> }, component: TokenSettings }, fixedScreens[2]]
+        [
+            fixedScreens[0], 
+            { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: (p: any) => <Images.TokensBlack fill={p.color} width={30} height={30} />}, component: TokenSettings }, 
+            fixedScreens[1]
+        ]
         : 
         fixedScreens
 
@@ -118,7 +120,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
             theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
             activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }} >
-            { actualScreens.map(screen => <Tab.Screen name={screen.name} options={screen.options} component={screen.component} />) }
+            { actualScreens.map((screen, idx) => <Tab.Screen key={idx} name={screen.name} options={screen.options} component={screen.component} />) }
         </Tab.Navigator>
     </PrimaryColoredContainer>
 }

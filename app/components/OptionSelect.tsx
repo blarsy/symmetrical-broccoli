@@ -10,7 +10,7 @@ interface Props {
     title: string
     selectedColor?: ColorValue
     color?: ColorValue
-    testID: string
+    testID?: string
 }
 
 const OptionSelect = ({ value, onChange, title, selectedColor, color, testID }: Props) => {

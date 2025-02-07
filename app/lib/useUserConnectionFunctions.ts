@@ -79,7 +79,9 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
         name
         language
         email
-        avatarImageId
+        imageByAvatarImageId {
+            publicId
+        }
         amountOfTokens
         activated
         id
@@ -160,7 +162,7 @@ export default () => {
                 activated: payload.data.accountChangeReceived.account.activated,
                 amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
                 lastChangeTimestamp: new Date(),
-                avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
+                avatarPublicId: payload.data.accountChangeReceived.account.imageByAvatarImageId?.publicId,
                 email: payload.data.accountChangeReceived.account.email,
                 id: payload.data.accountChangeReceived.account.id,
                 name: payload.data.accountChangeReceived.account.name,
@@ -169,6 +171,7 @@ export default () => {
                 unreadNotifications: [],
                 unlimitedUntil: payload.data.unlimitedUntil || null
             }
+            
             appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
         }})
         

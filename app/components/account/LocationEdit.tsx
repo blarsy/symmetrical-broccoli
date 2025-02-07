@@ -3,16 +3,17 @@ import { StyleProp, View, ViewStyle } from "react-native"
 import { IconButton, Modal, Portal, Text, TextInput, useTheme } from "react-native-paper"
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { language, t } from "@/i18n"
-import { adaptToWidth, regionFromLocation } from "@/lib/utils"
+import { adaptToWidth, regionFromLocation, SMALL_IMAGEBUTTON_SIZE } from "@/lib/utils"
 import 'react-native-get-random-values'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import { lightPrimaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { googleMapsApiKey } from "@/lib/settings"
 import Geocoder from 'react-native-geocoding'
 import { OrangeButton } from "../layout/lib"
 import { Location } from "@/lib/schema"
 import ConfirmDialog from "../ConfirmDialog"
 import Images from "@/Images"
+import BareIconButton from "../layout/BareIconButton"
 
 const DEFAUT_LOCATION: Location = {
     latitude: 50.60953016033429,
@@ -70,9 +71,9 @@ const EditAddressModal = ({ visible, onDone }: EditAddressModalProps) => {
         </Modal>
     </Portal>
 } 
-    
+
 interface Props {
-    location?: Location
+    location: Location | null
     style?: StyleProp<ViewStyle>
     onLocationChanged: (newLocation: Location) => void
     onDeleteRequested: () => void
@@ -82,7 +83,7 @@ interface Props {
 
 export default ({ location, style, onLocationChanged, onDeleteRequested, orangeBackground, small }: Props) => {
     const [editedLocation, setEditedLocation] = useState<Location | undefined>(undefined)
-    const [currentLocation, setCurrentLocation] = useState<Location | undefined>(location)
+    const [currentLocation, setCurrentLocation] = useState<Location | null>(location)
     const [deleteRequested, setDeleteRequested] = useState(false)
 
     useEffect(() => {
@@ -90,16 +91,15 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
     }, [location])
 
     const color = orangeBackground ? '#fff' : '#000'
-    const iconButtonMode = orangeBackground ? 'contained' : 'outlined'
 
     return <View style={{ gap: 20, alignContent: 'stretch', ...(style as object)}}>
         { currentLocation ?
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text variant="headlineSmall" lineBreakMode="tail" numberOfLines={2} style={{ color, flexShrink: 1 }}>{currentLocation.address}</Text>
-                <View style={{ flexDirection: 'row' }}>
-                    <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon="pencil" 
+                <View style={{ flexDirection: 'row', gap: 3}}>
+                    <BareIconButton size={SMALL_IMAGEBUTTON_SIZE} color="#000" Image={Images.ModifyInCircle}
                         onPress={() => { setEditedLocation(currentLocation || DEFAUT_LOCATION)}} />
-                    <IconButton size={25} mode={iconButtonMode} containerColor="#fff" iconColor="#000" icon={p => <Images.Bin style={{ width: 25, height: 25 }} fill={p.color} />}
+                    <BareIconButton size={SMALL_IMAGEBUTTON_SIZE} color={orangeBackground ? lightPrimaryColor : primaryColor} Image={Images.Remove}
                         onPress={() => { setDeleteRequested(true)}} />
                 </View>
             </View>

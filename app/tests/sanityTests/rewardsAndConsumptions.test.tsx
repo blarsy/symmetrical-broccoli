@@ -42,10 +42,17 @@ test('Apply rewards', async () => {
          })
     ])
     
-    await applyResourceRewards(testAccounts[0].data.token, testAccounts[0].data.id)
+   await applyResourceRewards(testAccounts[0].data.token, testAccounts[0].data.id)
 
-    // should have 30 (account creation reward) + 20 (1 resourcese created for 24 hours)
-    await checkAccountTokens(testAccounts[1].info.email, 50)
-    // should have only 30 (account creation reward)
-    await checkAccountTokens(testAccounts[0].info.email, 30)
+   // should have 30 (account creation reward) + 20 (1 resourcese created for 24 hours)
+   await checkAccountTokens(testAccounts[0].info.email, 50)
+   // should have only 30 (account creation reward)
+   await checkAccountTokens(testAccounts[1].info.email, 30)
+
+   await applyResourceRewards(testAccounts[1].data.token, testAccounts[1].data.id)
+
+   // should have 30 (account creation reward) + 20 (1 resourcese created for 24 hours)
+   await checkAccountTokens(testAccounts[0].info.email, 50)
+   // should have 75 (account creation reward)+ 2 resources, 1 with image)
+   await checkAccountTokens(testAccounts[1].info.email, 75)
 })

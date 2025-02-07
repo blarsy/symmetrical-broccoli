@@ -15,7 +15,6 @@ import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppCont
 import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import Tokens from "../tokens/Tokens"
 import { GraphQlLib } from "@/lib/backendFacade"
 
 const NUMBER_OF_FREE_RESOURCES = 2
@@ -139,27 +138,24 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
             {t('activate_account', { email: appContext.account?.email })}
         </Banner>
         { appContext.account ?
-          <>
-            { appContext.account.willingToContribute && <Tokens testID="Tokens" account={appContext.account} style={{ marginTop: 5 }} />}
-            <AppendableList testID="ResourcesAppendableList" state={{ data: resources, loading, error } as LoadState} dataFromState={state => state.data}
-              onAddRequested={() => {
-                ensureContributionEnforced(resources, addRequested)
-              }} onRefreshRequested={() => {
-                refetch()
-              }} noDataLabel={<NoResourceYet/>}
-              contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
-                borderColor: 'yellow', borderWidth: 0
+          <AppendableList testID="ResourcesAppendableList" state={{ data: resources, loading, error } as LoadState} dataFromState={state => state.data}
+            onAddRequested={() => {
+              ensureContributionEnforced(resources, addRequested)
+            }} onRefreshRequested={() => {
+              refetch()
+            }} noDataLabel={<NoResourceYet/>}
+            contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
+              borderColor: 'yellow', borderWidth: 0
+            }}
+            displayItem={(resource: any, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`}
+              key={idx} resource={resource}
+              viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
+              editRequested={() => {
+                editResourceContext.actions.setResource(resource)
+                editRequested()
               }}
-              displayItem={(resource: any, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`}
-                key={idx} resource={resource}
-                viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
-                editRequested={() => {
-                  editResourceContext.actions.setResource(resource)
-                  editRequested()
-                }}
-              />}
+            />}
           />
-          </>
            :
           <View style={{ margin: 10, flexDirection: 'column', borderColor: 'green', borderWidth: 0, flex: 1 }}>
             <WhiteButton mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>

@@ -68,11 +68,11 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
                         }
                         setAuthStatus(fromData(null))
                     } catch(fetchError) {
-                        setAuthStatus(fromError(fetchError as Error, t('requestError')))
+                        setAuthStatus(fromError(fetchError as Error))
                     }
                 }
             } catch (e) {
-                setAuthStatus(fromError(e as Error, t('requestError')))
+                setAuthStatus(fromError(e as Error))
             }
         }} />
         { signedInUser && <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

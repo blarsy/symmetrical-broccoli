@@ -45,7 +45,7 @@ test(`become contributor when creating one's 3rd resource`, async () => {
     fireEvent.press(screen.getByTestId('BackButton'))
     await waitFor(() => expect(screen.getByTestId(`resourceList:ResourceCard:${res1Id}:EditButton`)).toBeOnTheScreen(), { timeout: 3000 })
     //check amount of topes
-    expect(screen.getByTestId('Tokens:amount')).toHaveTextContent('30 Topes')
+    expect(screen.getByTestId('TokenCounter:AmountOfTokens')).toHaveTextContent('X30')
 
     fireEvent.press(screen.getByTestId('ResourcesAppendableList:addButton'))
 

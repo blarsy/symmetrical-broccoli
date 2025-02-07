@@ -40,6 +40,7 @@ export enum ScreenSize {
 }
 
 export const MAX_DISTANCE = 50
+export const SMALL_IMAGEBUTTON_SIZE = 30
 
 export const getTheme = (): ThemeProp => ({
   fonts: configureFonts({ config: { 

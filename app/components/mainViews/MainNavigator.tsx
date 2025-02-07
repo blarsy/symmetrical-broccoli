@@ -114,7 +114,7 @@ export function Main ({ screens }: Props) {
             const res = await getCategories({ variables: { locale: getLanguage() }})
             appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
-            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e, t('requestError')) })
+            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e) })
         }
     }
 

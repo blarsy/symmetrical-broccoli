@@ -30,7 +30,7 @@ export default () => {
 
             setState(fromData(defaultLocation))
         } catch(e) {
-            setState(fromError(e, t('requestError')))
+            setState(fromError(e))
             appDispatch({ type: AppReducerActionType.DisplayNotification,  payload: { error: e }})
         }
     }

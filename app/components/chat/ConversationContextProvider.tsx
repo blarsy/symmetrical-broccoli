@@ -195,7 +195,7 @@ const ConversationContextProvider = ({ children }: Props) => {
               throw new Error('Unexpected data from API call')
             }
           } catch(e) {
-            setConversationState(fromError(e, t('requestError')))
+            setConversationState(fromError(e))
           }
         },
         setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]): void => {
@@ -232,7 +232,7 @@ const ConversationContextProvider = ({ children }: Props) => {
               } catch(e) {
                 setMessagesState(prevValue => ({
                   endCursor: prevValue.endCursor,
-                  messages: { ...fromError(e, t('requestError')), ...{loading: false, data: prevValue.messages.data}},
+                  messages: { ...fromError(e), ...{loading: false, data: prevValue.messages.data}},
                   loadingEarlier: false
                 }))
               }

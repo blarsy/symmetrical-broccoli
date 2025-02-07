@@ -42,7 +42,7 @@ export default ({ route, navigation }:RouteProps) => {
             
             if(navigation.canGoBack()) navigation.goBack()
         } catch(e: any) {
-            setSaveResourcestate(fromError(e, t('requestError')))
+            setSaveResourcestate(fromError(e))
             appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e } })
         }
     }
@@ -148,7 +148,7 @@ export default ({ route, navigation }:RouteProps) => {
                     <ErrorMessage component={ErrorText} name="canBeTakenAway" />
                     <Hr />
                 </> }
-                <LocationEdit style={{ marginLeft: 16 }} location={values.specificLocation || undefined} 
+                <LocationEdit style={{ marginLeft: 16 }} location={values.specificLocation} 
                     onDeleteRequested={() => {
                         setFieldValue('specificLocation', null)
                     }}
