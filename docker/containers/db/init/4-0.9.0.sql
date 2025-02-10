@@ -1089,6 +1089,44 @@ GRANT EXECUTE ON FUNCTION sb.my_notifications() TO sb;
 
 REVOKE ALL ON FUNCTION sb.my_notifications() FROM PUBLIC;
 
+--Reward current users
+
+--Reward for links on account
+INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+SELECT account_id, 3, 20 FROM sb.accounts_links
+GROUP BY account_id;
+
+UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + 20
+WHERE id IN (
+	SELECT account_id 
+	FROM sb.accounts_links
+	GROUP BY account_id);
+
+--Reward for address defined on account
+INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+SELECT id, 2, 20
+FROM sb.accounts
+WHERE location_id IS NOT NULL
+GROUP BY id;
+	
+UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + 20
+WHERE id IN (
+	SELECT id
+	FROM sb.accounts
+	WHERE location_id IS NOT NULL);
+
+--Reward for presence of logo image
+INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+SELECT id, 1, 20 FROM sb.accounts
+WHERE avatar_image_id IS NOT NULL;
+
+UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + 20
+WHERE id IN (
+	SELECT id FROM sb.accounts
+	WHERE avatar_image_id IS NOT NULL);
+
+SELECT sb.apply_account_resources_rewards(id) FROM sb.active_accounts;
+
 DO
 $body$
 BEGIN
