@@ -14,6 +14,7 @@ const meta: Meta<typeof Profile> = {
       variables: { id: 1 },
       result: {
         accountById: {
+          id: 1,
           accountsLinksByAccountId: {
             nodes: [{
               label: 'label',

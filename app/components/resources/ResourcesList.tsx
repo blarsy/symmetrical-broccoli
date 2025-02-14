@@ -5,7 +5,7 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import AppendableList from "../AppendableList"
 import { fromServerGraphResources, Resource } from "@/lib/schema"
-import { Banner, Text } from "react-native-paper"
+import { Banner } from "react-native-paper"
 import { t } from "@/i18n"
 import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
@@ -16,6 +16,7 @@ import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import { GraphQlLib } from "@/lib/backendFacade"
+import ContributeDialog from "../tokens/ContributeDialog"
 
 const NUMBER_OF_FREE_RESOURCES = 2
 export const RESOURCES = gql`query MyResources {
@@ -81,7 +82,6 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
-    const [switchToContributionMode] = useMutation(GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE)
     const [askingSwitchToContributionMode, setAskingSwitchToContributionMode] = useState(false)
     const [resources, setResources] = useState<Resource[]>([])
     const [deletingResource, setDeletingResource] = useState(0)
@@ -110,7 +110,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     }, [data])
 
     const ensureContributionEnforced = (resources: Resource[], addRequested: () => void) => {
-      if(resources.filter((res => !res.deleted && (res.expiration && new Date(res.expiration) > new Date()))).length < NUMBER_OF_FREE_RESOURCES){
+      if(resources.filter((res => !res.deleted && ((res.expiration && new Date(res.expiration) > new Date()) || res.expiration === null))).length < NUMBER_OF_FREE_RESOURCES){
         addRequested()
       } else {
         if(!appContext.account!.willingToContribute && (!appContext.account?.unlimitedUntil || appContext.account?.unlimitedUntil < new Date())) {
@@ -175,25 +175,8 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 setDeletingResource(0)
               }
             }} onDismiss={() => setDeletingResource(0)}/>
-        <ConfirmDialog testID="SwitchToContributionModeDialog" title={t('SwitchToContributionMode_DialogTitle')} content={<View>
-            <Text>{t('Contribution_tip', { numberOfFreeResources: NUMBER_OF_FREE_RESOURCES })}</Text>
-            <Text>{t('Contribution_explain1', { numberOfFreeResources: NUMBER_OF_FREE_RESOURCES })}</Text>
-            <Text>{t('Contribution_explain_token')}</Text>
-            <Text variant="headlineSmall">{t('Contribution_subTitle')}</Text>
-            <Text>{t('Contribution_explain2')}</Text>
-            <Text variant="headlineMedium">{t('Contribution_gifts_title')}</Text>
-            <Text variant="labelSmall">{t('Contribution_gift_1')}</Text>
-            <Text variant="labelSmall">{t('Contribution_gift_2')}</Text>
-            <Text variant="labelSmall">{t('Contribution_gift_3')}</Text>
-            <Text variant="titleMedium">{t('SwitchToContributionMode_Question')}</Text>
-          </View>} visible={askingSwitchToContributionMode} onResponse={async response => {
-              if(response) {
-                await switchToContributionMode()
-                await reloadAccount()
-                addRequested()
-              }
-              setAskingSwitchToContributionMode(false)
-        }} onDismiss={() => setAskingSwitchToContributionMode(false)} />
+        <ContributeDialog onBecameContributor={addRequested} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
+            title={t('contributionExplainationDialogTitle')} />
     </>
 }
 

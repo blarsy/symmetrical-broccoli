@@ -19,9 +19,8 @@ const TokenSettings = () => {
             <Text testID="AmountOfTokens" variant="headlineLarge" style={{ color: '#fff' }}>{appContext.account?.amountOfTokens}</Text>
             <Text variant="headlineLarge" style={{ color: '#fff' }}>{t('tokenName')}</Text>
         </View>
-        <AccordionItem textColor="#fff" big testID="HowItWorks" title={t('howItWorksAccordionTitle')}>
-            <InfoHowItWorks />
-        </AccordionItem>
+        <Text style={{ color: '#fff', paddingLeft: 16, marginTop: 10, marginBottom: 10 }} variant="bodyLarge">{t('howItWorksTitle')}</Text>
+        <InfoHowItWorks />
         <AccordionItem style={{ marginBottom: 20 }} textColor="#fff" big testID="HistoryAccordion" title={t('tokenHistoryAccordionTitle')}>
             <History />
         </AccordionItem>

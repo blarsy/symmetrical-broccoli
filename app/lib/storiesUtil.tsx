@@ -37,11 +37,11 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, willingToContribute: boolean = false) => 
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, willingToContribute: boolean = false, amountOfTopes: number = 0) => 
     (StoryElement: React.ElementType) => 
         makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
             activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
-            willingToContribute, amountOfTokens: willingToContribute ? 30 : 0, unreadNotifications: [], 
+            willingToContribute, amountOfTokens: willingToContribute ? amountOfTopes | 30 : amountOfTopes, unreadNotifications: [], 
             unreadConversations: [], lastChangeTimestamp: new Date(), unlimitedUntil: null
          })
 

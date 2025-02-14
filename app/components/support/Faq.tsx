@@ -2,7 +2,7 @@ import { t } from "@/i18n";
 import { linksUrl } from "@/lib/settings";
 import React from "react";
 import { Linking, View } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { WhiteButton } from "../layout/lib";
 
 export default () => <View>

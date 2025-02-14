@@ -1,14 +1,17 @@
 import { t } from "@/i18n"
-import React from "react"
-import { Card, Text } from "react-native-paper"
-import { lightPrimaryColor } from "../layout/constants"
+import React, { useState } from "react"
+import { WhiteButton } from "../layout/lib"
+import { View } from "react-native"
+import ContributeDialog from "./ContributeDialog"
 
-const InfoHowItWorks = () => <Card style={{ backgroundColor: lightPrimaryColor, margin: 10, padding: 10 }}>
-    <Text variant="bodyMedium">{t('tokenExplain_HowItWorks_1')}</Text>
-    <Text variant="bodyMedium">{t('tokenExplain_HowItWorks_2')}</Text>
-    <Text variant="bodyMedium">{t('tokenExplain_HowItWorks_3')}</Text>
-    <Text variant="bodyMedium">{t('tokenExplain_HowItWorks_4')}</Text>
-    <Text variant="bodyMedium">{t('tokenExplain_HowItWorks_5')}</Text>
-</ Card>
+const InfoHowItWorks = () => {
+    const [explaining, setExplaining] = useState(false)
+
+    return <View style={{ alignItems: 'center' }}>
+        <WhiteButton onPress={() => setExplaining(true)}>{t('showMe')}</WhiteButton>
+        <ContributeDialog onDismiss={() => setExplaining(false)} visible={explaining} 
+            title={t('contributionExplainationDialogTitle')} />
+    </View>
+}
 
 export default InfoHowItWorks

@@ -5,31 +5,37 @@ import { ActivityIndicator, Dialog, IconButton, Portal, Text } from "react-nativ
 import { lightPrimaryColor, primaryColor } from "./layout/constants"
 import Images from "@/Images"
 import { OrangeButton } from "./layout/lib"
-import { StyleProp, ViewStyle } from "react-native"
+import { StyleProp, View, ViewStyle } from "react-native"
 import { ErrorSnackbar } from "./OperationFeedback"
 import { error } from "@/lib/logger"
+import BareIconButton from "./layout/BareIconButton"
 
 
 interface ThemedDialogProps {
     visible: boolean
     content: ReactNode
     title: string
-    actions: ReactNode[]
+    actions?: ReactNode[]
     testID?: string
     onDismiss: () => void
     actionZoneStyle?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>
+    contentStyle?: StyleProp<ViewStyle>
 }
 
-export const ThemedDialog = ({ visible, content, title, actions, testID, onDismiss, actionZoneStyle }: ThemedDialogProps) => {
+export const ThemedDialog = ({ visible, content, title, actions, testID, onDismiss, actionZoneStyle, style, contentStyle }: ThemedDialogProps) => {
     return <Portal>
-        <Dialog testID={testID} visible={visible} style={{ backgroundColor: lightPrimaryColor }} onDismiss={onDismiss}>
-            <Dialog.Title><Text variant="titleLarge">{title}</Text></Dialog.Title>
-            <Dialog.Content>
+        <Dialog testID={testID} visible={visible} style={{ backgroundColor: lightPrimaryColor, ...(style as object) }} onDismiss={onDismiss}>
+            <View style={{ flexDirection: 'row', paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between' }}>
+                <Text variant="titleLarge" style={{ textAlign:'center', flex: 1 }}>{title}</Text>
+                <BareIconButton style={{  }} size={15} Image={Images.Cross} onPress={onDismiss}/>
+            </View>
+            <Dialog.Content style={contentStyle}>
                 {content}
             </Dialog.Content>
-            <Dialog.Actions style={actionZoneStyle}>
+            { actions && <Dialog.Actions style={actionZoneStyle}>
                 {actions}
-            </Dialog.Actions>
+            </Dialog.Actions>}
         </Dialog>
     </Portal>
 }
