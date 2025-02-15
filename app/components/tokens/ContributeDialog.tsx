@@ -9,7 +9,7 @@ interface Props {
     title: string
     testID?: string
     onDismiss: () => void
-    onBecameContributor: () => void
+    onBecameContributor?: () => void
 }
 
 const ContributeDialog = (p: Props) => {
@@ -25,8 +25,10 @@ const ContributeDialog = (p: Props) => {
         }} contentStyle={{ height: subViewHeight }}
         content={
             <HowItWorksSwiper onBecameContributor={() => {
-                p.onBecameContributor()
-                p.onDismiss()
+                if(p.onBecameContributor){
+                    p.onBecameContributor()
+                    p.onDismiss()
+                }
             }} width={childWidth} />
         }/>
 }

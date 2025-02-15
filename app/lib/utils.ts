@@ -22,12 +22,19 @@ export interface RouteProps {
     navigation: NavigationHelpers<ParamListBase>
 }
 
+export const STANDARD_APPBAR_TITLE_FONTSIZE = 36
 export const mdScreenWidth = 600
-export const appBarsTitleFontSize = 36
+let appBarsTitleFontSize: number | undefined = undefined
 
 export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdScreenWidth
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
 export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
+export const getAppBarsTitleFontSize = () => {
+  if(!appBarsTitleFontSize) {
+    appBarsTitleFontSize = Dimensions.get("window").width < 400 ? 30 : STANDARD_APPBAR_TITLE_FONTSIZE
+  }
+  return appBarsTitleFontSize
+}
 
 export const fontSizeLarge = aboveMdWidth() ? 24 : 20
 export const fontSizeMedium = aboveMdWidth() ? 20 : 16

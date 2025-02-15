@@ -79,7 +79,7 @@ const HowItWorksSwiper = ({ width, onBecameContributor }: Props) => {
                 <Images.Tokens style={{ width: 30, height: 30 }}/>
                 <Text variant="bodyMedium">{t('tokenName')}</Text>
             </View>
-            <OrangeButton loading={becomingContributor} labelStyle={{ alignItems: 'center', padding: 1 }}
+            <OrangeButton loading={becomingContributor} labelStyle={{ alignItems: 'center' }}
                 onPress={ async () => {
                     setBecomingContributor(true)
                     try {
@@ -93,9 +93,8 @@ const HowItWorksSwiper = ({ width, onBecameContributor }: Props) => {
                 icon={p => <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
                 <Text style={{ color: '#fff' }} variant="bodySmall">+ 30</Text>
                 <Images.TokensBlack fill="#fff" style={{ width: 25, height: 25 }}/>
-                </View>}><View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: '#fff' }} variant="bodyLarge">{t('yes')}</Text>
-                    <Text style={{ color: '#fff' }} variant="bodyMedium">{t('becomeContributorButton')}</Text>
+                </View>}><View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                    <Text style={{ color: '#fff' }} variant="bodyLarge">{`${t('yes')} ${t('becomeContributorButton')}`}</Text>
                 </View>
             </OrangeButton>
         </View>}

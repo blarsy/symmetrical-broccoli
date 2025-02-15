@@ -233,7 +233,7 @@ const resources = {
       "completeProfile": "Complete your profile",
       "howItWorksStep6Title": "Let's go together ?",
       "youAlreadyHave": "We began counting already, and you have",
-      "becomeContributorButton": "I become contributor"
+      "becomeContributorButton": "I contribute"
    }
   },
   fr: {
@@ -461,7 +461,7 @@ const resources = {
       "completeProfile": "Compléter son profil",
       "howItWorksStep6Title": "On y va, ensemble ?",
       "youAlreadyHave": "On a déjà commencé à compter, et tu as déjà",
-      "becomeContributorButton": "Je deviens contributeur"
+      "becomeContributorButton": "Je contribue"
     }
   }
 }

@@ -2,11 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
 import HowItWorksSwiper from './HowItWorksSwiper'
-import { appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { GraphQlLib } from '@/lib/backendFacade'
 
 const meta: Meta<typeof HowItWorksSwiper> = {
   component: HowItWorksSwiper,
-  decorators: [paperProviderDecorator]
+  decorators: [paperProviderDecorator, apolloClientMocksDecorator([
+    { query: GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE, result: { switchToContributionMode: { integer: 1 } }  }
+  ])]
 }
 
 export default meta

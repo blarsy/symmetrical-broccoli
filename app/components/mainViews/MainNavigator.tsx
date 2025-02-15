@@ -2,7 +2,6 @@ import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigati
 import React, { useContext, useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import { Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'

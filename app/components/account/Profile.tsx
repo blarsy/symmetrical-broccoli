@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
 import { ActivityIndicator, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
-import { RouteProps, adaptToWidth, appBarsTitleFontSize, mdScreenWidth } from "@/lib/utils"
+import { RouteProps, adaptToWidth, getAppBarsTitleFontSize, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Appbar, Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
@@ -108,9 +108,9 @@ export default function Profile ({ route, navigation }: RouteProps) {
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
             <Appbar.BackAction onPress={() => navigation.navigate('main')} />
             <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', 
-                fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} 
+                fontSize: appBarsTitleFontSize, lineHeight: getAppBarsTitleFontSize() }} 
                 title={t('profile_label')}  />
-            <Appbar.Action testID="logout" icon="logout" size={appBarsTitleFontSize} color="#000" onPress={ async () => {
+            <Appbar.Action testID="logout" icon="logout" size={getAppBarsTitleFontSize()} color="#000" onPress={ async () => {
                 await logout()
                 navigation.reset({ routes: [
                     {name: 'main'}

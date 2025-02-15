@@ -1,5 +1,5 @@
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import { appBarsTitleFontSize } from "@/lib/utils"
+import { getAppBarsTitleFontSize, STANDARD_APPBAR_TITLE_FONTSIZE } from "@/lib/utils"
 import React, { ReactNode, useContext, useEffect } from "react"
 import { Appbar, Icon, Text } from "react-native-paper"
 import { AppContext } from "./AppContextProvider"
@@ -7,10 +7,10 @@ import { primaryColor, lightPrimaryColor } from "./layout/constants"
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated"
 import { AvatarIcon } from "./mainViews/AccountAvatar"
 import Images from "@/Images"
-import { TouchableOpacity, View } from "react-native"
+import { TouchableOpacity } from "react-native"
 
-const baseHeaderButtonSize = appBarsTitleFontSize * 0.75
-const profileButtonSize = baseHeaderButtonSize * 1.5
+const getBaseHeaderButtonSize = () => getAppBarsTitleFontSize() * 0.75
+const getProfileButtonSize = () => getBaseHeaderButtonSize() * 1.5
 
 const LoginButton = ({ size }:{ size: number }) => {
     const scale = useSharedValue(1)
@@ -55,15 +55,15 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
     const appContext = useContext(AppContext)
 
     const supportAction = <Appbar.Action key="support" icon={p => <Images.Question fill={primaryColor} />} style={{ backgroundColor: lightPrimaryColor }} 
-        size={baseHeaderButtonSize * 0.8} color="#000" onPress={onSupportScreenRequested} />
+        size={getBaseHeaderButtonSize() * 0.8} color="#000" onPress={onSupportScreenRequested} />
     const barContent = <Appbar.Content key="content" title={currentTabTitle} 
         titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', 
-            fontSize: appBarsTitleFontSize, lineHeight: appBarsTitleFontSize }} />
+            fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() }} />
     const profileAction = <Appbar.Action key="profile" testID={appContext.account ? 'openProfile': 'openLoginScreen'} 
         style={{ backgroundColor: appContext.account?.avatarPublicId ? 'transparent' : '#fff', 
-            height: profileButtonSize, width: profileButtonSize }} 
+            height: getProfileButtonSize(), width: getProfileButtonSize() }} 
         icon={p => appContext.account ? <AvatarIcon account={appContext.account} size={p.size} /> : <LoginButton size={p.size} />} 
-        size={ appContext.account ? profileButtonSize : baseHeaderButtonSize }
+        size={ appContext.account ? getProfileButtonSize() : getBaseHeaderButtonSize() }
         centered
         borderless
         onPress={() => { 
@@ -78,7 +78,7 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
 
     if(appContext.account?.willingToContribute) {
         components.push(
-            <TokenCounter key="counter" onPress={onTokenCounterPressed} size={50} amountOfTokens={appContext.account!.amountOfTokens}/>, 
+            <TokenCounter key="counter" onPress={onTokenCounterPressed} size={getAppBarsTitleFontSize() * 50/STANDARD_APPBAR_TITLE_FONTSIZE} amountOfTokens={appContext.account!.amountOfTokens}/>, 
             barContent, supportAction, profileAction)
     } else {
         components.push(supportAction, barContent, profileAction)
