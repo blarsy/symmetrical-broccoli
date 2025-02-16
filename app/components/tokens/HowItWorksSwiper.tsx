@@ -3,23 +3,14 @@ import { t } from "i18next"
 import React, { useContext, useState } from "react"
 import { View, Image } from "react-native"
 import SwiperFlatList from "react-native-swiper-flatlist"
-import { OrangeButton } from "../layout/lib"
 import { Icon, Text } from "react-native-paper"
 import { AppContext } from "../AppContextProvider"
-import { useMutation } from "@apollo/client"
-import { GraphQlLib } from "@/lib/backendFacade"
-import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 
 interface Props {
     width: number
-    onBecameContributor: () => void
 }
 
-const HowItWorksSwiper = ({ width, onBecameContributor }: Props) => {
-    const [switchToContributionMode] = useMutation(GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE)
-    const { reloadAccount } = useUserConnectionFunctions()
-    const [ becomingContributor, setBecomingContributor] = useState(false)
-    
+const HowItWorksSwiper = ({ width }: Props) => {
     const appContext = useContext(AppContext)
     const childWidth = width
     const childPadding = 10
@@ -79,24 +70,6 @@ const HowItWorksSwiper = ({ width, onBecameContributor }: Props) => {
                 <Images.Tokens style={{ width: 30, height: 30 }}/>
                 <Text variant="bodyMedium">{t('tokenName')}</Text>
             </View>
-            <OrangeButton loading={becomingContributor} labelStyle={{ alignItems: 'center' }}
-                onPress={ async () => {
-                    setBecomingContributor(true)
-                    try {
-                        await switchToContributionMode()
-                        await reloadAccount()
-                        onBecameContributor()
-                    } finally {
-                        setBecomingContributor(false)
-                    }
-                }}
-                icon={p => <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
-                <Text style={{ color: '#fff' }} variant="bodySmall">+ 30</Text>
-                <Images.TokensBlack fill="#fff" style={{ width: 25, height: 25 }}/>
-                </View>}><View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                    <Text style={{ color: '#fff' }} variant="bodyLarge">{`${t('yes')} ${t('becomeContributorButton')}`}</Text>
-                </View>
-            </OrangeButton>
         </View>}
     </SwiperFlatList>
 }

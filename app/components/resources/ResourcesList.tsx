@@ -175,7 +175,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 setDeletingResource(0)
               }
             }} onDismiss={() => setDeletingResource(0)}/>
-        <ContributeDialog onBecameContributor={addRequested} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
+        <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={addRequested} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
             title={t('contributionExplainationDialogTitle')} />
     </>
 }

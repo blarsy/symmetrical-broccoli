@@ -26,7 +26,7 @@ const testNum = getTestNum()
 const email = `me${testNum}@me.com`, password= 'Password1!'
 
 afterAll(async () => {
-    //await deleteAccount(email, password)
+    await deleteAccount(email, password)
 })
 
 test('register new user, then log in and out', async () => {

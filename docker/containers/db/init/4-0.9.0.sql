@@ -174,7 +174,8 @@ $BODY$;
 
 ALTER FUNCTION sb.apply_resources_rewards(integer)
     OWNER TO sb;
-	
+
+REVOKE ALL ON FUNCTION sb.apply_resources_rewards(integer) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION sb.apply_resources_rewards(integer) TO identified_account;
 
 CREATE OR REPLACE FUNCTION sb.apply_my_resources_rewards()

@@ -27,7 +27,7 @@ test('Apply rewards', async () => {
             accountId: testAccounts[1].data.id,  expiration: dayjs(new Date()).add(1, "days").toDate(), 
             created: dayjs(new Date()).add(-1, "days").toDate(), title: `res${testAccounts[1].info.name}`
          }, 'd96ifkunm53v7biuocaj'),
-         createResourceLowLevel({ 
+         createResourceLowLevel({
             accountId: testAccounts[0].data.id,  expiration: dayjs(new Date()).add(1, "days").toDate(), 
             created: dayjs(new Date()).add(-1, "days").toDate(), title: `res${testAccounts[0].info.name}-1DayOld`
          }),
@@ -44,7 +44,7 @@ test('Apply rewards', async () => {
     
    await applyResourceRewards(testAccounts[0].data.token, testAccounts[0].data.id)
 
-   // should have 30 (account creation reward) + 20 (1 resourcese created for 24 hours)
+   // should have 50 (account creation reward) + 20 (1 resourcese created for 24 hours)
    await checkAccountTokens(testAccounts[0].info.email, 50)
    // should have only 30 (account creation reward)
    await checkAccountTokens(testAccounts[1].info.email, 30)

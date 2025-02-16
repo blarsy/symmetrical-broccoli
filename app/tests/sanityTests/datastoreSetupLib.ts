@@ -126,7 +126,7 @@ const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesReward
 
 export const applyResourceRewards = async (jwtToken: string, accountId: number) => {
     const loggedInClient = getApolloClient(jwtToken)
-    loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
+    return loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
 }
 
 export const setResourceData = async (id: number, dates:{ suspended?: Date, deleted?: Date, paid_until?: Date, created?: Date}) => {

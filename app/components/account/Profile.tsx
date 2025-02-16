@@ -108,7 +108,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
             <Appbar.BackAction onPress={() => navigation.navigate('main')} />
             <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', 
-                fontSize: appBarsTitleFontSize, lineHeight: getAppBarsTitleFontSize() }} 
+                fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() }} 
                 title={t('profile_label')}  />
             <Appbar.Action testID="logout" icon="logout" size={getAppBarsTitleFontSize()} color="#000" onPress={ async () => {
                 await logout()
