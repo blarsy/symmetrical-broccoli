@@ -20,7 +20,7 @@ export default (dark: boolean) => createTheme({
       main: primaryColor,
     },
     secondary: {
-      main: lightPrimaryColor
+      main: dark ? '#333' : lightPrimaryColor
     }
   },
   typography: {

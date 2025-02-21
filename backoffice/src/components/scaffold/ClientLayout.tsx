@@ -9,7 +9,7 @@ interface Props {
 }
 
 const ClientLayout = ({ title, children, version }: Props) => <ClientWrapper version={version}>
-    <Container sx={{ height: '100vh', display: 'flex', alignItems: 'stretch', justifyContent: 'center' }}>
+    <Container maxWidth="xl" sx={{ height: '100vh'}}>
         <Box display="flex" flexDirection="column" flex="1" justifyContent="flex-start">
             <Box display="flex" flexDirection="column" justifyContent="space-between" flex="1">
                 <Box display="flex" flexDirection="column" alignItems="center">

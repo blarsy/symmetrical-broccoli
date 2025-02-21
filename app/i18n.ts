@@ -460,7 +460,7 @@ const resources = {
       "nicePic": "Mettre des jolies photos",
       "completeProfile": "Compléter son profil",
       "howItWorksStep6Title": "On y va, ensemble ?",
-      "youAlreadyHave": "On a déjà commencé à compter, et tu as déjà",
+      "youAlreadyHave": "On a commencé à compter, et tu as déjà",
       "becomeContributorButton": "Je contribue"
     }
   }

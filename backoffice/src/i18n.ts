@@ -13,7 +13,26 @@ export default (lang?: string) => {
                 "recovery_title": "Account recovery",
                 "required_field": "Mandatory field",
                 "password_changed": "Your password has been changed successfully",
-                "open_on_mobile": "Please reopen the mobile app, and reconnect"
+                "open_on_mobile": "Please reopen the mobile app, and reconnect",
+                "moreOptions": "More options",
+                "natureOptionsLabel": "Nature",
+                "exchangeTypeOptionsLabel": "Exchange type",
+                "deliveryOptionsLabel": "Acheminement",
+                "isProduct": "Product",
+                "isService": "Service",
+                "canBeGifted": "Gift",
+                "canBeExchanged": "Barter",
+                "canBeTakenAway": "Take away",
+                "canBeDelivered": "Delivery",
+                "categoriesTitle": "Categories",
+                "filtersTitle": "Filters",
+                "proximityTitle": "Proximity",
+                "noLocationSet": "First set a reference location",
+                "setLocationDialogTitle": "Set location",
+                "includeUnlocatedResourcesLabel": "Include resource with no location defined",
+                "distanceTo": " km from",
+                "okButton": "Ok",
+                "cancelButton": "Cancel"
             }
         },
         fr: { 
@@ -26,7 +45,26 @@ export default (lang?: string) => {
                 "recovery_title": "Récupération de compte",
                 "required_field": "Ce champ est requis",
                 "password_changed": "Votre mot de passe a été changé",
-                "open_on_mobile": "Ouvrez l'app mobile pour vous reconnecter"
+                "open_on_mobile": "Ouvrez l'app mobile pour vous reconnecter",
+                "moreOptions": "Plus d'options",
+                "natureOptionsLabel": "Nature",
+                "exchangeTypeOptionsLabel": "Type d'échange",
+                "deliveryOptionsLabel": "Acheminement",
+                "isProduct": "Produit",
+                "isService": "Service",
+                "canBeGifted": "Don",
+                "canBeExchanged": "Troc",
+                "canBeTakenAway": "A emporter",
+                "canBeDelivered": "Livraison",
+                "categoriesTitle": "Categories",
+                "filtersTitle": "Filtres",
+                "proximityTitle": "Proximité",
+                "noLocationSet": "Veuillez définir une location de référence",
+                "setLocationDialogTitle": "Définir une location",
+                "includeUnlocatedResourcesLabel": "Inclure les resources sans location définie",
+                "distanceTo": " km de ",
+                "okButton": "Ok",
+                "cancelButton": "Cancel"
             }
         }
     }

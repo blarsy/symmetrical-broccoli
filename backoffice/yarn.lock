@@ -3543,6 +3543,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/google.maps@npm:^3.54.10":
+  version: 3.58.1
+  resolution: "@types/google.maps@npm:3.58.1"
+  checksum: 7ad5bd9566ffa0396485c432368e45c43e3fe1ecc2b89324f257a49d9abbe03dfe046a771d82ae1808fa0fb6e04e6ffca870c7f2295fef73a6015a678b067364
+  languageName: node
+  linkType: hard
+
 "@types/hoist-non-react-statics@npm:^3.3.1":
   version: 3.3.6
   resolution: "@types/hoist-non-react-statics@npm:3.3.6"
@@ -3910,6 +3917,19 @@ __metadata:
     "@typescript-eslint/types": 8.19.0
     eslint-visitor-keys: ^4.2.0
   checksum: 8b39f234027b9ec8306fec65918207ea2be9798cf79b6afc09f5cf705fb546de9813e00df910905bb6b12d3d9ce784fca3740ed5b8a3994aed21a932104f6915
+  languageName: node
+  linkType: hard
+
+"@vis.gl/react-google-maps@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "@vis.gl/react-google-maps@npm:1.5.1"
+  dependencies:
+    "@types/google.maps": ^3.54.10
+    fast-deep-equal: ^3.1.3
+  peerDependencies:
+    react: ">=16.8.0 || ^19.0 || ^19.0.0-rc"
+    react-dom: ">=16.8.0 || ^19.0 || ^19.0.0-rc"
+  checksum: 234b4b01de2d4b929d47eee4c6702f909ea1bc926f5b3a2241235ac4132d7cfe0aa9cf152eda13e810d6681f2e234877b5f7d276c271925ab879d162e1260394
   languageName: node
   linkType: hard
 
@@ -4727,6 +4747,7 @@ __metadata:
     "@types/react": 18.2.8
     "@types/react-dom": 18.2.4
     "@types/react-swipeable-views": ^0.13.3
+    "@vis.gl/react-google-maps": ^1.5.1
     axios: ^1.4.0
     bcryptjs: ^2.4.3
     bufferutil: ^4.0.8
@@ -4748,12 +4769,14 @@ __metadata:
     postgraphile: ^4.13.0
     react: latest
     react-dom: latest
+    react-geocode: ^1.0.0-alpha.1
     react-image-crop: ^10.1.4
     react-qr-code: ^2.0.12
     socket.io: ^4.7.2
     socket.io-client: ^4.7.2
     storybook: ^8.4.7
     typescript: 5.1.3
+    use-debounce: ^10.0.4
     usehooks-ts: ^2.9.1
     utf-8-validate: ^6.0.3
     winston: ^3.9.0
@@ -11096,6 +11119,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-geocode@npm:^1.0.0-alpha.1":
+  version: 1.0.0-alpha.1
+  resolution: "react-geocode@npm:1.0.0-alpha.1"
+  checksum: a3c24d0e2bcd25e1563b54f8f636cfcf973d1f63a65ae43952e92596e5e1045e10d8bee5a2cf23116d088b2afc2e0dfece040d5c39209a9647d23388e9f75d10
+  languageName: node
+  linkType: hard
+
 "react-image-crop@npm:^10.1.4":
   version: 10.1.8
   resolution: "react-image-crop@npm:10.1.8"
@@ -13003,6 +13033,15 @@ __metadata:
     punycode: ^1.4.1
     qs: ^6.12.3
   checksum: c25e587723d343d5d4248892393bfa5039ded9c2c07095a9d005bc64b7cb8956d623c0d8da8d1a28f71986a7a8d80fc2e9f9cf84235e48fa435a5cb4451062c6
+  languageName: node
+  linkType: hard
+
+"use-debounce@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "use-debounce@npm:10.0.4"
+  peerDependencies:
+    react: "*"
+  checksum: 59d7e014e9ac6ba57a5b1c411cf1c088b44987b898dd64a4dc73a02da66a5ecacbc3521e261d042e7d388445b69c820b43837a1533fe9def7f85adcaaec472d0
   languageName: node
   linkType: hard
 

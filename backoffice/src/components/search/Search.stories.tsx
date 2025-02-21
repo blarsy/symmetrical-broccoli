@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import Search, { DEFAULT_SEARCH_PARAMETERS, SUGGEST_RESOURCES } from './Search'
+import Search, { SUGGEST_RESOURCES } from './Search'
 import { apolloClientMocksDecorator } from '@/lib/storiesUtil'
+import ClientWrapper from '../scaffold/ClientWrapper'
+import { DEFAULT_SEARCH_PARAMETERS } from './SearchFilter'
 
 const makeResourceData = (id: number, title: string, description: string, accountName: string, avatarPublicId: string,
     resourceImagesPublicIds: string[]
@@ -42,7 +44,9 @@ const meta = {
     backgroundColor: { control: 'color' },
   },
   args: {  },
-  decorators: [apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
+  decorators: [(Story) => <ClientWrapper version="">
+    <Story/>
+  </ClientWrapper>, apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
     suggestedResources: {
       resources: [ 
         makeResourceData(1, 'resource title', 'resource description. No avatar. No resource image', 'account 1', '', []),

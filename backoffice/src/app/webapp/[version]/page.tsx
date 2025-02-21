@@ -1,21 +1,15 @@
 "use client"
-import { getApolloClient } from "@/lib/apolloClient"
-import { ApolloProvider } from "@apollo/client"
-import { ThemeProvider, useMediaQuery } from "@mui/material"
-import createTheme from "@/theme"
-import { getCommonConfig } from "@/config"
-import Search from "@/components/Search"
-const { mainVersion } = getCommonConfig()
+import Search from "@/components/search/Search"
+import ClientWrapper from "@/components/scaffold/ClientWrapper"
+import { usePagePath } from "@/lib/utils"
+import { useEffect } from "react"
 
 const Page = () => {
-    const dark = useMediaQuery('(prefers-color-scheme: dark)')
-    const theme = createTheme(dark)
+    const { version } = usePagePath()
 
-    return <ApolloProvider client={getApolloClient(mainVersion)}>
-        <ThemeProvider theme={theme}>
-            <Search/>
-        </ThemeProvider>
-    </ApolloProvider>
+    return <ClientWrapper version={version}>
+        <Search/>
+    </ClientWrapper>
 }
 
 export default Page

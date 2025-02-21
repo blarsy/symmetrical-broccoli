@@ -3,7 +3,7 @@ import { LoadingButton } from "@mui/lab"
 import { Formik } from "formik"
 import * as yup from 'yup'
 import RecoverIcon from '@mui/icons-material/LockReset'
-import Feedback from "@/components/Feedback"
+import Feedback from "@/components/scaffold/Feedback"
 import { useEffect, useState } from "react"
 import { isValidPassword } from "@/utils"
 import { gql, useMutation } from "@apollo/client"
@@ -33,7 +33,7 @@ const Recover = ({ recoveryId }: Props) => {
     }, [])
 
     if(uiState.loading) {
-        return <CircularProgress />
+        return <CircularProgress color="primary"/>
     } else if(uiState.success) {
         return <Stack alignItems="center" gap="2rem">
             <Alert severity="success">{uiState.t!('password_changed')}</Alert>

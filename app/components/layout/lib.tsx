@@ -1,4 +1,4 @@
-import React, { LegacyRef, ReactNode, RefObject, useState } from "react"
+import React, { LegacyRef, PropsWithChildren, ReactNode, RefObject, useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
@@ -42,7 +42,7 @@ export const WhiteButton = (props: ButtonProps) => <Button mode="contained" text
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
     {...props} style={mergeWith({ borderRadius: 15, padding: 10 } , props.style )} />
     
-export function ErrorText(props: TextProps<never>) {
+export const ErrorText= (props: PropsWithChildren) => {
     return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>
 }
 
@@ -180,7 +180,7 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
                 <Icon source="chevron-right" size={26} color="#000" />
             </View>
         </TouchableOpacity>
-        <DatePickerModal testID={`${props.testID}:Picker`}
+        <DatePickerModal
             locale={getLanguage()}
             mode="single"
             visible={dateOpen}
@@ -197,7 +197,6 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
         />
     </View>
 }
-
 
 export const Hr = ({ color, thickness, margin }: { color?: ColorValue, thickness?: number, margin?: number }) => 
     <View style={{ backgroundColor: color || '#343434', 

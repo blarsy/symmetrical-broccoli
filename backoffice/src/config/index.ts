@@ -3,6 +3,7 @@ const config = JSON.parse(process.env.NEXT_PUBLIC_CONFIG!)
 export interface RawConfig {
     link1Url: string
     link2Url: string
+    mapsApiKey: string
     cloudinaryCloud: string
     mainVersion: string
     versions: {[version: string]: VersionSpecificRawConfig}

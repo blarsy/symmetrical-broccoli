@@ -1,3 +1,5 @@
+import AppContextProvider, { AppStateData } from "@/components/scaffold/AppContextProvider"
+import i18n from "@/i18n"
 import { DocumentNode } from "@apollo/client"
 import { MockedResponse, MockedProvider } from '@apollo/react-testing'
 
@@ -19,3 +21,15 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
             <Story />
         </MockedProvider>
     }
+
+export const appContextDecorator = (initial?: AppStateData) => {
+    if(!initial){
+        initial = { loading: false, token: '', i18n: { lang: 'fr', translator: (str, opt?) => `fr-${str}`} }
+
+    }
+    return (StoryElement: React.ElementType) => 
+        <AppContextProvider initial={initial}>
+            <StoryElement/>
+        </AppContextProvider>
+}
+      

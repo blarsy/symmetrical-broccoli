@@ -1,5 +1,5 @@
-import { Box, Stack, Alert, Typography, CircularProgress } from "@mui/material"
-import Feedback from "@/components/Feedback"
+import { Box, Stack, Alert, CircularProgress } from "@mui/material"
+import Feedback from "@/components/scaffold/Feedback"
 import { ReactNode, useEffect, useState } from "react"
 import { gql, useMutation } from "@apollo/client"
 import i18n from "@/i18n"
@@ -37,7 +37,7 @@ const Activation = ({ activationId }: Props) => {
     let content: ReactNode
 
     if(uiState.loading) {
-        content = <CircularProgress/>
+        content = <CircularProgress color="primary"/>
     } else if(uiState.error) {
         content = <Feedback severity="error" message={uiState.error.name} 
             detail={uiState.error.message} 

@@ -1,5 +1,5 @@
 "use client"
-import ClientLayout from "@/components/ClientLayout"
+import ClientLayout from "@/components/scaffold/ClientLayout"
 import { Box, Typography } from "@mui/material"
 
 const Support = () => {
