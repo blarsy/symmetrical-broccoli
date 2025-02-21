@@ -1,9 +1,10 @@
-import { Button, InputAdornment, OutlinedInput, Typography, Checkbox, FormControlLabel } from "@mui/material"
+import { Button, InputAdornment, OutlinedInput, Typography, Checkbox, FormControlLabel, IconButton } from "@mui/material"
 import { Stack } from "@mui/system"
 import { useContext, useEffect, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import ExpandLess from '@mui/icons-material/ExpandLess'
+import Close from '@mui/icons-material/Close'
 import Search from '@mui/icons-material/Search'
 import { primaryColor } from "@/utils"
 import CategoriesSelector from "../form/CategoriesSelector"
@@ -60,14 +61,18 @@ const SearchFilter = (p: Props) => {
             flexDirection:  'row',
             alignItems: 'inherit',
             padding: '0.5rem',
+            position: 'relative',
             [theme.breakpoints.down('md')]: {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '0.5rem'
             }
         })}>
+            <IconButton onClick={() => setShowOptions(false)} sx={{position: 'absolute', right: 0}}>
+                <Close/>
+            </IconButton>
             <ResourceAttributesFilter sx={{ flex: 1 }} searchParameters={searchParameters} onChange={setParams} />
-            <Stack sx={{ flex: 1 }}>
+            <Stack sx={{ flex: 1, alignItems: 'center' }}>
                 <Typography variant="h4" textAlign="center">{appContext.i18n.translator('categoriesTitle')}</Typography>
                 <CategoriesSelector lang={appContext.i18n.lang} values={searchParameters.categoryCodes} onSelectionChanged={selectedCats => setParams({ categoryCodes: selectedCats })}/>
             </Stack>
