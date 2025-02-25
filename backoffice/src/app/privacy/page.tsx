@@ -3,7 +3,7 @@ import ClientLayout from "@/components/scaffold/ClientLayout"
 import { Typography } from "@mui/material"
 
 const Privacy = () => {
-    return <ClientLayout title="Politique de confidentialié">
+    return <ClientLayout title="Politique de confidentialié" version="">
         <>
             <Typography variant="subtitle1">Nous accordons une grande importance à la confidentialit&#xE9; de vos donn&#xE9;es personnelles. Cette politique de confidentialit&#xE9; explique comment nous collectons, utilisons et prot&#xE9;geons les informations que vous nous fournissez lorsque vous utilisez notre application web.</Typography>
             <Typography variant="subtitle2">1. Collecte des donn&#xE9;es personnelles</Typography>

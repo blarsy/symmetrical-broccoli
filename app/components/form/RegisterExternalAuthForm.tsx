@@ -21,8 +21,7 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
     ) {
       jwtToken
     }
-  }
-  `
+  }`
 
 const RegisterExternalAuthForm = ({ toggleRegisteringExternalAuth, onAccountRegistered, email, token }: Props) => {
     const { login } = useUserConnectionFunctions()

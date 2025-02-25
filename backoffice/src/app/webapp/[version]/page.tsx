@@ -1,15 +1,13 @@
 "use client"
 import Search from "@/components/search/Search"
-import ClientWrapper from "@/components/scaffold/ClientWrapper"
+import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import { usePagePath } from "@/lib/utils"
-import { useEffect } from "react"
 
 const Page = () => {
     const { version } = usePagePath()
-
-    return <ClientWrapper version={version}>
+    return <ConnectedLayout version={version}>
         <Search/>
-    </ClientWrapper>
+    </ConnectedLayout>
 }
 
 export default Page

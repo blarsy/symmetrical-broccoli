@@ -14,13 +14,12 @@ import { ApolloProvider } from '@apollo/client'
 import { getApolloClient } from '@/lib/apolloClient'
 import i18n from '@/i18n'
 import LoadedZone from './LoadedZone'
+import { PropsWithVersion } from '@/lib/utils'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import { getCommonConfig } from '@/config'
+import useAccountFunctions from '@/lib/useAccountFunctions'
 
 dayjs.extend(relativeTime)
-
-interface Props {
-    children: JSX.Element
-    version?: string
-}
 
 const getNavigatorLanguage = () => {
     navigator.languages.forEach(lang => {
@@ -30,25 +29,34 @@ const getNavigatorLanguage = () => {
     return 'fr'
 }
 
+const { googleApiKey } = getCommonConfig()
 
-const Translatable = ({ children }: { children: JSX.Element }) => {
+const Translatable = ({ children, version }: PropsWithVersion) => {
     const appDispatcher = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
     const [theme, setTheme] = useState(undefined as Theme | undefined)
     const dark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
+    const { restoreSession } = useAccountFunctions(version)
 
     const load = async () => {
         const token = localStorage.getItem('token')
         let uiLanguage = localStorage.getItem('lang')
+        if(!uiLanguage) {
+            uiLanguage = getNavigatorLanguage()
+            localStorage.setItem('lang', uiLanguage)
+        }
+        const translator = await i18n(uiLanguage)
+
         if(!token) {
-            if(!uiLanguage) {
-                uiLanguage = getNavigatorLanguage()
-                localStorage.setItem('lang', uiLanguage)
-            }
-            const translator = await i18n(uiLanguage)
-            appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage } }})
+            appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version }})
         } else {
-            //load account and set uiLanguage with the account's language
+            try {
+                await restoreSession(token, { i18n: { translator, lang: uiLanguage }, version })
+            } catch(e) {
+                // TODO: handle expired token
+
+                appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
+            }
         }
     }
     useEffect(() => { 
@@ -69,12 +77,14 @@ const Translatable = ({ children }: { children: JSX.Element }) => {
     </LoadedZone>
 }
 
-export const ClientWrapper = ({ children, version }: Props) => {
+export const ClientWrapper = ({ children, version }: PropsWithVersion) => {
     return <ApolloProvider client={getApolloClient(version)}>
         <AppContextProvider>
-            <Translatable>
-                { children }
-            </Translatable>
+            <GoogleOAuthProvider clientId={googleApiKey}>
+                <Translatable version={version}>
+                    { children }
+                </Translatable>
+            </GoogleOAuthProvider>
         </AppContextProvider>
     </ApolloProvider>
 }

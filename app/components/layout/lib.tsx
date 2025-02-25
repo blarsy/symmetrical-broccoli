@@ -46,7 +46,7 @@ export const ErrorText= (props: PropsWithChildren) => {
     return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>
 }
 
-export const OrangeBackedErrorText = (props: TextProps<never>) => <Text variant="bodyMedium" style={{
+export const OrangeBackedErrorText = (props: PropsWithChildren) => <Text variant="bodyMedium" style={{
     backgroundColor: 'orange', color: '#fff'
 }}>{props.children}</Text>
 

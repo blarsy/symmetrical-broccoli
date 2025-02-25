@@ -32,7 +32,13 @@ export default (lang?: string) => {
                 "includeUnlocatedResourcesLabel": "Include resource with no location defined",
                 "distanceTo": " km from",
                 "okButton": "Ok",
-                "cancelButton": "Cancel"
+                "cancelButton": "Cancel",
+                "searchButtonCaption": "Search",
+                "connectDialogTitle": "Connect to Tope-là",
+                "mustBeValidEmail": "must be a valid email address",
+                "requiredField": "must be provided",
+                "passwordLabel": "Password",
+                "connectButton": "Connect"
             }
         },
         fr: { 
@@ -64,7 +70,13 @@ export default (lang?: string) => {
                 "includeUnlocatedResourcesLabel": "Inclure les resources sans location définie",
                 "distanceTo": " km de ",
                 "okButton": "Ok",
-                "cancelButton": "Cancel"
+                "cancelButton": "Annuler",
+                "searchButtonCaption": "Recherche",
+                "connectDialogTitle": "Connecte-toi à Tope-là",
+                "mustBeValidEmail": "doit être une adresse email valide",
+                "requiredField": "doit être remplis",
+                "passwordLabel": "Mot de passe",
+                "connectButton": "Se connecter"
             }
         }
     }

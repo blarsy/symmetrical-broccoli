@@ -6,11 +6,13 @@ export interface RawConfig {
     mapsApiKey: string
     cloudinaryCloud: string
     mainVersion: string
+    googleApiKey: string
     versions: {[version: string]: VersionSpecificRawConfig}
 }
 
 interface VersionSpecificRawConfig {
     graphqlUrl: string
+    apiUrl: string
 }
 
 export interface Config extends RawConfig, VersionSpecificRawConfig {

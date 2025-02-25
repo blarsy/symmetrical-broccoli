@@ -4,6 +4,7 @@ import { createContext, Dispatch, useEffect, useReducer } from "react"
 export interface AppStateData {
   loading: boolean
   error?: Error
+  version: string
   token: string
   i18n: {
     translator: TFunction<"translation", undefined>
@@ -46,9 +47,9 @@ export enum AppReducerActionType {
 const appReducer = (previousState: AppStateData, action: { type: AppReducerActionType, payload: any }): AppStateData => {
   switch(action.type) {
       case AppReducerActionType.Load:
-        return {...previousState, ...{ loading: false, i18n: action.payload.i18n, error: action.payload.error }}
+        return {...previousState, ...{ loading: false, i18n: action.payload.i18n, error: action.payload.error, version: action.payload.version }}
       case AppReducerActionType.Login:
-        return {...previousState, ...{ account: { ...action.payload.account }, translator: action.payload.translator }}
+        return {...previousState, ...action.payload, ...{ loading: false }}
       case AppReducerActionType.Logout:
         return {...previousState, ...{ token: '', account: undefined, uiLanguage: 'fr' }}
       default:

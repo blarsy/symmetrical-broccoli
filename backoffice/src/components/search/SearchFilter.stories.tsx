@@ -3,6 +3,7 @@ import SearchFilter from "./SearchFilter"
 import ClientWrapper from "../scaffold/ClientWrapper"
 import { apolloClientMocksDecorator } from "@/lib/storiesUtil"
 import { GET_CATEGORIES } from "../form/CategoriesSelector"
+import { DEFAULT_SEARCH_PARAMETERS } from "./Search"
 
 const meta = {
     title: 'Search filter',
@@ -27,7 +28,7 @@ const meta = {
                 ]
             }
         }
-    }]), (Story) => <ClientWrapper version="">
+    }]), (Story) => <ClientWrapper version="v0_9">
     <Story/>
   </ClientWrapper>]
   } satisfies Meta<typeof SearchFilter>
@@ -37,6 +38,7 @@ const meta = {
   
   export const Empty: Story = {
     args: {
+      value: DEFAULT_SEARCH_PARAMETERS,
       onParamsChanged: console.log
     }
   }

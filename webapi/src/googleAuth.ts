@@ -4,11 +4,17 @@ import { OAuth2Client } from "google-auth-library"
 import logger from "./logger"
 import { runAndLog } from "./db_jobs/utils"
 import { Pool } from "pg"
+import { CorsRequest } from "cors"
 const client = new OAuth2Client()
 
-export default (app: Express, pool: Pool, googleAuthAudience: string) => {
+export default (app: Express, pool: Pool, googleAuthAudience: string, corsMiddleware: (req: CorsRequest, res: {
+    statusCode?: number | undefined;
+    setHeader(key: string, value: string): any;
+    end(): any;
+}, next: (err?: any) => any) => void) => {
     app.use(json())
-    app.post(`/gauth`, async (req, res) => {
+    
+    app.post(`/gauth`, corsMiddleware, async (req, res) => {
         try {
             // verify the userId at Google
             const loginTicket = await client.verifyIdToken({ idToken: req.body.idToken, audience: googleAuthAudience })

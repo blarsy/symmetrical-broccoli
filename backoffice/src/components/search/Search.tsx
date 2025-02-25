@@ -49,7 +49,7 @@ const AccountAvatar = ({name, avatarImagePublicId}:{ name: string, avatarImagePu
     return <Avatar alt={name}>{makeAvatarLetters(name)}</Avatar>
 }
 
-const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: false, canBeExchanged: false, 
+export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: false, canBeExchanged: false, 
   canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false, categoryCodes: [], 
   excludeUnlocated: false, referenceLocation: null, distanceToReferenceLocation: 50, searchTerm: '' }
 

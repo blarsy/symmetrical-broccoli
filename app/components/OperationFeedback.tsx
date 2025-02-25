@@ -16,7 +16,7 @@ interface ErrorSnackbarProps {
     message?: string
     error?: Error
     onDismissError: () => void
-    testID: string
+    testID?: string
 }
 export const ErrorSnackbar = ({ message, error, onDismissError }: ErrorSnackbarProps) => {
     useEffect(() => {

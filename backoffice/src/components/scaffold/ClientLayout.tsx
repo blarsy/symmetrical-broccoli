@@ -5,7 +5,7 @@ import ClientWrapper from "./ClientWrapper"
 interface Props {
     title?: string,
     children: JSX.Element | '' | undefined,
-    version?: string
+    version: string
 }
 
 const ClientLayout = ({ title, children, version }: Props) => <ClientWrapper version={version}>

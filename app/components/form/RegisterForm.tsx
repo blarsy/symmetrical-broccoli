@@ -31,7 +31,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                 email: yup.string().email(t('invalid_email')).required(t('field_required')),
                 password: yup.string().required(t('field_required')).test({ 
                     name: 'passwordValid', 
-                    message: t('password_invalid'), 
+                    message: t('password_invalid'),
                     test: isValidPassword
                 }),
                 repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
