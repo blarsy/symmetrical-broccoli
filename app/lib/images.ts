@@ -24,7 +24,7 @@ export const uploadImage = async (path: string):Promise<string> => {
 
     const res = await fetch(`${cloudinaryRestUrl}${cloudinaryCloud}/image/upload`, { method: 'POST', body: formData })
     const parsedResult = await res.json()
-    return parsedResult.public_id
+    return (parsedResult as any).public_id
 }
 
 export const urlFromPublicId = (publicId: string) => cld.image(publicId).toURL()

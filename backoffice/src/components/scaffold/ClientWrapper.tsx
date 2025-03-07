@@ -35,12 +35,13 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
     const appDispatcher = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
     const [theme, setTheme] = useState(undefined as Theme | undefined)
-    const dark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
+    const defaultDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
     const { restoreSession } = useAccountFunctions(version)
 
     const load = async () => {
         const token = localStorage.getItem('token')
         let uiLanguage = localStorage.getItem('lang')
+        const lightMode = localStorage.getItem('lightMode')
         if(!uiLanguage) {
             uiLanguage = getNavigatorLanguage()
             localStorage.setItem('lang', uiLanguage)
@@ -48,10 +49,10 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         const translator = await i18n(uiLanguage)
 
         if(!token) {
-            appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version }})
+            appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
         } else {
             try {
-                await restoreSession(token, { i18n: { translator, lang: uiLanguage }, version })
+                await restoreSession(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
             } catch(e) {
                 // TODO: handle expired token
 
@@ -60,33 +61,34 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         }
     }
     useEffect(() => { 
-        setTheme(createTheme(dark)) 
-    }, [dark])
+        console.log('setting theme, defaultDark, app lightMode', defaultDark, appContext.lightMode)
+        setTheme(createTheme(appContext.lightMode === undefined ? defaultDark : !appContext.lightMode)) 
+    }, [defaultDark, appContext.lightMode])
 
     useEffect(() => {
         load()
     }, [])
 
     return <LoadedZone loading={appContext.loading || !theme} error={appContext.error}>
-        { !appContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={appContext.i18n.lang}>
-            <ThemeProvider theme={theme!}>
-                <CssBaseline />
-                {children}
-            </ThemeProvider>
-        </LocalizationProvider>}
+        <ApolloProvider client={getApolloClient(version, appContext.token)}>
+            { !appContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={appContext.i18n.lang}>
+                <ThemeProvider theme={theme!}>
+                    <CssBaseline />
+                    {children}
+                </ThemeProvider>
+            </LocalizationProvider>}
+        </ApolloProvider>
     </LoadedZone>
 }
 
 export const ClientWrapper = ({ children, version }: PropsWithVersion) => {
-    return <ApolloProvider client={getApolloClient(version)}>
-        <AppContextProvider>
-            <GoogleOAuthProvider clientId={googleApiKey}>
-                <Translatable version={version}>
-                    { children }
-                </Translatable>
-            </GoogleOAuthProvider>
-        </AppContextProvider>
-    </ApolloProvider>
+    return <AppContextProvider>
+        <GoogleOAuthProvider clientId={googleApiKey}>
+            <Translatable version={version}>
+                { children }
+            </Translatable>
+        </GoogleOAuthProvider>
+    </AppContextProvider>
 }
 
 export default ClientWrapper

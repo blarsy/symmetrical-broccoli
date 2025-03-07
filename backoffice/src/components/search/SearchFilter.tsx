@@ -57,7 +57,7 @@ const SearchFilter = (p: Props) => {
                 onChange={e => setParams({ searchTerm: e.target.value || '' })}></OutlinedInput>
         </Stack>
         { showOptions && <Stack sx={theme => ({
-            bgcolor: 'secondary.main',
+            bgcolor: 'secondary',
             flexDirection:  'row',
             alignItems: 'inherit',
             padding: '0.5rem',
@@ -73,7 +73,7 @@ const SearchFilter = (p: Props) => {
             </IconButton>
             <ResourceAttributesFilter sx={{ flex: 1 }} searchParameters={searchParameters} onChange={setParams} />
             <Stack sx={{ flex: 1, alignItems: 'center' }}>
-                <Typography variant="h4" textAlign="center">{appContext.i18n.translator('categoriesTitle')}</Typography>
+                <Typography variant="h4" textAlign="center" color="secondary">{appContext.i18n.translator('categoriesTitle')}</Typography>
                 <CategoriesSelector lang={appContext.i18n.lang} values={searchParameters.categoryCodes} onSelectionChanged={selectedCats => setParams({ categoryCodes: selectedCats })}/>
             </Stack>
             <ProximityFilter sx={{ flex: 1 }}

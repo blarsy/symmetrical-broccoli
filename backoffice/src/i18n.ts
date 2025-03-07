@@ -38,7 +38,18 @@ export default (lang?: string) => {
                 "mustBeValidEmail": "must be a valid email address",
                 "requiredField": "must be provided",
                 "passwordLabel": "Password",
-                "connectButton": "Connect"
+                "connectButton": "Connect",
+                "preferencesMenuCaption": "Preferences",
+                "someDataInvalid": "Save failed: values missing or invalid",
+                "nameFieldLabel": "Account name",
+                "nameTooLong": "Please use a shorter name",
+                "requestError": "Error while processing request",
+                "emailFieldLabel": "Email",
+                "invalidEmail": "Email address format incorrect",
+                "selectLocalFileButton": "Choose a local file",
+                "dragImageHere": "... or drop an image here",
+                "uploadButtonCaption": "Done",
+                "newEmailMustBeActivated": "The new email address should be activated by clicking on the link sent there."
             }
         },
         fr: { 
@@ -76,7 +87,18 @@ export default (lang?: string) => {
                 "mustBeValidEmail": "doit être une adresse email valide",
                 "requiredField": "doit être remplis",
                 "passwordLabel": "Mot de passe",
-                "connectButton": "Se connecter"
+                "connectButton": "Se connecter",
+                "preferencesMenuCaption": "Préférences",
+                "someDataInvalid": "Echec: valeurs manquantes ou invalides",
+                "nameFieldLabel": "Nom du compte",
+                "nameTooLong": "Veuillez utiliser un nom plus court",
+                "requestError": "Une erreur est survenue pendant l'éxécution de la requête",
+                "emailFieldLabel": "Email",
+                "invalidEmail": "Format de l'adresse email incorrect",
+                "selectLocalFileButton": "Choisir un fichier",
+                "dragImageHere": "... ou déposer une image ici",
+                "uploadButtonCaption": "Terminé",
+                "newEmailMustBeActivated": "Le nouvel email doit encore être confirmé en cliquant sur le lien qui y a été envoyé."
             }
         }
     }

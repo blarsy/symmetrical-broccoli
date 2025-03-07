@@ -35,17 +35,21 @@ const Settings = (p: ProximitySettingsProps) => {
     const appContext = useContext(AppContext)
 
     return <Stack>
-        <Typography variant="body1">{`${p.distance} ${appContext.i18n.translator('distanceTo')}`}</Typography>
+        <Typography variant="body1" color="secondary">{`${p.distance} ${appContext.i18n.translator('distanceTo')}`}</Typography>
         <Stack direction="row" alignItems="center" gap="1rem">
-            <Typography variant="body1">{p.address}</Typography>
+            <Typography variant="body1" color="secondary">{p.address}</Typography>
             <IconButton onClick={p.onSetNewLocationRequest}>
-                <EditIcon/>
+                <EditIcon color="secondary"/>
             </IconButton>
         </Stack>
-        <Slider sx={{ color: primaryColor }} min={1} max={50} value={p.distance} onChange={(e, val) => p.onChange(val as number, p.excludeUnlocated) } />
+        <Slider color="secondary" min={1} max={50} value={p.distance} onChange={(e, val) => p.onChange(val as number, p.excludeUnlocated) } />
         <FormControlLabel control={<Checkbox checked={!p.excludeUnlocated} onChange={e => {
             p.onChange(p.distance, !p.excludeUnlocated)
-        }} />} label={appContext.i18n.translator('includeUnlocatedResourcesLabel')} />
+        }} />} label={appContext.i18n.translator('includeUnlocatedResourcesLabel')} sx={{
+            '& .MuiFormControlLabel-label': {
+                color: 'secondary.main'
+            }
+        }}/>
     </Stack>
 }
 
@@ -65,7 +69,7 @@ const ProximityFilter = (p: Props) => {
     }, [currentParameters])
 
     return <Stack sx={p.sx}>
-        <Typography variant="h4" textAlign="center">{appContext.i18n.translator('proximityTitle')}</Typography>
+        <Typography variant="h4" textAlign="center" color="secondary">{appContext.i18n.translator('proximityTitle')}</Typography>
         { currentParameters.referenceLocation ? <Settings 
             address={ currentParameters.referenceLocation!.address } 
             distance={currentParameters.distanceToReferenceLocation} 

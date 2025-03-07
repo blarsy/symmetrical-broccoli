@@ -1,13 +1,12 @@
 import { t } from "@/i18n"
 import { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { ActivityIndicator, Dialog, IconButton, Portal, Text } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./layout/constants"
 import Images from "@/Images"
 import { OrangeButton } from "./layout/lib"
 import { StyleProp, View, ViewStyle } from "react-native"
 import { ErrorSnackbar } from "./OperationFeedback"
-import { error } from "@/lib/logger"
 import BareIconButton from "./layout/BareIconButton"
 
 

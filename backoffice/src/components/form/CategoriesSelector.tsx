@@ -37,7 +37,11 @@ const CategoriesSelector = (p: Props) => {
                     return newValue
                 })
                 p.onSelectionChanged(newValue)
-        }} />} label={cat.name} />)}
+        }} />} label={cat.name} sx={{
+            '& .MuiFormControlLabel-label': {
+                color: 'secondary.main'
+            }
+        }} />)}
     </LoadedZone>
 }
 

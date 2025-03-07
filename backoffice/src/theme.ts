@@ -17,10 +17,11 @@ export default (dark: boolean) => createTheme({
   palette: {
     mode: dark ? 'dark': 'light',
     primary: {
-      main: primaryColor,
+      main: '#ff4401',
+      contrastText: '#fef0e3',
     },
     secondary: {
-      main: dark ? lightPrimaryColor :'#333'
+      main: '#f50057',
     }
   },
   typography: {

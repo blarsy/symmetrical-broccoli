@@ -2,7 +2,6 @@ import { AppContext, AppDispatchContext, AppReducerActionType } from "@/componen
 import { useContext, useEffect, useState } from "react"
 import { Location, parseLocationFromGraph } from "./schema"
 import { fromData, fromError, initial } from "./DataLoadState"
-import { t } from "@/i18n"
 import { gql, useLazyQuery } from "@apollo/client"
 
 export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {

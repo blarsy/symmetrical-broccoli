@@ -1,8 +1,8 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
-import { AppContext } from "../AppContextProvider"
 import { Link, Location, parseLocationFromGraph } from "@/lib/schema"
-import DataLoadState, { initial, fromError, fromData } from "@/lib/DataLoadState"
+import { AppContext } from "@/components/scaffold/AppContextProvider"
+import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
@@ -57,7 +57,7 @@ interface UseProfileData {
         update: (links: Link[], location: Location | null) => Promise<void>,
         updating: boolean
         error?: Error
-    } 
+    }
 }
 
 const emptyProfileData = { links: [], location: null, preferences: { chatMessageDaysSummary: 1, newResourcesDaysSummary: 1 }}
@@ -130,7 +130,7 @@ function useProfile () {
             })
         } else if(publicInfoError){
             setUseProfileData({
-                profileData: fromError(publicInfoError),
+                profileData: fromError(publicInfoError, appContext.i18n.translator('requestError')),
                 updatePublicInfo: { update: updatePublicInfo, updating: false }
             })
         } else {

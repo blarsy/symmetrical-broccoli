@@ -1,5 +1,6 @@
+import { AccountInfo } from "@/lib/useAccountFunctions"
 import { TFunction } from "i18next"
-import { createContext, Dispatch, useEffect, useReducer } from "react"
+import { createContext, Dispatch, useReducer } from "react"
 
 export interface AppStateData {
   loading: boolean
@@ -10,12 +11,8 @@ export interface AppStateData {
     translator: TFunction<"translation", undefined>
     lang: string
   }
-  account?: {
-    name: string
-    balance: number
-    email: string
-    language: string
-  }
+  account?: AccountInfo
+  lightMode?: boolean
 }
 
 const blankAppContext = { 
@@ -28,6 +25,7 @@ export enum AppReducerActionType {
   Load,
   Login,
   Logout,
+  SwitchLightMode,
   UpdateAccount,
   DisplayNotification,
   ClearNotification,
@@ -45,16 +43,30 @@ export enum AppReducerActionType {
 }
 
 const appReducer = (previousState: AppStateData, action: { type: AppReducerActionType, payload: any }): AppStateData => {
+  let newState : any
   switch(action.type) {
       case AppReducerActionType.Load:
-        return {...previousState, ...{ loading: false, i18n: action.payload.i18n, error: action.payload.error, version: action.payload.version }}
+        newState = { loading: false, i18n: action.payload.i18n, error: action.payload.error, version: action.payload.version, lightMode: action.payload.lightMode }
+        break
       case AppReducerActionType.Login:
-        return {...previousState, ...action.payload, ...{ loading: false }}
+        newState = {...action.payload, ...{ loading: false }}
+        break
       case AppReducerActionType.Logout:
-        return {...previousState, ...{ token: '', account: undefined, uiLanguage: 'fr' }}
+        newState = { token: '', account: undefined, uiLanguage: 'fr' }
+        break
+      case AppReducerActionType.SwitchLightMode:
+        newState = { lightMode: !previousState.lightMode }
+        break
+      case AppReducerActionType.UpdateAccount:
+        newState = { account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } } }
+        break
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
+
+  console.log('previous', previousState, 'new', newState)
+
+  return {...previousState, ...newState}
 }
 
 export const AppContext = createContext<AppStateData>(blankAppContext)

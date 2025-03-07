@@ -3,7 +3,6 @@ import { gql, useLazyQuery } from "@apollo/client"
 import { createContext, useState } from "react"
 import React from "react"
 import { Category, Resource, fromServerGraphResource } from "@/lib/schema"
-import { t } from "@/i18n"
 import { IMessage } from "./Chat"
 
 export const MESSAGES_PER_PAGE = 25

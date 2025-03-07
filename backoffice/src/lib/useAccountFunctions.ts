@@ -76,7 +76,7 @@ const useAccountFunctions = (version: string) => {
     const restoreSession = async (token: string, otherSessionProps: any) => {
         const { account } = await connectWithToken(token)
 
-        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, ...{account} } })
+        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, ...{account, token} } })
     }
 
     const login = async (email: string, password: string) => {

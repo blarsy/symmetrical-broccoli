@@ -1,6 +1,4 @@
-import { PropsWithChildren } from "react"
 import { Container } from "@mui/material"
-
 import ClientWrapper from "./ClientWrapper"
 import TopBar from "./TopBar"
 import { PropsWithVersion } from "@/lib/utils"

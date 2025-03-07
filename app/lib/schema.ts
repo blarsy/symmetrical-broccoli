@@ -4,7 +4,6 @@ export interface Account {
     name: string,
     id: number,
     email: string,
-    hash?: string,
     avatarImageUrl?: string
 }
 

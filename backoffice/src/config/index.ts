@@ -5,6 +5,8 @@ export interface RawConfig {
     link2Url: string
     mapsApiKey: string
     cloudinaryCloud: string
+    cloudinaryUploadPreset: string
+    cloudinaryRestUrl: string
     mainVersion: string
     googleApiKey: string
     versions: {[version: string]: VersionSpecificRawConfig}

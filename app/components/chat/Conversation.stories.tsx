@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, conversationContextDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Conversation, { CREATE_MESSAGE, SET_PARTICIPANT_READ } from './Conversation'
 import { initial } from '@/lib/DataLoadState'

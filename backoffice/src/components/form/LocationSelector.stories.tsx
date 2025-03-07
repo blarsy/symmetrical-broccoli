@@ -22,6 +22,7 @@ type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {
   args: {
-value: null
+    onLocationSet: console.log,
+    value: null
   }
 }
