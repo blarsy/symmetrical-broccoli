@@ -34,6 +34,7 @@ export const createPool = (config: Config, appName: string) => {
 export interface RawConfig {
     backupCommand: string
     dbPassword: string
+    googleApiSecret: string
     googleAuthAudience: string
     googleServiceAccount: string
     googlePrivateKey: string

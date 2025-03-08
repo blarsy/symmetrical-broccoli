@@ -52,7 +52,7 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = {...action.payload, ...{ loading: false }}
         break
       case AppReducerActionType.Logout:
-        newState = { token: '', account: undefined, uiLanguage: 'fr' }
+        newState = { token: '', account: undefined }
         break
       case AppReducerActionType.SwitchLightMode:
         newState = { lightMode: !previousState.lightMode }

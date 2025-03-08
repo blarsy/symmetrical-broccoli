@@ -73,6 +73,11 @@ const useAccountFunctions = (version: string) => {
         return { res, account, client }
     }
 
+    const disconnect = () => {
+        localStorage.removeItem('token')
+        appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
+    }
+
     const restoreSession = async (token: string, otherSessionProps: any) => {
         const { account } = await connectWithToken(token)
 
@@ -86,35 +91,45 @@ const useAccountFunctions = (version: string) => {
         appDispatch({ type: AppReducerActionType.Login, payload: { account } })
     }
 
-    const connectWithGoogle = async (gauthToken: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
+    const connectGoogleWithIdToken = async (idToken: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
+        return connectWithGoogle({
+            idToken
+        }, onNewAccountNeeded)
+    }
+
+    const connectGoogleWithAccessCode = async (code: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
+        return connectWithGoogle({
+            code
+        }, onNewAccountNeeded)
+    }
+
+    const connectWithGoogle = async (gauthBody: any, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
         const checkResponse = await fetch(`${config(appContext.version).apiUrl}/gauth`, { 
             method: 'POST',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                idToken: gauthToken
-            })
+            body: JSON.stringify(gauthBody)
         })
+        const responseBody = await checkResponse.json()
         if(checkResponse.status != 200) {
-            const responseBody = await checkResponse.json()
             if(responseBody.error === 'NO_ACCOUNT') {
-                const decoded = jwtDecode(gauthToken) as any
-                onNewAccountNeeded(decoded.name, decoded.email, gauthToken)
+                const decoded = jwtDecode(responseBody.idToken) as any
+                onNewAccountNeeded(decoded.name, decoded.email, responseBody.idToken)
             } else {
                 throw new Error('Google user verification failed.')
             }
         } else {
-            const decoded = jwtDecode(gauthToken)
+            const decoded = jwtDecode(responseBody.idToken)
             const client = getApolloClient(version)
-            const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_GOOGLE, variables: { email: (decoded as any).email, token: gauthToken } })
+            const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_GOOGLE, variables: { email: (decoded as any).email, token: responseBody.idToken } })
             const { account } = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
             appDispatch({ type: AppReducerActionType.Login, payload: { account } })
         }
     }
 
-    return { login, connectWithGoogle, restoreSession }
+    return { login, connectGoogleWithIdToken, connectGoogleWithAccessCode, restoreSession, disconnect }
 }
 
 

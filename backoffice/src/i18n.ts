@@ -49,7 +49,9 @@ export default (lang?: string) => {
                 "selectLocalFileButton": "Choose a local file",
                 "dragImageHere": "... or drop an image here",
                 "uploadButtonCaption": "Done",
-                "newEmailMustBeActivated": "The new email address should be activated by clicking on the link sent there."
+                "newEmailMustBeActivated": "The new email address should be activated by clicking on the link sent there.",
+                "logoutMenuCaption" : "Logout",
+                "conectWithGoogleButtonCaption": "Connect with Google"
             }
         },
         fr: { 
@@ -98,7 +100,9 @@ export default (lang?: string) => {
                 "selectLocalFileButton": "Choisir un fichier",
                 "dragImageHere": "... ou déposer une image ici",
                 "uploadButtonCaption": "Terminé",
-                "newEmailMustBeActivated": "Le nouvel email doit encore être confirmé en cliquant sur le lien qui y a été envoyé."
+                "newEmailMustBeActivated": "Le nouvel email doit encore être confirmé en cliquant sur le lien qui y a été envoyé.",
+                "logoutMenuCaption" : "Déconnexion",
+                "conectWithGoogleButtonCaption": "Se connecter avec Google"
             }
         }
     }

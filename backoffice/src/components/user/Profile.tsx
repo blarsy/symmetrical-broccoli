@@ -118,6 +118,9 @@ const Profile = () => {
                 label={t('nameFieldLabel')} textContentType="text"
                 validationSchema={yup.string().required(t('requiredField')).max(30, t('nameTooLong'))}
                 onSave={async (newVal) => {
+                    const updatedAccount = { ...appContext.account }
+                    updatedAccount.name = newVal
+                    appDispatch({ type: AppReducerActionType.UpdateAccount, payload: updatedAccount })
                     updateAccount({ variables: { name: newVal, avatarPublicId: appContext.account?.avatarPublicId } })
                 }} />
             <InlineFormTextInput initialValue={ appContext.account!.email } 

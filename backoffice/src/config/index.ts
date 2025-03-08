@@ -9,6 +9,7 @@ export interface RawConfig {
     cloudinaryRestUrl: string
     mainVersion: string
     googleApiKey: string
+    googleApiSecret: string
     versions: {[version: string]: VersionSpecificRawConfig}
 }
 

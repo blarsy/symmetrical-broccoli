@@ -52,7 +52,7 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
 
     app.options('*', corsMiddleware)
 
-    googleAuth(app, pool, config.googleAuthAudience, corsMiddleware)
+    googleAuth(app, pool, config.googleAuthAudience, config.googleApiSecret, corsMiddleware)
 
     app.use(postgraphile(config))
     
