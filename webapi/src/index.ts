@@ -42,7 +42,7 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
     const app = express()
     const allowedOrigins = JSON.parse(config.webClientUrls!) as string[]
 
-    app.options('*', cors({ origin(requestOrigin, callback) {
+    app.all('*', cors({ origin(requestOrigin, callback) {
         if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
             callback(null, requestOrigin)
         } else {
