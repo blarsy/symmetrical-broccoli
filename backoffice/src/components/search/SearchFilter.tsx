@@ -73,7 +73,7 @@ const SearchFilter = (p: Props) => {
             </IconButton>
             <ResourceAttributesFilter sx={{ flex: 1 }} searchParameters={searchParameters} onChange={setParams} />
             <Stack sx={{ flex: 1, alignItems: 'center' }}>
-                <Typography variant="h4" textAlign="center" color="secondary">{appContext.i18n.translator('categoriesTitle')}</Typography>
+                <Typography variant="h4" textAlign="center" color="primary">{appContext.i18n.translator('categoriesTitle')}</Typography>
                 <CategoriesSelector lang={appContext.i18n.lang} values={searchParameters.categoryCodes} onSelectionChanged={selectedCats => setParams({ categoryCodes: selectedCats })}/>
             </Stack>
             <ProximityFilter sx={{ flex: 1 }}

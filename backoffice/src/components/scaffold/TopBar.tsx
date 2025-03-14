@@ -54,21 +54,31 @@ const TopBar = ({ version }: Props) => {
             anchorEl={userMenuAnchorEl}
             open={!!userMenuAnchorEl}
             anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            disableScrollLock
             onClose={() => setUserMenuAnchorEl(null)}>
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
-                router.push(`${version}/profile`)
             }}>
                 <ListItemIcon>
                     <ManageAccounts fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{appContext.account?.name}</ListItemText>
+                <ListItemText>
+                    <Link href={`/webapp/${version}/profile`}>
+                        {appContext.account?.name}
+                    </Link>
+                </ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => setUserMenuAnchorEl(null)}>
+            <MenuItem onClick={() => {
+                setUserMenuAnchorEl(null)
+            }}>
                 <ListItemIcon>
                     <EditNotifications fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{appContext.i18n.translator('preferencesMenuCaption')}</ListItemText>
+                <ListItemText>
+                    <Link href={`/webapp/${version}/profile/prefs`}>
+                        {appContext.i18n.translator('preferencesMenuCaption')}
+                    </Link>
+                </ListItemText>
             </MenuItem>
             <MenuItem onClick={() => {
                 disconnect()

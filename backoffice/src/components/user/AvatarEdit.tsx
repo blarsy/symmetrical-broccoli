@@ -12,7 +12,7 @@ interface Props {
 
 const AvatarEdit = (p: Props) => {
     const [pickingImage, setPickingImage] = useState(false)
-    return <Stack sx={{ position: 'relative', padding: '2rem' }}>
+    return <Stack sx={{ position: 'relative', padding: '2rem', maxWidth: '20rem', alignSelf: 'center' }}>
         <Avatar src={urlFromPublicId(p.initialValue)} 
             sx={{ width: '100%', height: '100%' }} />
         <IconButton sx={{ position: 'absolute', bottom: '40px', right: 0 }} onClick={() => setPickingImage(true)}><Edit/></IconButton>

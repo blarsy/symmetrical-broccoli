@@ -4,15 +4,13 @@ import { useContext, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
 import * as yup from "yup"
-import { Alert, Backdrop, CircularProgress, IconButton, TextField, Typography } from "@mui/material"
-import { ErrorText } from "../misc"
-import Edit from '@mui/icons-material/Edit'
-import Delete from '@mui/icons-material/Delete'
-import Check from '@mui/icons-material/Check'
-import Close from '@mui/icons-material/Close'
+import { Alert, Backdrop, CircularProgress, TextField, Typography } from "@mui/material"
+import { ErrorText, RightAlignedModifyButtons } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import AvatarEdit from "./AvatarEdit"
 import { gql, useMutation } from "@apollo/client"
+import EditLinks from "./EditLinks"
+import EditAddress from "./EditAddress"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
@@ -27,24 +25,6 @@ const UPDATE_ACCOUNT_EMAIL = gql`mutation UpdateAccountEmail($newEmail: String) 
       integer
     }
 }`
-
-interface RightAlignedModifyButtonsProps {
-    editing: boolean
-    onEditRequested: () => void
-    saveButtonDisabled: boolean
-    onSave: () => void
-    onDelete?: () => void
-    onCancelEdit?: () => void
-}
-
-export const RightAlignedModifyButtons = (p: RightAlignedModifyButtonsProps) => <Stack sx={{ position: 'absolute', flexDirection: 'row', right: '14px', bottom: p.editing ? '13px' : '14px', gap: '3px' }}>
-    { !p.editing && <IconButton onClick={p.onEditRequested}><Edit/></IconButton> }
-    { p.editing && [
-        <IconButton key="save" color="secondary" disabled={p.saveButtonDisabled} onClick={p.onSave}><Check/></IconButton>,
-        <IconButton key="cancel" color="secondary" onClick={p.onCancelEdit}><Close/></IconButton>
-    ] }
-    { p.onDelete && <IconButton color="secondary" onClick={p.onDelete}><Delete/></IconButton>}
-</Stack>
 
 interface Props {
     label: string
@@ -73,11 +53,11 @@ const InlineFormTextInput = (p: Props) => {
         
         return <Stack style={{ position: 'relative', padding: 5 }}>
             { editing ?
-                <TextField color="secondary" label={p.label} type={p.textContentType} value={values.value} onChange={handleChange('value')} 
+                <TextField color="primary" label={p.label} type={p.textContentType} value={values.value} onChange={handleChange('value')} 
                     onBlur={handleBlur('value')} inputRef={textInputRef}/>
                 :[
-                    <Typography key="lbl" color="secondary" sx={{ position: 'relative', left: '14px', fontSize: '0.75rem', top: '-10px' }} variant="body1">{p.label}</Typography>,
-                    <Typography key="val" color="secondary" sx={{ position: 'relative', left: '14px', top: '-2px', paddingBottom: '14px' }}>{values.value}</Typography>
+                    <Typography key="lbl" color="primary" sx={{ position: 'relative', left: '14px', fontSize: '0.75rem', top: '-10px' }} variant="body1">{p.label}</Typography>,
+                    <Typography key="val" color="primary" sx={{ position: 'relative', left: '14px', top: '-2px', paddingBottom: '14px' }}>{values.value}</Typography>
                 ]
             }
             <RightAlignedModifyButtons editing={editing} saveButtonDisabled={!touched}
@@ -107,7 +87,8 @@ const Profile = () => {
     const t = appContext.i18n.translator
 
     return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center' }}>
-        { publicInfo.profileData.data && <Stack sx={{ width: '20rem' }}>
+        { publicInfo.profileData.data && <Stack sx={{ maxWidth: '40rem', gap: '1rem', paddingBottom: '1rem' }}>
+            <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('profilePageTitle')}</Typography>
             <AvatarEdit initialValue={ appContext.account!.avatarPublicId } onChange={async newPublicId => {
                 const updatedAccount = { ...appContext.account }
                 updatedAccount.avatarPublicId = newPublicId
@@ -131,11 +112,16 @@ const Profile = () => {
                     setNewEmailMustBeActivated(true)
                 }} />
             { newEmailMustBeActivated && <Alert severity="success">{t('newEmailMustBeActivated')}</Alert> }
+            <EditLinks onDone={newLinks => publicInfo.updatePublicInfo(newLinks, publicInfo.profileData.data!.location)} 
+                links={publicInfo.profileData.data.links}/>
+            <EditAddress value={publicInfo.profileData.data.location} onChange={newLocation => {
+                publicInfo.updatePublicInfo(publicInfo.profileData.data!.links, newLocation)
+            }} />
         </Stack> }
         <Backdrop
             open={updatingAccount || updatingEmail}
             onClick={() => {}}>
-            <CircularProgress color="inherit" />
+            <CircularProgress color="primary" />
         </Backdrop>
         { updateError && <Alert severity="error" onClose={reset}>{updateError.message}</Alert> }
         { updateEmailError && <Alert severity="error" onClose={resetEmail}>{ updateEmailError.message }</Alert> }

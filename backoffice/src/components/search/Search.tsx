@@ -6,7 +6,8 @@ import { urlFromPublicId } from "@/lib/images"
 import PictureGallery from "../scaffold/PictureGallery"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
 
-export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
+export const SUGGEST_RESOURCES = gql`
+  mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
     suggestedResources(
       input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm}
     ) {
@@ -57,7 +58,7 @@ export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: fal
 const Search = () => {
     const [ suggestResources, { loading, error }] = useMutation(SUGGEST_RESOURCES)
     const [suggestedResources, setSuggestedResources] = useState<any[]>([])
-    const [zoomedImg, setZoomedImg] = useState('')
+    const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const theme = useTheme()
 
     const loadResources = async (searchParameters: SearchParameters) => {
@@ -102,7 +103,7 @@ const Search = () => {
                 <CardContent>{res.description}</CardContent>
             </Card>) }
             <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
-                <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg('')}>
+                <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg(undefined)}>
                     <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
                 </Stack>
             </Dialog>

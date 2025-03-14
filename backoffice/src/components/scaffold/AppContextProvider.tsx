@@ -64,7 +64,7 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
 
-  console.log('previous', previousState, 'new', newState)
+  //console.log('previous', previousState, 'new', newState)
 
   return {...previousState, ...newState}
 }

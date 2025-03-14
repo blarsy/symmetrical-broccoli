@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { Checkbox, FormControlLabel } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 export const GET_CATEGORIES = gql`query Categories($locale: String) {
     allResourceCategories(condition: {locale: $locale}) {
@@ -39,7 +39,7 @@ const CategoriesSelector = (p: Props) => {
                 p.onSelectionChanged(newValue)
         }} />} label={cat.name} sx={{
             '& .MuiFormControlLabel-label': {
-                color: 'secondary.main'
+                color: 'primary.main'
             }
         }} />)}
     </LoadedZone>

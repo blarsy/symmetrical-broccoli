@@ -50,7 +50,7 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
         }
     }})
 
-    app.options('*', corsMiddleware)
+    app.all('*', corsMiddleware)
 
     googleAuth(app, pool, config.googleAuthAudience, config.googleApiSecret, corsMiddleware)
 

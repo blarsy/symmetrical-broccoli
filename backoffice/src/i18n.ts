@@ -51,7 +51,20 @@ export default (lang?: string) => {
                 "uploadButtonCaption": "Done",
                 "newEmailMustBeActivated": "The new email address should be activated by clicking on the link sent there.",
                 "logoutMenuCaption" : "Logout",
-                "conectWithGoogleButtonCaption": "Connect with Google"
+                "conectWithGoogleButtonCaption": "Connect with Google",
+                "linksEditTitle": "Links",
+                "addLinkButtonCaption": "Add",
+                "confirmLinkDeletionTitle": "Delete the link ?",
+                "mustBeWellFormedURL": "Must be a well-formed URL",
+                "addressEditTitle": "Location",
+                "notificationOptionPushLabel": "Realtime",
+                "notificationOptionEmailSummaryLabel": "Email summary",
+                "numberOfDaysBetweenSummariesLabel": "# days between summaries",
+                "chatMessageNotificationsTitle": "Chat message received",
+                "newResourceNotificationsTitle": "New ressource for me",
+                "profilePageTitle": "Profile",
+                "prefPageTitle": "Notifications",
+                "requiresTheAppPopover": "This requires a smartphone with the Tope-là app installed"
             }
         },
         fr: { 
@@ -102,7 +115,20 @@ export default (lang?: string) => {
                 "uploadButtonCaption": "Terminé",
                 "newEmailMustBeActivated": "Le nouvel email doit encore être confirmé en cliquant sur le lien qui y a été envoyé.",
                 "logoutMenuCaption" : "Déconnexion",
-                "conectWithGoogleButtonCaption": "Se connecter avec Google"
+                "conectWithGoogleButtonCaption": "Se connecter avec Google",
+                "linksEditTitle": "Vos liens",
+                "addLinkButtonCaption": "Ajouter",
+                "confirmLinkDeletionTitle": "Effacer ce lien ?",
+                "mustBeWellFormedURL": "Doit être une adresse Internet valide",
+                "addressEditTitle": "Localisation",
+                "notificationOptionPushLabel": "Immédiate",
+                "notificationOptionEmailSummaryLabel": "Résumé par email",
+                "numberOfDaysBetweenSummariesLabel": "# jours entre 2 résumés",
+                "chatMessageNotificationsTitle": "Message chat reçu",
+                "newResourceNotificationsTitle": "Nouvelle ressource pour moi",
+                "profilePageTitle": "Profil",
+                "prefPageTitle": "Notifications",
+                "requiresTheAppPopover": "Nécessite l'app mobile de Tope-là installée sur un smartphone"
             }
         }
     }

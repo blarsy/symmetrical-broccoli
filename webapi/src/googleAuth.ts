@@ -28,7 +28,6 @@ export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiS
                 return
             }
             // verify the userId at Google
-            console.log('{ idToken, audience: googleAuthAudience }', { idToken, audience: googleAuthAudience })
             const loginTicket = await client.verifyIdToken({ idToken, audience: googleAuthAudience })
                 
             const payload = loginTicket.getPayload()

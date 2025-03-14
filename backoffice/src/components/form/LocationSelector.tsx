@@ -6,6 +6,7 @@ import { setDefaults, setLanguage, fromLatLng, OutputFormat } from "react-geocod
 import { AppContext } from '../scaffold/AppContextProvider'
 import { Alert, CircularProgress, Stack, TextField } from '@mui/material'
 import { primaryColor } from '@/utils'
+import { DEFAULT_LOCATION_LAT_LNG } from '@/lib/constants'
 
 const { mapsApiKey } = getCommonConfig()
 
@@ -39,7 +40,7 @@ const LocationSelector = (p: Props) => {
             }}/> }
             <Map
                 style={{width: '100%', height: '100%'}}
-                defaultCenter={ p.value ? { lat: p.value.latitude, lng: p.value.longitude} : {lat: 50.60959849969602, lng: 3.3851458522352416}}
+                defaultCenter={ p.value ? { lat: p.value.latitude, lng: p.value.longitude} : {lat: DEFAULT_LOCATION_LAT_LNG.latitude, lng: DEFAULT_LOCATION_LAT_LNG.longitude}}
                 defaultZoom={16}
                 onClick={e => {
                     if(e.detail.latLng) {

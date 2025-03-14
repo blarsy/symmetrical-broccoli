@@ -61,7 +61,6 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         }
     }
     useEffect(() => { 
-        console.log('setting theme, defaultDark, app lightMode', defaultDark, appContext.lightMode)
         setTheme(createTheme(appContext.lightMode === undefined ? defaultDark : !appContext.lightMode)) 
     }, [defaultDark, appContext.lightMode])
 

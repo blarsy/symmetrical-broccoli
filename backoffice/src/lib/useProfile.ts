@@ -51,97 +51,59 @@ interface ProfileData {
     location: Location | null
 }
 
-interface UseProfileData {
-    profileData: DataLoadState<ProfileData>
-    updatePublicInfo: {
-        update: (links: Link[], location: Location | null) => Promise<void>,
-        updating: boolean
-        error?: Error
-    }
-}
-
 const emptyProfileData = { links: [], location: null, preferences: { chatMessageDaysSummary: 1, newResourcesDaysSummary: 1 }}
-
-const emptyUseProfileData: UseProfileData = {
-    profileData: initial(true, emptyProfileData),
-    updatePublicInfo: {
-        update: async () => {},
-        updating: false
-    }
-}
 
 function useProfile () {
     const appContext = useContext(AppContext)
     const [getPublicInfo, { data: publicInfoData, error: publicInfoError }] = useLazyQuery(GET_ACCOUNT_INFO)
     const [updateAccountPublicInfo] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
-    const [useProfileData, setUseProfileData] = useState<UseProfileData>(emptyUseProfileData)
+    const [profileData, setProfileData] = useState<DataLoadState<ProfileData>>(initial(true, emptyProfileData))
+    const [updateStatePublicInfo, setUpdateStatePublicInfo] = useState<DataLoadState<undefined>>()
 
     const updatePublicInfo = async(links: Link[],location: Location | null) => {
-        setUseProfileData({
-            profileData: useProfileData.profileData,
-            updatePublicInfo: {
-                update: updatePublicInfo, updating: true
-            }
-        })
+        setUpdateStatePublicInfo({ loading: true })
         try {
             await updateAccountPublicInfo({ variables: { 
                 links: links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })),
                 location
             } })
-            setUseProfileData({
-                profileData: fromData({
-                    location,
-                    links
-                }),
-                updatePublicInfo: {
-                    update: updatePublicInfo, updating: false
-                }
-            })
+            setUpdateStatePublicInfo({ loading: false })
         } catch (e) {
-            setUseProfileData({
-                profileData: useProfileData.profileData,
-                updatePublicInfo: {
-                    update: updatePublicInfo, updating: false, error: e as Error
-                }
-            })
+            setUpdateStatePublicInfo({ loading: false, error: e as Error })
         }
     }
 
     useEffect(() => {
         if(appContext.account && !publicInfoData) {
+            console.log('loadig account public info')
             getPublicInfo({ variables: { id: appContext.account!.id } })
         }
     }, [appContext.account?.id])
 
     useEffect(() => {
         if(publicInfoData) {
-            setUseProfileData({
-                profileData: fromData({
-                    links: publicInfoData.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
-                        id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
-                    } as Link)),
-                    location: parseLocationFromGraph(publicInfoData.accountById.locationByLocationId),
-                    preferences: {
-                        chatMessageDaysSummary: 1,
-                        newResourcesDaysSummary: 1
-                    }
-                }),
-                updatePublicInfo: { update: updatePublicInfo, updating: false }
-            })
+            setProfileData(fromData({
+                links: publicInfoData.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
+                    id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
+                } as Link)),
+                location: parseLocationFromGraph(publicInfoData.accountById.locationByLocationId),
+                preferences: {
+                    chatMessageDaysSummary: 1,
+                    newResourcesDaysSummary: 1
+                }
+            }))
         } else if(publicInfoError){
-            setUseProfileData({
-                profileData: fromError(publicInfoError, appContext.i18n.translator('requestError')),
-                updatePublicInfo: { update: updatePublicInfo, updating: false }
-            })
+            setProfileData(fromError(publicInfoError, appContext.i18n.translator('requestError')))
         } else {
-            setUseProfileData({ 
-                profileData: initial(true, useProfileData.profileData.data || emptyProfileData),
-                updatePublicInfo: { update: updatePublicInfo, updating: false }
-             })
+            setProfileData(initial(true, profileData.data || emptyProfileData))
         }
     }, [publicInfoData, publicInfoError])
 
-    return useProfileData
+    return {
+        profileData,
+        updateStatePublicInfo,
+        updatePublicInfo
+    }
 }
 
 export default useProfile

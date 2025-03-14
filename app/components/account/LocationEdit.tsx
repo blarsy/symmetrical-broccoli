@@ -16,8 +16,8 @@ import Images from "@/Images"
 import BareIconButton from "../layout/BareIconButton"
 
 const DEFAUT_LOCATION: Location = {
-    latitude: 50.60953016033429,
-    longitude: 3.3852031850513713,
+    latitude: 50.6058984,
+    longitude: 3.3881915,
     address: ''
 }
 
