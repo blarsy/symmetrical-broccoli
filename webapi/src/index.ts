@@ -43,11 +43,16 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
     const allowedOrigins = JSON.parse(config.webClientUrls!) as string[]
 
     app.all('*', cors({ origin(requestOrigin, callback) {
-        if(requestOrigin && allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
-            callback(null, requestOrigin)
+        if(requestOrigin) {
+            if(allowedOrigins.some(org => requestOrigin.toLowerCase() === org.toLocaleLowerCase() || requestOrigin.toLowerCase() === org.toLocaleLowerCase() + '/')) {
+                callback(null, requestOrigin)
+            } else {
+                logger.error(`${requestOrigin} rejected. Allowed origins are ${allowedOrigins}`, new Error('Disallowed'))
+                callback(new Error('Disallowed'))
+            }
         } else {
-            logger.error(`${requestOrigin} rejected. Allowed origins are ${allowedOrigins}`, new Error('Disallowed'))
-            callback(new Error('Disallowed'))
+            //Client did not request CORS
+            callback(null, requestOrigin)
         }
     }, }))
 
