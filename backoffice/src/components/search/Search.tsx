@@ -5,6 +5,7 @@ import { Avatar, Card, CardContent, CardHeader, Dialog, Stack, useTheme } from "
 import { urlFromPublicId } from "@/lib/images"
 import PictureGallery from "../scaffold/PictureGallery"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
+import ExpirationIndicator from "../resources/ExpirationIndicator"
 
 export const SUGGEST_RESOURCES = gql`
   mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
@@ -22,6 +23,7 @@ export const SUGGEST_RESOURCES = gql`
         created
         description
         title
+        expiration
         canBeExchanged
         canBeGifted
         resourcesImagesByResourceId {
@@ -95,7 +97,9 @@ const Search = () => {
                     flex: '0 1 100%'
                 }
             }}>
-                <CardHeader avatar={<AccountAvatar name={res.accountByAccountId.name} avatarImagePublicId={res.accountByAccountId.imageByAvatarImageId?.publicId} />} title={res.title}/>
+                <CardHeader avatar={<AccountAvatar name={res.accountByAccountId.name} 
+                  avatarImagePublicId={res.accountByAccountId.imageByAvatarImageId?.publicId} />} 
+                  title={res.title} subheader={<ExpirationIndicator value={res.expiration} />} />
                 { res.resourcesImagesByResourceId?.nodes.length > 0 && 
                     <PictureGallery sx={{ justifyContent: "center" }} images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
                         onImageClicked={img => setZoomedImg(img.uri)} />}

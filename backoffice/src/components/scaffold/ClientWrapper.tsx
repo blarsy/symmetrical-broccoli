@@ -47,6 +47,7 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
             localStorage.setItem('lang', uiLanguage)
         }
         const translator = await i18n(uiLanguage)
+        dayjs.locale(uiLanguage)
 
         if(!token) {
             appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})

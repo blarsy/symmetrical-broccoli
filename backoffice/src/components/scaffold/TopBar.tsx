@@ -29,6 +29,7 @@ const TopBar = ({ version }: Props) => {
     return <Stack direction="row" justifyContent="space-between">
         <Stack direction="row">
             <Button LinkComponent={Link} href={`/webapp/${appContext.version}`}>{appContext.i18n.translator('searchButtonCaption')}</Button>
+            { appContext.account && <Button LinkComponent={Link} href={`/webapp/${appContext.version}/resources`}>{appContext.i18n.translator('resourcesButtonCaption')}</Button> }
         </Stack>
         <Stack direction="row" gap="2rem">
             <Stack direction="row" alignItems="center">

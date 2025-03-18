@@ -64,7 +64,14 @@ export default (lang?: string) => {
                 "newResourceNotificationsTitle": "New ressource for me",
                 "profilePageTitle": "Profile",
                 "prefPageTitle": "Notifications",
-                "requiresTheAppPopover": "This requires a smartphone with the Tope-là app installed"
+                "requiresTheAppPopover": "This requires a smartphone with the Tope-là app installed",
+                "resourcesButtonCaption": "Resources",
+                "addResourceButtonCaption": "Add",
+                "modifyButtonCaption": "Edit",
+                "deleteButtonCaption": "Delete",
+                "doesNotExpire": "No expiration",
+                "expired": "Expired",
+                "deletedLabel": "Deleted"
             }
         },
         fr: { 
@@ -128,7 +135,14 @@ export default (lang?: string) => {
                 "newResourceNotificationsTitle": "Nouvelle ressource pour moi",
                 "profilePageTitle": "Profil",
                 "prefPageTitle": "Notifications",
-                "requiresTheAppPopover": "Nécessite l'app mobile de Tope-là installée sur un smartphone"
+                "requiresTheAppPopover": "Nécessite l'app mobile de Tope-là installée sur un smartphone",
+                "resourcesButtonCaption": "Ressources",
+                "addResourceButtonCaption": "Ajouter",
+                "modifyButtonCaption": "Modifier",
+                "deleteButtonCaption": "Effacer",
+                "doesNotExpire": "Permanent",
+                "expired": "Expiré",
+                "deletedLabel": "Supprimé"
             }
         }
     }

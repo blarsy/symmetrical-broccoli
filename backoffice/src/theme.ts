@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
-import { lightPrimaryColor, primaryColor } from "./utils"
+import { lightPrimaryColor } from "./utils"
 
 const title = localFont({ src: './app/dk-magical-brush.otf' })
 const general = localFont({ src: './app/futura-std-book.otf' })
@@ -18,7 +18,7 @@ export default (dark: boolean) => createTheme({
     mode: dark ? 'dark': 'light',
     primary: {
       main: '#ff4401',
-      contrastText: '#fef0e3',
+      contrastText: dark ? lightPrimaryColor : '#000',
     },
     secondary: {
       main: '#f50057',
