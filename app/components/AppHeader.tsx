@@ -78,12 +78,13 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
 
     if(appContext.account?.willingToContribute) {
         components.push(
-            <TokenCounter key="counter" onPress={onTokenCounterPressed} size={getAppBarsTitleFontSize() * 50/STANDARD_APPBAR_TITLE_FONTSIZE} amountOfTokens={appContext.account!.amountOfTokens}/>, 
+            <TokenCounter key="counter" onPress={onTokenCounterPressed} 
+                size={getAppBarsTitleFontSize() * 50/STANDARD_APPBAR_TITLE_FONTSIZE} 
+                amountOfTokens={appContext.account!.amountOfTokens}/>, 
             barContent, supportAction, profileAction)
     } else {
         components.push(supportAction, barContent, profileAction)
     }
-
 
     return <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor } }>{ components }</Appbar.Header>
 }

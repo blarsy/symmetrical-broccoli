@@ -20,7 +20,7 @@ import ContributeDialog from "../tokens/ContributeDialog"
 
 const NUMBER_OF_FREE_RESOURCES = 2
 export const RESOURCES = gql`query MyResources {
-  myresources {
+  myResources {
     nodes {
       id
       expiration
@@ -105,9 +105,9 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
 
     useEffect(() => {
       if(data) {
-        setResources(fromServerGraphResources(data.myresources?.nodes, appContext.categories.data || []))
+        setResources(fromServerGraphResources(data.myResources?.nodes, appContext.categories.data || []))
       }
-    }, [data])
+    }, [data, appContext.lastResourceChangedTimestamp])
 
     const ensureContributionEnforced = (resources: Resource[], addRequested: () => void) => {
       if(resources.filter((res => !res.deleted && ((res.expiration && new Date(res.expiration) > new Date()) || res.expiration === null))).length < NUMBER_OF_FREE_RESOURCES){

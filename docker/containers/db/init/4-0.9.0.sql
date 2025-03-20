@@ -214,7 +214,7 @@ BEGIN
 	FOR res IN
 		SELECT id 
 		FROM sb.resources r
-		WHERE deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
+		WHERE r.deleted IS NULL AND (r.expiration IS NULL OR r.expiration > NOW()) AND 
 			r.account_id = apply_account_resources_rewards.account_id
 	-- Loop through active resources - including suspended - to award applicable token rewards
 	LOOP
@@ -315,7 +315,7 @@ AS $BODY$
 
 SELECT *
 FROM sb.resources r
-WHERE deleted IS NULL AND suspended IS NULL AND (expiration IS NULL OR expiration > NOW()) AND
+WHERE r.deleted IS NULL AND r.suspended IS NULL AND (r.expiration IS NULL OR r.expiration > NOW()) AND
 (SELECT COUNT(*) FROM sb.resources_images WHERE resource_id = r.id) > 0
 ORDER BY r.created DESC LIMIT 10;
 
@@ -344,7 +344,7 @@ BEGIN
 	SELECT COUNT(*)
 	FROM sb.resources res
 	WHERE res.account_id = apply_resources_consumption.account_id AND 
-		deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
+		res.deleted IS NULL AND (res.expiration IS NULL OR res.expiration > NOW())
 	INTO number_of_resources;
 	-- Make sure current_amount_of_tokens is not null when the account is active, and it has at
 	-- least 3 active resources
@@ -358,9 +358,9 @@ BEGIN
 		FOR r IN
 			SELECT id, paid_until, suspended FROM sb.resources res
 			WHERE res.account_id = apply_resources_consumption.account_id AND 
-				deleted IS NULL AND (expiration IS NULL OR expiration > NOW()) AND 
-				(paid_until <= NOW() OR paid_until IS NULL)
-			ORDER BY created ASC
+				res.deleted IS NULL AND (res.expiration IS NULL OR res.expiration > NOW()) AND 
+				(res.paid_until <= NOW() OR res.paid_until IS NULL)
+			ORDER BY r.created ASC
 		LOOP
 			-- skip free resources
 			IF idx > (free_resources - 1) THEN
@@ -397,7 +397,7 @@ BEGIN
 			SELECT * FROM sb.accounts 
 			WHERE id = apply_resources_consumption.account_id 
 				AND (last_suspension_warning IS NULL OR last_suspension_warning < (NOW() - hours_before_warning * INTERVAL '1 hour'))
-		) AND ((number_of_resources - free_resources) * (hours_before_warning / 24)) > number_of_resources THEN
+		) AND ((number_of_resources - free_resources) * (hours_before_warning / 24)) > current_amount_of_tokens THEN
 			PERFORM sb.create_notification(apply_resources_consumption.account_id, json_build_object(
 				'info', 'WARNING_LOW_TOKEN_AMOUNT'
 			));
@@ -457,6 +457,26 @@ AS $BODY$
 DECLARE inserted_id INTEGER;
 DECLARE location_id INTEGER = NULL;
 BEGIN
+	-- Prevent creating a resource if the account already has 2 active
+	-- and is not either contributor, or unlimited account
+	IF NOT EXISTS (SELECT *
+		FROM sb.accounts a
+		WHERE id = sb.current_account_id()
+		AND ((
+			(a.unlimited_until IS NOT NULL AND a.unlimited_until < NOW())
+		) OR (
+			(SELECT COUNT(*) FROM sb.resources r WHERE r.account_id = sb.current_account_id()
+			AND (r.expiration is NULL OR r.expiration > NOW())
+			AND r.deleted IS NULL
+			AND r.suspended IS NULL) < (SELECT amount_free_resources FROM sb.system)
+		) OR (
+			NOT a.willing_to_contribute
+		))) THEN
+	
+	RAISE EXCEPTION 'This account cannot create non-free resource';
+	
+	END IF;
+	
 	IF specific_location IS NOT NULL THEN
 		INSERT INTO sb.locations (address, latitude, longitude)
 		VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
@@ -1089,6 +1109,32 @@ GRANT EXECUTE ON FUNCTION sb.my_notifications() TO identified_account;
 GRANT EXECUTE ON FUNCTION sb.my_notifications() TO sb;
 
 REVOKE ALL ON FUNCTION sb.my_notifications() FROM PUBLIC;
+
+DROP FUNCTION IF EXISTS sb.myresources();
+
+CREATE OR REPLACE FUNCTION sb.my_resources(
+	)
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+select r.*
+  from sb.resources r
+  where r.account_id = sb.current_account_id()
+  and r.deleted is null
+  order by created DESC;
+ 
+$BODY$;
+
+ALTER FUNCTION sb.my_resources()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.my_resources() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.my_resources() TO sb;
 
 --Reward current users
 

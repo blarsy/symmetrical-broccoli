@@ -13,7 +13,7 @@ import { urlFromPublicId } from '@/lib/images'
 import ExpirationIndicator from './ExpirationIndicator'
 
 export const RESOURCES = gql`query MyResources {
-    myresources {
+    myResources {
       nodes {
         id
         expiration
@@ -74,7 +74,7 @@ const Resources = () => {
         </Stack>
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem' }}>
-            { data && data.myresources.nodes.map((res: any) => <Card key={res.id} sx={theme => ({
+            { data && data.myResources.nodes.map((res: any) => <Card key={res.id} sx={theme => ({
                 backgroundColor: res.deleted ? theme.palette.primary.light: 'inherit',
                 display: 'flex',
                 flexDirection: 'column',

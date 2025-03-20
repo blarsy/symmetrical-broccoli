@@ -23,15 +23,16 @@ interface SubmitButtonProps extends ButtonProps {
     ErrorTextComponent: React.ComponentType<TextProps<never>>
     Component: React.ComponentType<ButtonProps>
     submitCount: number
+    enabled: boolean
     isValid: boolean
     updating: boolean
     handleSubmit: () => void
     testID: string
 }
 
-export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
+export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 10, marginBottom: 10, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
 { props.submitCount > 0 && !props.isValid && <props.ErrorTextComponent>{t('someDataInvalid')}</props.ErrorTextComponent> }
-    <props.Component disabled={props.updating} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
+    <props.Component disabled={props.updating || !props.enabled} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
         {t('save_label')}
     </props.Component>
 </View>
@@ -181,7 +182,9 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
             </View>
         </TouchableOpacity>
         <DatePickerModal
+            testID={`${props.testID}:Picker`}
             locale={getLanguage()}
+            saveLabel={t('selectButtonCaption')}
             mode="single"
             visible={dateOpen}
             onDismiss={() => setDateOpen(false)}

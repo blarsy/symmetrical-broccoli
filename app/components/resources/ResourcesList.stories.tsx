@@ -25,36 +25,36 @@ type Story = StoryObj<typeof ResourcesList>
 
 const futureDate = new Date(new Date().valueOf() + 1000*60*60*24)
 const initialResourceList = { 
-  myresources: {
+  myResources: {
     nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate },
-      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate },
-      { id: 3, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate },
-      { id: 4, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate },
-      { id: 5, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate },
-      { id: 6, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate },
-      { id: 7, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate },
-      { id: 8, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate },
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 3, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 4, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 5, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 6, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 7, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 8, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
     ]
   } 
 }
 
 const resourceListWithOneDeleted = { 
-  myresources: {
+  myResources: {
     nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource' },
-      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date() }
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource', accountByAccountId: { name: 'super artisan' } },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date(), accountByAccountId: { name: 'super artisan' } }
     ]
   } 
 }
 
 const resourceListWithSomeSuspended = {
-  myresources: {
+  myResources: {
     nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource' },
-      { id: 1, title: 'Resource suspendud', description: 'description de la ressource', suspended: new Date() },
-      { id: 3, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date() },
-      { id: 4, title: 'Autre resource suspendue', description: 'desc', suspended: new Date() }
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource', accountByAccountId: { name: 'super artisan' } },
+      { id: 1, title: 'Resource suspendud', description: 'description de la ressource', suspended: new Date(), accountByAccountId: { name: 'super artisan' } },
+      { id: 3, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date(), accountByAccountId: { name: 'super artisan' } },
+      { id: 4, title: 'Autre resource suspendue', description: 'desc', suspended: new Date(), accountByAccountId: { name: 'super artisan' } }
     ]
   }
 }
@@ -80,7 +80,7 @@ export const WithDeleted: Story = {
 export const Empty: Story = {
   name: 'List empty, with info',
   decorators: buildDecoratorList( { 
-    myresources: {
+    myResources: {
       nodes: []
     } 
   }),

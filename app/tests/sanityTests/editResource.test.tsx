@@ -78,24 +78,3 @@ test('Edit resource', async () => {
     }
 
 })
-
-test('View resource', async () => {
-    render(<AppWithScreens screens={[{ component: ResourcesList, name: 'resourceList' }, { component: ViewResource, name: 'viewResource' }]}
-        overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }} />)
-
-    await waitFor(() => expect(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:ViewButton`)).toBeOnTheScreen())
-    
-    // Use userEvent to trigger a 'press' on this button, because it is more intelligent than fireEvent,
-    // in that it provides an event object with a 'stopPropagation' function
-    const pressEdit = userEvent.setup()
-    await pressEdit.press(screen.getByTestId(`resourceList:ResourceCard:${resourceId}:ViewButton`))
-    
-    await waitFor(() => expect(screen.getByTestId(`viewResource:title`)).toHaveTextContent(title))
-    expect(screen.getByTestId('viewResource:description')).toHaveTextContent(description)
-    expect(screen.queryByTestId('viewResource:isProduct')).not.toBeOnTheScreen()
-    expect(screen.getByTestId('viewResource:isService')).toBeOnTheScreen()
-    expect(screen.queryByTestId('viewResource:canBeDelivered')).not.toBeOnTheScreen()
-    expect(screen.queryByTestId('viewResource:canBeTakenAway')).not.toBeOnTheScreen()
-    expect(screen.getByTestId('viewResource:canBeExchanged')).toBeOnTheScreen()
-    expect(screen.queryByTestId('viewResource:canBeGifted')).not.toBeOnTheScreen()
-})

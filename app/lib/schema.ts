@@ -113,7 +113,8 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         rawRes.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ publicId: imgData.imageByImageId.publicId} as ImageInfo)) :
         []
     return {
-        id: rawRes.id, title: rawRes.title, description: rawRes.description, expiration: rawRes.expiration, created: rawRes.created,
+        id: rawRes.id, title: rawRes.title, description: rawRes.description, 
+        expiration: rawRes.expiration && new Date(rawRes.expiration), created: rawRes.created && new Date(rawRes.created),
         isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
@@ -122,9 +123,9 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
             id: rawRes.accountByAccountId.id,
             email: rawRes.accountByAccountId.email,
             avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId)}, //rawRes.accountByAccountId,
-        deleted: rawRes.deleted,
-        suspended: rawRes.suspended,
-        paidUntil: rawRes.paidUntil,
+        deleted: rawRes.deleted && new Date(rawRes.deleted),
+        suspended:  rawRes.suspended && new Date(rawRes.suspended),
+        paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, subjectiveValue: rawRes.subjectiveValue
 } as Resource

@@ -26,6 +26,7 @@ export interface IAppState {
     notificationReceivedHandler: (() => void) | undefined
     lastConversationChangeTimestamp: number
     unreadNotifications: number[]
+    lastResourceChangedTimestamp: number
 }
 
 const initialAppState = { 
@@ -41,7 +42,8 @@ const initialAppState = {
     notificationReceivedHandler: undefined,
     account: undefined,
     lastNotification: undefined,
-    lastConversationChangeTimestamp: new Date().valueOf()
+    lastConversationChangeTimestamp: new Date().valueOf(),
+    lastResourceChangedTimestamp: new Date().valueOf()
 } as IAppState
 
 export enum AppReducerActionType {
@@ -61,7 +63,8 @@ export enum AppReducerActionType {
   NotificationsRead,
   NotificationRead,
   RefreshAccount,
-  AccountChanged
+  AccountChanged,
+  ResourceUpdated
 }
 
 const appReducer = (previousState: IAppState, action: { type: AppReducerActionType, payload: any }): IAppState => {
@@ -136,6 +139,8 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
           return { ...previousState, account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } }}
         case AppReducerActionType.AccountChanged:
           return { ...previousState, account: {...action.payload, ...{ unreadNotifications: previousState.unreadNotifications, unreadConversations: previousState.unreadConversations }} }
+        case AppReducerActionType.ResourceUpdated:
+          return { ...previousState, lastResourceChangedTimestamp: new Date().valueOf() }
         default:
           throw new Error(`Unexpected reducer action type ${action.type}`)
     }
