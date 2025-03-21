@@ -235,7 +235,10 @@ const resources = {
       "youAlreadyHave": "We began counting already, and you have",
       "becomeContributorButton": "I contribute",
       "selectButtonCaption": "Select",
-      "expired": "Expired"
+      "expired": "Expired",
+      "day": "day",
+      "days": "days",
+      "maxEvery": "At most every "
    }
   },
   fr: {
@@ -465,7 +468,10 @@ const resources = {
       "youAlreadyHave": "On a commencé à compter, et tu as déjà",
       "becomeContributorButton": "Je contribue",
       "selectButtonCaption": "Selectionner",
-      "expired": "Expiré"
+      "expired": "Expiré",
+      "day": "jour",
+      "days": "jours",
+      "maxEvery": "Au plus, chaque "
     }
   }
 }

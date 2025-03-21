@@ -10,7 +10,7 @@ import * as yup from 'yup'
 import OperationFeedback from "../OperationFeedback"
 import { RouteProps, aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/utils"
 import { ScrollView } from "react-native-gesture-handler"
-import { Text } from "react-native-paper"
+import { RadioButton, Text } from "react-native-paper"
 
 export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
     accountById(id: $id) {
@@ -51,8 +51,17 @@ export const PrefSelector = ({ value, onChange, title, handleBlur, fieldName }: 
                 onChange(1)
              }
         }} color="#fff" selectedColor="#fff" />
-    { !!value && <OrangeTextInput style={{ flex: 1 }} label={<StyledLabel label={t('number_of_days_between_summaries')} color="#fff"/>} textContentType="name" value={value.toLocaleString()}
-        onChangeText={e => onChange(new Number(e).valueOf())} onBlur={handleBlur(fieldName)} />}
+    { !!value && <View>
+        {[1, 3, 7, 30].map((v, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
+            <RadioButton
+                value={v.toLocaleString()}
+                status={ value === v ? "checked" : "unchecked" }
+                onPress={() => onChange(v)}
+                color="#fff"
+            />
+            <Text variant="bodyMedium" style={{ color: '#fff' }}>{`${t('maxEvery')} ${v.toLocaleString()} ${v === 1 ? t('day'): t('days')}`}</Text>
+        </View>)}
+    </View>}
 </View>
 
 export default ({ route, navigation }: RouteProps) => {
