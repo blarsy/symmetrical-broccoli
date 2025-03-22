@@ -1,6 +1,6 @@
 import { AccountInfo } from "@/lib/useAccountFunctions"
 import { TFunction } from "i18next"
-import { createContext, Dispatch, useReducer } from "react"
+import { createContext, Dispatch, Key, useReducer } from "react"
 
 export interface AppStateData {
   loading: boolean
@@ -8,7 +8,7 @@ export interface AppStateData {
   version: string
   token: string
   i18n: {
-    translator: TFunction<"translation", undefined>
+    translator: (str: string | Key | string[] | Key[], opts?: any) => string
     lang: string
   }
   account?: AccountInfo

@@ -2,6 +2,8 @@ import AppContextProvider, { AppStateData } from "@/components/scaffold/AppConte
 import i18n from "@/i18n"
 import { DocumentNode } from "@apollo/client"
 import { MockedResponse, MockedProvider } from '@apollo/react-testing'
+import { init, TFunctionProcessReturnValue, TFunctionReturnOptionalDetails } from "i18next"
+import { $NoInfer } from "i18next/typescript/helpers"
 
 export interface GraphQlOp {
     query: DocumentNode,
@@ -24,7 +26,10 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
 
 export const appContextDecorator = (initial?: AppStateData) => {
     if(!initial){
-        initial = { loading: false, token: '', i18n: { lang: 'fr', translator: (str, opt?) => `fr-${str}`} }
+        initial = { 
+            loading: false, token: '', i18n: { lang: 'fr', translator: (str, opts?) => 'rr' },
+            version: 'v0_9'
+        }
 
     }
     return (StoryElement: React.ElementType) => 

@@ -100,10 +100,8 @@ const Search = () => {
                 <CardHeader avatar={<AccountAvatar name={res.accountByAccountId.name} 
                   avatarImagePublicId={res.accountByAccountId.imageByAvatarImageId?.publicId} />} 
                   title={res.title} subheader={<ExpirationIndicator value={res.expiration} />} />
-                { res.resourcesImagesByResourceId?.nodes.length > 0 && 
-                    <PictureGallery sx={{ justifyContent: "center" }} images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
-                        onImageClicked={img => setZoomedImg(img.uri)} />}
-
+                  <PictureGallery sx={{ justifyContent: "center" }} images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
+                      onImageClicked={img => setZoomedImg(img.uri)} />
                 <CardContent>{res.description}</CardContent>
             </Card>) }
             <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>

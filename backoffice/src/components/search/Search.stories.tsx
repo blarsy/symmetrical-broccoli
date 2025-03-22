@@ -43,7 +43,7 @@ const meta = {
     backgroundColor: { control: 'color' },
   },
   args: {  },
-  decorators: [(Story) => <ClientWrapper>
+  decorators: [(Story) => <ClientWrapper version="v0_9">
     <Story/>
   </ClientWrapper>, apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
     suggestedResources: {
