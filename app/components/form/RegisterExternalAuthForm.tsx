@@ -49,10 +49,10 @@ const RegisterExternalAuthForm = ({ toggleRegisteringExternalAuth, onAccountRegi
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
         <View>
-            <OrangeTextInput label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
+            <OrangeTextInput label={<StyledLabel color="#fff" isMandatory label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
                 onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
             <ErrorMessage component={OrangeBackedErrorText} name="name" />
-            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={email}
+            <OrangeTextInput label={<StyledLabel color="#fff" isMandatory label={t('email_label')} />} textContentType="emailAddress" value={email}
                 disabled />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
                 <WhiteButton style={{ flex: 1 }} onPress={e => { handleSubmit() }} loading={loading}>

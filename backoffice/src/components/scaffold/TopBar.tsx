@@ -1,4 +1,4 @@
-import { Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Switch, Typography } from "@mui/material"
+import { Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Switch, Typography } from "@mui/material"
 import { Stack } from "@mui/system"
 import Link from "next/link"
 import { useContext, useState } from "react"
@@ -6,9 +6,7 @@ import ConnectDialog from "../user/ConnectDialog"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "./AppContextProvider"
 import Account from '@mui/icons-material/AccountCircle'
 import ConnectedAccount from '@mui/icons-material/ManageAccounts'
-import ManageAccounts from '@mui/icons-material/ManageAccounts'
 import EditNotifications from '@mui/icons-material/EditNotifications'
-import { useRouter } from "next/navigation"
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -23,7 +21,6 @@ const TopBar = ({ version }: Props) => {
     const appDispatcher = useContext(AppDispatchContext)
     const [connecting, setConnecting] = useState(false)
     const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null)
-    const router = useRouter()
     const { disconnect } = useAccountFunctions(version)
 
     return <Stack direction="row" justifyContent="space-between">
@@ -60,26 +57,26 @@ const TopBar = ({ version }: Props) => {
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <ListItemIcon>
-                    <ManageAccounts fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                    <Link href={`/webapp/${version}/profile`}>
+                <Link href={`/webapp/${version}/profile`}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                        <Box sx={{ minWidth: '36px' }}>
+                            <ConnectedAccount fontSize="small" />
+                        </Box>
                         {appContext.account?.name}
-                    </Link>
-                </ListItemText>
+                    </Box>
+                </Link>
             </MenuItem>
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <ListItemIcon>
-                    <EditNotifications fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                    <Link href={`/webapp/${version}/profile/prefs`}>
+                <Link href={`/webapp/${version}/profile/prefs`}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                        <Box sx={{ minWidth: '36px' }}>
+                            <EditNotifications fontSize="small" />
+                        </Box>
                         {appContext.i18n.translator('preferencesMenuCaption')}
-                    </Link>
-                </ListItemText>
+                    </Box>
+                </Link>
             </MenuItem>
             <MenuItem onClick={() => {
                 disconnect()

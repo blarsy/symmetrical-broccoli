@@ -43,7 +43,7 @@ function LoadedList<T>({ loading, error, data, displayItem, noDataLabel, style, 
                 setLoadingEarlier(false)
             }
         }
-      }} style={actualStyle} contentContainerStyle={contentContainerStyle}>
+      }} scrollEventThrottle={100} style={actualStyle} contentContainerStyle={contentContainerStyle}>
         { loading && <View style={{ flex:1, alignContent: 'center' }}><ActivityIndicator testID={`${testID}:Loader`} color={primaryColor} /></View> }
         { !loading && !error && <>
             <ListOf loadingEarlier={loadingEarlier} testID={testID} data={data} displayItem={displayItem} noDataLabel={noDataLabel} />

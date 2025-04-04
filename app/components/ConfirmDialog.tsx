@@ -27,7 +27,7 @@ export const ThemedDialog = ({ visible, content, title, actions, testID, onDismi
         <Dialog testID={testID} visible={visible} style={{ backgroundColor: lightPrimaryColor, ...(style as object) }} onDismiss={onDismiss}>
             <View style={{ flexDirection: 'row', paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between' }}>
                 <Text variant="titleLarge" style={{ textAlign:'center', flex: 1 }}>{title}</Text>
-                <BareIconButton style={{  }} size={15} Image={Images.Cross} onPress={onDismiss}/>
+                <BareIconButton size={20} Image={Images.Cross} onPress={onDismiss}/>
             </View>
             <Dialog.Content style={contentStyle}>
                 {content}

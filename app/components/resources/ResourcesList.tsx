@@ -11,7 +11,7 @@ import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertContext, AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
@@ -81,6 +81,7 @@ interface ResourceListProps {
 export const ResourcesList = ({ route, addRequested, viewRequested, editRequested }: ResourceListProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [askingSwitchToContributionMode, setAskingSwitchToContributionMode] = useState(false)
     const [resources, setResources] = useState<Resource[]>([])
@@ -130,7 +131,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 try {
                     await sendAgain()
                 } catch(e) {
-                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
+                  appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
                 }
             } }, { label: t('hide_button'), onPress: () => {
                 setHideBanner(true)  
@@ -158,7 +159,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
           />
            :
           <View style={{ margin: 10, flexDirection: 'column', borderColor: 'green', borderWidth: 0, flex: 1 }}>
-            <WhiteButton mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
+            <WhiteButton testID="addResourceButton" mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
             <NoResourceYet />
           </View>
         }
@@ -175,7 +176,10 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 setDeletingResource(0)
               }
             }} onDismiss={() => setDeletingResource(0)}/>
-        <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={addRequested} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
+        <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={() => {
+          setAskingSwitchToContributionMode(false)
+          addRequested()
+        }} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
             title={t('contributionExplainationDialogTitle')} />
     </>
 }

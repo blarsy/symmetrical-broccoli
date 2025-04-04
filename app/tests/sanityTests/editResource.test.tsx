@@ -6,7 +6,6 @@ import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } fr
 import ResourcesList from "@/components/resources/ResourcesList"
 import '@testing-library/react-native/extend-expect'
 import EditResource from "@/components/form/EditResource"
-import ViewResource from "@/components/resources/ViewResource"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from "dayjs"
 

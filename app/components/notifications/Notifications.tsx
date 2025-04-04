@@ -240,7 +240,61 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     image: undefined,
                     onPress: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        navigation.navigate('profile')
+                        navigation.navigate('profile', {
+                            screen: 'tokens'
+                        })
+                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                            if (notif.id === rawNotification.node.id) {
+                                return { ...notif, ...{ read: true } }
+                            }
+                            return notif
+                        }) } } }))
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                    }
+                })
+            } else if (rawNotification.node.data.info === 'TOKENS_RECEIVED') {
+                otherNotifs.push({
+                    id: rawNotification.node.id,
+                    created: rawNotification.node.created, 
+                    headline1: t('tokensReceivedHeadline1'),
+                    headline2: t('tokensReceivedHeadline2'),
+                    read: rawNotification.node.read,
+                    text: t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }),
+                    image: undefined,
+                    onPress: async () => {
+                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                        navigation.navigate('profile', {
+                            screen: 'tokens',
+                            params: {
+                                showHistory: true
+                            }
+                        })
+                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                            if (notif.id === rawNotification.node.id) {
+                                return { ...notif, ...{ read: true } }
+                            }
+                            return notif
+                        }) } } }))
+                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                    }
+                })
+            } else if (rawNotification.node.data.info === 'TOKENS_SENT') {
+                otherNotifs.push({
+                    id: rawNotification.node.id,
+                    created: rawNotification.node.created, 
+                    headline1: t('tokensSentHeadline1'),
+                    headline2: t('tokensSentHeadline2'),
+                    read: rawNotification.node.read,
+                    text: t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }),
+                    image: undefined,
+                    onPress: async () => {
+                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                        navigation.navigate('profile', {
+                            screen: 'tokens',
+                            params: {
+                                showHistory: true
+                            }
+                        })
                         setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
                             if (notif.id === rawNotification.node.id) {
                                 return { ...notif, ...{ read: true } }
@@ -326,7 +380,10 @@ export default ({ navigation }: RouteProps) => {
                 title={() => <View style={{ flexDirection: 'column', paddingBottom: 10 }}>
                     <Text testID={`notifications:${notif.id}:Headline1`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline1 }</Text>
                     <Text testID={`notifications:${notif.id}:HeadLine2`} variant="bodySmall" style={{ fontWeight: 'normal' }}>{ notif.headline2 }</Text>
-                </View>} description={<Text testID={`notifications:${notif.id}:Text`} variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>{notif.text}</Text>} />
+                </View>} description={<Text testID={`notifications:${notif.id}:Text`} 
+                    variant="headlineMedium" style={{ color: primaryColor, fontWeight: !notif.read ? 'bold' : 'normal' }}>
+                    {notif.text}
+                </Text>} />
             }} />:
             <Text variant="labelLarge" style={{ textAlign: 'center', padding: 10 }}>{t('PleaseConnectLabel')}</Text>
         }

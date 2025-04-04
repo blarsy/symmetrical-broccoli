@@ -8,7 +8,7 @@ import Images from "@/Images"
 import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
 import { cropImageCenterVertically, pickImage } from "@/lib/utils"
-import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType } from "../AppContextProvider"
 import { Camera, CameraCapturedPicture } from "expo-camera"
 import Slider from '@react-native-community/slider'
 import { error } from "@/lib/logger"
@@ -43,16 +43,20 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
     }}>
         { children }
         { takingPicture && <Portal>
-            <View style={{ width: Dimensions.get('screen').width, height: Dimensions.get('screen').height, 
-                backgroundColor: lightPrimaryColor, justifyContent: 'center', alignItems: 'center',
+            <View style={{ width: Dimensions.get('screen').width, height: Dimensions.get('screen').height - 80, 
+                backgroundColor: lightPrimaryColor, alignItems: 'center',
                 flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
                 <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
-                <Camera ref={ref} zoom={zoom} style={{ width: picSize, height: picSize, justifyContent: processing ? 'space-between' : 'flex-end', alignItems: 'center', padding: 10, gap: 5 }}
+                <Camera ref={ref} zoom={zoom} pictureSize="1:1" 
+                    style={{ flex: 1, alignSelf: 'stretch', justifyContent: processing ? 'space-between' : 'flex-end', 
+                        alignItems: 'center', padding: 10, gap: 5 }}
                     onCameraReady={() => setCameraReady(true)}>
-                    { processing && <ActivityIndicator color={primaryColor} style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
+                    { processing && <ActivityIndicator color={primaryColor}
+                        style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
                     <View style={{ flexDirection: 'row' }}>
                         <Icon color="#fff" size={20} source="magnify"/>
-                        <Slider thumbTintColor={primaryColor} maximumTrackTintColor={lightPrimaryColor} minimumTrackTintColor={lightPrimaryColor}
+                        <Slider thumbTintColor={primaryColor} maximumTrackTintColor={lightPrimaryColor} 
+                            minimumTrackTintColor={lightPrimaryColor}
                             onValueChange={val => setZoom(val / 100)} minimumValue={0} value={zoom * 100}
                             maximumValue={100} style={{ width: '70%' }} />
                     </View>
@@ -84,7 +88,7 @@ interface Props {
 }
 
 const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Props) => {
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
 
     const addPicture = (uri: string) => {
         try {
@@ -92,7 +96,7 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 path: uri
             })
         } catch (e) {
-            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error}})
+            appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error}})
         }
     }
 
@@ -107,7 +111,8 @@ const PicturesField = ({ images, onImageSelected, onImageDeleteRequested }: Prop
                 })}
             </View>
         }
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: lightPrimaryColor, borderRadius: 25, alignItems: 'stretch', justifyContent: 'space-around', padding: 15 }}>
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: lightPrimaryColor, borderRadius: 25, 
+            alignItems: 'stretch', justifyContent: 'space-around', padding: 15 }}>
             <CameraButton onDone={async img => {
                     const resizedPic = await cropImageCenterVertically(img.uri, PICTURE_SIZE, img.height, img.width)
                     addPicture(resizedPic.uri)

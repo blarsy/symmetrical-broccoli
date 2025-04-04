@@ -21,7 +21,7 @@ export default ({ onPress, resource, onChatOpen, testID }: ResourceCartProps) =>
     const appContext = useContext(AppContext)
     return <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 10, 
         paddingHorizontal: 5, paddingVertical: 5, backgroundColor: lightPrimaryColor, 
-        borderRadius: IMAGE_BORDER_RADIUS }} onPress={onPress}>
+        borderRadius: IMAGE_BORDER_RADIUS }} onPress={onPress} testID={`${testID}:ViewResourceButton`}>
         <MainResourceImage resource={resource} />
         <View style={{ display: 'flex', flexDirection: 'column', position: 'relative', flex: 1, marginRight: 2 }}>
             <Text variant="displaySmall" style={{ color: primaryColor, alignSelf: 'flex-end', fontSize: 10 }}>{`${t('published_at')} ${dayjs(resource.created).format(t('dateFormat'))}`}</Text>

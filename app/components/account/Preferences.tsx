@@ -4,7 +4,7 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import { AppContext } from "../AppContextProvider"
 import { t } from "@/i18n"
 import { DimensionValue, FlexAlignType, View } from "react-native"
-import { CheckboxGroup, OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "../layout/lib"
+import { CheckboxGroup, OrangeBackedErrorText, WhiteButton } from "../layout/lib"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from 'yup'
 import OperationFeedback from "../OperationFeedback"
@@ -39,7 +39,7 @@ interface PrefSelectorProps {
     fieldName: string
 }
 
-export const PrefSelector = ({ value, onChange, title, handleBlur, fieldName }: PrefSelectorProps) => <View style={{ flexDirection: 'column', padding: 10 }}>
+export const PrefSelector = ({ value, onChange, title }: PrefSelectorProps) => <View style={{ flexDirection: 'column', padding: 10 }}>
     <CheckboxGroup options={{
             realtime: t('option_realtime'),
             regularSummary: t('option_regularSummary')
@@ -90,23 +90,21 @@ export default ({ route, navigation }: RouteProps) => {
                     { eventType: 2, daysBetweenSummaries: values.newResourcesDaysSummary || -1 }
                 ] } })
             }}>
-                {({handleBlur, setFieldValue, submitForm, values }) => {
-                    return <>
-                        <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 20 }}>{t('notifications_settings_title')}</Text>
-                        <PrefSelector title={t('chat_broadcast_prefs_title')} onChange={numberOfDays => {
-                            setFieldValue('chatMessageDaysSummary', numberOfDays)
-                        } } handleBlur={handleBlur} value={ values.chatMessageDaysSummary } fieldName="chatMessageDaysSummary" />
-                        { values.chatMessageDaysSummary && <ErrorMessage component={OrangeBackedErrorText} name="chatMessageDaysSummary" /> }
-                        <PrefSelector title={t('newResources_broadcast_prefs_title')} onChange={numberOfDays => {
-                            setFieldValue('newResourcesDaysSummary', numberOfDays)
-                        } } handleBlur={handleBlur} value={ values.newResourcesDaysSummary } fieldName="newResourcesDaysSummary" />
-                        { values.newResourcesDaysSummary && <ErrorMessage component={OrangeBackedErrorText} name="newResourcesDaysSummary" /> }
-                        <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => submitForm()} loading={updating}>
-                            {t('save_label')}
-                        </WhiteButton>
-                        <OperationFeedback testID="prefsFeedback" error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={reset} />
-                    </>
-                }}
+                {({handleBlur, setFieldValue, submitForm, values }) => <>
+                    <Text variant="headlineLarge" style={{ flex: 1, color: '#fff', textAlign: 'center', paddingBottom: 20 }}>{t('notifications_settings_title')}</Text>
+                    <PrefSelector title={t('chat_broadcast_prefs_title')} onChange={numberOfDays => {
+                        setFieldValue('chatMessageDaysSummary', numberOfDays)
+                    } } handleBlur={handleBlur} value={ values.chatMessageDaysSummary } fieldName="chatMessageDaysSummary" />
+                    { values.chatMessageDaysSummary && <ErrorMessage component={OrangeBackedErrorText} name="chatMessageDaysSummary" /> }
+                    <PrefSelector title={t('newResources_broadcast_prefs_title')} onChange={numberOfDays => {
+                        setFieldValue('newResourcesDaysSummary', numberOfDays)
+                    } } handleBlur={handleBlur} value={ values.newResourcesDaysSummary } fieldName="newResourcesDaysSummary" />
+                    { values.newResourcesDaysSummary && <ErrorMessage component={OrangeBackedErrorText} name="newResourcesDaysSummary" /> }
+                    <WhiteButton disabled={loading} style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} onPress={e => submitForm()} loading={updating}>
+                        {t('save_label')}
+                    </WhiteButton>
+                    <OperationFeedback testID="prefsFeedback" error={updateError} success={!!updateData} onDismissError={reset} onDismissSuccess={reset} />
+                </>}
             </Formik>
         </LoadedZone>
     </ScrollView>

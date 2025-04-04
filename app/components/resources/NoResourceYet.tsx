@@ -13,7 +13,7 @@ const exampleResources: Resource[] = [{
     images: [{ publicId: 'xz5oydf7u5lj2rjkuda1' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
-    specificLocation: null
+    specificLocation: null, subjectiveValue: null
 },{
     id: 2, 
     title: t('title_example_resource_things_to_rent'), 
@@ -21,7 +21,7 @@ const exampleResources: Resource[] = [{
     images: [{ publicId: 'jqmyhsmx1led7nhvilp3' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
-    specificLocation: null
+    specificLocation: null, subjectiveValue: null
 },{
     id: 3, 
     title: t('title_example_resource_unused_object'), 
@@ -29,7 +29,7 @@ const exampleResources: Resource[] = [{
     images: [{ publicId: 'e1cz5k4rxiwpbw9ekidj' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
-    specificLocation: null
+    specificLocation: null, subjectiveValue: null
 }] 
 
 export default () => {

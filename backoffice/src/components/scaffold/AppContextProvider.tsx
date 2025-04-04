@@ -1,5 +1,4 @@
 import { AccountInfo } from "@/lib/useAccountFunctions"
-import { TFunction } from "i18next"
 import { createContext, Dispatch, Key, useReducer } from "react"
 
 export interface AppStateData {

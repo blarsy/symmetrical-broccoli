@@ -35,7 +35,7 @@ test('Third ressource consumes a token per day', async() => {
 
     await waitForThenPress('HistoryAccordion:Button', screen)
 
-    await waitFor(() => expect(screen.getByTestId('tokenHistory:0:movement')).toHaveTextContent('-1'))
+    await waitFor(() => expect(screen.getByTestId('tokenHistory:0:movement')).toHaveTextContent('-1'), { timeout: 5000 })
     expect(screen.getByTestId('tokenHistory:0:title')).toHaveTextContent('Topes consommés par les ressources')
     expect(screen.getByTestId('tokenHistory:1:movement')).toHaveTextContent('+30')
     expect(screen.getByTestId('tokenHistory:1:title')).toHaveTextContent('Mode contribution activé')

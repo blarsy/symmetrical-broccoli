@@ -5,6 +5,7 @@ export interface Account {
     id: number,
     email: string,
     avatarImageUrl?: string
+    willingToContribute?: boolean
 }
 
 export enum LinkTypes {
@@ -122,7 +123,9 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
             name: rawRes.accountByAccountId.name,
             id: rawRes.accountByAccountId.id,
             email: rawRes.accountByAccountId.email,
-            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId)}, //rawRes.accountByAccountId,
+            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId),
+            willingToContribute: rawRes.accountByAccountId.willingToContribute
+        },
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         suspended:  rawRes.suspended && new Date(rawRes.suspended),
         paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),

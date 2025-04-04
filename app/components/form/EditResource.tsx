@@ -10,10 +10,10 @@ import { ActivityIndicator, Portal } from "react-native-paper"
 import OperationFeedback from "../OperationFeedback"
 import { Category, Resource } from "@/lib/schema"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import useProfileAddress from "@/lib/useProfileAddress"
-import { CheckboxGroup, DateTimePickerField, ErrorText, Hr, OrangeButton, StyledLabel, SubmitButton, TransparentTextInput } from "../layout/lib"
+import { CheckboxGroup, DateTimePickerField, ErrorText, Hr, InfoIcon, OrangeButton, StyledLabel, SubmitButton, TransparentTextInput } from "../layout/lib"
 import LocationEdit from "../account/LocationEdit"
 import PicturesField from "./PicturesField"
 import Icons from "@expo/vector-icons/FontAwesome"
@@ -24,6 +24,7 @@ import { primaryColor } from "../layout/constants"
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const [saveResourceState, setSaveResourcestate] = useState(initial(false, false))
@@ -33,8 +34,7 @@ export default ({ route, navigation }:RouteProps) => {
     const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
         try {
-            const subjectiveValue = new Number(values.subjectiveValue).valueOf()
-            values.subjectiveValue = isNaN(subjectiveValue) ? null : subjectiveValue
+            if(values.subjectiveValue != null) values.subjectiveValue = Number(values.subjectiveValue)
 
             await editResourceContext.actions.save(values)
             setSaveResourcestate(fromData(true))
@@ -45,7 +45,7 @@ export default ({ route, navigation }:RouteProps) => {
             if(navigation.canGoBack()) navigation.goBack()
         } catch(e: any) {
             setSaveResourcestate(fromError(e))
-            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e } })
+            appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e } })
         }
     }
 
@@ -79,7 +79,6 @@ export default ({ route, navigation }:RouteProps) => {
             })
         }}>
         {formikState => {
-            const appDispatch = useContext(AppDispatchContext)
             const { handleChange, handleBlur, values, setFieldValue, setTouched, handleSubmit } = formikState
             const editResourceContext = useContext(EditResourceContext)
 
@@ -89,21 +88,22 @@ export default ({ route, navigation }:RouteProps) => {
                         onImageSelected={async img => {
                             try {
                                 await editResourceContext.actions.addImage(img, values)
+                                
                             } catch(e) {
-                                appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error } })
+                                appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error } })
                             }
                         }}
                         onImageDeleteRequested={img => {
                             editResourceContext.actions.setResource({ ...editResourceContext.state.editedResource, ...values })
                             return editResourceContext.actions.deleteImage(img, values)
                         }} />
-                    <TransparentTextInput testID="title" label={<StyledLabel label={t('title_label') + ' *'} />} value={values.title}
+                    <TransparentTextInput testID="title" label={<StyledLabel isMandatory label={t('title_label')} />} value={values.title}
                         onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
                     <ErrorMessage component={ErrorText} name="title" />
                     <TransparentTextInput testID="description" label={<StyledLabel label={t('description_label')} />} value={values.description}
                         onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
                     <ErrorMessage component={ErrorText} name="description" />
-                    <CheckboxGroup testID="nature" title={t('nature_label') + ' *'} onChanged={val => {
+                    <CheckboxGroup testID="nature" isMandatory title={t('nature_label')} onChanged={val => {
                         setFieldValue('isProduct', val.isProduct)
                         setTouched({ isProduct: true })
                         setFieldValue('isService', val.isService)
@@ -114,8 +114,11 @@ export default ({ route, navigation }:RouteProps) => {
                     }} />
                     <ErrorMessage component={ErrorText} name="isProduct" />
                     <Hr />
-                    <TransparentTextInput testID="subjectiveValue" label={<StyledLabel label={t('subjectiveValueLabel')} />} value={values.subjectiveValue?.toString()}
-                        onChangeText={handleChange('subjectiveValue')} onBlur={handleBlur('subjectiveValue')} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TransparentTextInput style={{ flex: 1 }} testID="subjectiveValue" label={<StyledLabel label={t('subjectiveValueLabel')} />} value={values.subjectiveValue?.toString()}
+                            onChangeText={handleChange('subjectiveValue')} onBlur={handleBlur('subjectiveValue')} />
+                        <InfoIcon text={t('subjectiveValueTooltip')} />
+                    </View>
                     <ErrorMessage component={ErrorText} name="subjectiveValue" />
                     <DateTimePickerField testID="expiration" textColor="#000" value={values.expiration} onChange={async d => {
                         await setFieldValue('expiration', d)
@@ -123,12 +126,12 @@ export default ({ route, navigation }:RouteProps) => {
                     }} label={t('expiration_label')} />
                     <ErrorMessage component={ErrorText} name="expiration" />
                     <Hr />
-                    <CategoriesSelect testID="categories" inline label={t('resourceCategories_label') + ' *'} value={values.categories} onChange={(categories: Category[]) => {
+                    <CategoriesSelect testID="categories" inline isMandatory label={t('resourceCategories_label')} value={values.categories} onChange={(categories: Category[]) => {
                         setFieldValue('categories', categories)
                     }} />
                     <ErrorMessage component={ErrorText} name="categories" />
                     <Hr/>
-                    <CheckboxGroup testID="exchangeType" title={t('type_label') + ' *'} onChanged={val => {
+                    <CheckboxGroup testID="exchangeType" isMandatory title={t('type_label')} onChanged={val => {
                         setFieldValue('canBeGifted', val.canBeGifted)
                         setTouched({ canBeGifted: true })
                         setFieldValue('canBeExchanged', val.canBeExchanged)
@@ -140,7 +143,7 @@ export default ({ route, navigation }:RouteProps) => {
                     <ErrorMessage component={ErrorText} name="canBeGifted" />
                     <Hr />
                     { values.isProduct && <>
-                        <CheckboxGroup testID="transport" title={t('transport_label') + ' *'} onChanged={val => {
+                        <CheckboxGroup testID="transport" isMandatory title={t('transport_label')} onChanged={val => {
                             setFieldValue('canBeTakenAway', val.canBeTakenAway)
                             setTouched({ canBeTakenAway: true })
                             setFieldValue('canBeDelivered', val.canBeDelivered)
@@ -152,7 +155,7 @@ export default ({ route, navigation }:RouteProps) => {
                         <ErrorMessage component={ErrorText} name="canBeTakenAway" />
                         <Hr />
                     </> }
-                    <LocationEdit style={{ marginLeft: 16 }} location={values.specificLocation} 
+                    <LocationEdit testID="resourceAddress" style={{ marginLeft: 16 }} location={values.specificLocation} 
                         onDeleteRequested={() => {
                             setFieldValue('specificLocation', null)
                         }}
@@ -172,7 +175,6 @@ export default ({ route, navigation }:RouteProps) => {
                 </ScrollView>
                 <Hr />
                 <SubmitButton testID="submitButton"
-                    enabled={formikState.dirty}
                     handleSubmit={handleSubmit} icon={props => <Icons {...props} name="pencil-square" />} 
                     onPress={() => handleSubmit()} 
                     loading={saveResourceState.loading} Component={OrangeButton} ErrorTextComponent={ErrorText} isValid={formikState.isValid}

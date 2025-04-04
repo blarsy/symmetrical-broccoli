@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from "react"
 import { ActivityIndicator, Card, Text } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import Images from "@/Images"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import { useNavigation } from "@react-navigation/native"
 import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
@@ -26,7 +26,7 @@ const OneTimeTask = ({ text, checked, onPress, loading, reward }: OneTimeTaskPro
         :
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text variant="headlineMedium" style={{ minWidth: 35 }}>+ {reward}</Text>
-            <BareIconButton Image="arrow-right" size={35} style={{ margin: 0 }} onPress={onPress} />
+            <BareIconButton Image="arrow-right-bold" size={35} style={{ margin: 0, backgroundColor: '#fff', borderRadius: 17, borderWidth: 2, borderColor: '#000' }} onPress={onPress} />
         </View>}
 </View>
 
@@ -56,7 +56,7 @@ const ReccurringTask = ({ text, remainingAmount, remainingText, loading, reward,
         if(remainingAmount === 0) content.push(<Images.Check key="check" fill="#4BB543" height={35} width={35} />)
         else content.push(<View key="action" style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text variant="headlineMedium" style={{ minWidth: 35 }}>+ {reward}</Text>
-            <BareIconButton Image="arrow-right" size={35} onPress={onPress} style={{ margin: 0 }}/>
+            <BareIconButton Image="arrow-right-bold" size={35} style={{ margin: 0, backgroundColor: '#fff', borderRadius: 17, borderWidth: 2, borderColor: '#000' }} onPress={onPress} />
         </ View>)
     }
     return <View style={{ flexDirection: 'row', alignItems: 'center' }}>{content}</View>
@@ -71,7 +71,7 @@ interface PermanentTaskProps {
 const PermanentTask = ({ text, reward, onPress }: PermanentTaskProps) => <View style={{ flexDirection: 'row', alignItems: 'center' }}>
     <Text variant="headlineMedium" style={{ flex: 1 }}>{text}</Text>
     <Text variant="headlineMedium" style={{ minWidth: 35 }}>+ {reward}</Text>
-    <BareIconButton Image="arrow-right" size={35} onPress={onPress} style={{ margin: 0 }}/>
+    <BareIconButton Image="arrow-right-bold" size={35} style={{ margin: 0, backgroundColor: '#fff', borderRadius: 17, borderWidth: 2, borderColor: '#000' }} onPress={onPress} />
 </View>
 
 export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture {
@@ -84,14 +84,14 @@ export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture 
 
 const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
     const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     if(!navigation)
         navigation = useNavigation()
     const {data, loading, error, refetch} = useQuery(GraphQlLib.queries.GET_ACCOUNT, { variables: { id: appContext.account?.id } })
     const { data: resWithoutPics, loading: resWithoutPicsLoading, error: resWithoutPicsError } = useQuery(GET_RESOURCES_WITHOUT_PIC)
 
     useEffect(() => {
-        if(error || resWithoutPicsError) appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: (error || resWithoutPicsError) as Error } })
+        if(error || resWithoutPicsError) appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: (error || resWithoutPicsError) as Error } })
     }, [error])
 
     useEffect(() => {
@@ -108,10 +108,10 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
             onPress={() => navigation.navigate('main')} reward={ADD_LOGO_REWARD}/>
         <OneTimeTask text={t('howToGet_addLocation')} 
             checked={data && data.accountById?.locationByLocationId?.address} 
-            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={ADD_LOCATION_REWARD}/>
+            loading={loading} onPress={() => navigation.navigate('main')} reward={ADD_LOCATION_REWARD}/>
         <OneTimeTask text={t('howToGet_addLink')} 
             checked={data && data.accountById?.accountsLinksByAccountId?.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0} 
-            loading={loading} onPress={() => navigation.navigate('publicInfo')} reward={ADD_LINK_REWARD}/>
+            loading={loading} onPress={() => navigation.navigate('main')} reward={ADD_LINK_REWARD}/>
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 

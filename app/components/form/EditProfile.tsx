@@ -1,20 +1,19 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import * as yup from 'yup'
 import { adaptToWidth, fontSizeSmall, initials, pickImage, SMALL_IMAGEBUTTON_SIZE } from "@/lib/utils"
 import { t } from '@/i18n'
 import { Linking, StyleProp, View, ViewStyle } from "react-native"
-import { gql, useMutation } from "@apollo/client"
+import { gql, useMutation, useQuery } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { ActivityIndicator, Avatar, Banner, Button, Icon, Text } from "react-native-paper"
+import { Avatar, Banner, Button, Icon, Text } from "react-native-paper"
 import { uploadImage, urlFromPublicId } from "@/lib/images"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import { AccountInfo, getIconForLink, Link } from "@/lib/schema"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AccountInfo, getIconForLink, Link, Location, parseLocationFromGraph } from "@/lib/schema"
 import BareIconButton from "../layout/BareIconButton"
 import Images from "@/Images"
 import InlineFormTextInput from "./InlineFormTextInput"
 import { Hr, WhiteReadOnlyField } from "../layout/lib"
 import LocationEdit from "../account/LocationEdit"
-import useProfile from "../account/useProfile"
 import LoadedZone from "../LoadedZone"
 import ListOf from "../ListOf"
 import EditLinkModal from "../account/EditLinkModal"
@@ -41,6 +40,28 @@ export const UPDATE_ACCOUNT_PUBLIC_INFO = gql`mutation UpdateAccountPublicInfo($
     }
   }
 `
+
+export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
+    accountById(id: $id) {
+      id
+      accountsLinksByAccountId {
+        nodes {
+          label
+          url
+          id
+          linkTypeByLinkTypeId {
+            id
+          }
+        }
+      }
+      locationByLocationId {
+        address
+        latitude
+        longitude
+        id
+      }
+    }
+}`
 
 interface LinksEditProps {
     links: Link[]
@@ -71,15 +92,35 @@ const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkReque
     </View>} />
 </View>
 
-export default function EditProfile () {
-    const appContext = useContext(AppContext)
+interface ProfileData {
+    links: Link[]
+    location: Location | null
+}
+
+export default function EditProfile ({ account }: { account: AccountInfo }) {
     const appDispatch = useContext(AppDispatchContext)
-    const [updateAccount, { error: updateError, reset }] = useMutation(UPDATE_ACCOUNT)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
+    const [updateAccount, { error: updateError, reset, data: updateAccountData }] = useMutation(UPDATE_ACCOUNT)
     const [updateAccountEmail, { error: updateEmailError, reset: resetEmail }] = useMutation(UPDATE_ACCOUNT_EMAIL)
     const [newEmailMustBeActivated, setNewEmailMustBeActivated] = useState(false)
-    const publicInfo = useProfile()
+    const { data: publicInfoData, error: publicInfoError, loading: loadingPublicInfo } = useQuery(GET_ACCOUNT_INFO, { variables: { id: account.id } })
+    const [profileData, setProfileData] = useState<ProfileData>()
+    const [updateAccountPublicInfo, { reset: resetPublicInfo, data: publicInfoUpdateData, error: publicInfoUpdateError }] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
     const [editedLink, setEditedLink] = useState<Link | undefined>(undefined)
     
+    useEffect(() => {
+        if(publicInfoData) {
+            setProfileData({
+                links: publicInfoData.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
+                    id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
+                } as Link)),
+                location: parseLocationFromGraph(publicInfoData.accountById.locationByLocationId)
+            })
+        } else {
+            setProfileData(undefined)
+        }
+    }, [publicInfoData])
+
     const changeName = async (name: string) => {
         return handleUpdateAccount({ name })
     }
@@ -95,7 +136,7 @@ export default function EditProfile () {
     }
 
     const handleUpdateAccount = async ({name, avatarPublicId}: { name?: string, avatarPublicId?: string }) => {
-        const currentAccount = appContext.account! as AccountInfo
+        const currentAccount = {...account}
 
         if(name) {
             currentAccount.name = name
@@ -111,10 +152,6 @@ export default function EditProfile () {
         appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
 
-    if(!appContext.account) return <ActivityIndicator color="#fff"/>
-
-    const account = appContext.account
-
     return <View style={{ flex: 1, padding: 10 }}>
         <Banner style={{ marginBottom: 10 }} testID="emailChangingBanner" visible={newEmailMustBeActivated}>
             <Text variant="bodyMedium">{t('newEmailMustBeActivated_message')}</Text>
@@ -124,15 +161,15 @@ export default function EditProfile () {
                 { account.avatarPublicId ? 
                     <Avatar.Image source={{ uri: urlFromPublicId(account.avatarPublicId)}} size={adaptToWidth(150, 250, 300)} /> :
                     <Avatar.Text label={initials(account.name)} size={adaptToWidth(150, 250, 300)} />}
-                <BareIconButton size={SMALL_IMAGEBUTTON_SIZE} Image={Images.ModifyInCircle} color={'#000'} 
+                <BareIconButton testID="setImageButton" size={SMALL_IMAGEBUTTON_SIZE} Image={Images.ModifyInCircle} color={'#000'} 
                     style={{ position: 'absolute', bottom: 0, right: -SMALL_IMAGEBUTTON_SIZE }}
                     onPress={() => pickImage(async img => {
                     try {
                         const avatarPublicId = await uploadImage(img.uri)
                         await changeLogo(avatarPublicId)
-                        appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('logoChangedMessage') } })
+                        appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { message: t('logoChangedMessage') } })
                     } catch (e) {
-                        appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+                        appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error} })
                     }
                 }, 200)}/>
             </View>
@@ -145,51 +182,69 @@ export default function EditProfile () {
             initialValue={account.email} validationSchema={yup.string().email(t('invalid_email'))}
             onSave={changeEmail}/>
         <Hr color="#fff"/>
-        <LoadedZone testID="PublicInfo" {...publicInfo.profileData} loadIndicatorColor="#fff">
-            <WhiteReadOnlyField style={{ paddingRight: 0 }} label={t('publicInfo_settings_title')} value={
-                <LinksEdit
-                    links={publicInfo.profileData.data!.links}
-                    deleteLinkRequested={link => {
-                        const newLinks = publicInfo.profileData.data!.links.filter(l => l.id != link.id)
-                        publicInfo.updatePublicInfo.update(newLinks, publicInfo.profileData.data!.location)
-                    }}
-                    editLinkRequested={setEditedLink}
-                    newLinkRequested={() => { 
-                        setEditedLink({ id: 0, label: '', type: 4, url: '' }) 
-                    }} />} />
-            <Hr color="#fff"/>
-            <WhiteReadOnlyField style={{ paddingRight: 0 }} label={t('publicInfo_address_title')} value={
-                <LocationEdit orangeBackground location={publicInfo.profileData.data!.location} 
-                    onDeleteRequested={async () => {
-                        await publicInfo.updatePublicInfo.update(publicInfo.profileData.data!.links, null)
-                    }} onLocationChanged={async newLocation => {
-                        await publicInfo.updatePublicInfo.update(publicInfo.profileData.data!.links, newLocation)
-                    }}/>
-            } />
-            <Hr color="#fff"/>
+        <LoadedZone testID="PublicInfo" loading={loadingPublicInfo} error={publicInfoError} loadIndicatorColor="#fff">
+            {
+                profileData && [
+                    <WhiteReadOnlyField key="settings" style={{ paddingRight: 0 }} label={t('publicInfo_settings_title')} value={
+                        <LinksEdit
+                            links={profileData.links}
+                            deleteLinkRequested={link => {
+                                const newLinks = profileData.links.filter(l => l.id != link.id)
+                                updateAccountPublicInfo({ variables: { 
+                                    links: newLinks.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })),
+                                    location: profileData.location
+                                }})
+                                setProfileData(prev => ({ links: newLinks, location: prev?.location } as ProfileData))
+                            }}
+                            editLinkRequested={setEditedLink}
+                            newLinkRequested={() => { 
+                                setEditedLink({ id: 0, label: '', type: 4, url: '' }) 
+                            }} />} />,
+                    <Hr key="line1" color="#fff"/>,
+                    <WhiteReadOnlyField key="address" style={{ paddingRight: 0 }} label={t('publicInfo_address_title')} value={
+                        <LocationEdit testID="accountAddress" orangeBackground location={profileData.location} 
+                            onDeleteRequested={async () => {
+                                await updateAccountPublicInfo({ variables: { 
+                                    links: profileData.links, 
+                                    location: null 
+                                }})
+                                setProfileData(prev => ({ links: prev?.links, location: null } as ProfileData))
+                            }} onLocationChanged={newLocation => {
+                                updateAccountPublicInfo({ variables: { 
+                                    links: profileData.links, 
+                                    location: newLocation 
+                                }})
+                                setProfileData(prev => ({ links: prev?.links, location: newLocation } as ProfileData))
+                            }}/>
+                    } />,
+                    <Hr key="line2" color="#fff"/>
+                ]
+            }
         </LoadedZone>
-        <OperationFeedback testID="editProfileFeedback" error={updateError} onDismissError={reset} />
+        <OperationFeedback testID="editProfileFeedback" success={!!updateAccountData} successMessage={t('updateAccountSuccessful')} onDismissSuccess={reset} error={updateError} onDismissError={reset} />
         <OperationFeedback testID="editProfileEmailFeedback" error={updateEmailError} onDismissError={resetEmail} />
-        <OperationFeedback testID="publicInfoFeedback" error={publicInfo.updatePublicInfo.error} onDismissError={reset} />
+        <OperationFeedback testID="publicInfoFeedback" success={!!publicInfoUpdateData} onDismissSuccess={resetPublicInfo} error={publicInfoUpdateError} onDismissError={reset} />
         <EditLinkModal testID="editLinkModal" visible={!!editedLink} initial={editedLink} onDismiss={async link => {
             if(link) {
                 let newLinks: Link[]
                 if(link.id === 0) {
-                    const newLinkInternalId = publicInfo.profileData.data!.links.reduce<number>((prev, current) => {
+                    const newLinkInternalId = profileData!.links.reduce<number>((prev, current) => {
                         if(current.id < prev)
                             return current.id
 
                         return prev
                     }, 0)
-                    publicInfo.profileData.data!.links.push({ ...link, ...{ id: newLinkInternalId - 1 }})
-                    newLinks = [...publicInfo.profileData.data!.links]
+                    profileData!.links.push({ ...link, ...{ id: newLinkInternalId - 1 }})
+                    newLinks = [...profileData!.links]
                 } else {
-                    const idx = publicInfo.profileData.data!.links.findIndex(l => l.id === link.id)
-                    publicInfo.profileData.data!.links.splice(idx, 1, link)
-                    newLinks = [...publicInfo.profileData.data!.links]
+                    const idx = profileData!.links.findIndex(l => l.id === link.id)
+                    profileData!.links.splice(idx, 1, link)
+                    newLinks = [...profileData!.links]
                 }
                 
-                await publicInfo.updatePublicInfo.update(newLinks, publicInfo.profileData.data!.location)
+                await updateAccountPublicInfo({ variables: { 
+                    links: newLinks.map(link => ({ label: link.label, linkTypeId: link.type , url: link.url })), 
+                    location: profileData!.location}})
             }
             setEditedLink(undefined)
         }} />

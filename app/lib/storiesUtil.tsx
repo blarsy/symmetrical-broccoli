@@ -11,13 +11,12 @@ import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { NavigationContainer } from '@react-navigation/native'
-import { ConversationContext, conversationMessagesState, ConversationState } from '@/components/chat/ConversationContextProvider'
-
 import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { View } from 'react-native'
 import { IMessage } from '@/components/chat/Chat'
+import { ConversationContext, conversationMessagesState, ConversationState } from '@/components/chat/ConversationContextProvider'
 
 export const editResourceContextDecorator = (initialResource?: Resource) => (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
     {
@@ -55,13 +54,13 @@ const defaultResourceCategories: Category[] = [
 export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
     newChatMessage: '', categories: fromData(defaultResourceCategories), account, unreadNotifications: [],
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
-    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined, unreadConversations: [],
-    notificationReceivedHandler: undefined }}>
+    messageReceivedHandler: undefined, apolloClient: undefined, unreadConversations: [],
+    notificationReceivedHandler: undefined, lastResourceChangedTimestamp: new Date().valueOf() }}>
     <StoryElement />
 </AppContextProvider>
 
 export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]> = initial<Resource[]>(true, [])) => (StoryElement: React.ElementType) => <SearchFilterContext.Provider value={{ 
-    filter: { categories: [], location: { distanceToReferenceLocation: 50, excludeUnlocated: false }, options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
+    filter: { categories: [], location: { distanceToReferenceLocation: 50, excludeUnlocated: false, referenceLocation: null }, options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
     actions: {
         requery: async() => {},
         setSearchFilter: () => {}

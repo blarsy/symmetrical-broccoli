@@ -58,7 +58,6 @@ const resources = {
             "addressEditTitle": "Location",
             "notificationOptionPushLabel": "Realtime",
             "notificationOptionEmailSummaryLabel": "Email summary",
-            "numberOfDaysBetweenSummariesLabel": "# days between summaries",
             "chatMessageNotificationsTitle": "Chat message received",
             "newResourceNotificationsTitle": "New ressource for me",
             "profilePageTitle": "Profile",
@@ -71,7 +70,9 @@ const resources = {
             "doesNotExpire": "No expiration",
             "expired": "Expired",
             "deletedLabel": "Deleted",
-            "noPicture": "No picture"
+            "noPicture": "No picture",
+            "maximum": "At most every",
+            "days": "day(s)"
         }
     },
     fr: { 
@@ -130,7 +131,6 @@ const resources = {
             "addressEditTitle": "Localisation",
             "notificationOptionPushLabel": "Immédiate",
             "notificationOptionEmailSummaryLabel": "Résumé par email",
-            "numberOfDaysBetweenSummariesLabel": "# jours entre 2 résumés",
             "chatMessageNotificationsTitle": "Message chat reçu",
             "newResourceNotificationsTitle": "Nouvelle ressource pour moi",
             "profilePageTitle": "Profil",
@@ -143,7 +143,9 @@ const resources = {
             "doesNotExpire": "Permanent",
             "expired": "Expiré",
             "deletedLabel": "Supprimé",
-            "noPicture": "Pas d'image"
+            "noPicture": "Pas d'image",
+            "maximum": "Au plus, chaque",
+            "days": "jour(s)"
         }
     }
 }

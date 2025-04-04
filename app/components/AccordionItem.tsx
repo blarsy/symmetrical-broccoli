@@ -9,10 +9,11 @@ type AccordionItemProps = PropsWithChildren<{
     testID?: string
     big?: boolean
     textColor?: string
+    initialExpanded?: boolean
   }>
   
-export default ({ children, title, style, testID, big, textColor }: AccordionItemProps): JSX.Element => {
-    const [ expanded, setExpanded ] = useState(false)
+export default ({ children, title, style, testID, big, textColor, initialExpanded }: AccordionItemProps): JSX.Element => {
+    const [ expanded, setExpanded ] = useState(initialExpanded)
 
     const body = <View>{ children }</View>
 

@@ -42,8 +42,8 @@ export default () => {
             message: yup.string().required(t('field_required'))
         })} onSubmit={values => Linking.openURL(`mailto:topela.hello@gmail.com?subject=${encodeURI(t('support_mail_subject'))}&body=${encodeURI(values.message)}${encodeURI('\n\n')}${t('support_info')}${encodeURI(' :\n\n')}${JSON.stringify(supportInfo)}`)}>
             {({ values, handleChange, handleBlur, submitForm }) => <>
-                <TransparentTextInput mode="outlined" multiline 
-                    label={<StyledLabel label={t('support_message_label') + ' *'} />} 
+                <TransparentTextInput mode="flat" multiline 
+                    label={<StyledLabel isMandatory label={t('support_message_label')} />} 
                     value={values.message} onChangeText={handleChange('message')} 
                     onBlur={handleBlur('message')} style={{ marginBottom: 10 }} />
                 <ErrorMessage component={ErrorText} name="message" />

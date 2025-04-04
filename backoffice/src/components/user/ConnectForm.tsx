@@ -1,7 +1,6 @@
 import { LoadingButton } from "@mui/lab"
 import { TextField, Button, Alert } from "@mui/material"
 import { Stack } from "@mui/system"
-import { GoogleLogin } from "@react-oauth/google"
 import { Formik, Form, ErrorMessage } from "formik"
 import * as yup from "yup"
 import { ErrorText } from "../misc"
@@ -18,24 +17,23 @@ interface Props {
 
 const ConnectForm = (p: Props) => {
     const appContext = useContext(AppContext)
-    const { connectGoogleWithAccessCode, login } = useAccountFunctions(p.version)
+    const { connectGoogleWithAccessCode, login, registerViaGoogle } = useAccountFunctions(p.version)
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const t = appContext.i18n.translator
 
     const triggerLogin = useGoogleLogin({
         onSuccess: async res => {
-            console.log(res)
             setConnectionStatus({ loading: true })
             try {
-                await connectGoogleWithAccessCode(res.code, (name, email, token) => {
-                    console.log('Account creation requested with name, email, token', name, email, token)
+                await connectGoogleWithAccessCode(res.code, async (name, email, token) => {
+                    return registerViaGoogle(name, email, appContext.i18n.lang, token)
                 })
                 setConnectionStatus({ loading: false })
                 p.onClose()
             } catch(e) {
                 setConnectionStatus({ loading: false, error: e as Error })
             }
-        }, flow: 'auth-code'
+        }, flow: 'auth-code', select_account: true
       })
     
     return <Formik initialValues={{ email: '', password: '' }}

@@ -66,7 +66,9 @@ const HowItWorksSwiper = ({ width }: Props) => {
             <Text variant="headlineMedium">{t('howItWorksStep6Title')}</Text>
             <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
                 <Text variant="bodyMedium">{t('youAlreadyHave')}</Text>
-                <Text variant="bodyMedium">{appContext.account?.amountOfTokens}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5 }}>
+                <Text variant="bodyMedium"> {appContext.account?.amountOfTokens}</Text>
                 <Images.Tokens style={{ width: 30, height: 30 }}/>
                 <Text variant="bodyMedium">{t('tokenName')}</Text>
             </View>

@@ -9,7 +9,7 @@ import ChangePassword from "../form/ChangePassword"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import Preferences from "./Preferences"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
@@ -18,34 +18,29 @@ import { useMutation } from "@apollo/client"
 import Images from "@/Images"
 import TokenSettings from "../tokens/TokenSettings"
 import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
+import { useNavigation } from "@react-navigation/native"
 
 const Tab = createMaterialBottomTabNavigator()
 
-export default function Profile ({ route, navigation }: RouteProps) {
+export const ProfileMain = ({ route, navigation }: RouteProps) => {
+    const appContext = useContext(AppContext)
     const [changingPassword, setChangingPassword] = useState(false)
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [confirmedAccountDelete, setConfirmedAccountDelete] = useState(false)
     const [deleting, setDeleting] = useState(initial<null>(false, null))
     const [deleteAccount] = useMutation(GraphQlLib.mutations.DELETE_ACCOUNT)
-    const appDispatch = useContext(AppDispatchContext)
-    const appContext = useContext(AppContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const { logout } = useUserConnectionFunctions()
 
-    useEffect(() => {
-        if(!appContext.account) {
-            navigation.navigate('main')
-        }
-    }, [])
-
-    const Main = () => (<ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
+    return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>
         <View style={{ gap: 30, width: adaptToWidth<DimensionValue>('auto', mdScreenWidth, mdScreenWidth), margin: 10 }}>
             {changingPassword ? 
                 <ChangePassword onDone={success => {
-                    if(success) appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { message: t('password_changed_message') } })
+                    if(success) appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { message: t('password_changed_message') } })
                     setChangingPassword(false)
                 }}/> : 
                 <View>
-                    { appContext.account && <EditProfile /> }
+                    { appContext.account && <EditProfile account={appContext.account} /> }
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setChangingPassword(true)}>{t('change_password_label')}<Icon size={20} source="chevron-right"/></Button>
                     <Button style={{ alignSelf: 'flex-end' }} textColor="#000" mode="text" onPress={() => setDeletingAccount(true)}>{t('delete_account_button')}<Icon size={20} source="account-remove"/></Button>
                 </View>}
@@ -75,6 +70,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
                                 navigation.reset({ routes: [
                                     {name: 'main'}
                                 ], index: 0 })
+                                navigation.goBack()
                                 setDeleting(fromData(null))
                             } catch(e) {
                                 setDeleting(fromError(e))
@@ -88,16 +84,27 @@ export default function Profile ({ route, navigation }: RouteProps) {
                 </Dialog>
             </Portal>
         </View>
-    </ScrollView>)
+    </ScrollView>
+}
+
+export default function Profile ({ route, navigation }: RouteProps) {
+    const appContext = useContext(AppContext)
+    const { logout } = useUserConnectionFunctions()
+
+    useEffect(() => {
+        if(!appContext.account) {
+            navigation.navigate('main')
+        }
+    }, [])
 
     const fixedScreens: TabNavigatorProps[] = [
-        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Images.Profile height="30" width="30" fill={p.color} /> }, component: Main },
+        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Images.Profile height="30" width="30" fill={p.color} /> }, component: ProfileMain },
         { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Images.Preferences height="30" width="30" fill={p.color} /> }, component: Preferences },
     ]
 
     const actualScreens = appContext.account?.willingToContribute ? 
         [
-            fixedScreens[0], 
+            fixedScreens[0],
             { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: (p: any) => <Images.TokensBlack fill={p.color} width={30} height={30} />}, component: TokenSettings }, 
             fixedScreens[1]
         ]
@@ -106,7 +113,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
 
     return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch'}}>
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
-            <Appbar.BackAction onPress={() => navigation.navigate('main')} />
+            <Appbar.BackAction testID="Profile:BackButton" onPress={() => navigation.navigate('main')} />
             <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', 
                 fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() }} 
                 title={t('profile_label')}  />

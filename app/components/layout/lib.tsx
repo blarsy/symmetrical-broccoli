@@ -1,8 +1,8 @@
 import React, { LegacyRef, PropsWithChildren, ReactNode, RefObject, useState } from "react"
-import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
+import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps, Tooltip } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { ColorValue, Platform, StyleProp, View, ViewStyle } from "react-native"
+import { ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
@@ -23,7 +23,6 @@ interface SubmitButtonProps extends ButtonProps {
     ErrorTextComponent: React.ComponentType<TextProps<never>>
     Component: React.ComponentType<ButtonProps>
     submitCount: number
-    enabled: boolean
     isValid: boolean
     updating: boolean
     handleSubmit: () => void
@@ -32,7 +31,7 @@ interface SubmitButtonProps extends ButtonProps {
 
 export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 10, marginBottom: 10, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
 { props.submitCount > 0 && !props.isValid && <props.ErrorTextComponent>{t('someDataInvalid')}</props.ErrorTextComponent> }
-    <props.Component disabled={props.updating || !props.enabled} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
+    <props.Component disabled={props.updating} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
         {t('save_label')}
     </props.Component>
 </View>
@@ -51,7 +50,19 @@ export const OrangeBackedErrorText = (props: PropsWithChildren) => <Text variant
     backgroundColor: 'orange', color: '#fff'
 }}>{props.children}</Text>
 
-export const StyledLabel = ({ label, color, variant }: { label: string, color?: ColorValue, variant?: VariantProp<never> | undefined }) => <Text variant={variant || 'labelSmall'} style={{ color: color }}>{label}</Text>
+interface StyledLabelProps {
+    label: string
+    color?: ColorValue
+    variant?: VariantProp<never> | undefined
+    isMandatory?: boolean
+    style?: StyleProp<TextStyle>
+}
+
+export const StyledLabel = ({ label, color, variant, isMandatory, style }: StyledLabelProps) => 
+    <Text variant={variant || 'labelSmall'} style={{ color, ...(style as object) }}>
+        {label} {isMandatory && <Icon source="asterisk" size={20} color={color?.toString()}/>}
+    </Text>
+
 
 interface TextInputWithRefProps extends TextInputProps {
     innerRef?: RefObject<TextInput> | null
@@ -99,11 +110,12 @@ export const TransparentTextInput = (props: TransparentTextInput) => {
             color: '#000',
             padding: props.inlineMode ? 0 : undefined
         }} 
-        style={Object.assign({
+        {...props}
+        style={{
             backgroundColor: 'transparent',
-            marginTop: 10
-        }, props.style)} 
-        {...props}/>
+            marginTop: 10,
+            ...(props.style as object)}}
+        />
 }
 
 interface CheckboxGroupProps {
@@ -116,10 +128,11 @@ interface CheckboxGroupProps {
     selectedColor?: ColorValue
     color?: ColorValue
     testID?: string
+    isMandatory?: boolean
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
-    { props.title && <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text> }
+    { props.title && <StyledLabel style={{ marginLeft: 16 }} color={props.color} isMandatory={props.isMandatory} label={props.title}/> }
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
         { Object.entries(props.options).map((p, idx) => <OptionSelect testID={`${props.testID}:${p[0]}`} selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
             const oldValues = {...props.values}
@@ -205,3 +218,7 @@ export const Hr = ({ color, thickness, margin }: { color?: ColorValue, thickness
     <View style={{ backgroundColor: color || '#343434', 
         height: thickness || 1, transform: 'scaleY(0.5)', 
         marginVertical: margin || 5 }}></View>
+
+export const InfoIcon = ({ text }: { text: string }) => <Tooltip enterTouchDelay={1} title={text}>
+    <Icon source="help-circle" size={20} />
+</Tooltip>

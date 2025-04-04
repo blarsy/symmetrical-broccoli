@@ -56,14 +56,14 @@ export default function ChangePassword ({ onDone }: Props) {
         onDone(true)
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View style={{ flex: 1, padding: 10 }}>
-            <OrangeTextInput label={<StyledLabel label={t('password_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.password}
+        <View style={{ flex: 1, padding: 10, gap: 10 }}>
+            <OrangeTextInput label={<StyledLabel isMandatory label={t('password_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.password}
                 onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
             <ErrorMessage component={OrangeBackedErrorText} name="password" />
-            <OrangeTextInput label={<StyledLabel label={t('newpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.newPassword}
+            <OrangeTextInput label={<StyledLabel isMandatory label={t('newpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.newPassword}
                 onChangeText={handleChange('newPassword')} onBlur={handleBlur('newPassword')} />
             <ErrorMessage component={OrangeBackedErrorText} name="newPassword" />
-            <OrangeTextInput label={<StyledLabel label={t('repeatnewpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.passwordRepeat}
+            <OrangeTextInput label={<StyledLabel isMandatory label={t('repeatnewpassword_label')} color="#fff"/>} textContentType="password" secureTextEntry value={values.passwordRepeat}
                 onChangeText={handleChange('passwordRepeat')} onBlur={handleBlur('passwordRepeat')} />
             <ErrorMessage component={OrangeBackedErrorText} name="passwordRepeat" />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>

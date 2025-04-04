@@ -22,6 +22,12 @@ export interface RouteProps {
     navigation: NavigationHelpers<ParamListBase>
 }
 
+export const DEFAUT_LOCATION: Location = {
+    latitude: 50.6058984,
+    longitude: 3.3881915,
+    address: ''
+}
+
 export const STANDARD_APPBAR_TITLE_FONTSIZE = 36
 export const mdScreenWidth = 600
 let appBarsTitleFontSize: number | undefined = undefined
@@ -173,6 +179,7 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       email
       id
       name
+      willingToContribute
       imageByAvatarImageId {
         publicId
       }

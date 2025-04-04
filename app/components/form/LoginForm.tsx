@@ -1,4 +1,4 @@
-import { Formik, ErrorMessage } from "formik"
+import { ErrorMessage } from "formik"
 import { t } from "i18next"
 import { View } from "react-native"
 import React, { useState } from "react"
@@ -47,11 +47,11 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
                 setAuthError(e as Error)
             }
         }}>
-        {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
-                <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+        {({ handleChange, handleBlur, handleSubmit, values }) => (<View style={{ gap: 10 }}>
+                <OrangeTextInput testID="email" label={<StyledLabel color="#fff" isMandatory label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                     onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="email" />
-                <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                <OrangeTextInput testID="password" label={<StyledLabel color="#fff"  isMandatory label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                     onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="password" />
                 <WhiteButton testID="login" style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 

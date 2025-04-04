@@ -36,7 +36,7 @@ export default ({ initial, visible, onDismiss, testID }: EditLinkModalProps) => 
                 return <View>
                     <Text variant="headlineLarge" style={{ textAlign: 'center', paddingVertical: 10, borderBottomColor: '#000', borderBottomWidth: 1, fontSize: 24 }}>{t('link_dialog_title')}</Text>
                     <View style={{ paddingVertical: 25, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 5 }}>
-                        <TransparentTextInput testID="linkModal:url" label={<StyledLabel label={t('url_label') + ' *'} />} value={values.url} onChangeText={handleChange('url')} onBlur={handleBlur('url')}/>
+                        <TransparentTextInput testID="linkModal:url" label={<StyledLabel isMandatory label={t('url_label')} />} value={values.url} onChangeText={handleChange('url')} onBlur={handleBlur('url')}/>
                         <ErrorMessage component={ErrorText} name="url" />
                         <TransparentTextInput testID="linkModal:label" label={<StyledLabel label={t('link_label_label') } />} value={values.label} onChangeText={handleChange('label')} onBlur={handleBlur('label')}/>
                         <ErrorMessage component={ErrorText} name="label" />

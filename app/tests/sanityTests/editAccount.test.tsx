@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { cleanupTestAccounts, makeTestAccounts, simulateActivation, TestAccount } from "./datastoreSetupLib"
 import React from "react"
-import EditProfile from "@/components/form/EditProfile"
 import { checkActivationEmailSent, checkAccountData, checkLinksOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
 import { AppContextProvider } from "@/components/AppContextProvider"
 import '@testing-library/react-native/extend-expect'
 import { waitForThenPress } from "./lib"
+import { ProfileMain } from "@/components/account/Profile"
 
 jest.useFakeTimers()
 jest.mock('react-native-paper-dates')
@@ -26,7 +26,7 @@ test('edit account data: name', async () => {
         <AppContextProvider>
             <Start splashScreenMinimumDuration={0} 
                 overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
-                <EditProfile />
+                <ProfileMain />
             </Start>
         </AppContextProvider>)
 
@@ -45,7 +45,7 @@ test('edit account data: email', async () => {
     const newEmail = `new${account.info.email}`
     render(<AppContextProvider>
         <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
-            <EditProfile />
+            <ProfileMain />
         </Start>
     </AppContextProvider>)
 
@@ -107,7 +107,7 @@ test('edit account data: links', async () => {
     
     render(<AppContextProvider>
         <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
-            <EditProfile />
+            <ProfileMain />
         </Start>
     </AppContextProvider>)
 

@@ -50,7 +50,7 @@ export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiS
             }
 
             if(qryRes.rows[0].update_google_auth_status === 1) {
-                res.status(500).json({ error: 'NO_ACCOUNT' })
+                res.status(500).json({ error: 'NO_ACCOUNT', idToken })
                 return
             }
             res.send({ idToken })

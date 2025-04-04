@@ -1,7 +1,7 @@
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { useContext, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
-import { FormControl, FormControlLabel, IconButton, Popover, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material"
+import { Alert, Backdrop, CircularProgress, FormControl, FormControlLabel, IconButton, Popover, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material"
 import { FieldTitle } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import SmartPhone from '@mui/icons-material/Vibration'
@@ -66,33 +66,30 @@ const PrefSelector = (p: PrefSelectorProps) => {
                     label={<Typography variant="body1" color="primary">{appContext.i18n.translator('notificationOptionEmailSummaryLabel')}</Typography>} />
             </RadioGroup>
         </FormControl>
-        <TextField color="primary" sx={{ width: '10rem' }} label={appContext.i18n.translator('numberOfDaysBetweenSummariesLabel')}
-            value={currentValue.numberOfDaysBetweenSummaries === "" ? '' : (currentValue.numberOfDaysBetweenSummaries || 1)} onChange={e => {
-                let newVal: number | ''
-                if(e.target.value === '0' || isNaN(Number(e.target.value))) {
-                    newVal = 1
-                } else if(e.target.value === '') {
-                    newVal = ''
-                } else {
-                    newVal = Math.abs(Number(e.target.value))
-                }
-                setCurrentValue({ numberOfDaysBetweenSummaries: newVal })
-                if(newVal != '' && newVal != currentValue.numberOfDaysBetweenSummaries){
+        <RadioGroup sx={{ paddingLeft: '3rem' }} name="emailSummaryInterval" value={currentValue.numberOfDaysBetweenSummaries} 
+            onChange={e => {
+                const newVal = Number(e.target.value)
+                setCurrentValue({ numberOfDaysBetweenSummaries: Number(e.target.value) })
+                if(newVal != currentValue.numberOfDaysBetweenSummaries){
                     p.onChange(newVal)
                 }
-            }} 
-            disabled={currentValue.numberOfDaysBetweenSummaries === null} />
+            }}>
+            {
+                [1, 3, 7, 30].map(val => <FormControlLabel key={val} disabled={currentValue.numberOfDaysBetweenSummaries === null} 
+                    color="primary" value={val} control={<Radio />}
+                    label={<Typography variant="body1" color="primary">
+                        {`${appContext.i18n.translator('maximum')} ${val} ${appContext.i18n.translator('days')}`}
+                    </Typography>} />
+                )
+            }
+       </RadioGroup>
     </Stack>
-} 
-
-interface Props {
-    
 }
 
-const Preferences = (p: Props) => {
+const Preferences = () => {
     const appContext = useContext(AppContext)
     const { data, loading, error } = useQuery(GET_PREFERENCES, { variables: { id: appContext.account?.id } })
-    const [update, { data: updateData, loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_BROADCAST_PREFS)
+    const [update, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_BROADCAST_PREFS)
 
     const prefsFromData = (data: any): { pref1: {
         numberOfDaysBetweenSummaries: number | null
@@ -111,7 +108,7 @@ const Preferences = (p: Props) => {
     const prefs = prefsFromData(data)
 
     return <LoadedZone loading={loading} error={error} containerStyle={{ alignItems: 'center' }}>
-        <Stack sx={{ maxWidth: '40rem', paddingBottom: '1rem', gap: '1rem' }}>
+        <Stack sx={{ maxWidth: '40rem', paddingBottom: '1rem', gap: '2rem' }}>
             <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('prefPageTitle')}</Typography>
             <PrefSelector value={ prefs.pref1 } title={appContext.i18n.translator('chatMessageNotificationsTitle')}
                 onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
@@ -123,6 +120,12 @@ const Preferences = (p: Props) => {
                     { eventType: 1, daysBetweenSummaries: prefs.pref1.numberOfDaysBetweenSummaries},
                     { eventType: 2, daysBetweenSummaries: numberOfDaysBetweenSummaries }
                 ] } })} />
+            <Backdrop
+                open={updating}
+                onClick={() => {}}>
+                <CircularProgress color="primary" />
+            </Backdrop>
+            { updateError && <Alert severity="error" onClose={reset}>{updateError.message}</Alert> }
         </Stack>
     </LoadedZone>
 }

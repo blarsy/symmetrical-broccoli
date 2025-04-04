@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"
+import { gql, useMutation } from "@apollo/client"
 import { getApolloClient } from "./apolloClient"
 import { useContext } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
@@ -46,6 +46,14 @@ const AUTHENTICATE_GOOGLE = gql`mutation AuthenticateExternalAuth($token: String
       jwtToken
     }
 }`
+
+const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth($accountName: String, $email: String, $language: String, $token: String) {
+    registerAccountExternalAuth(
+      input: {accountName: $accountName, email: $email, language: $language, token: $token}
+    ) {
+      jwtToken
+    }
+  }`
 
 const useAccountFunctions = (version: string) => {
     const appContext = useContext(AppContext)
@@ -103,6 +111,16 @@ const useAccountFunctions = (version: string) => {
         }, onNewAccountNeeded)
     }
 
+    const registerViaGoogle = async (accountName: string, email: string, language: string, gauthToken: string) => {
+        const client = getApolloClient(version)
+
+        const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken } })
+        
+        console.log('register return', res.data)
+        const { account } = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
+        appDispatch({ type: AppReducerActionType.Login, payload: { account } })
+    }
+
     const connectWithGoogle = async (gauthBody: any, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
         const checkResponse = await fetch(`${config(appContext.version).apiUrl}/gauth`, { 
             method: 'POST',
@@ -113,9 +131,11 @@ const useAccountFunctions = (version: string) => {
             body: JSON.stringify(gauthBody)
         })
         const responseBody = await checkResponse.json()
+
         if(checkResponse.status != 200) {
             if(responseBody.error === 'NO_ACCOUNT') {
                 const decoded = jwtDecode(responseBody.idToken) as any
+                
                 onNewAccountNeeded(decoded.name, decoded.email, responseBody.idToken)
             } else {
                 throw new Error('Google user verification failed.')
@@ -129,7 +149,7 @@ const useAccountFunctions = (version: string) => {
         }
     }
 
-    return { login, connectGoogleWithIdToken, connectGoogleWithAccessCode, restoreSession, disconnect }
+    return { login, connectGoogleWithIdToken, connectGoogleWithAccessCode, restoreSession, disconnect, registerViaGoogle }
 }
 
 

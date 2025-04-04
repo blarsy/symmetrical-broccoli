@@ -49,7 +49,7 @@ interface ProximitySelectorProps {
 
 const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
     return <View style={{ flexDirection: 'column', alignContent: 'stretch', paddingBottom: 10 }}>
-        <LocationEdit small style={{ paddingLeft: 10 }} location={value?.referenceLocation} 
+        <LocationEdit testID="searchAddress" small style={{ paddingLeft: 10 }} location={value?.referenceLocation} 
             onLocationChanged={newLocation => {
                 onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation, 
                     excludeUnlocated: value.excludeUnlocated,

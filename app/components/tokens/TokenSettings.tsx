@@ -9,8 +9,9 @@ import History from "./History"
 import InfoHowToGet from "./InfoHowToGet"
 import { primaryColor } from "../layout/constants"
 import { ScrollView } from "react-native-gesture-handler"
+import { RouteProps } from "@/lib/utils"
 
-const TokenSettings = () => {
+const TokenSettings = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
 
     return <ScrollView style={{ backgroundColor: primaryColor }}>
@@ -21,7 +22,7 @@ const TokenSettings = () => {
         </View>
         <Text style={{ color: '#fff', paddingLeft: 16, marginTop: 10, marginBottom: 10 }} variant="bodyLarge">{t('howItWorksTitle')}</Text>
         <InfoHowItWorks />
-        <AccordionItem style={{ marginBottom: 20 }} textColor="#fff" big testID="HistoryAccordion" title={t('tokenHistoryAccordionTitle')}>
+        <AccordionItem initialExpanded={route.params?.showHistory} style={{ marginBottom: 20 }} textColor="#fff" big testID="HistoryAccordion" title={t('tokenHistoryAccordionTitle')}>
             <History />
         </AccordionItem>
         <InfoHowToGet />

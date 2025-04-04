@@ -1,6 +1,5 @@
 import { executeQuery } from './lib'
 
-
 export const checkAllAccountDataCreated = async (email: string) => {
     const result = await executeQuery(`select *
         from sb.accounts a
@@ -17,6 +16,23 @@ export const checkAccountData = async (email: string, name: string) => {
         where a.email = lower($1) and a.name = $2`, [email, name])
     
     expect(result.rowCount).toBe(1)
+}
+
+export const checkAccountAddress = async (address: string, latitude: number, longitude: number, accountId: number) => {
+    const result = await executeQuery(`select *
+        from sb.accounts a inner join sb.locations l on l.id = a.location_id
+        where a.id = $1 and l.address = $2 and l.latitude = $3 and l.longitude = $4`, [accountId, address, latitude, longitude])
+    
+    expect(result.rowCount).toBe(1)
+}
+
+export const checkAccountLogo = async (publicId: string, accountId: number) => {
+    const result = await executeQuery(`select *
+        from sb.accounts a
+        inner join sb.images i on a.avatar_image_id = i.id
+        where a.id = $1 and i.public_id = $2`, [accountId, publicId])
+    
+    return result.rowCount === 1
 }
 
 export const checkLinksOnAccount = async (email: string, links: { label: string, url: string, type: number}[]) => {
@@ -130,9 +146,39 @@ export const checkLastNotificationExists = async (email: string): Promise<any> =
     return notif.rows[0]
 }
 
+export const checkANotificationExists = async (email: string, validateData: (data: any) => boolean) => {
+    const result = await executeQuery(`select n.data from sb.notifications n
+            inner join sb.accounts a on a.id = n.account_id
+            where a.email = lower($1)
+            limit 1`, [email])
+
+    if(result.rowCount === 0) return false
+
+    return result.rows.some(row => validateData(row.data))
+}
+
 export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {
     const result = await executeQuery(`select amount_of_tokens from sb.accounts
         where email = lower($1)`, [email])
     
     expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
+}
+
+export const getTokenAmounts = async (accountIds: number[]): Promise<{[accountId: number]: number}> => {
+    const result = await executeQuery(`select id, amount_of_tokens from sb.accounts where id in (${accountIds.join(',')})`)
+
+    const returnValue: {[accountId: number]: number} = {}
+
+    result.rows.forEach(row => { returnValue[row.id] = row.amount_of_tokens })
+
+    return returnValue
+}
+
+export const checkTokenTransactionExists = async (accountId: number, transactionType: number, movement: number, targetAccountId: number) => {
+    const result = await executeQuery(`select * from sb.accounts_token_transactions 
+        where account_id = $1 AND token_transaction_type_id = $2 AND movement = $3 AND target_account_id = $4`,
+        [accountId, transactionType, movement, targetAccountId]
+    )
+
+    return result.rowCount && result.rowCount > 0
 }

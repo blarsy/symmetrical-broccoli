@@ -66,6 +66,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
   accountById(id: $otherAccountId) {
     id
     name
+    willingToContribute
     imageByAvatarImageId {
       publicId
     }
@@ -106,14 +107,13 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
     paidUntil
     deleted
   }
-}
-`
+}`
 
 export interface ConversationState extends DataLoadState<{ 
       id: number
       participantId: number
       resource?: Resource
-      otherAccount: { id: number, name: string } 
+      otherAccount: { id: number, name: string, willingToContribute: boolean } 
 } | undefined> {}
 
 export interface conversationMessagesState {
@@ -142,7 +142,7 @@ const blankConversationState: ConversationState = initial(true, {
   id: 0,
   participantId: 0,
   resource: undefined, 
-  otherAccount: { id: 0, name: '', avatarPublicId: '' }
+  otherAccount: { id: 0, name: '', avatarPublicId: '', willingToContribute: false }
 })
 
 const blankMessagesState: conversationMessagesState = {
@@ -170,7 +170,6 @@ const ConversationContextProvider = ({ children }: Props) => {
         load: async (resourceId: number, otherAccountId: number, categories: Category[]) => {
           try {
             const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
-    
             if(res.data) {
               const loadedMessages = fromData(asIMessages(res.data.conversationMessages.edges))
 
@@ -181,7 +180,12 @@ const ConversationContextProvider = ({ children }: Props) => {
                   participantId: res.data.conversationMessages.edges.length > 0 ? 
                     res.data.conversationMessages.edges[0].node.participantByParticipantId.id :
                     -1,
-                  otherAccount: { id: res.data.accountById.id, name: res.data.accountById.name, avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId },
+                  otherAccount: { 
+                    id: res.data.accountById.id, 
+                    name: res.data.accountById.name, 
+                    avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId,
+                    willingToContribute: res.data.accountById.willingToContribute
+                  },
                   resource: fromServerGraphResource(res.data.resourceById, categories)
                 }
               ))

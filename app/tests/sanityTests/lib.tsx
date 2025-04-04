@@ -95,8 +95,8 @@ export const checkBadgeNumeric = async (testID: string, screen : RenderResult) =
     expect(badges[0]).toHaveTextContent(/\d+/)
 }
 
-export const waitForThenPress = async (testId: string, screen: RenderResult) => {
-    await waitFor(() => expect(screen.getByTestId(testId)).toBeOnTheScreen())
+export const waitForThenPress = async (testId: string, screen: RenderResult, timeout?: number) => {
+    await waitFor(() => expect(screen.getByTestId(testId)).toBeOnTheScreen(), { timeout })
     const uv = userEvent.setup()
     uv.press(screen.getByTestId(testId))
 }

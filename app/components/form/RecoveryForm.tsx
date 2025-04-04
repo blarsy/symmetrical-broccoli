@@ -7,7 +7,7 @@ import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
 import { gql, useMutation } from "@apollo/client"
 import OperationFeedback from "../OperationFeedback"
-import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType } from "../AppContextProvider"
 
 const REQUEST_RECOVERY = gql`mutation RequestAccountRecovery($email: String) {
     requestAccountRecovery(input: {email: $email}) {
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const RecoveryForm = ({ toggleRecovering }: Props) => {
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const [recoveryRequested, setRecoveryRequested] = useState(false)
     const [requestRecovery, { loading, error, reset }] = useMutation(REQUEST_RECOVERY)
 
@@ -31,12 +31,12 @@ const RecoveryForm = ({ toggleRecovering }: Props) => {
             await requestRecovery({ variables: { email: values.email }})
             setRecoveryRequested(true)
         } catch(e: any) {
-            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e }})
+            appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e }})
         }
     }}>
     {({ handleChange, handleBlur, handleSubmit, values }) => (
-        <View>
-            <OrangeTextInput label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+        <View style={{ gap: 10 }}>
+            <OrangeTextInput label={<StyledLabel color="#fff" isMandatory label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                 onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
             <ErrorMessage component={OrangeBackedErrorText} name="email" />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
