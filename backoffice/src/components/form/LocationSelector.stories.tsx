@@ -26,3 +26,10 @@ export const Empty: Story = {
     value: null
   }
 }
+
+export const Initialized: Story = {
+  args: {
+    onLocationSet: console.log,
+    value: { address: 'somewhere', latitude: 50, longitude: 3 }
+  }
+}

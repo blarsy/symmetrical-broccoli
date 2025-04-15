@@ -1,9 +1,10 @@
 import AppContextProvider, { AppStateData } from "@/components/scaffold/AppContextProvider"
-import i18n from "@/i18n"
+import { getCommonConfig } from "@/config"
 import { DocumentNode } from "@apollo/client"
 import { MockedResponse, MockedProvider } from '@apollo/react-testing'
-import { init, TFunctionProcessReturnValue, TFunctionReturnOptionalDetails } from "i18next"
-import { $NoInfer } from "i18next/typescript/helpers"
+import { APIProvider } from "@vis.gl/react-google-maps"
+import { fromData } from "./DataLoadState"
+const { mapsApiKey } = getCommonConfig()
 
 export interface GraphQlOp {
     query: DocumentNode,
@@ -24,11 +25,18 @@ export const apolloClientMocksDecorator = (ops: GraphQlOp[]) =>
         </MockedProvider>
     }
 
+export const MapsProviderDecorator = (Story: React.ElementType) => {
+    return <APIProvider apiKey={mapsApiKey} >
+        <Story/>
+    </APIProvider>
+}
+
 export const appContextDecorator = (initial?: AppStateData) => {
     if(!initial){
-        initial = { 
-            loading: false, token: '', i18n: { lang: 'fr', translator: (str, opts?) => 'rr' },
-            version: 'v0_9'
+        initial = {
+            loading: false, token: '', i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
+            version: 'v0_9',
+            categories: fromData([])
         }
 
     }

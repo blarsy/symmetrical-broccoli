@@ -4,13 +4,14 @@ import { useContext, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
 import * as yup from "yup"
-import { Alert, Backdrop, CircularProgress, TextField, Typography } from "@mui/material"
-import { ErrorText, RightAlignedModifyButtons } from "../misc"
+import { Backdrop, CircularProgress, TextField, Typography } from "@mui/material"
+import { ErrorText, FieldTitle, RightAlignedModifyButtons } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import AvatarEdit from "./AvatarEdit"
 import { gql, useMutation } from "@apollo/client"
 import EditLinks from "./EditLinks"
 import EditAddress from "./EditAddress"
+import Feedback from "../scaffold/Feedback"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
@@ -111,9 +112,10 @@ const Profile = () => {
                     updateAccountEmail({ variables: { newEmail } })
                     setNewEmailMustBeActivated(true)
                 }} />
-            { newEmailMustBeActivated && <Alert severity="success">{t('newEmailMustBeActivated')}</Alert> }
+            <Feedback visible={!!newEmailMustBeActivated} severity="success" detail={t('newEmailMustBeActivated')} />
             <EditLinks onDone={newLinks => publicInfo.updatePublicInfo(newLinks, publicInfo.profileData.data!.location)} 
                 links={publicInfo.profileData.data.links}/>
+            <FieldTitle title={appContext.i18n.translator('addressEditTitle')} sx={{ alignSelf: 'flex-start'}} />
             <EditAddress value={publicInfo.profileData.data.location} onChange={newLocation => {
                 publicInfo.updatePublicInfo(publicInfo.profileData.data!.links, newLocation)
             }} />
@@ -123,8 +125,8 @@ const Profile = () => {
             onClick={() => {}}>
             <CircularProgress color="primary" />
         </Backdrop>
-        { updateError && <Alert severity="error" onClose={reset}>{updateError.message}</Alert> }
-        { updateEmailError && <Alert severity="error" onClose={resetEmail}>{ updateEmailError.message }</Alert> }
+        <Feedback severity="error" onClose={reset} visible={!!updateError} />
+        <Feedback severity="error" onClose={resetEmail} visible={!!updateEmailError} />
     </LoadedZone>
 }
 

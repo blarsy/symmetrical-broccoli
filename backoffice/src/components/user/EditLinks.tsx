@@ -10,6 +10,7 @@ import PlusIcon from '@mui/icons-material/Add'
 import { ConfirmDialog, ErrorText, FieldTitle, RightAlignedModifyButtons } from "../misc"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
+import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 
 interface LinkIconEditProps {
     value: LinkTypes
@@ -72,7 +73,7 @@ const LinkIcon = ({ value }: { value: LinkTypes}) => {
 
 interface Props {
     links: Link[]
-    onDone: (newLinks: Link[]) => void
+    onDone: (newLinks: Link[]) => Promise<void>
 }
 
 const EditLinks = (p: Props) => {
@@ -80,6 +81,7 @@ const EditLinks = (p: Props) => {
     const [editedLinks, setEditedLinks] = useState<number[]>([])
     const [currentLinks, setCurrentLinks] = useState<Link[]>(p.links)
     const [linkToDelete, setLinkToDelete] = useState<number | null>(null)
+    const [deleteLinkState, setDeleteLinkState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
     return <Stack padding="5px">
         <FieldTitle title={appContext.i18n.translator('linksEditTitle')} />
@@ -127,12 +129,21 @@ const EditLinks = (p: Props) => {
                     }}
                     onDelete={() => setLinkToDelete(idx)}
                     saveButtonDisabled={!f.dirty} />
-                    <ConfirmDialog title={ appContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
+                    <ConfirmDialog processing={deleteLinkState.loading} title={ appContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
                         onClose={ response => {
                             if(response) {
                                 setCurrentLinks(prev => {
                                     const newLinks = prev.filter((val, i) => idx != i)
-                                    setTimeout(() => p.onDone(newLinks), 0)
+                                    setTimeout(() => {
+                                        setDeleteLinkState(beginOperation())
+                                        try {
+                                            p.onDone(newLinks)
+                                        } catch(e) {
+                                            setDeleteLinkState(fromError(e as Error, appContext.i18n.translator('requestError')))
+                                        } finally {
+                                            setDeleteLinkState(fromData(undefined))
+                                        }
+                                    }, 0)
                                     return newLinks
                                 })
                             }

@@ -1,5 +1,7 @@
 import { AccountInfo } from "@/lib/useAccountFunctions"
 import { createContext, Dispatch, Key, useReducer } from "react"
+import { Category } from "@/lib/schema"
+import DataLoadState, { initial } from "@/lib/DataLoadState"
 
 export interface AppStateData {
   loading: boolean
@@ -12,11 +14,18 @@ export interface AppStateData {
   }
   account?: AccountInfo
   lightMode?: boolean
+  categories: DataLoadState<Category[]>
 }
 
 const blankAppContext = { 
     loading: true,
     token: '',
+    categories: initial<Category[]>(false, undefined),
+    version: '',
+    i18n: {
+      translator: (code) => `tr-${code}`,
+      lang: ''
+    }
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -59,6 +68,9 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
       case AppReducerActionType.UpdateAccount:
         newState = { account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } } }
         break
+      case AppReducerActionType.SetCategoriesState:
+        newState = { categories: action.payload }
+        break;
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }

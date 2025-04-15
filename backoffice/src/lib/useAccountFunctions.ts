@@ -62,6 +62,11 @@ const useAccountFunctions = (version: string) => {
     const connectWithToken = async (token: string) => {
         const client = getApolloClient(version, token)
         const res = await client.query({ query: GET_SESSION_DATA })
+
+        if(!res.data.getSessionData) {
+            localStorage.removeItem('token')
+            return undefined
+        }
     
         const account: AccountInfo = {
             id: res.data.getSessionData.accountId, 
@@ -78,7 +83,7 @@ const useAccountFunctions = (version: string) => {
         }
 
         localStorage.setItem('token', token)
-        return { res, account, client }
+        return account
     }
 
     const disconnect = () => {
@@ -87,7 +92,8 @@ const useAccountFunctions = (version: string) => {
     }
 
     const restoreSession = async (token: string, otherSessionProps: any) => {
-        const { account } = await connectWithToken(token)
+        const account = await connectWithToken(token)
+        if(!account) token = ''
 
         appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, ...{account, token} } })
     }
@@ -95,7 +101,7 @@ const useAccountFunctions = (version: string) => {
     const login = async (email: string, password: string) => {
         const client = getApolloClient(version)
         const tokenRes = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } })
-        const { account } = await connectWithToken(tokenRes.data.authenticate.jwtToken)
+        const account = await connectWithToken(tokenRes.data.authenticate.jwtToken)
         appDispatch({ type: AppReducerActionType.Login, payload: { account } })
     }
 
@@ -116,8 +122,7 @@ const useAccountFunctions = (version: string) => {
 
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken } })
         
-        console.log('register return', res.data)
-        const { account } = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
+        const account = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
         appDispatch({ type: AppReducerActionType.Login, payload: { account } })
     }
 
@@ -144,7 +149,7 @@ const useAccountFunctions = (version: string) => {
             const decoded = jwtDecode(responseBody.idToken)
             const client = getApolloClient(version)
             const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_GOOGLE, variables: { email: (decoded as any).email, token: responseBody.idToken } })
-            const { account } = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
+            const account = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
             appDispatch({ type: AppReducerActionType.Login, payload: { account } })
         }
     }

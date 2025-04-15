@@ -21,7 +21,7 @@ export function beginOperation<M>(): DataLoadState<M> {
     return new DataLoadState<M>(undefined, true, undefined)
 }
 
-export function initial<M> (loading: boolean, value: M): DataLoadState<M> {
+export function initial<M> (loading: boolean, value?: M): DataLoadState<M> {
     return new DataLoadState<M>(value, loading, undefined)
 }
 

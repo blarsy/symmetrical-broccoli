@@ -9,6 +9,7 @@ import useAccountFunctions from "@/lib/useAccountFunctions"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { useGoogleLogin } from '@react-oauth/google'
 import GoogleLogo from '../../../public/google.svg'
+import Feedback from "../scaffold/Feedback"
 
 interface Props {
     onClose: () => void
@@ -55,19 +56,6 @@ const ConnectForm = (p: Props) => {
                     <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: appContext.lightMode ? 'light': 'dark' }}>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<GoogleLogo width={'1.5rem'} height={'1.5rem'} />}
                             onClick={triggerLogin}>{appContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
-                        {/* <GoogleLogin containerProps={{ style: { alignSelf: 'center', margin: 0, padding: 0 } }} shape="circle" onSuccess={async c => {
-                            setConnectionStatus({ loading: true })
-                            try {
-                                console.log('c', c)
-                                await connectWithGoogle(c.credential!, (name, email, gauthToken) => {
-                                    //TODO: new account UI flow
-                                })
-                                setConnectionStatus({ loading: false })
-                                p.onClose()
-                            } catch(e) {
-                                setConnectionStatus({ loading: false, error: e as Error })
-                            }
-                        }}/> */}
                         <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
                         <TextField id="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
@@ -76,9 +64,9 @@ const ConnectForm = (p: Props) => {
                             <Button color="secondary" onClick={() => p.onClose()}>{t('cancelButton')}</Button>
                             <LoadingButton loading={connectionStatus.loading} type="submit">{t('connectButton')}</LoadingButton>
                         </Stack>
-                        { connectionStatus.error && <Alert onClose={() => {
+                        <Feedback visible={!!connectionStatus.error} onClose={() => {
                             setConnectionStatus({ loading: false })
-                        }} severity="error">{connectionStatus.error.message}</Alert>  }
+                        }} detail={connectionStatus.error?.message} severity="error" />
                     </Stack>
                 </Form>
             }

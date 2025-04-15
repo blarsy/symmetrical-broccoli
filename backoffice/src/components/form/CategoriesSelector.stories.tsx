@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import CategoriesSelector, { GET_CATEGORIES } from './CategoriesSelector'
-import { apolloClientMocksDecorator } from '@/lib/storiesUtil'
+import CategoriesSelector from './CategoriesSelector'
+import { apolloClientMocksDecorator, appContextDecorator } from '@/lib/storiesUtil'
+import { GET_CATEGORIES } from '@/lib/useCategories'
+import { fromData, initial } from '@/lib/DataLoadState'
 
 const meta = {
   component: CategoriesSelector,
@@ -24,7 +26,12 @@ const meta = {
             }
         }
     }
-  ])]
+  ]), appContextDecorator({ i18n: { lang: 'fr', translator: val => (val as string) }, 
+    categories: initial(true, []),
+    version: '0_9',
+    loading: false,
+    token: 'token'
+  })]
 } satisfies Meta<typeof CategoriesSelector>
 
 export default meta
@@ -32,7 +39,6 @@ type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {
   args: {
-    lang: 'fr',
     onSelectionChanged: console.log,
     values: []
   }
@@ -40,7 +46,6 @@ export const Empty: Story = {
 
 export const SomeSelected: Story = {
   args: {
-    lang: 'fr',
     onSelectionChanged: console.log,
     values: [1, 2]
   }

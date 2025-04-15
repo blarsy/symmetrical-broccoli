@@ -1,6 +1,5 @@
 import { Avatar, Dialog, IconButton, Modal, Stack } from "@mui/material"
 import Edit from "@mui/icons-material/Edit"
-import { getCommonConfig } from "@/config"
 import { useState } from "react"
 import ImageUpload from "./ImageUpload"
 import { urlFromPublicId } from "@/lib/images"

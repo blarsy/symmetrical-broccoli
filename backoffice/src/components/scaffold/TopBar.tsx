@@ -25,8 +25,8 @@ const TopBar = ({ version }: Props) => {
 
     return <Stack direction="row" justifyContent="space-between">
         <Stack direction="row">
-            <Button LinkComponent={Link} href={`/webapp/${appContext.version}`}>{appContext.i18n.translator('searchButtonCaption')}</Button>
-            { appContext.account && <Button LinkComponent={Link} href={`/webapp/${appContext.version}/resources`}>{appContext.i18n.translator('resourcesButtonCaption')}</Button> }
+            <Button><Link href={{ pathname: `/webapp/${appContext.version}` }}>{appContext.i18n.translator('searchButtonCaption')}</Link></Button>
+            { appContext.account && <Button><Link href={{ pathname: `/webapp/${appContext.version}/resources` }}>{appContext.i18n.translator('resourcesButtonCaption')}</Link></Button> }
         </Stack>
         <Stack direction="row" gap="2rem">
             <Stack direction="row" alignItems="center">
@@ -57,7 +57,7 @@ const TopBar = ({ version }: Props) => {
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <Link href={`/webapp/${version}/profile`}>
+                <Link href={{ pathname: `/webapp/${version}/profile` }}>
                     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                         <Box sx={{ minWidth: '36px' }}>
                             <ConnectedAccount fontSize="small" />
@@ -69,7 +69,7 @@ const TopBar = ({ version }: Props) => {
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <Link href={`/webapp/${version}/profile/prefs`}>
+                <Link href={{ pathname: `/webapp/${version}/profile/prefs`}}>
                     <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                         <Box sx={{ minWidth: '36px' }}>
                             <EditNotifications fontSize="small" />

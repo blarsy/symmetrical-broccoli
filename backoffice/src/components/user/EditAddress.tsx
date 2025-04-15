@@ -7,7 +7,6 @@ import SetLocationDialog from "../search/SetLocationDialog"
 import DisplayLocation from "./DisplayLocation"
 import Edit from "@mui/icons-material/Edit"
 import Delete from "@mui/icons-material/Delete"
-import { FieldTitle } from "../misc"
 
 interface Props {
     value: Location | null
@@ -25,7 +24,6 @@ const EditAddress = (p: Props) => {
                 p.onChange(newLocation)
                 setCurrentAddress(newLocation)
             }}/>
-        <FieldTitle title={appContext.i18n.translator('addressEditTitle')} sx={{ alignSelf: 'flex-start'}} />
         { currentAddress ?
             <Stack height="20rem" minWidth="20rem">
                 <Stack direction="row" alignItems="center">

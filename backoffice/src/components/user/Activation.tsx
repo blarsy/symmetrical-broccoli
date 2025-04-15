@@ -39,12 +39,12 @@ const Activation = ({ activationId }: Props) => {
     if(uiState.loading) {
         content = <CircularProgress color="primary"/>
     } else if(uiState.error) {
-        content = <Feedback severity="error" message={uiState.error.name} 
+        content = <Feedback visible={!!uiState.error} severity="error" message={uiState.error.name} 
             detail={uiState.error.message} 
             onClose={() => {}}/>
     } else {
         content = (<Stack alignItems="center" gap="2rem">
-            <Alert severity="success">{uiState.t!('email_activated')}</Alert>
+            <Feedback severity="success" message={uiState.t && uiState.t('email_activated')} />
         </Stack>)
     }
 

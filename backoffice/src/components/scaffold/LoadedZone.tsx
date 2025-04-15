@@ -1,4 +1,5 @@
 import { Alert, CircularProgress, Stack, SxProps, Theme } from "@mui/material"
+import Feedback from "./Feedback"
 
 export interface StateError extends Error {
     detail?: string
@@ -17,9 +18,7 @@ function LoadedZone({ loading, error, children, containerStyle }: Props) {
             <CircularProgress color="primary" />
         </Stack> }
         { !loading && !error && children }
-        { error && <Stack>
-            <Alert severity="error">{error.message}</Alert>
-        </Stack> }
+        <Feedback visible={!!error} severity="error" detail={error?.message} />
     </Stack>
 }
 

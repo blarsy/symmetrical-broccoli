@@ -26,7 +26,7 @@ const resources = {
             "categoriesTitle": "Categories",
             "filtersTitle": "Filters",
             "proximityTitle": "Proximity",
-            "noLocationSet": "First set a reference location",
+            "noLocationSet": "No location defined",
             "setLocationDialogTitle": "Set location",
             "includeUnlocatedResourcesLabel": "Include resource with no location defined",
             "distanceTo": " km from",
@@ -72,7 +72,21 @@ const resources = {
             "deletedLabel": "Deleted",
             "noPicture": "No picture",
             "maximum": "At most every",
-            "days": "day(s)"
+            "days": "day(s)",
+            "confirmDeleteResourceTitle": "Delete this resource ?",
+            "titleLabel": "Title",
+            "descriptionLabel": "Description",
+            "max30Chars": "Maximum 30 characters long",
+            "dateMustBeFuture": "Must be in the future",
+            "mustBeAValidNumber": "Must be a number",
+            "subjectiveValueLabel": "Estimated value",
+            "selectCategoriesDialogTitle": "Categories selection",
+            "categoriesLabel": "Categories",
+            "permanentLabel": "Permanent",
+            "saveButtonLabel": "Save",
+            "someValuesInvalid": "Some values are missing or invalid",
+            "imagesLabel": "Images",
+            "drawASquareWithinTheImage": "Draw the area within the image that will be uploaded"
         }
     },
     fr: { 
@@ -99,7 +113,7 @@ const resources = {
             "categoriesTitle": "Categories",
             "filtersTitle": "Filtres",
             "proximityTitle": "Proximité",
-            "noLocationSet": "Veuillez définir une location de référence",
+            "noLocationSet": "Aucune location définie",
             "setLocationDialogTitle": "Définir une location",
             "includeUnlocatedResourcesLabel": "Inclure les resources sans location définie",
             "distanceTo": " km de ",
@@ -145,7 +159,21 @@ const resources = {
             "deletedLabel": "Supprimé",
             "noPicture": "Pas d'image",
             "maximum": "Au plus, chaque",
-            "days": "jour(s)"
+            "days": "jour(s)",
+            "confirmDeleteResourceTitle": "Effacer cette ressource ?",
+            "titleLabel": "Titre",
+            "descriptionLabel": "Description",
+            "max30Chars": "Maximum 30 caractères",
+            "dateMustBeFuture": "Doit être dans le futur",
+            "mustBeAValidNumber": "Doit être un nombre",
+            "subjectiveValueLabel": "Valeur estimée",
+            "selectCategoriesDialogTitle": "Sélection de catégories",
+            "categoriesLabel": "Catégories",
+            "permanentLabel": "Permanent",
+            "saveButtonLabel": "Sauver",
+            "someValuesInvalid": "Certaines valeurs sont manquantes ou invalides",
+            "imagesLabel": "Images",
+            "drawASquareWithinTheImage": "Tracez à la souris dans l'image la zone qui sera téléchargée"
         }
     }
 }

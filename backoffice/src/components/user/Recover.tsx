@@ -36,7 +36,7 @@ const Recover = ({ recoveryId }: Props) => {
         return <CircularProgress color="primary"/>
     } else if(uiState.success) {
         return <Stack alignItems="center" gap="2rem">
-            <Alert severity="success">{uiState.t!('password_changed')}</Alert>
+            <Feedback severity="success" detail={uiState.t!('password_changed')} />
             <Typography variant="overline">{uiState.t!('open_on_mobile')}</Typography>
         </Stack>
     } else {

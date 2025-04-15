@@ -5,6 +5,7 @@ import { Alert, Backdrop, CircularProgress, FormControl, FormControlLabel, IconB
 import { FieldTitle } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import SmartPhone from '@mui/icons-material/Vibration'
+import Feedback from "../scaffold/Feedback"
 
 export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
     accountById(id: $id) {
@@ -125,7 +126,8 @@ const Preferences = () => {
                 onClick={() => {}}>
                 <CircularProgress color="primary" />
             </Backdrop>
-            { updateError && <Alert severity="error" onClose={reset}>{updateError.message}</Alert> }
+            <Feedback severity="error" onClose={reset} visible={!!updateError}
+                detail={updateError?.message} />
         </Stack>
     </LoadedZone>
 }

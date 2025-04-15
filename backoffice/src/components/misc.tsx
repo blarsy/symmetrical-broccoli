@@ -1,13 +1,12 @@
 import Check from "@mui/icons-material/Check"
 import Close from "@mui/icons-material/Close"
-import Cross from '@mui/icons-material/Close'
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import { Dialog, DialogActions, DialogTitle, IconButton, Stack, SxProps, Theme, Typography } from "@mui/material"
 import { PropsWithChildren } from "react"
 
 export const ErrorText= (props: PropsWithChildren) => {
-    return <Typography variant="body1" sx={{ color: 'red' }}>{props.children}</Typography>
+    return <Typography textAlign="center" variant="body1" sx={{ color: 'red' }}>{props.children}</Typography>
 }
 
 interface RightAlignedModifyButtonsProps {
@@ -32,6 +31,8 @@ interface ConfirmDialogProps {
     title: string
     onClose: (response: boolean) => void
     visible: boolean
+    processing: boolean
+    error?: Error
 }
 
 export const ConfirmDialog = (p: ConfirmDialogProps) => {

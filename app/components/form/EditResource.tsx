@@ -161,7 +161,7 @@ export default ({ route, navigation }:RouteProps) => {
                         }}
                         onLocationChanged={newLocation => {
                             setFieldValue('specificLocation', newLocation)
-                        } } 
+                        }} 
                         orangeBackground={false}/>
                     <Portal>
                         <OperationFeedback testID="resourceEditionFeedback" error={saveResourceState.error}

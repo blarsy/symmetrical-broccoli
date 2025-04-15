@@ -28,8 +28,9 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
     const [zoom, setZoom] = useState(0)
     const ref = useRef<Camera | null>(null)
 
-    const picSize = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height)
+    const previewSize = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height)
     const vertical = Dimensions.get('screen').width < Dimensions.get('screen').height
+    
 
     return <TouchableOpacity onPress={async () => {
         if(permission && !permission.granted){
@@ -47,7 +48,7 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                 backgroundColor: lightPrimaryColor, alignItems: 'center',
                 flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
                 <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
-                <Camera ref={ref} zoom={zoom} pictureSize="1:1" 
+                <Camera ref={ref} zoom={zoom} pictureSize="1:1" ratio="1:1"
                     style={{ flex: 1, alignSelf: 'stretch', justifyContent: processing ? 'space-between' : 'flex-end', 
                         alignItems: 'center', padding: 10, gap: 5 }}
                     onCameraReady={() => setCameraReady(true)}>
