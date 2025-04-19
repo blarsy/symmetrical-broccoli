@@ -223,7 +223,7 @@ const resources = {
       "howItWorksStep1Title": "Tope-là needs to grow",
       "chickenOrEgg": "A chicken or the egg situation: no resource, no topper, no topper, no resource.",
       "howItWorksStep2Title": "For everyone",
-      "freeResources": "Two active resources at any time.",
+      "freeResources": "You have two active resources at any time, without any restriction.",
       "howItWorksStep3Title": "For the braves",
       "needContribution": "Your resources beyond the first two make Tope-là grow !",
       "howItWorksStep4Title": "A token for Tope-là",
@@ -251,7 +251,9 @@ const resources = {
       "tokensReceivedDetails": "{{fromAccount}} sent you {{amountReceived}} Topes",
       "tokensSentHeadline1": "Topes sent",
       "tokensSentHeadline2": "You sent some Topes",
-      "tokensSentDetails": "You sent {{amountSent}} Topes to {{toAccount}}"
+      "tokensSentDetails": "You sent {{amountSent}} Topes to {{toAccount}}",
+      "exchangeResourcesAgainsTokens": "Swap resources against Topes",
+      "understoodBecomingContributor": "I understood all the hereabove aspeects"
    }
   },
   fr: {
@@ -469,7 +471,7 @@ const resources = {
       "howItWorksStep1Title": "Tope-là a besoin de grandir",
       "chickenOrEgg": "C'est l'oeuf ou la poule: pas de toppeur, pas de ressource, et pas de ressource, pas de toppeur.",
       "howItWorksStep2Title": "Pour tout le monde",
-      "freeResources": "Vous pouvez avoir deux ressources actives à tout moment.",
+      "freeResources": "Vous pouvez avoir deux ressources actives à tout moment, sans aucune restriction.",
       "howItWorksStep3Title": "Pour les motivé.e.s",
       "needContribution": "Vos ressources actives aù-delà des deux premières font grandir Tope-là !",
       "howItWorksStep4Title": "Un jeton pour Tope-là",
@@ -497,7 +499,9 @@ const resources = {
       "tokensReceivedDetails": "{{fromAccount}} vous à envoyé {{amountReceived}} Topes",
       "tokensSentHeadline1": "Topes envoyés",
       "tokensSentHeadline2": "Vous avez envoyé des Topes",
-      "tokensSentDetails": "Vous avez envoyé {{amountSent}} Topes à {{toAccount}}"
+      "tokensSentDetails": "Vous avez envoyé {{amountSent}} Topes à {{toAccount}}",
+      "exchangeResourcesAgainsTokens": "Exchanger contre des Topes",
+      "understoodBecomingContributor": "J'ai bien compris tous les aspects ci-dessus"
     }
   }
 }

@@ -175,7 +175,7 @@ const alertReducer = (previousState: IAppNotification, action: {type: AppAlertRe
     default:
       throw new Error(`Unexpected alert reducer action type ${action.type}`)
   }
-  console.log('alert action', action)
+  //console.log('alert action', action)
   return result
 }
 

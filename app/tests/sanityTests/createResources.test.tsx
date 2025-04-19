@@ -17,7 +17,7 @@ dayjs.extend(utc)
 let accounts: TestAccount[]
 
 afterEach( async () => {
-    await cleanupTestAccounts(accounts)
+    //await cleanupTestAccounts(accounts)
 })
 
 test('Create resource with unconfirmed account', async () => {

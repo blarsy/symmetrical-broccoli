@@ -4,6 +4,7 @@ import React  from 'react'
 import HowItWorksSwiper from './HowItWorksSwiper'
 import { apolloClientMocksDecorator, appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import { GraphQlLib } from '@/lib/backendFacade'
+import { Dimensions } from 'react-native'
 
 const meta: Meta<typeof HowItWorksSwiper> = {
   component: HowItWorksSwiper,
@@ -17,12 +18,12 @@ type Story = StoryObj<typeof HowItWorksSwiper>
 
 export const Simple: Story = {
     name: 'Simple',
-    args: { width: 300 },
+    args: { width: Dimensions.get('window').width },
     decorators: [appContextDecorator(false, false, false, 60)]
 }
 
 export const ExplainOnly: Story = {
     name: 'Explain only',
-    args: { width: 300 },
+    args: { width: Dimensions.get('window').width },
     decorators: [appContextDecorator(false, false, true)]
 }

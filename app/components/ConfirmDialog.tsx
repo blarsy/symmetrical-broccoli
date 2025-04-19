@@ -13,7 +13,7 @@ import BareIconButton from "./layout/BareIconButton"
 interface ThemedDialogProps {
     visible: boolean
     content: ReactNode
-    title: string
+    title?: string
     actions?: ReactNode[]
     testID?: string
     onDismiss: () => void
@@ -26,7 +26,7 @@ export const ThemedDialog = ({ visible, content, title, actions, testID, onDismi
     return <Portal>
         <Dialog testID={testID} visible={visible} style={{ backgroundColor: lightPrimaryColor, ...(style as object) }} onDismiss={onDismiss}>
             <View style={{ flexDirection: 'row', paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between' }}>
-                <Text variant="titleLarge" style={{ textAlign:'center', flex: 1 }}>{title}</Text>
+                <Text variant="titleLarge" style={{ textAlign:'center', flex: 1 }}>{title || ''}</Text>
                 <BareIconButton size={20} Image={Images.Cross} onPress={onDismiss}/>
             </View>
             <Dialog.Content style={contentStyle}>

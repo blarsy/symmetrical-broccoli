@@ -52,8 +52,12 @@ const ImagesViewer = ({ resource, onImagePress }: { resource: Resource, onImageP
 
     return <View style={{ flex: 1, flexGrow: 1, alignItems: 'center', flexDirection:"row", marginBottom: 10 }}>
         <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}></View>
-        <SwiperFlatList style={{ width: imgSize, flexGrow: 0, flexShrink: 0 }} data={getSwiperData(resource)} onEndReached={() => setSwipedToEnd(true)} renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity onPress={() => onImagePress(item.source)}>
-            <Image key={item.idx} source={item.source} width={imgSize} height={imgSize} style={{ borderRadius: IMAGE_BORDER_RADIUS }} />
+        <SwiperFlatList style={{ width: imgSize, flexGrow: 0, flexShrink: 0 }} 
+            data={getSwiperData(resource)} onEndReached={() => setSwipedToEnd(true)} 
+            renderItem= {({ item }: { item: ImgMetadata }) => <TouchableOpacity 
+            onPress={() => onImagePress(item.source)}>
+            <Image key={item.idx} source={item.source} width={imgSize} height={imgSize} 
+                style={{ borderRadius: IMAGE_BORDER_RADIUS }} />
         </TouchableOpacity>} />
         <View style={{ flexBasis: '50%', flexShrink: 1, alignItems: 'center' }}>{ !swipedToEnd && <Icon source="gesture-swipe-right" size={40}/>}</View>
     </View>

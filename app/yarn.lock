@@ -6764,7 +6764,7 @@ __metadata:
     react-native-screens: ~3.29.0
     react-native-svg: 14.1.0
     react-native-svg-transformer: ^1.1.0
-    react-native-swiper-flatlist: ^3.2.4
+    react-native-swiper-flatlist: ^3.2.5
     react-native-uuid: ^2.0.2
     react-native-web: ^0.19.11
     socket.io-client: ^4.7.2
@@ -16481,7 +16481,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-swiper-flatlist@npm:^3.2.4":
+"react-native-swiper-flatlist@npm:^3.2.5":
   version: 3.2.5
   resolution: "react-native-swiper-flatlist@npm:3.2.5"
   peerDependencies:
