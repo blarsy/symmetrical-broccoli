@@ -19,6 +19,7 @@ import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/l
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
 import EditImage from "./EditImage"
+import { useRouter } from "next/navigation"
 
 interface Props {
     value?: Resource
@@ -73,6 +74,7 @@ const blankResource: Resource = {
 
 const EditResource = (p: Props) => {
     const appContext = useContext(AppContext)
+    const router = useRouter()
     const profileAddress = useProfileAddress()
     const categories = useCategories()
     const t = appContext.i18n.translator
@@ -80,7 +82,6 @@ const EditResource = (p: Props) => {
     const [createResource] = useMutation(CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
     const [saveState, setSaveState] = useState<DataLoadState<undefined>>(initial(false, undefined))
-    const [editedImage, setEditedImage] = useState<number | undefined>(undefined)
 
     return <LoadedZone loading={profileAddress.loading || categories.loading} error={profileAddress.error}>
         { profileAddress.data && categories.data && <Formik initialValues={p.value || blankResource} onSubmit={async values => {
@@ -91,15 +92,16 @@ const EditResource = (p: Props) => {
                         canBeGifted: values.canBeGifted, canBeTakenAway: values.canBeTakenAway, categoryCodes: values.categories.map(c => c.code), 
                         description: values.description, expiration: values.expiration, imagesPublicIds: values.images.map(img => img.publicId), 
                         isProduct: values.isProduct, isService: values.isService, title: values.title, 
-                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue } })
+                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue ? Number(values.subjectiveValue) : null } })
                 } else {
                     await createResource({ variables: { canBeDelivered: values.canBeDelivered, canBeExchanged: values.canBeExchanged, 
                         canBeGifted: values.canBeGifted, canBeTakenAway: values.canBeTakenAway, categoryCodes: values.categories.map(c => c.code), 
                         description: values.description, expiration: values.expiration, imagesPublicIds: values.images.map(img => img.publicId), 
                         isProduct: values.isProduct, isService: values.isService, title: values.title, 
-                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue } })
+                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue ? Number(values.subjectiveValue) : null } })
                 } 
                 setSaveState(fromData(undefined))
+                router.push('.')
             } catch(e) {
                 setSaveState(fromError(e, appContext.i18n.translator('requestError')))
             }
@@ -108,7 +110,7 @@ const EditResource = (p: Props) => {
             description: yup.string(),
             expiration: yup.date().nullable().min(new Date(), t('dateMustBeFuture')),
             subjectiveValue: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber')),
-            categories: yup.array().min(1, t('field_required')),
+            categories: yup.array().min(1, t('required_field')),
             isProduct: yup.bool().test('natureIsPresent', t('required_field'), (val, ctx) => {
                 return val || ctx.parent.isService
             }),
@@ -147,11 +149,12 @@ const EditResource = (p: Props) => {
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <Stack direction="row">
+                                <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{appContext.i18n.translator('expirationFieldLabel')}</Typography>
                                 <FormControlLabel sx={{ 
-                                flex: 1,
-                                '& .MuiFormControlLabel-label': {
-                                    color: 'primary.main'
-                                }
+                                    flex: 1,
+                                    '& .MuiFormControlLabel-label': {
+                                        color: 'primary.main'
+                                    }
                                 }} 
                                 control={<Checkbox size="small" sx={{ padding: '0 0.25rem' }} checked={f.values.expiration === null} onChange={e => {
                                     if(f.values.expiration === null) {
@@ -166,11 +169,13 @@ const EditResource = (p: Props) => {
                                         f.setFieldValue('expiration', e?.toDate())
                                     }} />
                             </Stack>
+                            <ErrorMessage component={ErrorText} name="expiration" />
                             <Stack direction="row" justifyContent="space-between" gap="2rem">
                                 <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{appContext.i18n.translator('categoriesLabel')}</Typography>
                                 <Typography variant="body1" sx={{ flex: 1 }} color="primary">{f.values.categories.map(cat => cat.name).join(', ')}</Typography>
                                 <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
                             </Stack>
+                            <ErrorMessage component={ErrorText} name="categories" />
                             <TextField size="small" id="subjectiveValue" name="subjectiveValue" value={f.values.subjectiveValue}
                                 placeholder={appContext.i18n.translator('subjectiveValueLabel')}
                                 onChange={f.handleChange('subjectiveValue')} onBlur={f.handleBlur('subjectiveValue')}/>
@@ -184,8 +189,10 @@ const EditResource = (p: Props) => {
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <Typography variant="body1" color="primary">{appContext.i18n.translator('addressEditTitle')}</Typography>
-                            <EditAddress value={f.values.specificLocation}
-                                onChange={newLoc => f.setFieldValue('specificLocation', newLoc)} />
+                            <Stack alignItems="center">
+                                <EditAddress value={f.values.specificLocation}
+                                    onChange={newLoc => f.setFieldValue('specificLocation', newLoc)} />
+                            </Stack>
                         </Stack>
                         <Stack padding="1rem 2rem" sx={theme => ({ bottom: 0, left: 0, position: 'fixed', width: '100%', backgroundColor: alpha(theme.palette.secondary.main, 0.5) })} >
                             <Feedback severity="error" visible={!!saveState.error}

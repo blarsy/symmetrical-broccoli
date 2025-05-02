@@ -40,9 +40,11 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    backgroundColor: { control: 'color' },
+    //backgroundColor: { control: 'color' },
   },
-  args: {  },
+  args: { 
+    version: 'v0_9'
+   },
   decorators: [(Story) => <ClientWrapper version="v0_9">
     <Story/>
   </ClientWrapper>, apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {

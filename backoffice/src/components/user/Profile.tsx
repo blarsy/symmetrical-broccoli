@@ -87,7 +87,7 @@ const Profile = () => {
     const [updateAccountEmail, { error: updateEmailError, reset: resetEmail, loading: updatingEmail}] = useMutation(UPDATE_ACCOUNT_EMAIL)
     const t = appContext.i18n.translator
 
-    return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center' }}>
+    return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         { publicInfo.profileData.data && <Stack sx={{ maxWidth: '40rem', gap: '1rem', paddingBottom: '1rem' }}>
             <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('profilePageTitle')}</Typography>
             <AvatarEdit initialValue={ appContext.account!.avatarPublicId } onChange={async newPublicId => {

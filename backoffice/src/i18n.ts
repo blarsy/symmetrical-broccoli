@@ -86,7 +86,16 @@ const resources = {
             "saveButtonLabel": "Save",
             "someValuesInvalid": "Some values are missing or invalid",
             "imagesLabel": "Images",
-            "drawASquareWithinTheImage": "Draw the area within the image that will be uploaded"
+            "drawASquareWithinTheImage": "Draw the area within the image that will be uploaded",
+            "chatButtonCaption": "Chat",
+            "deletedAccount": "Deleted account",
+            "noConversationSelected": "No conversation selected",
+            "expirationFieldLabel": "Expiration",
+            "fulldateFormat": "MM/DD/YYYY",
+            "linksLabel": "Links",
+            "accountLocationLabel": "Location",
+            "availableResources": "Available resources",
+            "pleaseTypeTheAddress": "Please type the address here, or click the location on the map"
         }
     },
     fr: { 
@@ -173,7 +182,16 @@ const resources = {
             "saveButtonLabel": "Sauver",
             "someValuesInvalid": "Certaines valeurs sont manquantes ou invalides",
             "imagesLabel": "Images",
-            "drawASquareWithinTheImage": "Tracez à la souris dans l'image la zone qui sera téléchargée"
+            "drawASquareWithinTheImage": "Tracez à la souris dans l'image la zone qui sera téléchargée",
+            "chatButtonCaption": "Chat",
+            "deletedAccount": "Compte supprimé",
+            "noConversationSelected": "Aucune conversation sélectionnée",
+            "expirationFieldLabel": "Expiration",
+            "fulldateFormat": "DD/MM/YYYY",
+            "linksLabel": "Liens",
+            "accountLocationLabel": "Localisation",
+            "availableResources": "Ressources disponibles",
+            "pleaseTypeTheAddress": "Tapez l'adresse ici, ou cliquez l'endroit sur la carte"
         }
     }
 }

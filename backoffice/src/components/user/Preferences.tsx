@@ -108,7 +108,7 @@ const Preferences = () => {
 
     const prefs = prefsFromData(data)
 
-    return <LoadedZone loading={loading} error={error} containerStyle={{ alignItems: 'center' }}>
+    return <LoadedZone loading={loading} error={error} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         <Stack sx={{ maxWidth: '40rem', paddingBottom: '1rem', gap: '2rem' }}>
             <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('prefPageTitle')}</Typography>
             <PrefSelector value={ prefs.pref1 } title={appContext.i18n.translator('chatMessageNotificationsTitle')}

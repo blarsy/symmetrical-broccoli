@@ -1,12 +1,13 @@
 "use client"
-import Search from "@/components/search/Search"
+import ViewResource from "@/components/resources/ViewResource"
 import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import { usePagePath } from "@/lib/utils"
 
 const Page = () => {
-    const { version } = usePagePath()
+    const { version, param } = usePagePath()
+
     return <ConnectedLayout version={version} allowAnonymous>
-        <Search version={version}/>
+        <ViewResource resourceId={Number(param)} />
     </ConnectedLayout>
 }
 

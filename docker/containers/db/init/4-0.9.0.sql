@@ -1246,6 +1246,33 @@ GRANT EXECUTE ON FUNCTION sb.send_tokens(integer, integer) TO sb;
 
 REVOKE ALL ON FUNCTION sb.send_tokens(integer, integer) FROM PUBLIC;
 
+CREATE OR REPLACE FUNCTION sb.conversation_messages_by_conversation_id(
+	id integer)
+    RETURNS SETOF messages 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT m.*
+  	FROM sb.messages m
+  	WHERE id = conversation_messages_by_conversation_id.id
+	AND EXISTS (
+		SELECT * FROM sb.participants p
+		WHERE p.conversation_id = conversation_messages_by_conversation_id.id
+		AND account_id = sb.current_account_id())
+	ORDER BY m.created DESC
+ 
+$BODY$;
+
+ALTER FUNCTION sb.conversation_messages_by_conversation_id(integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO sb;
+
 DO
 $body$
 BEGIN

@@ -1,11 +1,9 @@
 import { gql, useMutation } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useState } from "react"
-import { Avatar, Card, CardContent, CardHeader, Dialog, Stack, useTheme } from "@mui/material"
-import { urlFromPublicId } from "@/lib/images"
-import PictureGallery from "../scaffold/PictureGallery"
+import { Stack } from "@mui/material"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
-import ExpirationIndicator from "../resources/ExpirationIndicator"
+import ResourceCard from "../resources/ResourceCard"
 
 export const SUGGEST_RESOURCES = gql`
   mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
@@ -43,25 +41,14 @@ export const SUGGEST_RESOURCES = gql`
     }
 }`
 
-const makeAvatarLetters = (name: string) =>
-    name.split(/[ -]/, 2).map(word => word[0]).join('').toLocaleUpperCase()
-const AccountAvatar = ({name, avatarImagePublicId}:{ name: string, avatarImagePublicId: string}) => {
-    if(avatarImagePublicId) {
-        return <Avatar src={urlFromPublicId(avatarImagePublicId)} alt={name} />
-    }
-    return <Avatar alt={name}>{makeAvatarLetters(name)}</Avatar>
-}
-
 export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: false, canBeExchanged: false, 
   canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false, categoryCodes: [], 
   excludeUnlocated: false, referenceLocation: null, distanceToReferenceLocation: 50, searchTerm: '' }
 
 
-const Search = () => {
+const Search = (p: {version: string}) => {
     const [ suggestResources, { loading, error }] = useMutation(SUGGEST_RESOURCES)
     const [suggestedResources, setSuggestedResources] = useState<any[]>([])
-    const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
-    const theme = useTheme()
 
     const loadResources = async (searchParameters: SearchParameters) => {
       const res = await suggestResources({ variables: { 
@@ -76,39 +63,20 @@ const Search = () => {
       setSuggestedResources(res.data.suggestedResources.resources)
     }
 
-    return <Stack sx={{ padding: '2rem', gap: '2rem' }}>
+    return <Stack sx={{ paddingTop: '2rem', gap: '2rem', overflow: 'auto' }}>
         <SearchFilter value={DEFAULT_SEARCH_PARAMETERS} onParamsChanged={async searchParams => {
             loadResources(searchParams)
         }} />
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', 
-                gap: '1rem', justifyContent: 'center' }}>
-            { suggestedResources.map((res: any)=> <Card key={res.id} sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                flex: '0 1 23%',
-                [theme.breakpoints.down('lg')]: {
-                    flex: '0 1 30%'
-                },
-                [theme.breakpoints.down('md')]: {
-                    flex: '0 1 45%'
-                },
-                [theme.breakpoints.down('sm')]: {
-                    flex: '0 1 100%'
-                }
-            }}>
-                <CardHeader avatar={<AccountAvatar name={res.accountByAccountId.name} 
-                  avatarImagePublicId={res.accountByAccountId.imageByAvatarImageId?.publicId} />} 
-                  title={res.title} subheader={<ExpirationIndicator value={res.expiration} />} />
-                  <PictureGallery sx={{ justifyContent: "center" }} images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
-                      onImageClicked={img => setZoomedImg(img.uri)} />
-                <CardContent>{res.description}</CardContent>
-            </Card>) }
-            <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
-                <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg(undefined)}>
-                    <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
-                </Stack>
-            </Dialog>
+                gap: '1rem', justifyContent: 'center', overflow: 'auto' }}>
+            { suggestedResources.map((res: any, idx)=> <ResourceCard key={idx} version={p.version}
+              resource={{
+                id: res.id, accountName: res.accountByAccountId.name, description: res.description,
+                title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),
+                avatarPublicId: res.accountByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountByAccountId.id
+              }}/>
+            )}
         </LoadedZone>
     </Stack> 
 }

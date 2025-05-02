@@ -73,7 +73,7 @@ const Resources = () => {
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
     const [deleteResource, { loading: deleting, error: deleteError}] = useMutation(DELETE_RESOURCE)
 
-    return <Stack gap="1rem">
+    return <Stack gap="1rem" overflow="auto">
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
             <Button variant="contained" startIcon={<PlusIcon/>}>
               <Link href={{ pathname: `/webapp/${appContext.version}/resources/0` }}>{appContext.i18n.translator('addResourceButtonCaption')}</Link>
@@ -83,7 +83,7 @@ const Resources = () => {
             </IconButton>
         </Stack>
         <LoadedZone loading={loading} error={error} 
-            containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem' }}>
+            containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }}>
             { data && data.myResources.nodes.map((res: any) => <Card key={res.id} sx={theme => ({
                 backgroundColor: res.deleted ? theme.palette.primary.light: 'inherit',
                 display: 'flex',

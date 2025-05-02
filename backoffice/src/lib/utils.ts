@@ -10,3 +10,13 @@ export const usePagePath = () => {
 export interface PropsWithVersion extends PropsWithChildren {
     version: string
 }
+
+export const maxLength = (text: string | undefined, maxLength: number) => {
+    if(!text) return ''
+
+    const terminationSequence = '...'
+    if(text.length > (maxLength - terminationSequence.length)) {
+        return `${text.substring(0, maxLength - terminationSequence.length)}${terminationSequence}`
+    }
+    return text
+}

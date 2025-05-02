@@ -1,5 +1,5 @@
 import { Category } from "@/lib/schema"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material"
 import CategoriesSelector from "./CategoriesSelector"
@@ -19,7 +19,7 @@ const CategoriesDialog = (p: Props) => {
     return <Dialog maxWidth="xl" open={p.visible} onClose={() => p.onClose()}>
         <DialogTitle>{appContext.i18n.translator('selectCategoriesDialogTitle')}</DialogTitle>
         <DialogContent sx={{ width: '100%', height: '100vh' }}>
-            <CategoriesSelector lang={appContext.i18n.lang} values={p.value.map(c => c.code)} 
+            <CategoriesSelector values={p.value.map(c => c.code)} 
                 onSelectionChanged={e => {
                     setCurrentCategories(
                         e.map(catCode => categories.data!.find(cat => cat.code === catCode)!)

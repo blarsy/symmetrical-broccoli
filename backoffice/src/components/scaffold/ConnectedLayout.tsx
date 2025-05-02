@@ -1,4 +1,3 @@
-import { Container } from "@mui/material"
 import ClientWrapper from "./ClientWrapper"
 import TopBar from "./TopBar"
 import { PropsWithVersion } from "@/lib/utils"
@@ -14,15 +13,15 @@ const ConnectContent = (p: Props) => {
     const appContext = useContext(AppContext)
 
     if(!appContext.account && !p.allowAnonymous) {
-        return <Container maxWidth="xl">
-            <TopBar version={ p.version }/>
-            <ConnectForm onClose={() => {}} version={p.version}/>
-        </Container>
+        return [
+            <TopBar key="topbar" version={ p.version }/>,
+            <ConnectForm key="connect" onClose={() => {}} version={p.version}/>
+        ]
     } else 
-        return <Container maxWidth="xl">
-            <TopBar version={ p.version }/>
-            { p.children }
-        </Container>
+        return [
+            <TopBar key="topbar" version={ p.version }/>,
+            p.children
+        ]
 }
 
 export const ConnectedLayout = (p: Props) => {

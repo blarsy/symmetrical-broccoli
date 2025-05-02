@@ -26,7 +26,10 @@ const TopBar = ({ version }: Props) => {
     return <Stack direction="row" justifyContent="space-between">
         <Stack direction="row">
             <Button><Link href={{ pathname: `/webapp/${appContext.version}` }}>{appContext.i18n.translator('searchButtonCaption')}</Link></Button>
-            { appContext.account && <Button><Link href={{ pathname: `/webapp/${appContext.version}/resources` }}>{appContext.i18n.translator('resourcesButtonCaption')}</Link></Button> }
+            { appContext.account && [
+                <Button key="resources"><Link href={{ pathname: `/webapp/${appContext.version}/resources` }}>{appContext.i18n.translator('resourcesButtonCaption')}</Link></Button>,
+                <Button key="chat"><Link href={{ pathname: `/webapp/${appContext.version}/chat` }}>{appContext.i18n.translator('chatButtonCaption')}</Link></Button>,                
+            ]}
         </Stack>
         <Stack direction="row" gap="2rem">
             <Stack direction="row" alignItems="center">

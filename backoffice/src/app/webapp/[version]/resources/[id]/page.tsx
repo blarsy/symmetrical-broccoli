@@ -10,7 +10,7 @@ import useCategories from "@/lib/useCategories"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import EditResource from "@/components/resources/EditResource"
 
-export const GET_RESOURCE = gql`query GetResource($id: Int!) {
+const GET_RESOURCE = gql`query GetResource($id: Int!) {
     resourceById(id: $id) {
       accountByAccountId {
         email
@@ -79,15 +79,15 @@ const Wrapped = (p: { resourceId: number }) => {
         if(categories.data) loadResource()
     }, [categories.data])
 
-    return <LoadedZone loading={resource.loading} error={resource.error}>
-            <EditResource value={resource.data}/>
-        </LoadedZone>
+    return <LoadedZone loading={resource.loading} error={resource.error} containerStyle={{ overflow: 'auto', paddingLeft: '2rem', paddingRight: '2rem' }}>
+        <EditResource value={resource.data}/>
+    </LoadedZone>
 }
 
 const Page = () => {
     const { version, param } = usePagePath()
 
-    return <ConnectedLayout version={version}>
+    return <ConnectedLayout version={version} allowAnonymous>
         <Wrapped resourceId={Number(param)} />
     </ConnectedLayout>
 }

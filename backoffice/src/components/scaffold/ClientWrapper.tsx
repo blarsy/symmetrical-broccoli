@@ -1,6 +1,6 @@
 "use client"
 import createTheme from '@/theme'
-import {  CssBaseline, ThemeProvider } from '@mui/material'
+import {  Container, CssBaseline, Stack, ThemeProvider } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
@@ -69,7 +69,11 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         load()
     }, [])
 
-    return <LoadedZone loading={appContext.loading || !theme} error={appContext.error}>
+    return <LoadedZone loading={appContext.loading || !theme} error={appContext.error} containerStyle={{ 
+            height: '100vh', 
+            overflow: 'clip', 
+            display: 'flex'
+        }}>
         <ApolloProvider client={getApolloClient(version, appContext.token)}>
             { !appContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={appContext.i18n.lang}>
                 <ThemeProvider theme={theme!}>

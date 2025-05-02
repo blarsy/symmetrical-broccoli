@@ -1,12 +1,12 @@
 "use client"
-import Search from "@/components/search/Search"
 import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
+import ViewAccount from "@/components/user/ViewAccount"
 import { usePagePath } from "@/lib/utils"
 
 const Page = () => {
-    const { version } = usePagePath()
+    const { version, param } = usePagePath()
     return <ConnectedLayout version={version} allowAnonymous>
-        <Search version={version}/>
+        <ViewAccount accountId={Number(param)} version={version} />
     </ConnectedLayout>
 }
 

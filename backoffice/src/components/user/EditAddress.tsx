@@ -14,34 +14,26 @@ interface Props {
 }
 
 const EditAddress = (p: Props) => {
-    const appContext = useContext(AppContext)
     const [settingAddress, setSettingAddress] = useState(false)
     const [currentAddress, setCurrentAddress] = useState(p.value)
 
-    return <Stack alignItems="center" padding="5px">
+    return <>
         <SetLocationDialog value={currentAddress} onClose={() => setSettingAddress(false)} visible={!!settingAddress} 
             onLocationSet={newLocation => {
                 p.onChange(newLocation)
                 setCurrentAddress(newLocation)
             }}/>
         { currentAddress ?
-            <Stack height="20rem" minWidth="20rem">
-                <Stack direction="row" alignItems="center">
-                    <Typography color="secondary">{currentAddress.address}</Typography>
-                    <Stack direction="row" gap="3px">
-                        <IconButton onClick={() => setSettingAddress(true)}><Edit/></IconButton>
-                        <IconButton onClick={() => {
-                            setCurrentAddress(null)
-                            p.onChange(null)
-                        }}><Delete/></IconButton>
-                    </Stack>
-                </Stack>
-                <DisplayLocation value={currentAddress} />
-            </Stack>
+            <DisplayLocation value={currentAddress} editMode 
+                onEditRequested={() => setSettingAddress(true)}
+                onDeleteRequested={() => {
+                    setCurrentAddress(null)
+                    p.onChange(null)
+                }} />
         :
             <NoLocation onLocationSetRequested={() => setSettingAddress(true)}/>
         }
-    </Stack>
+    </>
 }
 
 export default EditAddress

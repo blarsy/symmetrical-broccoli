@@ -2,8 +2,8 @@ import { Meta, StoryObj } from "@storybook/react/*"
 import SearchFilter from "./SearchFilter"
 import ClientWrapper from "../scaffold/ClientWrapper"
 import { apolloClientMocksDecorator } from "@/lib/storiesUtil"
-import { GET_CATEGORIES } from "../form/CategoriesSelector"
 import { DEFAULT_SEARCH_PARAMETERS } from "./Search"
+import { GET_CATEGORIES } from "@/lib/useCategories"
 
 const meta = {
     title: 'Search filter',
