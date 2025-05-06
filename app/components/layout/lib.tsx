@@ -183,17 +183,18 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
 
     return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-        { props.value && <BareIconButton Image={p => <Images.Cross fill="red"/>} color={primaryColor} size={20} onPress={e => {
-            e.stopPropagation()
-            props.onChange(undefined)
-        }} />}
-        <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
-            onPress={() => setDateOpen(true)}>
-            <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
-            <View style={{ marginRight: 14 }}>
-                <Icon source="chevron-right" size={26} color="#000" />
-            </View>
-        </TouchableOpacity>
+        <View>
+            <OptionSelect title={t('noDate')} value={!props.value} onChange={() => {
+                    props.onChange(undefined)
+                }} />
+            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
+                onPress={() => setDateOpen(true)}>
+                <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('setDate')}</Text>
+                <View style={{ marginRight: 14 }}>
+                    <Icon source="chevron-right" size={26} color="#000" />
+                </View>
+            </TouchableOpacity>
+        </View>
         <DatePickerModal
             testID={`${props.testID}:Picker`}
             locale={getLanguage()}
