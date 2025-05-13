@@ -16,6 +16,7 @@ export interface RawConfig {
 interface VersionSpecificRawConfig {
     graphqlUrl: string
     apiUrl: string
+    subscriptionsUrl: string
 }
 
 export interface Config extends RawConfig, VersionSpecificRawConfig {

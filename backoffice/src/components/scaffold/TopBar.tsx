@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Switch, Typography } from "@mui/material"
+import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Switch, Typography } from "@mui/material"
 import { Stack } from "@mui/system"
 import Link from "next/link"
 import { useContext, useState } from "react"
@@ -28,7 +28,9 @@ const TopBar = ({ version }: Props) => {
             <Button><Link href={{ pathname: `/webapp/${appContext.version}` }}>{appContext.i18n.translator('searchButtonCaption')}</Link></Button>
             { appContext.account && [
                 <Button key="resources"><Link href={{ pathname: `/webapp/${appContext.version}/resources` }}>{appContext.i18n.translator('resourcesButtonCaption')}</Link></Button>,
-                <Button key="chat"><Link href={{ pathname: `/webapp/${appContext.version}/chat` }}>{appContext.i18n.translator('chatButtonCaption')}</Link></Button>,                
+                <Badge key="chat" badgeContent={appContext.unreadConversations && appContext.unreadConversations.length}>
+                    <Button><Link href={{ pathname: `/webapp/${appContext.version}/chat` }}>{appContext.i18n.translator('chatButtonCaption')}</Link></Button>
+                </Badge>,                
             ]}
         </Stack>
         <Stack direction="row" gap="2rem">

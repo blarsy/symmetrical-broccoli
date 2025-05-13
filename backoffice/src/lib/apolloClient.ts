@@ -2,6 +2,8 @@ import getConfig from '@/config/index'
 import { createHttpLink, split, ApolloClient, from, InMemoryCache } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { getMainDefinition } from "@apollo/client/utilities"
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { createClient } from 'graphql-ws'
 
 // const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
 
@@ -26,14 +28,14 @@ export const getApolloClient = (version: string, token?: string) => {
     }
 
     const httpLink = createHttpLink({ uri: config.graphqlUrl, fetch: customFetch || undefined })
-    // const wsLink = new GraphQLWsLink(
-    //   createClient({ 
-    //     url: subscriptionsUrl,
-    //     shouldRetry: e => true, 
-    //     retryAttempts: 5, 
-    //     webSocketImpl,
-    //     connectionParams: { authorization: `Bearer ${token}` } })
-    // )
+    const wsLink = new GraphQLWsLink(
+      createClient({ 
+        url: config.subscriptionsUrl,
+        shouldRetry: e => true, 
+        retryAttempts: 5, 
+        webSocketImpl,
+        connectionParams: { authorization: `Bearer ${token}` } })
+    )
     
     const authLink = setContext(async (_, { headers }) => {
       if(token) {
@@ -55,7 +57,7 @@ export const getApolloClient = (version: string, token?: string) => {
           definition.operation === 'subscription'
         )
       },
-      // wsLink,
+      wsLink,
       httpLink
     )
 
@@ -91,8 +93,7 @@ export const getApolloClient = (version: string, token?: string) => {
         //   }
         // }),
         authLink,
-        httpLink
-        //wsSplitLink
+        wsSplitLink
       ]),
       cache: new InMemoryCache(),
       defaultOptions: {

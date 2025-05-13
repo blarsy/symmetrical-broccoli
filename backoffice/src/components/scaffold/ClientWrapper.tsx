@@ -1,6 +1,6 @@
 "use client"
 import createTheme from '@/theme'
-import {  Container, CssBaseline, Stack, ThemeProvider } from '@mui/material'
+import {  CssBaseline, Snackbar, Stack, ThemeProvider, Typography } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
@@ -79,6 +79,12 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
                 <ThemeProvider theme={theme!}>
                     <CssBaseline />
                     {children}
+                    <Snackbar open={!!appContext.newChatMessage} key="msg" autoHideDuration={null}>
+                        { appContext.newChatMessage && <Stack flexDirection="column" padding="0.5rem" sx={theme => ({ backgroundColor: theme.palette.primary.contrastText }) }>
+                            <Typography color="text" variant="body1">{appContext.newChatMessage.participantByParticipantId.accountByAccountId.name || appContext.i18n.translator('deletedAccount')}</Typography>
+                            <Typography color="text" variant="body2">{appContext.newChatMessage.text || '<Image>'}</Typography>
+                        </Stack> }
+                    </Snackbar>
                 </ThemeProvider>
             </LocalizationProvider>}
         </ApolloProvider>

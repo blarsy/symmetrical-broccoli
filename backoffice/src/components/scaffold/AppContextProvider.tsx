@@ -1,7 +1,8 @@
 import { AccountInfo } from "@/lib/useAccountFunctions"
-import { createContext, Dispatch, Key, useReducer } from "react"
+import { createContext, Dispatch, Key, useEffect, useReducer } from "react"
 import { Category } from "@/lib/schema"
 import DataLoadState, { initial } from "@/lib/DataLoadState"
+import { Subscription } from "zen-observable-ts"
 
 export interface AppStateData {
   loading: boolean
@@ -15,6 +16,10 @@ export interface AppStateData {
   account?: AccountInfo
   lightMode?: boolean
   categories: DataLoadState<Category[]>
+  messageReceivedHandler?: (payload: any) => void
+  unreadConversations: number[]
+  newChatMessage?: any
+  messageSubscription?: Subscription
 }
 
 const blankAppContext = { 
@@ -25,7 +30,8 @@ const blankAppContext = {
     i18n: {
       translator: (code) => `tr-${code}`,
       lang: ''
-    }
+    },
+    unreadConversations: []
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -70,12 +76,30 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         break
       case AppReducerActionType.SetCategoriesState:
         newState = { categories: action.payload }
-        break;
+        break
+      case AppReducerActionType.SetMessageReceivedHandler:
+        newState= { messageReceivedHandler: action.payload }
+        break
+      case AppReducerActionType.SetNewChatMessage:
+        if (!action.payload) {
+          newState = { ...previousState, ...{ newChatMessage: undefined } }
+          break
+        }
+        const newMsgState: any = { 
+          newChatMessage: action.payload 
+        }
+        
+        const participantId = action.payload.participantByParticipantId?.id
+        if(!previousState.unreadConversations.includes(participantId)) {
+          newMsgState.unreadConversations = [ ...previousState.unreadConversations, participantId ]
+        }
+
+        newState = { ...previousState, ...newMsgState }
+        console.log('newState', newState)
+        break
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
-
-  //console.log('previous', previousState, 'new', newState)
 
   return {...previousState, ...newState}
 }
@@ -90,6 +114,7 @@ interface Props {
 const AppContextProvider = ({ children, initial }: Props) => {
     const [appState, dispatch] = useReducer<(previousState: AppStateData, action: { type: AppReducerActionType, payload: any }) => AppStateData>(appReducer, initial || blankAppContext)
 
+    useEffect(() => (() => appState.messageSubscription && appState.messageSubscription.unsubscribe()), [])
     return <AppContext.Provider value={appState}>
         <AppDispatchContext.Provider value={dispatch} >
             {children}

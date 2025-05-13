@@ -35,6 +35,35 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
     }
   }`
 
+export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
+    messageReceived {
+        event
+        message {
+            id
+            text
+            created
+            received
+            imageByImageId {
+                publicId
+            }
+            participantByParticipantId {
+                id
+                accountByAccountId {
+                    name
+                    id
+                }
+                conversationByConversationId {
+                    id
+                    resourceByResourceId {
+                        id
+                        title
+                    }
+                }
+            }
+        }
+    }
+}`
+
 export const AUTHENTICATE = gql`mutation Authenticate($email: String, $password: String) {
     authenticate(input: {email: $email, password: $password}) {
         jwtToken
@@ -67,6 +96,18 @@ const useAccountFunctions = (version: string) => {
             localStorage.removeItem('token')
             return undefined
         }
+
+        const subscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
+            console.log('msg', payload)
+            if(payload.data.messageReceived) {
+                console.log('payload', payload)
+                if(appContext.messageReceivedHandler) {
+                    appContext.messageReceivedHandler(payload.data.messageReceived.message)
+                } else {
+                    appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
+                }
+            }
+        } })
     
         const account: AccountInfo = {
             id: res.data.getSessionData.accountId, 
@@ -83,7 +124,7 @@ const useAccountFunctions = (version: string) => {
         }
 
         localStorage.setItem('token', token)
-        return account
+        return { account, subscription }
     }
 
     const disconnect = () => {
@@ -92,17 +133,17 @@ const useAccountFunctions = (version: string) => {
     }
 
     const restoreSession = async (token: string, otherSessionProps: any) => {
-        const account = await connectWithToken(token)
-        if(!account) token = ''
+        const res = await connectWithToken(token)
+        if(!res) token = ''
 
-        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, ...{account, token} } })
+        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, ...{account: res?.account, token, messageSubscription: res?.subscription} } })
     }
 
     const login = async (email: string, password: string) => {
         const client = getApolloClient(version)
         const tokenRes = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } })
-        const account = await connectWithToken(tokenRes.data.authenticate.jwtToken)
-        appDispatch({ type: AppReducerActionType.Login, payload: { account } })
+        const res = await connectWithToken(tokenRes.data.authenticate.jwtToken)
+        appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, messageSubscription: res?.subscription } })
     }
 
     const connectGoogleWithIdToken = async (idToken: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
@@ -122,8 +163,8 @@ const useAccountFunctions = (version: string) => {
 
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken } })
         
-        const account = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
-        appDispatch({ type: AppReducerActionType.Login, payload: { account } })
+        const connectRes = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
+        appDispatch({ type: AppReducerActionType.Login, payload: { account: connectRes?.account, messageSubscription: connectRes?.subscription } })
     }
 
     const connectWithGoogle = async (gauthBody: any, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
@@ -149,8 +190,8 @@ const useAccountFunctions = (version: string) => {
             const decoded = jwtDecode(responseBody.idToken)
             const client = getApolloClient(version)
             const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_GOOGLE, variables: { email: (decoded as any).email, token: responseBody.idToken } })
-            const account = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
-            appDispatch({ type: AppReducerActionType.Login, payload: { account } })
+            const res = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
+            appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, messageSubscription: res?.subscription } })
         }
     }
 

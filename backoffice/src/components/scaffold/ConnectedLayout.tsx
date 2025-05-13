@@ -4,6 +4,7 @@ import { PropsWithVersion } from "@/lib/utils"
 import { useContext } from "react"
 import { AppContext } from "./AppContextProvider"
 import ConnectForm from "../user/ConnectForm"
+import { Snackbar, SnackbarContent, Stack, Typography } from "@mui/material"
 
 interface Props extends PropsWithVersion {
     allowAnonymous?: boolean
@@ -17,11 +18,12 @@ const ConnectContent = (p: Props) => {
             <TopBar key="topbar" version={ p.version }/>,
             <ConnectForm key="connect" onClose={() => {}} version={p.version}/>
         ]
-    } else 
+    } else {
         return [
             <TopBar key="topbar" version={ p.version }/>,
             p.children
         ]
+    }
 }
 
 export const ConnectedLayout = (p: Props) => {

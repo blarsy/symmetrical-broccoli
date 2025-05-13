@@ -1,4 +1,4 @@
-import React, { LegacyRef, PropsWithChildren, ReactNode, RefObject, useState } from "react"
+import React, { PropsWithChildren, ReactNode, RefObject, useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps, Tooltip } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"

@@ -9,6 +9,7 @@ import useCategories from "@/lib/useCategories"
 import ConversationHeader from "./ConversationHeader"
 import { ConversationDisplayData, ConversationState, Message } from "./lib"
 import ConversationMessages from "./ConversationMessages"
+import MessageComposer from "./MessageComposer"
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -156,7 +157,6 @@ const Conversation = (p: Props) => {
         try {
             const res = await getConversation({ variables: { id, first: 50 } })
             const conversationData = fromRawConversation(res.data, appContext.account!.id, categories.data!)
-            console.log('conversationData', conversationData)
             setConversationData(fromData(conversationData))
         } catch (e) {
             setConversationData(fromError(e, appContext.i18n.translator('requestError')))
@@ -174,7 +174,8 @@ const Conversation = (p: Props) => {
             <LoadedZone loading={conversationData?.loading} error={conversationData?.error} containerStyle={{ maxHeight: '100%' }}>
                 { conversationData.data && [
                     <ConversationHeader key="header" sx={{ borderTop: '1px solid #555', borderBottom: '1px solid #555' }} data={conversationData.data!.conversation}  />,
-                    <ConversationMessages key="messages" data={conversationData.data!.messages} />
+                    <ConversationMessages key="messages" data={conversationData.data!.messages} />,
+                    <MessageComposer key="composer" conversation={conversationData.data.conversation} />
                 ]}
             </LoadedZone>
         :

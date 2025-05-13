@@ -4830,6 +4830,7 @@ __metadata:
     express: ^4.18.2
     formidable: ^3.5.0
     formik: ^2.4.1
+    graphql-ws: ^6.0.4
     handlebars: ^4.7.8
     i18next: ^23.8.1
     i18next-browser-languagedetector: ^7.2.0
@@ -7824,6 +7825,25 @@ __metadata:
   peerDependencies:
     graphql: ">=0.11 <=16"
   checksum: ecbfee032fed2fad80a7da192ad46c0ff53c13125def6c5bd83f6ad491c9e77c212f343c7f87b4e36825b0a92178ea5038081bb0f27b96af91e9bdd44dba24e6
+  languageName: node
+  linkType: hard
+
+"graphql-ws@npm:^6.0.4":
+  version: 6.0.4
+  resolution: "graphql-ws@npm:6.0.4"
+  peerDependencies:
+    "@fastify/websocket": ^10 || ^11
+    graphql: ^15.10.1 || ^16
+    uWebSockets.js: ^20
+    ws: ^8
+  peerDependenciesMeta:
+    "@fastify/websocket":
+      optional: true
+    uWebSockets.js:
+      optional: true
+    ws:
+      optional: true
+  checksum: 11bf3a83e2b3485d73d79bc9e030a9ecf11fce5a999ba107feda365ec3308ddbe35562fc4cb350b3c938743a7822608046442e6a6cf331414e76d437c8536c65
   languageName: node
   linkType: hard
 
