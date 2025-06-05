@@ -7,15 +7,15 @@ import { useState } from "react"
 interface Props {
     sx?: SxProps<Theme>
     conversationId?: number
-    onConversationSelected: (conversationId: number) => void
+    onConversationSelected: (target: number, current?: number) => void
 }
 
 const Chat = (p: Props) => {
-    const [conversationId, setConverationId] = useState(p.conversationId)
+    const [conversationId, setConversationId] = useState(p.conversationId)
     return <Stack direction="row" flex="1" sx={p.sx}>
-        <Conversations onConversationSelected={id => {
-            setConverationId(id)
-            p.onConversationSelected(id)
+        <Conversations currentConversation={conversationId} onConversationSelected={id => {
+            setConversationId(id)
+            p.onConversationSelected(id, conversationId)
         }} sx={{ flex: '0 0 30%', borderRight: '1px solid #555', borderTop: '1px solid #555', maxHeight: '100%' }}/>
         <Conversation conversationId={conversationId} sx={{ flex: '0 0 70%', maxHeight: '100%' }}/>
     </Stack>

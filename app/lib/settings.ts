@@ -9,6 +9,8 @@ if(isTesting()) {
 } else {
     config = {
         apiUrl: Constants.expoConfig!.extra!.appSettings.apiUrl,
+        appleAuthRedirectUri: Constants.expoConfig!.extra!.appSettings.appleAuthRedirectUri,
+        appleServiceId: Constants.expoConfig!.extra!.appSettings.appleServiceId,
         graphQlApiUrl: Constants.expoConfig!.extra!.appSettings.graphQlApiUrl,
         subscriptionsUrl: Constants.expoConfig!.extra!.appSettings.subscriptionsUrl,
         linksUrl: Constants.expoConfig!.extra!.appSettings.linksUrl,
@@ -23,6 +25,8 @@ if(isTesting()) {
 }
 
 export const apiUrl = config.apiUrl
+export const appleServiceId = config.appleServiceId
+export const appleAuthRedirectUri = config.appleAuthRedirectUri
 export const graphQlApiUrl = config.graphQlApiUrl
 export const subscriptionsUrl = config.subscriptionsUrl
 export const linksUrl = config.linksUrl

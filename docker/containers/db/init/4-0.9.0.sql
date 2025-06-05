@@ -730,6 +730,9 @@ ALTER TYPE sb.session_data
 	
 ALTER TYPE sb.session_data
     ADD ATTRIBUTE unlimited_until timestamp with time zone;
+
+ALTER TYPE sb.session_data
+    ADD ATTRIBUTE number_of_external_auth_providers integer;
 	
 ALTER TYPE sb.session_data
     RENAME ATTRIBUTE number_of_unread_notifications TO unread_notifications;
@@ -852,7 +855,10 @@ AS $BODY$
 		FROM sb.my_notifications()
 		WHERE read IS NULL
 	) as unread_notifications,
-	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until
+	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until,
+	(SELECT COUNT(*) 
+	 FROM sb.external_auth_tokens eat 
+	 WHERE eat.email = a.email) as number_of_external_auth_providers
 
 	FROM sb.accounts a
 	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
@@ -933,7 +939,9 @@ BEGIN
 	SELECT a.email, a.language
 	INTO current_email, account_language
 	FROM sb.accounts a
-	WHERE a.id = sb.current_account_id();
+	WHERE a.id = sb.current_account_id() AND
+	-- Fail any attempt to change the email of an account linked to one or more extarnal auth provider
+	(SELECT COUNT(*) FROM sb.external_auth_tokens eat WHERE eat.email = a.email) = 0;
 	
 	IF new_email IS NOT NULL AND new_email <> '' AND current_email <> LOWER(new_email) THEN
 		SELECT array_to_string(ARRAY(SELECT substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
@@ -1272,6 +1280,151 @@ ALTER FUNCTION sb.conversation_messages_by_conversation_id(integer)
 GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO identified_account;
 
 GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO sb;
+
+ALTER TABLE IF EXISTS sb.google_auth_tokens
+    RENAME TO external_auth_tokens;
+
+ALTER TABLE IF EXISTS sb.external_auth_tokens
+    ADD COLUMN auth_provider integer NOT NULL DEFAULT 0;
+
+DROP FUNCTION IF EXISTS sb.authenticate_external_auth(character varying, character varying);
+
+CREATE OR REPLACE FUNCTION sb.authenticate_external_auth(
+	email character varying,
+	token character varying,
+	auth_provider integer)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare account_id INTEGER;
+begin
+  select a.id into account_id
+    from sb.accounts as a
+	inner join sb.external_auth_tokens eat ON eat.email = a.email AND eat.auth_provider = authenticate_external_auth.auth_provider
+    where a.email = LOWER(authenticate_external_auth.email) and eat.token = authenticate_external_auth.token;
+
+  if account_id IS NOT NULL then
+    return (
+      account_id,
+      extract(epoch from now() + interval '100 day'),
+      'identified_account'
+    )::sb.jwt_token;
+  else
+    return null;
+  end if;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.authenticate_external_auth(character varying, character varying, integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying, integer) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying, integer) TO anonymous;
+
+GRANT EXECUTE ON FUNCTION sb.authenticate_external_auth(character varying, character varying, integer) TO sb;
+
+DROP FUNCTION IF EXISTS sb.register_account_external_auth(character varying, character varying, character varying, character varying);
+
+CREATE OR REPLACE FUNCTION sb.register_account_external_auth(
+	email character varying,
+	token character varying,
+	account_name character varying,
+	language character varying,
+	auth_provider integer)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id integer;
+BEGIN
+	IF EXISTS(SELECT *
+		FROM sb.external_auth_tokens eat
+		WHERE eat.email = LOWER(register_account_external_auth.email) AND
+			eat.token = register_account_external_auth.token AND
+			eat.auth_provider = register_account_external_auth.auth_provider) THEN
+	
+		INSERT INTO sb.accounts(name, email, language, activated)
+		VALUES (account_name, LOWER(register_account_external_auth.email), 
+			register_account_external_auth.language, now())
+		RETURNING id INTO inserted_id;
+
+		INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+		VALUES (2, inserted_id, 1);
+
+		PERFORM sb.create_notification(inserted_id, json_build_object(
+			'info', 'COMPLETE_PROFILE'
+		));
+	
+		RETURN (
+			inserted_id,
+			EXTRACT(epoch FROM now() + interval '100 day'),
+			'identified_account'
+		)::sb.jwt_token;
+	
+  	END IF;
+	RETURN NULL;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.register_account_external_auth(character varying, character varying, character varying, character varying, integer)
+    OWNER TO sb;
+
+DROP FUNCTION IF EXISTS sb.update_google_auth_status(character varying, character varying);
+
+CREATE OR REPLACE FUNCTION sb.update_external_auth_status(
+	email character varying,
+	token character varying,
+	auth_provider integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+declare account_id INTEGER;
+declare current_token character varying;
+begin
+  SELECT a.id, eat.token INTO account_id, current_token
+    FROM sb.accounts AS a
+	LEFT JOIN sb.external_auth_tokens eat ON eat.email = a.email AND
+		eat.auth_provider = update_external_auth_status.auth_provider
+    WHERE a.email = LOWER(update_external_auth_status.email);
+
+  IF account_id IS NOT NULL THEN
+    IF current_token IS NULL THEN
+		INSERT INTO sb.external_auth_tokens (email, token, auth_provider)
+		VALUES (update_external_auth_status.email, update_external_auth_status.token, update_external_auth_status.auth_provider);
+	ELSE
+		UPDATE sb.external_auth_tokens eat
+		SET token = update_external_auth_status.token, updated = now()
+		WHERE eat.email = update_external_auth_status.email AND eat.auth_provider = update_external_auth_status.auth_provider;
+	END IF;
+	RETURN 2;
+  ELSE
+  	IF EXISTS(SELECT * FROM sb.external_auth_tokens eat WHERE eat.email = update_external_auth_status.email AND
+		eat.auth_provider = update_external_auth_status.auth_provider) THEN
+		UPDATE sb.external_auth_tokens eat
+		SET token = update_external_auth_status.token, updated = now()
+		WHERE eat.email = update_external_auth_status.email AND eat.auth_provider = update_external_auth_status.auth_provider;
+	ELSE
+		INSERT INTO sb.external_auth_tokens (email, token, auth_provider)
+		VALUES (update_external_auth_status.email, update_external_auth_status.token, update_external_auth_status.auth_provider);
+	END IF;
+    RETURN 1;
+  END IF;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.update_external_auth_status(character varying, character varying, integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.update_external_auth_status(character varying, character varying, integer) TO sb;
+
+REVOKE ALL ON FUNCTION sb.update_external_auth_status(character varying, character varying, integer) FROM PUBLIC;
+
 
 DO
 $body$

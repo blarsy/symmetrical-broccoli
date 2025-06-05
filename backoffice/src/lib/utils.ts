@@ -20,3 +20,8 @@ export const maxLength = (text: string | undefined, maxLength: number) => {
     }
     return text
 }
+
+export enum AuthProviders {
+    google = 0,
+    apple = 1
+}

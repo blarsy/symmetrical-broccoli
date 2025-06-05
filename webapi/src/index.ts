@@ -14,6 +14,7 @@ import timezone from 'dayjs/plugin/timezone'
 import dayjs from "dayjs"
 import googleAuth from "./googleAuth"
 import { Pool } from "pg"
+import appleAuth from "./appleAuth"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -58,6 +59,7 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
     app.all('*', corsMiddleware)
 
     googleAuth(app, pool, config.googleAuthAudience, config.googleApiSecret, corsMiddleware)
+    appleAuth(app, pool, corsMiddleware)
 
     app.use(postgraphile(config))
     

@@ -4,7 +4,7 @@ import { Stack, SxProps, Theme, Typography } from "@mui/material"
 import { useContext } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { maxLength } from "@/lib/utils"
-import Link from "next/link"
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { ConversationData } from "./lib"
 import ConversationImage from "./ConversationImage"
 
@@ -76,6 +76,7 @@ const getConversationData = (rawConv:any, currentAccountId: number): Conversatio
 
 interface Props {
     sx?: SxProps<Theme>
+    currentConversation?: number
     onConversationSelected: (conversationId: number) => void
 }
 
@@ -90,15 +91,22 @@ const Conversations = (p: Props) => {
     }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
         { data && data.myConversations.nodes.toReversed().map((rawConv: any, idx: number) => {
             const conversationData = getConversationData(rawConv, appContext.account!.id)
-            return <Stack key={idx} direction="row" gap="0.5rem" sx={{ cursor: 'pointer' }} onClick={ () => p.onConversationSelected(conversationData.id) }>
-                  <ConversationImage accountImagePublicId={conversationData.imagePublicId}
-                    accountName={conversationData.accountName} resourceImagePublicId={conversationData.resourceImagePublicId} />
-                  <Stack alignSelf="flex-start">
-                      <Typography color="primary" variant="overline">{conversationData.accountName || appContext.i18n.translator('deletedAccount')}</Typography>
-                      <Typography color="primary" variant="caption">{conversationData.resourceName}</Typography>
-                      <Typography color="primary" variant="body1">{ maxLength(conversationData.lastMessage, 50) }</Typography>
-                  </Stack>
+            const hasUnread = appContext.unreadConversations.includes(rawConv.id)
+            return <Stack key={idx} direction="row" gap="0.5rem"
+              sx={theme => ({ 
+                cursor: 'pointer', 
+                backgroundColor: rawConv.id === p.currentConversation ? theme.palette.primary.contrastText : 'initial',
+                alignItems: 'center'
+              })} onClick={ () => p.onConversationSelected(conversationData.id) }>
+              <ConversationImage accountImagePublicId={conversationData.imagePublicId}
+                accountName={conversationData.accountName} resourceImagePublicId={conversationData.resourceImagePublicId} />
+              <Stack alignSelf="flex-start" flex="1">
+                  <Typography color="primary" variant="overline" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{conversationData.accountName || appContext.i18n.translator('deletedAccount')}</Typography>
+                  <Typography color="primary" variant="caption">{conversationData.resourceName}</Typography>
+                  <Typography color="primary" variant="body1" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{ maxLength(conversationData.lastMessage, 50) }</Typography>
               </Stack>
+              { hasUnread && <FiberManualRecordIcon color="primary" /> }
+          </Stack>
         }) }
     </LoadedZone>
 }

@@ -40,6 +40,7 @@ export interface AccountInfo {
     amountOfTokens: number
     lastChangeTimestamp: Date
     unlimitedUntil: Date | null
+    numberOfExternalAuthProviders: number
 }
 
 export interface ImageInfo {

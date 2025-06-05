@@ -39,6 +39,7 @@ module.exports = {
       "**/*"
     ],
     "ios": {
+      "usesAppleSignIn": true,
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",
         "CFBundleURLTypes": [

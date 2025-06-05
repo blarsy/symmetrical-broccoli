@@ -8,7 +8,9 @@ const Page = () => {
 
     return <ConnectedLayout version={version}>
       <Chat sx={{ flex: 1, overflow: 'clip', minHeight: 0 }} conversationId={Number(param)} 
-        onConversationSelected={id => window.history.replaceState(null, '', `${id}`)}/>
+        onConversationSelected={id => {
+          window.history.replaceState(null, '', `${id}`)
+        }}/>
     </ConnectedLayout>
 }
 

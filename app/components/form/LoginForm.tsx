@@ -6,18 +6,19 @@ import * as yup from "yup"
 import { Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
-import { aboveMdWidth } from "@/lib/utils"
+import { aboveMdWidth, AuthProviders } from "@/lib/utils"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
 import { GraphQlLib } from "@/lib/backendFacade"
 import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
 import { useMutation } from "@apollo/client"
+import AppleSignin from "./AppleSignin"
 
 interface Props {
     toggleRegistering: () => void
     toggleRecovering: () => void
-    onAccountRegistrationRequired: (email: string, token: string) => void
+    onAccountRegistrationRequired: (email: string, token: string, authProvider: AuthProviders, suggestedName?: string) => void
     onDone?: () => void
 }
 
@@ -27,7 +28,11 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
     const { login } = useUserConnectionFunctions()
 
     return <View style={{ alignItems: 'stretch' }}>
-        <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
+        <AppleSignin onDone={async jwtToken => {
+            await login(jwtToken)
+            onDone && onDone()
+        }} onAccountRegistrationRequired={(email, idToken, suggestedName) => onAccountRegistrationRequired(email, idToken, AuthProviders.apple, suggestedName)}/>
+        <GoogleSignin onAccountRegistrationRequired={(email, idToken) => onAccountRegistrationRequired(email, idToken, AuthProviders.google)} onDone={async jwtToken => {
             await login(jwtToken)
             onDone && onDone()
         }} />

@@ -90,6 +90,13 @@ export const GraphQlLib = {
           switchToContributionMode(input: {}) {
             integer
           }
+        }`,
+        AUTHENTICATE_EXTERNAL_AUTH: gql`mutation AuthenticateExternalAuth($token: String, $email: String, $authProvider: Int) {
+          authenticateExternalAuth(
+            input: {email: $email, token: $token, authProvider: $authProvider}
+          ) {
+            jwtToken
+          }
         }`
     },
     subscriptions: {}

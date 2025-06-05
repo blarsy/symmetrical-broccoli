@@ -150,7 +150,10 @@ const appReducer = (previousState: IAppState, action: { type: AppReducerActionTy
           result = { ...previousState, account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } }}
           break
         case AppReducerActionType.AccountChanged:
-          result = { ...previousState, account: {...action.payload, ...{ unreadNotifications: previousState.unreadNotifications, unreadConversations: previousState.unreadConversations }} }
+          result = { ...previousState, account: {...action.payload, ...{ 
+            unreadNotifications: previousState.unreadNotifications, 
+            unreadConversations: previousState.unreadConversations
+          }} }
           break
         case AppReducerActionType.ResourceUpdated:
           result = { ...previousState, lastResourceChangedTimestamp: new Date().valueOf() }

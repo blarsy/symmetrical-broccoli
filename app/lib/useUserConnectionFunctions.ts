@@ -22,6 +22,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       willingToContribute
       amountOfTokens
       unlimitedUntil
+      numberOfExternalAuthProviders
     }
   }`
 
@@ -120,6 +121,7 @@ export default () => {
             id: res.data.getSessionData.accountId, 
             name: res.data.getSessionData.name, 
             email: res.data.getSessionData.email, 
+            numberOfExternalAuthProviders: res.data.getSessionData.numberOfExternalAuthProviders,
             avatarPublicId: res.data.getSessionData.avatarPublicId,
             activated: res.data.getSessionData.activated,
             unreadConversations: res.data.getSessionData.unreadConversations,
@@ -169,7 +171,9 @@ export default () => {
                 willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
                 unreadConversations: [],
                 unreadNotifications: [],
-                unlimitedUntil: payload.data.unlimitedUntil || null
+                unlimitedUntil: payload.data.unlimitedUntil || null,
+                // Does not change, so just repeat it from previous account value
+                numberOfExternalAuthProviders: account.numberOfExternalAuthProviders
             }
             
             appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })

@@ -54,7 +54,7 @@ const defaultResourceCategories: Category[] = [
 export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
     newChatMessage: '', categories: fromData(defaultResourceCategories), account, unreadNotifications: [],
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
-    messageReceivedHandler: undefined, apolloClient: undefined, unreadConversations: [],
+    apolloClient: undefined, unreadConversations: [],
     notificationReceivedHandler: undefined, lastResourceChangedTimestamp: new Date().valueOf() }}>
     <StoryElement />
 </AppContextProvider>

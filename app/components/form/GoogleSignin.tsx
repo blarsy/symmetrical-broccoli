@@ -3,22 +3,17 @@ import { GoogleSignin, GoogleSigninButton, User } from "@react-native-google-sig
 import React, { useEffect, useState } from "react"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { t } from "@/i18n"
-import { gql, useMutation } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { ActivityIndicator, IconButton, Text } from "react-native-paper"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { View } from "react-native"
+import { GraphQlLib } from "@/lib/backendFacade"
+import { AuthProviders } from "@/lib/utils"
 
 GoogleSignin.configure({
     webClientId: googleAuthWebClienttId,
     iosClientId: googleAuthIOSClientID
 })
-
-const AUTHENTICATE_GOOGLE = gql`mutation AuthenticateExternalAuth($token: String, $email: String) {
-    authenticateExternalAuth(input: {email: $email, token: $token}) {
-      jwtToken
-    }
-}`
-
 
 interface Props {
     onDone: (jwtToken: string) => void
@@ -27,7 +22,7 @@ interface Props {
 
 export default ({ onDone, onAccountRegistrationRequired }: Props) => {
     const [authStatus, setAuthStatus] = useState<DataLoadState<null>>(initial(false, null))
-    const [authenticateGoogle] = useMutation(AUTHENTICATE_GOOGLE)
+    const [authenticateExternalAuth] = useMutation(GraphQlLib.mutations.AUTHENTICATE_EXTERNAL_AUTH)
     const [signedInUser, setSignedInUser] = useState<User | null>(null)
 
     useEffect(() => {
@@ -35,7 +30,7 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
     }, [])
     
     return <>
-        <GoogleSigninButton style={{ alignSelf: 'center' }} onPress={async () => {
+        <GoogleSigninButton style={{ alignSelf: 'center', width: 200, height: 40 }} onPress={async () => {
             setAuthStatus(beginOperation())
             try {
                 await GoogleSignin.hasPlayServices()
@@ -63,7 +58,7 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
                                 throw new Error('Google user verification failed.')
                             }
                         } else {
-                            const authenticateRes = await authenticateGoogle({ variables: { email: res.data.user.email, token: res.data.idToken! } })
+                            const authenticateRes = await authenticateExternalAuth({ variables: { email: res.data.user.email, token: res.data.idToken!, authProvider: AuthProviders.google } })
                             onDone && onDone(authenticateRes.data.authenticateExternalAuth.jwtToken)
                         }
                         setAuthStatus(fromData(null))

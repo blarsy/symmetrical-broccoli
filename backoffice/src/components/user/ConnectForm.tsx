@@ -10,6 +10,7 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import { useGoogleLogin } from '@react-oauth/google'
 import GoogleLogo from '../../../public/google.svg'
 import Feedback from "../scaffold/Feedback"
+import { AuthProviders } from "@/lib/utils"
 
 interface Props {
     onClose: () => void
@@ -18,7 +19,7 @@ interface Props {
 
 const ConnectForm = (p: Props) => {
     const appContext = useContext(AppContext)
-    const { connectGoogleWithAccessCode, login, registerViaGoogle } = useAccountFunctions(p.version)
+    const { connectGoogleWithAccessCode, login, registerViaAuthProvider } = useAccountFunctions(p.version)
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const t = appContext.i18n.translator
 
@@ -27,7 +28,7 @@ const ConnectForm = (p: Props) => {
             setConnectionStatus({ loading: true })
             try {
                 await connectGoogleWithAccessCode(res.code, async (name, email, token) => {
-                    return registerViaGoogle(name, email, appContext.i18n.lang, token)
+                    return registerViaAuthProvider(name, email, appContext.i18n.lang, token, AuthProviders.google)
                 })
                 setConnectionStatus({ loading: false })
                 p.onClose()

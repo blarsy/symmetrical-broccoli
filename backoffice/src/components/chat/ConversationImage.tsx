@@ -12,6 +12,7 @@ const ConversationImage = (p: ConversationImageProps) => {
     const totalSize = baseSize * 1.5
     return <Box sx={theme => ({ 
             position: 'relative', 
+            padding: '0.25rem 0 0 0.25rem',
             flex: `0 0 ${makePxSize(totalSize)}`, height: makePxSize(totalSize),
             [theme.breakpoints.down('lg')]: {
                 flex: `0 0 ${makePxSize(totalSize, screenSizesCoefficients[0])}`, 

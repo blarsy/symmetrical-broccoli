@@ -28,9 +28,11 @@ const TopBar = ({ version }: Props) => {
             <Button><Link href={{ pathname: `/webapp/${appContext.version}` }}>{appContext.i18n.translator('searchButtonCaption')}</Link></Button>
             { appContext.account && [
                 <Button key="resources"><Link href={{ pathname: `/webapp/${appContext.version}/resources` }}>{appContext.i18n.translator('resourcesButtonCaption')}</Link></Button>,
-                <Badge key="chat" badgeContent={appContext.unreadConversations && appContext.unreadConversations.length}>
-                    <Button><Link href={{ pathname: `/webapp/${appContext.version}/chat` }}>{appContext.i18n.translator('chatButtonCaption')}</Link></Button>
-                </Badge>,                
+                <Button key="chat">
+                    <Badge color="secondary" badgeContent={appContext.unreadConversations.length}>
+                        <Link href={{ pathname: `/webapp/${appContext.version}/chat` }}>{appContext.i18n.translator('chatButtonCaption')}</Link>
+                    </Badge>
+                </Button>,                
             ]}
         </Stack>
         <Stack direction="row" gap="2rem">

@@ -1,7 +1,7 @@
 import { Tooltip, Typography } from "@mui/material"
 import { Message } from "./lib"
 import { Stack } from "@mui/system"
-import { useContext } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { lightPrimaryColor, primaryColor } from "@/utils"
 import dayjs from "dayjs"
@@ -22,7 +22,13 @@ const friendlyTime = (time: Date) => {
 
 const ConversationMessages = (p: Props) => {
     const appContext = useContext(AppContext)
-    return <Stack gap="0.5rem" padding="0.5rem" overflow="auto">
+    const endRef = useRef<null | HTMLDivElement>(null)
+
+    useEffect(() => {
+        endRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [])
+
+    return <Stack gap="0.5rem" padding="0.5rem" overflow="auto" flex="1">
         {p.data.map((msg, idx) => {
             const isMessageFromMe = msg.user.id === appContext.account!.id
             return <Stack key={idx} direction="row" justifyContent={isMessageFromMe ? 'flex-end' : 'flex-start'}>
@@ -40,6 +46,7 @@ const ConversationMessages = (p: Props) => {
                 </Tooltip>
             </Stack>
         } )}
+        <div ref={endRef}/>
     </Stack>
 }
 

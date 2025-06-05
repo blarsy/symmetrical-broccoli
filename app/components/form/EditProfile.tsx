@@ -178,10 +178,12 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
             initialValue={account.name} validationSchema={yup.string().required(t('field_required')).max(30, t('name_too_long'))}
             onSave={changeName}/>
         <Hr color="#fff"/>
-        <InlineFormTextInput testID="email" label={t('email_label')} textContentType="emailAddress" 
-            initialValue={account.email} validationSchema={yup.string().email(t('invalid_email'))}
-            onSave={changeEmail}/>
-        <Hr color="#fff"/>
+        { account.numberOfExternalAuthProviders === 0 && <>
+            <InlineFormTextInput testID="email" label={t('email_label')} textContentType="emailAddress" 
+                initialValue={account.email} validationSchema={yup.string().email(t('invalid_email'))}
+                onSave={changeEmail}/> 
+            <Hr color="#fff"/>
+        </>}
         <LoadedZone testID="PublicInfo" loading={loadingPublicInfo} error={publicInfoError} loadIndicatorColor="#fff">
             {
                 profileData && [

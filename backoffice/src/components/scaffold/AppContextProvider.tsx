@@ -2,7 +2,8 @@ import { AccountInfo } from "@/lib/useAccountFunctions"
 import { createContext, Dispatch, Key, useEffect, useReducer } from "react"
 import { Category } from "@/lib/schema"
 import DataLoadState, { initial } from "@/lib/DataLoadState"
-import { Subscription } from "zen-observable-ts"
+import { Observable, Subscription } from "zen-observable-ts"
+import { FetchResult } from "@apollo/client"
 
 export interface AppStateData {
   loading: boolean
@@ -16,9 +17,10 @@ export interface AppStateData {
   account?: AccountInfo
   lightMode?: boolean
   categories: DataLoadState<Category[]>
-  messageReceivedHandler?: (payload: any) => void
   unreadConversations: number[]
+  unreadNotifications: number[]
   newChatMessage?: any
+  messageSubscriber?: Observable<FetchResult<any>>
   messageSubscription?: Subscription
 }
 
@@ -31,7 +33,8 @@ const blankAppContext = {
       translator: (code) => `tr-${code}`,
       lang: ''
     },
-    unreadConversations: []
+    unreadConversations: [],
+    unreadNotifications: []
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -78,24 +81,24 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = { categories: action.payload }
         break
       case AppReducerActionType.SetMessageReceivedHandler:
-        newState= { messageReceivedHandler: action.payload }
+        newState = { messageSubscription: action.payload }
         break
       case AppReducerActionType.SetNewChatMessage:
         if (!action.payload) {
-          newState = { ...previousState, ...{ newChatMessage: undefined } }
+          newState = { newChatMessage: undefined }
           break
-        }
-        const newMsgState: any = { 
-          newChatMessage: action.payload 
         }
         
         const participantId = action.payload.participantByParticipantId?.id
         if(!previousState.unreadConversations.includes(participantId)) {
-          newMsgState.unreadConversations = [ ...previousState.unreadConversations, participantId ]
+          newState = { newChatMessage: action.payload , unreadConversations: [ ...previousState.unreadConversations || [], participantId ] }
+        } else {
+          newState = { newChatMessage: action.payload }
         }
-
-        newState = { ...previousState, ...newMsgState }
-        console.log('newState', newState)
+        
+        break
+      case AppReducerActionType.SetConversationRead:
+        newState = { unreadConversations: previousState.unreadConversations.filter(c => c !== action.payload) }
         break
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)

@@ -1,4 +1,6 @@
 {
+    "appleServiceId": "com.tope-la.android",
+    "appleAuthRedirectUri": "https://www.tope-la.com/apple-auth",
     "graphQlApiUrl": "https://www.tope-la.com/graphqlv0_6",
     "subscriptionsUrl": "wss://www.tope-la.com/graphqlv0_6",
     "linksUrl": "https://www.tope-la.com/api/link/",

@@ -8,7 +8,13 @@ const Page = () => {
 
     return <ConnectedLayout version={version}>
       <Chat sx={{ flex: 1, overflow: 'auto', maxHeight: '100%' }} 
-        onConversationSelected={id => window.history.pushState(null, '', `chat/${id}`)}/>
+        onConversationSelected={(target, current) => {
+          if(current) {
+            window.history.replaceState(null, '', `${target}`)
+          } else {
+            window.history.replaceState(null, '', `chat/${target}`)
+          }
+        }}/>
     </ConnectedLayout>
 }
 

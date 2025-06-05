@@ -267,3 +267,8 @@ export const regionFromLocation = (loc : Location) => ({
 })
 
 export const daysFromNow = (days: number) => new Date(new Date().valueOf() + days * 24 * 60 * 60 * 1000)
+
+export enum AuthProviders {
+  google = 0,
+  apple = 1
+}

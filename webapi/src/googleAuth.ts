@@ -40,16 +40,16 @@ export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiS
             // Issue a JWT token
             const email = payload.email
 
-            const qryRes = await runAndLog(`SELECT sb.update_google_auth_status ($1, $2)`, 
+            const qryRes = await runAndLog(`SELECT sb.update_external_auth_status ($1, $2, $3)`, 
                 pool, 'Checking Google authentication status', 
-                [email, idToken])
+                [email, idToken, 0])
 
-            if(qryRes.rows.length != 1 || !qryRes.rows[0].update_google_auth_status || ![1, 2].includes(qryRes.rows[0].update_google_auth_status)) {
+            if(qryRes.rows.length != 1 || !qryRes.rows[0].update_external_auth_status || ![1, 2].includes(qryRes.rows[0].update_external_auth_status)) {
                 res.status(500).json({ error: 'UNEXPECTED_INTERNAL_AUTH_STATUS_RETURN_CODE' })
                 return
             }
 
-            if(qryRes.rows[0].update_google_auth_status === 1) {
+            if(qryRes.rows[0].update_external_auth_status === 1) {
                 res.status(500).json({ error: 'NO_ACCOUNT', idToken })
                 return
             }
