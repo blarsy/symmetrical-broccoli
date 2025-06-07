@@ -13,6 +13,7 @@ import { GraphQlLib } from '@/lib/backendFacade'
 import "core-js/stable/atob"
 import { jwtDecode } from 'jwt-decode'
 import { AuthProviders } from '@/lib/utils'
+import ExternalAuthButton, { ExternalAuthButtonProvider } from '../account/ExternalAuthButton'
 
 interface Props {
     onAccountRegistrationRequired: (email: string, idToken: string, suggestedName: string) => void
@@ -54,9 +55,7 @@ const AppleSignin = ({ onAccountRegistrationRequired, onDone }: Props) => {
 
     //if(appleAuth.isSupported) {
     return <View style={{ alignItems: 'center' }}>
-        <AppleButton style={{ width: 200, height: 40 }}
-            buttonStyle={AppleButton.Style.WHITE}
-            buttonType={AppleButton.Type.SIGN_IN} onPress={async () => {
+        <ExternalAuthButton type={ExternalAuthButtonProvider.apple} onPress={async () => {
                 if(Platform.OS === 'ios') {
                     const appleAuthRequestResponse = await appleAuth.performRequest({
                         requestedOperation: appleAuth.Operation.LOGIN,

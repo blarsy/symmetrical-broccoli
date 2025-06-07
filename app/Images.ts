@@ -1,4 +1,5 @@
 import Arrow from './assets/img/fleche.svg'
+import AppleLogo from './assets/img/apple-logo.svg'
 import BackgroundChat from './assets/img/background-chat.svg'
 import Bell from './assets/img/BELL.svg'
 import Bin from './assets/img/BIN.svg'
@@ -9,6 +10,7 @@ import Check from './assets/img/CHECK.svg'
 import Clock from './assets/img/CLOCK.svg'
 import Cross from './assets/img/CROSS.svg'
 import Exit from './assets/img/EXIT.svg'
+import GoogleLogo from './assets/img/google-logo.svg'
 import Heart from './assets/img/HEART.svg'
 import History from './assets/img/HISTORY.svg'
 import Link from './assets/img/LINK.svg'
@@ -33,6 +35,7 @@ import View from './assets/img/VIEW.svg'
 
 export default {
     Arrow, 
+    AppleLogo,
     BackgroundChat, 
     Bell,
     Bin,
@@ -43,6 +46,7 @@ export default {
     Clock,
     Cross, 
     Exit,
+    GoogleLogo,
     Heart, 
     History, 
     Link,

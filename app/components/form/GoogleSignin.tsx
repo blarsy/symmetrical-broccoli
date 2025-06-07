@@ -9,6 +9,7 @@ import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/l
 import { View } from "react-native"
 import { GraphQlLib } from "@/lib/backendFacade"
 import { AuthProviders } from "@/lib/utils"
+import ExternalAuthButton, { ExternalAuthButtonProvider } from "../account/ExternalAuthButton"
 
 GoogleSignin.configure({
     webClientId: googleAuthWebClienttId,
@@ -29,8 +30,9 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
         setSignedInUser(GoogleSignin.getCurrentUser())
     }, [])
     
-    return <>
-        <GoogleSigninButton style={{ alignSelf: 'center', width: 200, height: 40 }} onPress={async () => {
+    return <View style={{ alignItems: 'center' }}>
+        <ExternalAuthButton type={ExternalAuthButtonProvider.google} 
+            onPress={async () => {
             setAuthStatus(beginOperation())
             try {
                 await GoogleSignin.hasPlayServices()
@@ -79,5 +81,5 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
         </View> }
         { authStatus.loading && <ActivityIndicator color="#FFF" /> }
         { authStatus.error && <ErrorSnackbar onDismissError={() => setAuthStatus(initial(false, null))} error={authStatus.error} message={t('requestError')} /> }
-    </>
+    </View>
 }

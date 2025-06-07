@@ -254,7 +254,9 @@ const resources = {
       "tokensSentHeadline2": "You sent some Topes",
       "tokensSentDetails": "You sent {{amountSent}} Topes to {{toAccount}}",
       "exchangeResourcesAgainsTokens": "Swap resources against Topes",
-      "understoodBecomingContributor": "I understood all the hereabove aspeects"
+      "understoodBecomingContributor": "I understood all the hereabove aspeects",
+      "signInApple": "Sign in with Apple",
+      "signInGoogle": "Sign in with Google"
    }
   },
   fr: {
@@ -503,7 +505,9 @@ const resources = {
       "tokensSentHeadline2": "Vous avez envoyé des Topes",
       "tokensSentDetails": "Vous avez envoyé {{amountSent}} Topes à {{toAccount}}",
       "exchangeResourcesAgainsTokens": "Exchanger contre des Topes",
-      "understoodBecomingContributor": "J'ai bien compris tous les aspects ci-dessus"
+      "understoodBecomingContributor": "J'ai bien compris tous les aspects ci-dessus",
+      "signInApple": "Connexion avec Apple",
+      "signInGoogle": "Connexion avec Google"
     }
   }
 }

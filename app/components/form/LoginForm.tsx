@@ -27,11 +27,12 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
-    return <View style={{ alignItems: 'stretch' }}>
+    return <View style={{ alignItems: 'stretch', gap: 20 }}>
         <AppleSignin onDone={async jwtToken => {
             await login(jwtToken)
             onDone && onDone()
-        }} onAccountRegistrationRequired={(email, idToken, suggestedName) => onAccountRegistrationRequired(email, idToken, AuthProviders.apple, suggestedName)}/>
+        }} 
+        onAccountRegistrationRequired={(email, idToken, suggestedName) => onAccountRegistrationRequired(email, idToken, AuthProviders.apple, suggestedName)}/>
         <GoogleSignin onAccountRegistrationRequired={(email, idToken) => onAccountRegistrationRequired(email, idToken, AuthProviders.google)} onDone={async jwtToken => {
             await login(jwtToken)
             onDone && onDone()
