@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import CategoriesSelector from './CategoriesSelector'
 import { apolloClientMocksDecorator, appContextDecorator } from '@/lib/storiesUtil'
 import { GET_CATEGORIES } from '@/lib/useCategories'
-import { fromData, initial } from '@/lib/DataLoadState'
+import { initial } from '@/lib/DataLoadState'
 
 const meta = {
   component: CategoriesSelector,
@@ -30,7 +30,8 @@ const meta = {
     categories: initial(true, []),
     version: '0_9',
     loading: false,
-    token: 'token'
+    token: 'token',
+    unreadConversations: [], unreadNotifications: []
   })]
 } satisfies Meta<typeof CategoriesSelector>
 

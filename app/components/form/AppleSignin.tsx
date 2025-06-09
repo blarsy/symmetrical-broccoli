@@ -1,4 +1,4 @@
-import { appleAuth, appleAuthAndroid, AppleButton } from '@invertase/react-native-apple-authentication'
+import { appleAuth, appleAuthAndroid } from '@invertase/react-native-apple-authentication'
 import React, { useState } from 'react'
 import { Platform, View } from 'react-native'
 import { v4 as uuid } from 'uuid'
@@ -14,6 +14,7 @@ import "core-js/stable/atob"
 import { jwtDecode } from 'jwt-decode'
 import { AuthProviders } from '@/lib/utils'
 import ExternalAuthButton, { ExternalAuthButtonProvider } from '../account/ExternalAuthButton'
+import { error } from '@/lib/logger'
 
 interface Props {
     onAccountRegistrationRequired: (email: string, idToken: string, suggestedName: string) => void
@@ -56,6 +57,7 @@ const AppleSignin = ({ onAccountRegistrationRequired, onDone }: Props) => {
     //if(appleAuth.isSupported) {
     return <View style={{ alignItems: 'center' }}>
         <ExternalAuthButton type={ExternalAuthButtonProvider.apple} onPress={async () => {
+            try {
                 if(Platform.OS === 'ios') {
                     const appleAuthRequestResponse = await appleAuth.performRequest({
                         requestedOperation: appleAuth.Operation.LOGIN,
@@ -71,49 +73,58 @@ const AppleSignin = ({ onAccountRegistrationRequired, onDone }: Props) => {
                     }
 
                     if (credentialState === appleAuth.State.AUTHORIZED) {
-                        await authenticateWithApple(appleAuthRequestResponse.identityToken!, appleAuthRequestResponse.nonce!, 
-                           firstName, lastName)
+                        // errors while executing the mutation will be automatically logged to the server, so don't log it explicitely
+                        try {
+                            await authenticateWithApple(appleAuthRequestResponse.identityToken!, appleAuthRequestResponse.nonce!, 
+                               firstName, lastName)
+                        } catch(e) {
+                            setFeedback(fromError(e, t('requestError')))
+                        }
                     }
                 } else if(Platform.OS === 'android') {
                     const rawNonce = uuid()
                     const state = uuid()
 
+                    // Initialize the module
+                    appleAuthAndroid.configure({
+                        // The Service ID you registered with Apple
+                        clientId: appleServiceId,
+
+                        // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
+                        // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
+                        redirectUri: appleAuthRedirectUri,
+
+                        // Scope.ALL (DEFAULT) = 'email name'
+                        scope: appleAuthAndroid.Scope.ALL,
+
+                        // ResponseType.ALL (DEFAULT) = 'code id_token';
+                        responseType: appleAuthAndroid.ResponseType.ALL,
+
+                        // [OPTIONAL]
+                        // A String value used to associate a client session with an ID token and mitigate replay attacks.
+                        // This value will be SHA256 hashed by the library before being sent to Apple.
+                        // This is required if you intend to use Firebase to sign in with this credential.
+                        // Supply the response.id_token and rawNonce to Firebase OAuthProvider
+                        nonce: rawNonce,
+
+                        // [OPTIONAL]
+                        // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
+                        state,
+                    })
+
+                    const { id_token, nonce, user } = await appleAuthAndroid.signIn()
+                    // errors while executing the mutation will be automatically logged to the server, so don't log it explicitely
                     try {
-                        // Initialize the module
-                        appleAuthAndroid.configure({
-                            // The Service ID you registered with Apple
-                            clientId: appleServiceId,
-
-                            // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
-                            // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
-                            redirectUri: appleAuthRedirectUri,
-
-                            // Scope.ALL (DEFAULT) = 'email name'
-                            scope: appleAuthAndroid.Scope.ALL,
-
-                            // ResponseType.ALL (DEFAULT) = 'code id_token';
-                            responseType: appleAuthAndroid.ResponseType.ALL,
-
-                            // [OPTIONAL]
-                            // A String value used to associate a client session with an ID token and mitigate replay attacks.
-                            // This value will be SHA256 hashed by the library before being sent to Apple.
-                            // This is required if you intend to use Firebase to sign in with this credential.
-                            // Supply the response.id_token and rawNonce to Firebase OAuthProvider
-                            nonce: rawNonce,
-
-                            // [OPTIONAL]
-                            // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
-                            state,
-                        })
-
-                        const { id_token, nonce, user } = await appleAuthAndroid.signIn()
                         await authenticateWithApple(id_token!, nonce!, user?.name?.firstName, user?.name?.lastName)
                     } catch(e) {
                         setFeedback(fromError(e, t('requestError')))
                     }
                 }
-            }}
-        />
+            } catch (e) {
+                error({ message: (e as Error).message }, true)
+                setFeedback(fromError(e, t('requestError')))
+            }
+        }} />
         { feedback?.loading && <ActivityIndicator /> }
         { feedback?.error && <OrangeBackedErrorText>{feedback.error.message}</OrangeBackedErrorText>}
     </ View>

@@ -10,6 +10,7 @@ import { View } from "react-native"
 import { GraphQlLib } from "@/lib/backendFacade"
 import { AuthProviders } from "@/lib/utils"
 import ExternalAuthButton, { ExternalAuthButtonProvider } from "../account/ExternalAuthButton"
+import { error } from "@/lib/logger"
 
 GoogleSignin.configure({
     webClientId: googleAuthWebClienttId,
@@ -40,7 +41,6 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
                 
                 if(res.type === 'success') {
                     //Call backend to verity google account
-                    try {
                         const checkResponse = await fetch(`${apiUrl}/gauth`, { 
                             method: 'POST',
                             headers: {
@@ -55,20 +55,26 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
                         if(checkResponse.status != 200) {
                             const responseBody = await checkResponse.json()
                             if(responseBody.error === 'NO_ACCOUNT') {
-                                onAccountRegistrationRequired(res.data.user.email, res.data.idToken!)
+                                try {
+                                    onAccountRegistrationRequired(res.data.user.email, res.data.idToken!)
+                                } catch(e) {
+                                    setAuthStatus(fromError(e as Error))
+                                }
                             } else {
-                                throw new Error('Google user verification failed.')
+                                throw new Error(`Google user verification failed. Code : ${responseBody.error}`)
                             }
                         } else {
-                            const authenticateRes = await authenticateExternalAuth({ variables: { email: res.data.user.email, token: res.data.idToken!, authProvider: AuthProviders.google } })
-                            onDone && onDone(authenticateRes.data.authenticateExternalAuth.jwtToken)
+                            try {
+                                const authenticateRes = await authenticateExternalAuth({ variables: { email: res.data.user.email, token: res.data.idToken!, authProvider: AuthProviders.google } })
+                                onDone && onDone(authenticateRes.data.authenticateExternalAuth.jwtToken)
+                            } catch(e) {
+                                setAuthStatus(fromError(e as Error))
+                            }
                         }
                         setAuthStatus(fromData(null))
-                    } catch(fetchError) {
-                        setAuthStatus(fromError(fetchError as Error))
-                    }
                 }
             } catch (e) {
+                error({ message: (e as Error).message }, true)
                 setAuthStatus(fromError(e as Error))
             }
         }} />

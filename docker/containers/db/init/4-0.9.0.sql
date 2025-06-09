@@ -835,6 +835,12 @@ ALTER FUNCTION sb.switch_to_contribution_mode()
 
 GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO identified_account;
 
+ALTER TABLE IF EXISTS sb.google_auth_tokens
+    RENAME TO external_auth_tokens;
+
+ALTER TABLE IF EXISTS sb.external_auth_tokens
+    ADD COLUMN auth_provider integer NOT NULL DEFAULT 0;
+
 CREATE OR REPLACE FUNCTION sb.get_session_data(
 	)
     RETURNS session_data
@@ -1280,12 +1286,6 @@ ALTER FUNCTION sb.conversation_messages_by_conversation_id(integer)
 GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO identified_account;
 
 GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO sb;
-
-ALTER TABLE IF EXISTS sb.google_auth_tokens
-    RENAME TO external_auth_tokens;
-
-ALTER TABLE IF EXISTS sb.external_auth_tokens
-    ADD COLUMN auth_provider integer NOT NULL DEFAULT 0;
 
 DROP FUNCTION IF EXISTS sb.authenticate_external_auth(character varying, character varying);
 

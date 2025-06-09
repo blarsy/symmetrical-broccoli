@@ -36,7 +36,8 @@ export const appContextDecorator = (initial?: AppStateData) => {
         initial = {
             loading: false, token: '', i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
             version: 'v0_9',
-            categories: fromData([])
+            categories: fromData([]),
+            unreadConversations: [], unreadNotifications: []
         }
 
     }
