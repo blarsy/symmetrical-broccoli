@@ -29,8 +29,8 @@ const AppleSignin = ({ onAccountRegistrationRequired, onDone }: Props) => {
         const checkResponse = await fetch(`${apiUrl}/appleauth`, { 
             method: 'POST',
             headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 id_token,

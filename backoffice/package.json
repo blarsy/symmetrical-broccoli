@@ -52,6 +52,7 @@
     "pg": "^8.11.3",
     "postgraphile": "^4.13.0",
     "react": "latest",
+    "react-apple-signin-auth": "^1.1.2",
     "react-dom": "latest",
     "react-geocode": "^1.0.0-alpha.1",
     "react-google-autocomplete": "^2.7.5",

@@ -10,6 +10,8 @@ export interface RawConfig {
     mainVersion: string
     googleApiKey: string
     googleApiSecret: string
+    appleAuthRedirectUri: string
+    appleServiceId: string
     versions: {[version: string]: VersionSpecificRawConfig}
 }
 

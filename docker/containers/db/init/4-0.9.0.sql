@@ -1429,7 +1429,7 @@ REVOKE ALL ON FUNCTION sb.update_external_auth_status(character varying, charact
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.9.0', minimum_client_version = '0.9.0';
+	UPDATE sb.system SET version = '0.9.0', minimum_client_version = '0.9.14';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

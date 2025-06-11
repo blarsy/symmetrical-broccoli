@@ -4841,6 +4841,7 @@ __metadata:
     pg: ^8.11.3
     postgraphile: ^4.13.0
     react: latest
+    react-apple-signin-auth: ^1.1.2
     react-dom: latest
     react-geocode: ^1.0.0-alpha.1
     react-google-autocomplete: ^2.7.5
@@ -11210,6 +11211,16 @@ __metadata:
     iconv-lite: 0.4.24
     unpipe: 1.0.0
   checksum: ba1583c8d8a48e8fbb7a873fdbb2df66ea4ff83775421bfe21ee120140949ab048200668c47d9ae3880012f6e217052690628cf679ddfbd82c9fc9358d574676
+  languageName: node
+  linkType: hard
+
+"react-apple-signin-auth@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "react-apple-signin-auth@npm:1.1.2"
+  peerDependencies:
+    react: ">= 16.8.0"
+    react-dom: ">= 16.8.0"
+  checksum: 7b9dd612b531191777badd1fbb1169c71fbcbcc0772385ad863c9d124df9c535677cb8bdde8f17d28704e232553b7d41f8ee50613ca3483a92f4de12d8618962
   languageName: node
   linkType: hard
 

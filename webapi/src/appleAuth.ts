@@ -15,13 +15,15 @@ export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res
     app.use(json())
     
     app.post(`/appleauth`, corsMiddleware, async (req, res) => {
-        if(req.body.id_token && req.body.nonce) {
+        if(req.body.id_token && (req.body.nonce || req.body.full_nonce)) {
             try {
+
+                const nonce = req.body.nonce ? createHash('sha256').update(req.body.nonce).digest('hex') : req.body.full_nonce
                 const appleIdTokenClaims = await appleSigninAuth.verifyIdToken(req.body.id_token, {
                     /** sha256 hex hash of raw nonce */
-                    nonce: req.body.nonce ? createHash('sha256').update(req.body.nonce).digest('hex') : undefined,
+                    nonce
                 })
-                        
+
                 const qryRes = await runAndLog(`SELECT sb.update_external_auth_status ($1, $2, $3)`, 
                     pool, 'Checking apple authentication status', 
                     [appleIdTokenClaims.email, req.body.id_token, 1])

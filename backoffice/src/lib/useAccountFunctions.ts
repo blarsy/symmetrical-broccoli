@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"
+import { gql, useMutation } from "@apollo/client"
 import { getApolloClient } from "./apolloClient"
 import { Dispatch, useContext } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
@@ -66,6 +66,14 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
     }
 }`
 
+const AUTHENTICATE_EXTERNAL_AUTH = gql`mutation AuthenticateExternalAuth($token: String, $email: String, $authProvider: Int) {
+    authenticateExternalAuth(
+        input: {email: $email, token: $token, authProvider: $authProvider}
+    ) {
+        jwtToken
+    }
+}`
+
 export const createMessageHandler = (appDispatch: Dispatch<{
     type: AppReducerActionType;
     payload: any;
@@ -82,14 +90,6 @@ export const AUTHENTICATE = gql`mutation Authenticate($email: String, $password:
     }
 }`
 
-const AUTHENTICATE_GOOGLE = gql`mutation AuthenticateExternalAuth($token: String, $email: String, $authProvider: Int) {
-    authenticateExternalAuth(
-        input: {email: $email, token: $token, authProvider: $authProvider}
-    ) {
-        jwtToken
-    }
-}`
-
 const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth($accountName: String, $email: String, $language: String, $token: String, $authProvider: Int) {
   registerAccountExternalAuth(
     input: {accountName: $accountName, email: $email, language: $language, token: $token, authProvider: $authProvider}
@@ -99,8 +99,8 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
 }`
 
 const useAccountFunctions = (version: string) => {
-    const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
+    const { apiUrl } = config(version)
 
     const connectWithToken = async (token: string) => {
         const client = getApolloClient(version, token)
@@ -159,12 +159,6 @@ const useAccountFunctions = (version: string) => {
             unreadNotifications: res?.unreadNotifications } })
     }
 
-    const connectGoogleWithIdToken = async (idToken: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
-        return connectWithGoogle({
-            idToken
-        }, onNewAccountNeeded)
-    }
-
     const connectGoogleWithAccessCode = async (code: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
         return connectWithGoogle({
             code
@@ -184,8 +178,44 @@ const useAccountFunctions = (version: string) => {
             unreadNotifications: connectRes?.unreadNotifications } })
     }
 
+    const connectApple = async (id_token: string, nonce: string, firstName: string, lastName: string, onNewAccountNeeded: (name: string, email: string, token: string) => void) => {
+        const checkResponse = await fetch(`${apiUrl}/appleauth`, { 
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id_token,
+                full_nonce: nonce
+            })
+        })
+
+        // decode the email from the jwt token, as Apple will return it only the first time the user logs in to the app
+        const decoded = jwtDecode<{ email: string }>(id_token!)
+
+        if(checkResponse.status != 200) {
+            const responseBody = await checkResponse.json()
+            if(responseBody.error === 'NO_ACCOUNT') {
+                onNewAccountNeeded((firstName && lastName) ? firstName + ' ' + lastName : '', decoded.email, id_token!)
+            } else {
+                throw new Error('Apple user verification failed.')
+            }
+        } else {
+            //Important to use the imperative form of Apollo here (no useQuery, useMutation, ...), otherwise some page prerenders fail during the NextJs build, trying to create an Apollo client prematurely
+            const client = getApolloClient(version)
+             const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_EXTERNAL_AUTH, variables: { email: decoded.email, token: id_token!, authProvider: AuthProviders.apple } })
+            const res = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
+            appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, 
+                messageSubscription: res?.subscription, 
+                messageSubscriber: res?.subscriber,
+                unreadConversations: res?.unreadConversations, 
+                unreadNotifications: res?.unreadNotifications } })
+        }
+    }
+
     const connectWithGoogle = async (gauthBody: any, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
-        const checkResponse = await fetch(`${config(appContext.version).apiUrl}/gauth`, { 
+        const checkResponse = await fetch(`${apiUrl}/gauth`, { 
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -205,8 +235,9 @@ const useAccountFunctions = (version: string) => {
             }
         } else {
             const decoded = jwtDecode(responseBody.idToken)
+            //Important to use the imperative form of Apollo here (no useQuery, useMutation, ...), otherwise some page prerenders fail during the NextJs build, trying to create an Apollo client prematurely
             const client = getApolloClient(version)
-            const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_GOOGLE, variables: { email: (decoded as any).email, token: responseBody.idToken } })
+            const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_EXTERNAL_AUTH, variables: { email: (decoded as any).email, token: responseBody.idToken, authProvider: AuthProviders.google } })
             const res = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
             appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, 
                 messageSubscription: res?.subscription, 
@@ -216,7 +247,7 @@ const useAccountFunctions = (version: string) => {
         }
     }
 
-    return { login, connectGoogleWithIdToken, connectGoogleWithAccessCode, restoreSession, disconnect, registerViaAuthProvider }
+    return { login, connectGoogleWithAccessCode, connectApple, restoreSession, disconnect, registerViaAuthProvider }
 }
 
 
