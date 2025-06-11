@@ -1,0 +1,10 @@
+version: '2.1'
+services:
+  maintenance_proxy:
+    build:
+      context: './proxy'
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/var/local
