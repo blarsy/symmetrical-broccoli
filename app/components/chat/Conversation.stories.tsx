@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, conversationContextDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Conversation, { CREATE_MESSAGE, SET_PARTICIPANT_READ } from './Conversation'
+import { initial } from '@/lib/DataLoadState'
 
 const someMessages = [
   { id: 2, text: 'message 1', user: { id: 2, name: 'otherAccountName', avatar: '' }, createdAt: new Date() },
@@ -24,7 +24,6 @@ const meta: Meta<typeof Conversation> = {
         result: { createMessage: {integer: 1 } }
     }]),
     conversationContextDecorator({
-      conversation: {
         loading: false,
         error: undefined,
         data: {
@@ -34,10 +33,10 @@ const meta: Meta<typeof Conversation> = {
             isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
             canBeExchanged: false, created: new Date(), deleted: null, specificLocation: null},
           otherAccount: { name: 'otherAccountName', id: 2 } ,
-          messages: someMessages,
-          endCursor: ''
-        },
-      }
+        }
+    }, {
+        messages: initial(false, someMessages),
+        endCursor: ''
     }),
     navigationContainerDecorator()
   ]
@@ -62,25 +61,21 @@ export const SimpleView: Story = {
 
 export const CantChatWithDeletedAccount: Story = {
   name: 'Cannot chat with deleted account', decorators: [
-    conversationContextDecorator({
-      conversation: {
-        loading: false,
-        error: undefined,
-        data: {
-          id: 1,
-          participantId: 1,
-          resource: { id: 3, title: 'Super ressource', images: [], description: 'description de la ressource', categories: [], 
-            isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
-            canBeExchanged: false, created: new Date(), deleted: null, specificLocation: null},
-          otherAccount: { name: '', id: 2 } ,
-          messages: [
-            { id: 2, text: 'message 1', user: { id: 2, name: 'Artisan incroyable', avatar: '' }, createdAt: new Date() },
-            { id: 1, text: 'message 2', user: { id: 1, name: 'Mon association super', avatar: '' }, createdAt: new Date() },
-          ],
-          endCursor: ''
-        },
-      }
-    })
+    conversationContextDecorator(
+      initial(false, {
+        id: 1,
+        participantId: 1,
+        resource: { id: 3, title: 'Super ressource', images: [], description: 'description de la ressource', categories: [], 
+          isService: false, isProduct: false, canBeTakenAway: false, canBeDelivered: false, canBeGifted: false,
+          canBeExchanged: false, created: new Date(), deleted: null, specificLocation: null},
+        otherAccount: { name: '', id: 2 } ,
+      }), {
+        messages: initial(false,[
+          { id: 2, text: 'message 1', user: { id: 2, name: 'Artisan incroyable', avatar: '' }, createdAt: new Date() },
+          { id: 1, text: 'message 2', user: { id: 1, name: 'Mon association super', avatar: '' }, createdAt: new Date() },
+        ]),
+        endCursor: ''
+      })
   ],
   args: {
     route: {

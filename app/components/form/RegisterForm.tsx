@@ -31,7 +31,7 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                 email: yup.string().email(t('invalid_email')).required(t('field_required')),
                 password: yup.string().required(t('field_required')).test({ 
                     name: 'passwordValid', 
-                    message: t('password_invalid'), 
+                    message: t('password_invalid'),
                     test: isValidPassword
                 }),
                 repeatPassword: yup.string().required(t('field_required')).test('passwordsIdentical', t('passwords_dont_match'), (val, ctx) => val === ctx.parent.password )
@@ -44,17 +44,17 @@ const RegisterForm = ({ toggleRegistering, onAccountRegistered, onAccountRegistr
                 }
             }}>
             {({ handleChange, handleBlur, handleSubmit, values }) => (
-                <View>
-                    <OrangeTextInput testID="name" label={<StyledLabel label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
+                <View style={{ gap: 10 }}>
+                    <OrangeTextInput testID="name" label={<StyledLabel color="#fff"  isMandatory label={t('organization_name_label')} />} textContentType="givenName" value={values.name}
                         onChangeText={handleChange('name')} onBlur={handleBlur('name')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="name" />
-                    <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+                    <OrangeTextInput testID="email" label={<StyledLabel color="#fff" isMandatory label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                         onChangeText={newText => handleChange('email')(newText.trim())} onBlur={handleBlur('email')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="email" />
-                    <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                    <OrangeTextInput testID="password" label={<StyledLabel color="#fff" isMandatory label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                         onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="password" />
-                    <OrangeTextInput testID="repeatPassword" label={<StyledLabel label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
+                    <OrangeTextInput testID="repeatPassword" label={<StyledLabel color="#fff" isMandatory label={t('repeatpassword_label')} />} textContentType="password" secureTextEntry value={values.repeatPassword}
                         onChangeText={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')} />
                     <ErrorMessage component={OrangeBackedErrorText} name="repeatPassword" />
                     <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>

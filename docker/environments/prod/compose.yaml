@@ -8,6 +8,7 @@ services:
       dockerfile: './Dockerfile'
     ports:
       - "3000"
+    restart: always
   sb_webapi:
     depends_on:
       - sb_db
@@ -27,6 +28,7 @@ services:
       - "443:443"
     volumes:
       - /etc/letsencrypt:/var/local
+    restart: always
   sb_db:
     env_file:
       - .env

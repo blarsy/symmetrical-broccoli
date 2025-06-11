@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
 import { apolloClientMocksDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
-import Account, { GET_ACCOUNT } from './Account'
+import Account from './Account'
+import { GraphQlLib } from '@/lib/backendFacade'
 
 const accountId = 1
 
@@ -66,7 +67,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }, {
                 id: 2,
                 canBeExchanged: false,
@@ -86,7 +88,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }, {
                 id: 3,
                 canBeExchanged: true,
@@ -106,7 +109,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }, {
                 id: 4,
                 canBeExchanged: true,
@@ -126,7 +130,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }, {
                 id: 5,
                 canBeExchanged: true,
@@ -146,7 +151,8 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }, {
                 id: 6,
                 canBeExchanged: true,
@@ -166,13 +172,14 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null
+                deleted: null,
+                paidUntil: new Date()
             }
         ]
     }
 
     return {
-        query: GET_ACCOUNT,
+        query: GraphQlLib.queries.GET_ACCOUNT,
         variables: {
             id: accountId
         },

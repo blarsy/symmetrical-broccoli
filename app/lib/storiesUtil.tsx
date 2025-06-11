@@ -11,19 +11,18 @@ import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { NavigationContainer } from '@react-navigation/native'
-import { ConversationContext, ConversationState } from '@/components/chat/ConversationContextProvider'
-
 import { getTheme, useCustomFonts } from './utils'
 import { AppContextProvider } from '@/components/AppContextProvider'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { View } from 'react-native'
 import { IMessage } from '@/components/chat/Chat'
+import { ConversationContext, conversationMessagesState, ConversationState } from '@/components/chat/ConversationContextProvider'
 
 export const editResourceContextDecorator = (initialResource?: Resource) => (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
     {
         editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null, specificLocation: null, expiration: new Date() },
+            isService: false, deleted: null, specificLocation: null, expiration: new Date(), subjectiveValue: null },
         changeCallbacks: [], imagesToAdd: []},
         actions: {
             setResource: () => {},
@@ -37,9 +36,13 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true) => 
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, willingToContribute: boolean = false, amountOfTopes: number = 0) => 
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv' })
+        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
+            activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
+            willingToContribute, amountOfTokens: willingToContribute ? amountOfTopes | 30 : amountOfTopes, unreadNotifications: [], 
+            unreadConversations: [], lastChangeTimestamp: new Date(), unlimitedUntil: null
+         })
 
 const defaultResourceCategories: Category[] = [
     { code: 1, name: 'category 1' },
@@ -49,15 +52,15 @@ const defaultResourceCategories: Category[] = [
 ]
 
 export const makeAppContextProvider = (StoryElement: React.ElementType, account?: AccountInfo) => <AppContextProvider initialState={{
-    newChatMessage: '', categories: fromData(defaultResourceCategories), account, numberOfUnreadNotifications: 0,
+    newChatMessage: '', categories: fromData(defaultResourceCategories), account, unreadNotifications: [],
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
-    messageReceivedHandler: undefined, lastNotification: undefined, apolloClient: undefined, unreadConversations: [],
-    notificationReceivedHandler: undefined }}>
+    apolloClient: undefined, unreadConversations: [],
+    notificationReceivedHandler: undefined, lastResourceChangedTimestamp: new Date().valueOf() }}>
     <StoryElement />
 </AppContextProvider>
 
 export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]> = initial<Resource[]>(true, [])) => (StoryElement: React.ElementType) => <SearchFilterContext.Provider value={{ 
-    filter: { categories: [], location: { distanceToReferenceLocation: 50, excludeUnlocated: false }, options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
+    filter: { categories: [], location: { distanceToReferenceLocation: 50, excludeUnlocated: false, referenceLocation: null }, options: { canBeDelivered: false, canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false }, search: '' }, 
     actions: {
         requery: async() => {},
         setSearchFilter: () => {}
@@ -65,10 +68,11 @@ export const searchFilterContextDecorator = (resources: DataLoadState<Resource[]
     <StoryElement />
 </SearchFilterContext.Provider>
 
-export const conversationContextDecorator =  (initialConversationData: ConversationState) => {
+export const conversationContextDecorator =  (initialConversationData: ConversationState, initialMessagesState: conversationMessagesState) => {
     return (StoryElement: React.ElementType) => 
     <ConversationContext.Provider value={{ 
-        state: initialConversationData,
+        conversationState: initialConversationData,
+        messagesState: initialMessagesState,
         actions: { load: async () => {}, setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => {}, loadEarlier: async () => {} }
     }}>
         <StoryElement />
@@ -126,3 +130,74 @@ export const gestureHandlerDecorator = (Story: React.ElementType) =>
     <GestureHandlerRootView style={{ flex: 1 }}>
         <Story />
     </GestureHandlerRootView>
+
+const threeImages = [        
+    { 
+      imageByImageId: {
+        publicId: 'cwhkuoqezdqyrot6hoez'
+      }
+    },
+    { 
+      imageByImageId: {
+        publicId: 'pwb8arnohwpjahnebyxj'
+      }
+    },
+    { 
+      imageByImageId: {
+        publicId: 'occysgyx6m8kk5y51myu'
+      }
+    }
+  ]
+  
+const oneImage = [
+    { 
+      imageByImageId: {
+        publicId: 'cwhkuoqezdqyrot6hoez'
+      }
+    }
+]
+
+export const singleResource = (id?: number, isDeleted: boolean = false, threeImage: boolean = true, 
+    hasAddress: boolean = false, title: string = 'Une super ressource', 
+    accountName: string = 'Artisan incroyable') => {
+    return {
+        canBeDelivered: true,
+        canBeExchanged: true,
+        canBeGifted: true,
+        canBeTakenAway: true,
+        description: 'description de la ressource',
+        id: id || 1,
+        isProduct: true,
+        isService: true,
+        expiration: new Date(2025,1,1),
+        title,
+        created: new Date(2022, 1, 1),
+        deleted: isDeleted ? new Date() : null,
+        suspended: null,
+        subjectiveValue: null,
+        paidUntil: null,
+        accountByAccountId: {
+            email: 'me@me.com',
+            id: 12,
+            name: accountName,
+            imageByAvatarImageId: { publicId: 'sboopci7bbre34jezxu8' }
+        },
+        resourcesImagesByResourceId: {
+            nodes: threeImage ? threeImages : oneImage
+        },
+        resourcesResourceCategoriesByResourceId: {
+            nodes: [{
+                resourceCategoryCode: 2
+            },
+            {
+                resourceCategoryCode: 4
+            }]
+        },
+        locationBySpecificLocationId: hasAddress ? {
+            address: 'Rue de la resource, 123',
+            latitude: 50,
+            longitude: 3,
+            id: 1
+        }: null
+    }
+}

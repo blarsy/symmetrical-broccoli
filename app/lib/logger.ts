@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client
 import { logger } from 'react-native-logs'
 import { graphQlApiUrl, diagnostic } from "./settings"
 import * as Device from 'expo-device'
+import 'react-native-get-random-values'
 import uuid from 'react-native-uuid'
 import secureStore from '@/lib/secureStore'
 

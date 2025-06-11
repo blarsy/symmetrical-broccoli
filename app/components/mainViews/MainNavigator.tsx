@@ -2,7 +2,6 @@ import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigati
 import React, { useContext, useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { t } from '@/i18n'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import { Portal, Snackbar } from 'react-native-paper'
 import Container from '../layout/Container'
@@ -114,7 +113,7 @@ export function Main ({ screens }: Props) {
             const res = await getCategories({ variables: { locale: getLanguage() }})
             appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
-            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e, t('requestError')) })
+            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e) })
         }
     }
 

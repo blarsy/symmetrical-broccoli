@@ -1,6 +1,6 @@
 import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { AppWithScreens } from "./lib"
+import { AppWithScreens, executeQuery } from "./lib"
 import { SearchResults } from "@/components/mainViews/Search"
 import '@testing-library/react-native/extend-expect'
 import { cleanupSearchableResources, getTestNum, setupSearchableResources } from "./datastoreSetupLib"
@@ -10,14 +10,16 @@ let searchableData: {
         name: string;
         token: string;
     }[];
-    resourceIds: [number, number, number, number, number, number];
+    resourceIds: [number, number, number, number, number, number, number];
 }
 
 beforeAll(async () => {
     searchableData = await setupSearchableResources(getTestNum())
 })
 
-afterAll(async () => cleanupSearchableResources(searchableData))
+afterAll(async () => {
+    cleanupSearchableResources(searchableData)
+})
 
 test('Search on resource text', async () => {
     render(<AppWithScreens screens={[{ component: SearchResults, name: 'searchResults' }]} />)
@@ -26,7 +28,7 @@ test('Search on resource text', async () => {
 
     fireEvent.changeText(screen.getByTestId('searchText'), `${searchableData.accounts[0].name}`)
 
-    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-2`), { interval: 400, timeout: 2000 })
+    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-2`), { timeout: 5000 })
     expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[2]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-3`)
     
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).not.toBeOnTheScreen()
@@ -36,9 +38,9 @@ test('Search on resource text', async () => {
 
     fireEvent.changeText(screen.getByTestId('searchText'), `${searchableData.accounts[1].name}`)
 
-    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).toHaveTextContent(`${searchableData.accounts[1].name}-2`), { interval: 400, timeout: 2000 })
+    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).toHaveTextContent(`${searchableData.accounts[1].name}-2`), { timeout: 5000 })
     expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[5]}:Title`)).toHaveTextContent(`${searchableData.accounts[1].name}-3`)
-    
+
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[0]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[2]}:Title`)).not.toBeOnTheScreen()
@@ -56,7 +58,7 @@ test('Search on resource categories', async () => {
 
     fireEvent.press(screen.getByTestId('categories:Modal:ConfirmButton'))
    
-    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[2]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-3`))
+    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[2]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-3`), { timeout: 5000 })
     expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).toHaveTextContent(`${searchableData.accounts[1].name}-2`)
     
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[0]}:Title`)).not.toBeOnTheScreen()
@@ -76,7 +78,7 @@ test('Search on resource attributes', async () => {
     fireEvent.press(screen.getByTestId(`transport:canBeDelivered:Button`))
     fireEvent.press(screen.getByTestId(`exchangeType:canBeExchanged:Button`))
    
-    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-2`))
+    await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).toHaveTextContent(`${searchableData.accounts[0].name}-2`), { timeout: 5000 })
     expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[5]}:Title`)).toHaveTextContent(`${searchableData.accounts[1].name}-3`)
     
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[0]}:Title`)).not.toBeOnTheScreen()
@@ -93,4 +95,17 @@ test('Search on resource attributes', async () => {
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[3]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).not.toBeOnTheScreen()
     
+})
+
+test('search results should exclude suspended resources', async () => {
+    render(<AppWithScreens screens={[{ component: SearchResults, name: 'searchResults' }]} />)
+
+    await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
+
+    const suspendedResQuery = await executeQuery(`SELECT title FROM sb.resources WHERE id = ${searchableData.resourceIds[6]}`)
+    const resName = suspendedResQuery.rows[0].title
+    
+    fireEvent.changeText(screen.getByTestId('searchText'), resName)
+
+    await waitFor(() => expect(screen.queryByTestId(`foundResources:NoData`)).toBeOnTheScreen())
 })

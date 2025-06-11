@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React  from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import PastConversations, { MY_CONVERSATIONS } from './PastConversations'
 
 const fromNow = (milliseconds: number) => new Date(new Date().valueOf() - milliseconds)
-const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string, hasUnread: boolean = true) => (                    {
+const makeAConversation = (id: number, lastActivityMillisecondsFromNow: number, text: string, hasUnread: boolean = true) => ({
+    id,
     created: new Date(),
     messageByLastMessage: {
         text,
@@ -14,6 +15,7 @@ const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string
     participantsByConversationId: {
         nodes: [
             {
+                id: 1,
                 unreadMessagesByParticipantId: { totalCount: hasUnread ? 2 : 0 },
                 accountByAccountId: {
                     id: 1,
@@ -23,6 +25,7 @@ const makeAConversation = (lastActivityMillisecondsFromNow: number, text: string
                 }
             }, 
             {
+                id: 2,
                 unreadMessagesByParticipantId: { totalCount: 0 },
                 accountByAccountId: {
                     id: 2,
@@ -58,15 +61,16 @@ const meta: Meta<typeof PastConversations> = {
     paperProviderDecorator,
     appContextDecorator(),
     configDayjsDecorator,
+    gestureHandlerDecorator,
     apolloClientMocksDecorator([{
         query: MY_CONVERSATIONS,
         result: { myConversations: {
             nodes: [
-                makeAConversation(11 * 60 * 1000, 'Message d\'il y a 11 minutes'),
-                makeAConversation(400 * 24 * 60 * 60 * 1000, 'Message d\'il y a plus d\'un an', false),
-                makeAConversation(3000, 'reçu il y a 3 secondes'),
-                makeAConversation(24 * 60 * 60 * 1000, 'reçu hier, même heure', false),
-                makeAConversation(12 * 24 * 60 * 60 * 1000, 'Message d\'il y a 12 jours'),
+                makeAConversation(1, 11 * 60 * 1000, 'Message d\'il y a 11 minutes'),
+                makeAConversation(2, 400 * 24 * 60 * 60 * 1000, 'Message d\'il y a plus d\'un an', false),
+                makeAConversation(3, 3000, 'reçu il y a 3 secondes'),
+                makeAConversation(4, 24 * 60 * 60 * 1000, 'reçu hier, même heure', false),
+                makeAConversation(5, 12 * 24 * 60 * 60 * 1000, 'Message d\'il y a 12 jours'),
             ]
         } } 
     }])

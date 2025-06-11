@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React  from 'react'
 import Profile from './Profile'
 import { apolloClientMocksDecorator, appContextDecorator, navigationContainerDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
-import { GET_ACCOUNT_INFO } from './PublicInfo'
 import { GET_PREFERENCES } from './Preferences'
+import { GET_ACCOUNT_INFO } from '../form/EditProfile'
 
 const meta: Meta<typeof Profile> = {
   component: Profile,
@@ -14,6 +14,7 @@ const meta: Meta<typeof Profile> = {
       variables: { id: 1 },
       result: {
         accountById: {
+          id: 1,
           accountsLinksByAccountId: {
             nodes: [{
               label: 'label',

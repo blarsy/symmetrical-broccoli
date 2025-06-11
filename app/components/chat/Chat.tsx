@@ -7,7 +7,7 @@ import { t } from "@/i18n"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { adaptToWidth, pickImage } from "@/lib/utils"
 import { imgSourceFromPublicId, uploadImage } from "@/lib/images"
-import { AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import { ScrollView } from "react-native-gesture-handler"
 import BareIconButton from "../layout/BareIconButton"
 import DataLoadState from "@/lib/DataLoadState"
@@ -27,7 +27,7 @@ interface BottomBarProps {
 const BottomBar = ({ onSend, disabled, testID }: BottomBarProps) => {
     const [message, setMessage] = useState('')
     const [sending, setSending] = useState(false)
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     return <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, 
             borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#eee', backgroundColor: '#fff' }}>
         <BareIconButton testID={`${testID}:SendPicture`} size={50} Image={Images.Photos} disabled={disabled} 
@@ -38,7 +38,7 @@ const BottomBar = ({ onSend, disabled, testID }: BottomBarProps) => {
                     const uploadRes = await uploadImage(img.uri)
                     onSend(message, uploadRes)
                 } catch (e) {
-                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+                    appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error} })
                 } finally {
                     setSending(false)
                 }
@@ -59,7 +59,7 @@ const BottomBar = ({ onSend, disabled, testID }: BottomBarProps) => {
                         await onSend(message, '')
                         setMessage('')
                     } catch (e) {
-                        appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+                        appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error} })
                     } finally {
                         setSending(false)
                     }
@@ -100,7 +100,7 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
     const [invertedMessages, setInvertedMessages] =useState<IMessage[]>([])
     
     useEffect(() => {
-        if(messages.data && messages.data.length > 0) {
+        if(messages.data) {
             setInvertedMessages(messages.data!.slice().reverse())
             
             if(!scrolledToBottom){
@@ -123,7 +123,7 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
             <ScrollView maintainVisibleContentPosition={{ minIndexForVisible: MESSAGES_PER_PAGE }} 
                 ref={scrollRef} scrollEventThrottle={100}
                 onScroll={e => {
-                    if(e.nativeEvent.contentOffset.y === 0) {
+                    if(e.nativeEvent.contentOffset.y < 50) {
                         onLoadEarlier()
                     }
                     setScrollsToTail(e.nativeEvent.contentOffset.y + e.nativeEvent.layoutMeasurement.height > e.nativeEvent.contentSize.height - 20)

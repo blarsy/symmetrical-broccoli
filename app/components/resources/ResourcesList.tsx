@@ -4,20 +4,23 @@ import ConfirmDialog from "../ConfirmDialog"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { SearchFilterContext } from "../SearchFilterContextProvider"
 import AppendableList from "../AppendableList"
-import { fromServerGraphResources } from "@/lib/schema"
-import { Banner, Button } from "react-native-paper"
+import { fromServerGraphResources, Resource } from "@/lib/schema"
+import { Banner } from "react-native-paper"
 import { t } from "@/i18n"
-import { ScrollView, View } from "react-native"
+import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertContext, AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import { GraphQlLib } from "@/lib/backendFacade"
+import ContributeDialog from "../tokens/ContributeDialog"
 
+const NUMBER_OF_FREE_RESOURCES = 2
 export const RESOURCES = gql`query MyResources {
-  myresources {
+  myResources {
     nodes {
       id
       expiration
@@ -31,6 +34,8 @@ export const RESOURCES = gql`query MyResources {
       canBeGifted
       canBeDelivered
       deleted
+      suspended
+      subjectiveValue
       accountByAccountId {
         id
         name
@@ -60,12 +65,6 @@ export const RESOURCES = gql`query MyResources {
   }
 }`
 
-export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
-  deleteResource(input: {resourceId: $resourceId}) {
-    integer
-  }
-}`
-
 export const SEND_AGAIN = gql`mutation SendAgain {
   sendActivationAgain(input: {}) {
       integer
@@ -82,11 +81,14 @@ interface ResourceListProps {
 export const ResourcesList = ({ route, addRequested, viewRequested, editRequested }: ResourceListProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
+    const [askingSwitchToContributionMode, setAskingSwitchToContributionMode] = useState(false)
+    const [resources, setResources] = useState<Resource[]>([])
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
-    const [deleteResource] = useMutation(DELETE_RESOURCE)
+    const [deleteResource] = useMutation(GraphQlLib.mutations.DELETE_RESOURCE)
     const [sendAgain] = useMutation(SEND_AGAIN)
     const [hideBanner, setHideBanner] = useState(false)
     const { reloadAccount } = useUserConnectionFunctions()
@@ -102,6 +104,24 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
       return () => editResourceContext.actions.removeChangeCallback()
     }, [route])
 
+    useEffect(() => {
+      if(data) {
+        setResources(fromServerGraphResources(data.myResources?.nodes, appContext.categories.data || []))
+      }
+    }, [data, appContext.lastResourceChangedTimestamp])
+
+    const ensureContributionEnforced = (resources: Resource[], addRequested: () => void) => {
+      if(resources.filter((res => !res.deleted && ((res.expiration && new Date(res.expiration) > new Date()) || res.expiration === null))).length < NUMBER_OF_FREE_RESOURCES){
+        addRequested()
+      } else {
+        if(!appContext.account!.willingToContribute && (!appContext.account?.unlimitedUntil || appContext.account?.unlimitedUntil < new Date())) {
+          setAskingSwitchToContributionMode(true)
+        } else {
+          addRequested()
+        }
+      }
+    }
+
     return <>
         <Banner visible={!!appContext.account && !appContext.account.activated && !hideBanner} style={{ alignSelf: 'stretch' }}
             actions={[ {
@@ -111,7 +131,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 try {
                     await sendAgain()
                 } catch(e) {
-                    appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
+                  appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
                 }
             } }, { label: t('hide_button'), onPress: () => {
                 setHideBanner(true)  
@@ -119,23 +139,27 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
             {t('activate_account', { email: appContext.account?.email })}
         </Banner>
         { appContext.account ?
-          <AppendableList state={{ data, loading, error } as LoadState} dataFromState={state => state.data && fromServerGraphResources(state.data?.myresources?.nodes, appContext.categories.data || [])}
-              onAddRequested={addRequested} onRefreshRequested={() => {
-                refetch()
-              }} noDataLabel={<NoResourceYet/>}
-              contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
-                borderColor: 'yellow', borderWidth: 0
-               }}
-              displayItem={(resource, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`} key={idx} resource={resource}
-                viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
-                editRequested={() => {
-                  editResourceContext.actions.setResource(resource)
-                  editRequested()
-                }}
-              />}
-          /> :
+          <AppendableList testID="ResourcesAppendableList" state={{ data: resources, loading, error } as LoadState} dataFromState={state => state.data}
+            onAddRequested={() => {
+              ensureContributionEnforced(resources, addRequested)
+            }} onRefreshRequested={() => {
+              refetch()
+            }} noDataLabel={<NoResourceYet/>}
+            contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', flexWrap: 'wrap',
+              borderColor: 'yellow', borderWidth: 0
+            }}
+            displayItem={(resource: any, idx) => <ResourceCard testID={`resourceList:ResourceCard:${resource.id}`}
+              key={idx} resource={resource}
+              viewRequested={viewRequested} deleteRequested={resourceId => setDeletingResource(resourceId)}
+              editRequested={() => {
+                editResourceContext.actions.setResource(resource)
+                editRequested()
+              }}
+            />}
+          />
+           :
           <View style={{ margin: 10, flexDirection: 'column', borderColor: 'green', borderWidth: 0, flex: 1 }}>
-            <WhiteButton mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
+            <WhiteButton testID="addResourceButton" mode="outlined" icon="plus" onPress={addRequested}>{t('add_buttonLabel')}</WhiteButton>
             <NoResourceYet />
           </View>
         }
@@ -151,7 +175,12 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
               } else {
                 setDeletingResource(0)
               }
-            }} />
+            }} onDismiss={() => setDeletingResource(0)}/>
+        <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={() => {
+          setAskingSwitchToContributionMode(false)
+          addRequested()
+        }} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
+            title={t('contributionExplainationDialogTitle')} />
     </>
 }
 

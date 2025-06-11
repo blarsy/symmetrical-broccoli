@@ -1,5 +1,5 @@
-const version = '0.8.15'
-const versionCode = 135
+const version = '0.9.14'
+const versionCode = 150
 
 let appSettings
 if(process.env.TARGET_ENV) {
@@ -39,10 +39,15 @@ module.exports = {
       "**/*"
     ],
     "ios": {
+      "usesAppleSignIn": true,
       "infoPlist": {
-        "LSMinimumSystemVersion": "12.0"
+        "LSMinimumSystemVersion": "12.0",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["com.googleusercontent.apps.940052967066-sc7nhl39md08efgkca8i64076i5uskic"]
+          }
+        ]
       },
-      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.topela",

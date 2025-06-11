@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import React from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator, singleResource } from '@/lib/storiesUtil'
 import ViewResource from './ViewResource'
 import { GET_RESOURCE } from '@/lib/utils'
 
@@ -14,6 +14,12 @@ const meta: Meta<typeof ViewResource> = {
   ]
 }
 
+const simpleResource = (id?: number, isDeleted: boolean = false, threeImage: boolean = true, 
+  hasAddress: boolean = false, title: string = 'Une super ressource', 
+  accountName: string = 'Artisan incroyable') => ({
+  resourceById: singleResource(id, isDeleted, threeImage, hasAddress, title, accountName)
+})
+
 export default meta
 type Story = StoryObj<typeof ViewResource>
 
@@ -24,74 +30,6 @@ const initialArgs = {
   viewRequested: (id: number) =>  console.log(`viewrequested, id ${id}`)
 }
 
-const threeImages = [        
-  { 
-    imageByImageId: {
-      publicId: 'cwhkuoqezdqyrot6hoez'
-    }
-  },
-  { 
-    imageByImageId: {
-      publicId: 'pwb8arnohwpjahnebyxj'
-    }
-  },
-  { 
-    imageByImageId: {
-      publicId: 'occysgyx6m8kk5y51myu'
-    }
-  }
-]
-
-const oneImage = [
-  { 
-    imageByImageId: {
-      publicId: 'cwhkuoqezdqyrot6hoez'
-    }
-  }
-]
-
-const simpleResource = (isDeleted: boolean = false, threeImage: boolean = true, 
-    hasAddress: boolean = false, title: string = 'Une super ressource', 
-    accountName: string = 'Artisan incroyable') => ({
-    resourceById: {
-        canBeDelivered: true,
-        canBeExchanged: true,
-        canBeGifted: true,
-        canBeTakenAway: true,
-        description: 'description de la ressource',
-        id: 1,
-        isProduct: true,
-        isService: true,
-        expiration: new Date(2025,1,1),
-        title,
-        created: new Date(2022, 1, 1),
-        deleted: isDeleted ? new Date() : null,
-        accountByAccountId: {
-            email: 'me@me.com',
-            id: 12,
-            name: accountName,
-            imageByAvatarImageId: { publicId: '' }
-        },
-        resourcesImagesByResourceId: {
-            nodes: threeImage ? threeImages : oneImage
-        },
-        resourcesResourceCategoriesByResourceId: {
-            nodes: [{
-              resourceCategoryCode: 2
-            },
-            {
-              resourceCategoryCode: 4
-            }]
-        },
-        locationBySpecificLocationId: hasAddress ? {
-          address: 'Rue de la resource, 123',
-          latitude: 50,
-          longitude: 3,
-          id: 1
-        }: null
-    }
-})
-
 export const SimpleView: Story = {
   name: 'Simple view',
   decorators: [
@@ -100,7 +38,7 @@ export const SimpleView: Story = {
       variables: {
         id: 1
       },
-      result: simpleResource(false)
+      result: simpleResource(1, false)
     }])
   ],
   args: initialArgs
@@ -114,7 +52,7 @@ export const SingleImageView: Story = {
       variables: {
         id: 1
       },
-      result: simpleResource(false, false)
+      result: simpleResource(1, false, false)
     }])
   ],
   args: initialArgs
@@ -128,7 +66,7 @@ export const DeletedView: Story = {
       variables: {
         id: 1
       },
-      result: simpleResource(true)
+      result: simpleResource(1, true)
     }])
   ],
   args: initialArgs
@@ -141,7 +79,7 @@ export const WithSpecificAddress: Story = {
         variables: {
           id: 1
         },
-        result: simpleResource(true,false, true)
+        result: simpleResource(1, true,false, true)
       }])
     ],
     args: initialArgs
@@ -155,7 +93,7 @@ export const WithLongTexts: Story = {
       variables: {
         id: 1
       },
-      result: simpleResource(false, false, true, 'Un titre de ressource abusé comme il est trop long', `Un nom d'activité déliramment trop long aussi`)
+      result: simpleResource(1, false, false, true, 'Un titre de ressource abusé comme il est trop long', `Un nom d'activité déliramment trop long aussi`)
     }])
   ],
   args: initialArgs
@@ -169,10 +107,10 @@ export const OwnResource: Story = {
       variables: {
         id: 1
       },
-      result: simpleResource(false, false, true, 'Un titre de ressource', 'Super artisan')
+      result: simpleResource(1, false, false, true, 'Un titre de ressource', 'Super artisan')
     }]),
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date() })
+        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date(), amountOfTokens: 0, willingToContribute: false, unreadConversations: [1,2,3], lastChangeTimestamp: new Date(), unlimitedUntil: null, unreadNotifications: [1,2,3] })
   ],
   args: initialArgs,
 }

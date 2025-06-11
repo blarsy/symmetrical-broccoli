@@ -87,8 +87,9 @@ export const Outdated: Story = {
               avatarPublicId: '',
               activated: new Date(),
               logLevel: 2,
-              numberOfUnreadNotifications: 2,
-              unreadConversations: [1, 2]
+              unreadNotifications: [1, 2],
+              unreadConversations: [1, 2],
+              amountOfTokens: 0
           }
         }}))
         return client

@@ -17,8 +17,6 @@ import TopperPainter from './img/toppers/painter.svg'
 import TopperPastryChef from './img/toppers/pastry-chef.svg'
 import TopperScout from './img/toppers/scout.svg'
 import TopperJeweler from './img/toppers/jewelry-maker.svg'
-import 'swiper/css'
-import 'swiper/css/navigation'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { Button } from "@mui/material"
@@ -235,12 +233,6 @@ const Page = () => {
                         <ToppersBar />
                     </Stack>
                 </ParchmentContainer>
-                <Stack alignItems="center" justifyContent="center" gap="1rem" direction="column" padding="3rem">
-                    <SectionTitle lines={[
-                        [{ color: '#fff', text: 'Ressources ' }, { color: '#000', text: 'récentes' }]
-                    ]} sx={{ padding: '3rem 0' }}/>
-                    <ResourcesGallery />
-                </Stack>
                 <Stack alignItems="center" justifyContent="center" padding="3rem">
                      <Stack sx={{ padding: '0 0 2rem', alignItems: 'center' }}>
                         <Typography color="#000" textAlign="center" lineHeight={28/32} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={32} textTransform="uppercase">Disponible sur l&apos;application </Typography>
@@ -258,6 +250,12 @@ const Page = () => {
                         <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
                     </Stack>
                 </Stack>
+                <Stack alignItems="center" justifyContent="center" gap="1rem" direction="column" padding="3rem">
+                    <SectionTitle lines={[
+                        [{ color: '#fff', text: 'Ressources ' }, { color: '#000', text: 'récentes' }]
+                    ]} sx={{ padding: '3rem 0' }}/>
+                    <ResourcesGallery />
+                </Stack>
                 <ParchmentContainer>
                     <SectionTitle lines={[
                         [{ color: primaryColor, text: 'Notre ' }, { color: '#000', text: 'team' }]
@@ -273,7 +271,5 @@ const Page = () => {
         </ThemeProvider>
     </ApolloProvider>
 }
-
-    
 
 export default Page

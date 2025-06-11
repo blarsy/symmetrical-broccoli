@@ -1,9 +1,9 @@
 import { Account, Category, Resource } from "./schema"
 import { GET_RESOURCE } from "./utils"
 import { GraphQlOp } from "./storiesUtil"
-import { GET_ACCOUNT } from "@/components/account/Account"
 import { SUGGEST_RESOURCES } from "@/components/SearchFilterContextProvider"
 import { ACCOUNT_LOCATION } from "./useProfileAddress"
+import { GraphQlLib } from "./backendFacade"
 
 const createRes = (id: number, account: Account, title: string, description: string, categories: Category[], imgPubIds: string[]): Resource => ({
     account,
@@ -21,7 +21,8 @@ const createRes = (id: number, account: Account, title: string, description: str
     categories,
     canBeDelivered: true,
     deleted: null,
-    specificLocation: null
+    specificLocation: null,
+    subjectiveValue: null
 })
 
 const account1 = { id: 1, name: 'Super artisan', email: 'me@me.com', avatarImageUrl: undefined, avatarPublicId: 'cwd3apntbv1z2jdf1ocf' } as Account & { avatarPublicId?: string }
@@ -59,7 +60,9 @@ const makeSearchResourceResult = (resources: Resource[]) => resources.map(resour
           resourceCategoryCode: cat.code
         }))
     },
-    locationBySpecificLocationId: null
+    locationBySpecificLocationId: null,
+    paidUntil: null,
+    suspended: null
 }))
 
 const makeGetResourceGraphQlOp = (res: Resource) => ({
@@ -105,7 +108,7 @@ const makeGetResourceGraphQlOp = (res: Resource) => ({
 })
 
 const makeGetAccountGraphQlOp = (resources: Resource[], account: Account & { avatarPublicId?: string }) => ({
-  query: GET_ACCOUNT,
+  query: GraphQlLib.queries.GET_ACCOUNT,
   variables: { id: account.id },
   result: {
     accountById: {

@@ -11,8 +11,15 @@ interface AccountAvatarProps extends AvatarIconProps {
     style?: StyleProp<ViewStyle>
 }
 
+export interface AvatarIconAccountInfo {
+    id: number
+    avatarPublicId?: string
+    name: string
+    avatarImageUrl?: string
+}
+
 interface AvatarIconProps {
-    account: { id: number, avatarPublicId?: string, name: string, avatarImageUrl?: string }
+    account: AvatarIconAccountInfo
     size: number
 }
 

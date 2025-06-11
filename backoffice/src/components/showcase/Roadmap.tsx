@@ -82,11 +82,11 @@ const Roadmap = () => {
             }
          }}>
             <Typography color="#000" textAlign="center" variant="h1">Feuille de route</Typography>
-            <StepStone leftText={'Avril 2024'} done rightTextTitle={'Version Alpha'}  rightTextDetail={'Création de compte et de ressources. Messagerie instantanée.'}/>
-            <StepStone leftText={'Août 2024'} done rightTextTitle={'Version Bèta'}  rightTextDetail={'Customisation de compte. Notification de messages instantanés et nouvelles ressources.'}/>
-            <StepStone leftText={'Décembre 2024'} rightTextTitle={'Modèle économique'}  rightTextDetail={'Une rémunération juste pour la plateforme, collectée de manière équitable.'}/>
-            <StepStone leftText={'Janvier 2025'} rightTextTitle={'Campagne de lancement'}  rightTextDetail={`Uh subside à l'économie circulaire en démocratie directe.`}/>
-            <StepStone leftText={'2025'} rightTextTitle={'Collectivisation'}  rightTextDetail={`Tope-là devient progressibement un projet 100% auto-géré par ses utilisateurs.`}/>
+            <StepStone leftText={'Avril 2024'} done rightTextTitle={'Version Alpha'} rightTextDetail={'Création de compte et de ressources. Messagerie instantanée.'}/>
+            <StepStone leftText={'Août 2024'} done rightTextTitle={'Version Bèta'} rightTextDetail={'Customisation de compte. Notification de messages instantanés et nouvelles ressources.'}/>
+            <StepStone leftText={'Décembre 2024'} done rightTextTitle={'Version stable'} rightTextDetail={'Une version jolie et complètement fonctionnelle, pour commencer les choses sérieuses.'}/>
+            <StepStone leftText={'Juin 2025'} done rightTextTitle={'Mode "contributeur"'} rightTextDetail={`Pour les motivé.e.s, Tope-là devient un jeu gagnant-gagnant.`}/>
+            <StepStone leftText={'2025'} rightTextTitle={'Collectivisation'} rightTextDetail={`Tope-là devient progressibement un projet 100% auto-géré par ses utilisateurs.`}/>
         </Stack>
     </Stack>
 }

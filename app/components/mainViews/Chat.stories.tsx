@@ -119,43 +119,44 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 },
             ]
         },
-          accountById: {
+        accountById: {
             id: otherAccountId,
             name: otherAccountDeleted ? '' : 'Mon association trop bien',
             imageByAvatarImageId: { publicId: '' }
-          },
-          resourceById: {
-                accountByAccountId: {
-                    email: 'other@other.com',
-                    id: 2,
-                    name: otherAccountDeleted ? '' : 'Mon association trop bien',
-                    imageByAvatarImageId: { publicId: '' }
-                },
-                canBeDelivered: true,
-                canBeExchanged: true,
-                canBeGifted: true,
-                canBeTakenAway: true,
-                description: 'description de ressource',
-                id: resourceId,
-                isProduct: true,
-                isService: true,
-                expiration: null,
-                title: 'Une super ressource',
-                resourcesResourceCategoriesByResourceId: {
-                    nodes: [{
-                        resourceCategoryCode: 'cat2'
-                    },{
-                        resourceCategoryCode: 'cat4'
-                    }]
-                },
-                resourcesImagesByResourceId: {
-                    nodes: []
-                },
-                created: new Date(),
-                deleted: resourceDeleted ? new Date() : null
-          }
+        },
+        resourceById: {
+            accountByAccountId: {
+                email: 'other@other.com',
+                id: 2,
+                name: otherAccountDeleted ? '' : 'Mon association trop bien',
+                imageByAvatarImageId: { publicId: '' }
+            },
+            canBeDelivered: true,
+            canBeExchanged: true,
+            canBeGifted: true,
+            canBeTakenAway: true,
+            description: 'description de ressource',
+            id: resourceId,
+            isProduct: true,
+            isService: true,
+            expiration: null,
+            title: 'Une super ressource',
+            resourcesResourceCategoriesByResourceId: {
+                nodes: [{
+                    resourceCategoryCode: 'cat2'
+                },{
+                    resourceCategoryCode: 'cat4'
+                }]
+            },
+            resourcesImagesByResourceId: {
+                nodes: []
+            },
+            created: new Date(),
+            paidUntil: null,
+            suspended: null,
+            deleted: resourceDeleted ? new Date() : null
         }
-    )
+    })
     
 const defaultResourceId = 1
 const defaultOtherAccountId = 2
@@ -177,6 +178,7 @@ type Story = StoryObj<typeof Chat>
 
 const argsForSingleConversationViews = {
     route: {
+        name: '', 
         params: { resourceId: defaultResourceId, otherAccountId: defaultOtherAccountId }
     }
 }

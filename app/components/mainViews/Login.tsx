@@ -50,7 +50,7 @@ export default function Login ({ onDone, infoTextI18n, infoSubtextI18n }: Props)
                 <LoginForm toggleRegistering={() => setCurrentOp({ stage: CurrentOperationEnum.Registration, data: null }) } 
                     toggleRecovering={() => setCurrentOp({ stage: CurrentOperationEnum.Recovery, data: null })}
                     onDone={onDone}
-                    onAccountRegistrationRequired={(email, token) => setCurrentOp({ stage: CurrentOperationEnum.ExternalAuthRegistration, data: { email, token } })} />
+                    onAccountRegistrationRequired={(email, token, authProvider, suggestedName) => setCurrentOp({ stage: CurrentOperationEnum.ExternalAuthRegistration, data: { email, token, suggestedName, authProvider } })} />
             </ConnectContainer>
         case CurrentOperationEnum.Recovery:
             return <ConnectContainer titleI18n="recovery_page_title">
@@ -64,8 +64,8 @@ export default function Login ({ onDone, infoTextI18n, infoSubtextI18n }: Props)
             </ConnectContainer>
         case CurrentOperationEnum.ExternalAuthRegistration:
             return <ConnectContainer titleI18n="register_page_title">
-                <RegisterExternalAuthForm email={ currentOp.data.email } token={ currentOp.data.token } 
-                onAccountRegistered={onDone} 
+                <RegisterExternalAuthForm email={ currentOp.data.email } token={ currentOp.data.token } suggestedName={ currentOp.data.suggestedName }
+                onAccountRegistered={onDone} authProvider={currentOp.data.authProvider}
                 toggleRegisteringExternalAuth={() => setCurrentOp({ stage: CurrentOperationEnum.Login, data: null })} />
             </ConnectContainer>
     }

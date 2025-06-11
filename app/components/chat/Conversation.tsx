@@ -4,7 +4,7 @@ import { gql, useMutation } from "@apollo/client"
 import { RouteProps } from "@/lib/utils"
 import { ConversationContext, asIMessage } from "./ConversationContextProvider"
 import { useNavigation } from "@react-navigation/native"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import PanZoomImage from "../PanZoomImage"
 import ChatBackground from "./ChatBackground"
 import Chat from "./Chat"
@@ -29,6 +29,7 @@ export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccoun
 const Conversation = ({ route }: RouteProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const conversationContext = useContext(ConversationContext)
     const [focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const navigation = useNavigation()
@@ -37,7 +38,7 @@ const Conversation = ({ route }: RouteProps) => {
 
     useEffect(() => {
       if(appContext.categories.data) {
-          conversationContext.actions.load(route.params?.resourceId, route.params?.otherAccountId, appContext.categories.data)
+        conversationContext.actions.load(route.params?.resourceId, route.params?.otherAccountId, appContext.categories.data)
       }
     }, [route.params, appContext.categories.data])
 
@@ -60,7 +61,7 @@ const Conversation = ({ route }: RouteProps) => {
             sent: true
             }, ...prevMessages])
         } catch(e) {
-          appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error} })
+          appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error} })
         }
     }, [conversationContext.conversationState.data])
 
@@ -71,9 +72,20 @@ const Conversation = ({ route }: RouteProps) => {
       })
     }
 
+    const setConversationRead = () => {
+      if(conversationContext.conversationState.data?.resource && conversationContext.messagesState.messages.data) {
+          setParticipantRead({ variables: { 
+          resourceId: conversationContext.conversationState.data?.resource?.id, 
+          otherAccountId: conversationContext.conversationState.data?.otherAccount.id
+        } })
+        appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.conversationState.data?.participantId })
+      }
+    }
+
     useEffect(() => {
         navigation.addListener('focus', () => {
           appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: onMessageReceived }})
+          setConversationRead()
         })
         navigation.addListener('blur', () => appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: { messageReceivedHandler: undefined } }))
         return () => {
@@ -82,13 +94,7 @@ const Conversation = ({ route }: RouteProps) => {
     }, [])
 
     useEffect(() => {
-      if(conversationContext.conversationState.data?.resource && conversationContext.messagesState.messages.data) {
-        setParticipantRead({ variables: { 
-          resourceId: conversationContext.conversationState.data?.resource?.id, 
-          otherAccountId: conversationContext.conversationState.data?.otherAccount.id
-         } })
-        appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.conversationState.data?.participantId })
-      }
+      setConversationRead()
     }, [conversationContext.messagesState.messages.data])
 
     return <ChatBackground>
@@ -99,9 +105,9 @@ const Conversation = ({ route }: RouteProps) => {
             onSend={onSend} otherAccount={conversationContext.conversationState.data!.otherAccount}
             onLoadEarlier={conversationContext.actions.loadEarlier} 
             testID="conversation" 
-            loadingEarlier={conversationContext.messagesState.messages ? conversationContext.messagesState.messages.loading: false}
+            loadingEarlier={conversationContext.messagesState.loadingEarlier}
             canLoadEarlier={!!conversationContext.messagesState.endCursor}/>
-          </LoadedZone>
+        </LoadedZone>
         <PanZoomImage source={focusedImage} onDismess={() => setFocusedImage(undefined)} />
     </ChatBackground>
 }

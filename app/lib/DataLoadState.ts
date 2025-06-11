@@ -1,3 +1,5 @@
+import { t } from "@/i18n"
+
 export interface StateError extends Error {
     detail?: string
 }
@@ -25,8 +27,8 @@ export function initial<M> (loading: boolean, value: M): DataLoadState<M> {
     return new DataLoadState<M>(value, loading, undefined)
 }
 
-export function fromError<M> (err: any, message: string): DataLoadState<M> {
-    return new DataLoadState<M>(undefined, false, { name: 'Error', message, detail: err.toString() })
+export function fromError<M> (err: any, message?: string): DataLoadState<M> {
+    return new DataLoadState<M>(undefined, false, { name: 'Error', message: message || t('requestError'), detail: err.toString() })
 }
 
 export default DataLoadState

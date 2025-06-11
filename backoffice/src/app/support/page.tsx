@@ -1,9 +1,12 @@
 "use client"
-import ClientLayout from "@/components/ClientLayout"
+import ClientLayout from "@/components/scaffold/ClientLayout"
+import { usePagePath } from "@/lib/utils"
 import { Box, Typography } from "@mui/material"
 
 const Support = () => {
-    return <ClientLayout title="Support">
+    const { version } = usePagePath()
+    
+    return <ClientLayout title="Support" version={version}>
         <>
             <Typography variant="subtitle1">Pour tout problème ou remarque lors de l&quot;utilisation de nos produits:</Typography>
             <Typography variant="subtitle2" fontSize="2.5rem"><a href="mailto://topela.hello@gmail.com">topela.hello@gmail.com</a></Typography>

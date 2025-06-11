@@ -1,4 +1,4 @@
-import { Formik, ErrorMessage } from "formik"
+import { ErrorMessage } from "formik"
 import { t } from "i18next"
 import { View } from "react-native"
 import React, { useState } from "react"
@@ -6,18 +6,19 @@ import * as yup from "yup"
 import { Button, Portal } from "react-native-paper"
 import Icons from "@expo/vector-icons/FontAwesome"
 import { OrangeBackedErrorText, OrangeTextInput, StyledLabel, WhiteButton } from "@/components/layout/lib"
-import { aboveMdWidth } from "@/lib/utils"
+import { aboveMdWidth, AuthProviders } from "@/lib/utils"
 import { ErrorSnackbar } from "../OperationFeedback"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import GoogleSignin from "./GoogleSignin"
 import { GraphQlLib } from "@/lib/backendFacade"
 import KeyboardAvoidingForm from "./KeyboardAvoidingForm"
 import { useMutation } from "@apollo/client"
+import AppleSignin from "./AppleSignin"
 
 interface Props {
     toggleRegistering: () => void
     toggleRecovering: () => void
-    onAccountRegistrationRequired: (email: string, token: string) => void
+    onAccountRegistrationRequired: (email: string, token: string, authProvider: AuthProviders, suggestedName?: string) => void
     onDone?: () => void
 }
 
@@ -26,8 +27,13 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
     const [authError, setAuthError] = useState(undefined as Error|undefined)
     const { login } = useUserConnectionFunctions()
 
-    return <View style={{ alignItems: 'stretch' }}>
-        <GoogleSignin onAccountRegistrationRequired={onAccountRegistrationRequired} onDone={async jwtToken => {
+    return <View style={{ alignItems: 'stretch', gap: 20 }}>
+        <AppleSignin onDone={async jwtToken => {
+            await login(jwtToken)
+            onDone && onDone()
+        }} 
+        onAccountRegistrationRequired={(email, idToken, suggestedName) => onAccountRegistrationRequired(email, idToken, AuthProviders.apple, suggestedName)}/>
+        <GoogleSignin onAccountRegistrationRequired={(email, idToken) => onAccountRegistrationRequired(email, idToken, AuthProviders.google)} onDone={async jwtToken => {
             await login(jwtToken)
             onDone && onDone()
         }} />
@@ -47,11 +53,11 @@ const LoginForm = ({ toggleRegistering, toggleRecovering, onDone, onAccountRegis
                 setAuthError(e as Error)
             }
         }}>
-        {({ handleChange, handleBlur, handleSubmit, values }) => (<View>
-                <OrangeTextInput testID="email" label={<StyledLabel label={t('email_label')} />} textContentType="emailAddress" value={values.email}
+        {({ handleChange, handleBlur, handleSubmit, values }) => (<View style={{ gap: 10 }}>
+                <OrangeTextInput testID="email" label={<StyledLabel color="#fff" isMandatory label={t('email_label')} />} textContentType="emailAddress" value={values.email}
                     onChangeText={handleChange('email')} onBlur={handleBlur('email')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="email" />
-                <OrangeTextInput testID="password" label={<StyledLabel label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
+                <OrangeTextInput testID="password" label={<StyledLabel color="#fff"  isMandatory label={t('password_label')} />} textContentType="password" secureTextEntry value={values.password}
                     onChangeText={handleChange('password')} onBlur={handleBlur('password')} />
                 <ErrorMessage component={OrangeBackedErrorText} name="password" />
                 <WhiteButton testID="login" style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }} icon={props => <Icons {...props} name="sign-in" />} onPress={() => handleSubmit()} 

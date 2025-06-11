@@ -32,6 +32,7 @@ web_test.zip
 .keystore
 *.aab
 /webapi/mails/*
+/webapi/schema*.graphql
 
 .pnp*
 

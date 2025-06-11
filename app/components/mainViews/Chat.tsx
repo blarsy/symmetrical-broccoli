@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { Dimensions, View } from "react-native"
 import { RouteProps, fontSizeMedium } from "@/lib/utils"
 import Conversation from "../chat/Conversation"
@@ -12,14 +12,14 @@ import ConversationContextProvider, { ConversationContext } from "../chat/Conver
 import dayjs from "dayjs"
 import { AppContext } from "../AppContextProvider"
 import ChatBackground from "../chat/ChatBackground"
-import AccountAvatar from "./AccountAvatar"
 import Images from "@/Images"
 import NoConversationYet from "../chat/NoConversationYet"
 import BareIconButton from "../layout/BareIconButton"
-import { ResourceImage } from "../resources/MainResourceImage"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewAccount from "./ViewAccount"
 import ViewResource from "../resources/ViewResource"
+import ResourceImageWithCreator from "../ResourceImageWithAuthor"
+import SendTokensDialog from "../account/SendTokensDialog"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
@@ -28,7 +28,9 @@ interface ChatHeaderProps extends NativeStackHeaderProps {
 }
 
 export const ChatHeader = (p: ChatHeaderProps) => {
+    const appContext = useContext(AppContext)
     const conversationContext = useContext(ConversationContext)
+    const [sendingTokensTo, setSendingTokensTo] = useState<number | undefined>()
 
     const resourceDeleted = conversationContext.conversationState.data?.resource?.deleted
     
@@ -37,12 +39,8 @@ export const ChatHeader = (p: ChatHeaderProps) => {
             backgroundColor: lightPrimaryColor, maxWidth: Dimensions.get('window').width, paddingVertical: 5 }} loadIndicatorColor={primaryColor}>
             { conversationContext.conversationState.data?.resource && <>
                 <BareIconButton testID="backToConversationList" Image="chevron-left" size={40} onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
-                <View style={{ position: 'relative', width: 60, height: 60 }}>
-                    <ResourceImage size={ 50 } resource={conversationContext.conversationState.data!.resource} />
-                    <AccountAvatar style={{ position: 'absolute', top: -30, left: 20 }} 
-                        onPress={p.onAccountShowRequested} 
-                        account={conversationContext.conversationState.data!.otherAccount} size={40} />
-                </View>
+                <ResourceImageWithCreator authorInfo={conversationContext.conversationState.data!.otherAccount}
+                    resource={conversationContext.conversationState.data!.resource} onAccountPress={p.onAccountShowRequested} />
                 <View style={{ flexShrink: 1, flexGrow: 1, flexDirection: 'column', padding: 6 }}>
                     <Text numberOfLines={1} ellipsizeMode="tail" variant="headlineMedium" 
                         style={{ color: primaryColor, textTransform: 'uppercase' }}>
@@ -53,7 +51,13 @@ export const ChatHeader = (p: ChatHeaderProps) => {
                     { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
                 </View>
                 <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => p.onResourceShowRequested(conversationContext.conversationState.data!.resource!.id)} />
+                { conversationContext.conversationState.data.otherAccount.willingToContribute && appContext.account && 
+                    <IconButton style={{ borderRadius: 0 }} size={40} iconColor="#000" 
+                        icon="hand-coin" 
+                        onPress={() => setSendingTokensTo(conversationContext.conversationState.data!.otherAccount.id)} /> }
             </>}
+        <SendTokensDialog toAccount={sendingTokensTo} accountName={conversationContext.conversationState.data!.otherAccount.name} 
+            onDismiss={() => setSendingTokensTo(undefined)} />
     </LoadedZone>)
 }
 

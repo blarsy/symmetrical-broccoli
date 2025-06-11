@@ -16,7 +16,7 @@ const Resources = ({ route, navigation }: RouteProps) => {
       <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
       <StackNav.Screen name="editResource" key="editResource" options={{ header: SimpleBackHeader }} component={EditResource} />
       <StackNav.Screen name="viewAccount" key="viewAccount" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewAccount} />
-      </StackNav.Navigator>
+  </StackNav.Navigator>
 }
 
 export default Resources

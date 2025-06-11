@@ -1,10 +1,8 @@
-import React, { ReactNode } from 'react'
-import { RouteProps } from "@/lib/utils"
-import { RouteProp, ParamListBase } from "@react-navigation/native"
-import { MaterialBottomTabNavigationOptions } from "react-native-paper"
+import React from 'react'
 import { lightPrimaryColor, primaryColor } from "./layout/constants"
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { t } from '@/i18n'
+import { TabNavigatorProps } from '@/lib/TabNavigatorProps'
 
 const Tab = createMaterialBottomTabNavigator()
 
@@ -21,15 +19,6 @@ const getViewTitleI18n = (screenName: string): string => {
         default:
             return ''
     }
-}
-
-export interface TabNavigatorProps {
-    name: string
-    component: (r: RouteProps) => ReactNode
-    options?: MaterialBottomTabNavigationOptions | ((props: {
-        route: RouteProp<ParamListBase, string>
-        navigation: any
-    }) => MaterialBottomTabNavigationOptions)
 }
 
 interface DealNavigatorProps {

@@ -7,9 +7,9 @@ import { getTheme, useCustomFonts, versionChecker } from "@/lib/utils"
 import { ApolloClient, ApolloProvider, NormalizedCacheObject, gql, useLazyQuery } from "@apollo/client"
 import { ErrorSnackbar, SuccessSnackbar } from "../OperationFeedback"
 import UpdateApp from "../UpdateApp"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
-import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
-import secureStore, { ISecureStore } from "@/lib/secureStore"
+import { AppAlertContext, AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import useUserConnectionFunctions, { setOverrides } from "@/lib/useUserConnectionFunctions"
+import { ISecureStore } from "@/lib/secureStore"
 import { Provider } from "react-native-paper"
 
 export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
@@ -17,7 +17,7 @@ export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
 }`
 
 const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => {
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const [getMinimumClientVersion] = useLazyQuery(GET_MINIMUM_CLIENT_VERSION)
     const [busy, setBusy] = useState(false)
     const [outdated, setOutdated] = useState(false)
@@ -26,11 +26,12 @@ const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => 
         try {
             setBusy(true)
             const minimumClientVersionData = await getMinimumClientVersion()
+            if(minimumClientVersionData.error) throw minimumClientVersionData.error
             if(!versionChecker(minimumClientVersionData.data.getMinimumClientVersion)) {
                 setOutdated(true)
             }
         } catch(e) {
-            appDispatch({ type: AppReducerActionType.DisplayNotification, payload: { error: e as Error } })
+            appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error } })
             setOutdated(false)
         } finally {
             setBusy(false)
@@ -54,12 +55,15 @@ interface Props {
 
 export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker, clientGetter, children, splashScreenMinimumDuration }: Props) => {
     const { t } = i18n
-    const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertContext = useContext(AppAlertContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const [startingUp, setStartingUp] = useState(true)
     const { checkingVersion, outdated } = useVersionCheck(overrideVersionChecker || versionChecker)
     const [fontsLoaded, fontError] = useCustomFonts()
-    const { tryRestoreToken } = useUserConnectionFunctions(overrideSecureStore || secureStore, clientGetter)
+
+    setOverrides({ clientGetter, secureStore: overrideSecureStore })
+
+    const { tryRestoreToken } = useUserConnectionFunctions()
     
     const load = async () => {
         try {
@@ -84,12 +88,12 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     if(fontsLoaded) {
         return <GestureHandlerRootView style={{ flex: 1 }}>
             { children }
-            <ErrorSnackbar testID="startupError" error={appContext.lastNotification?.error} 
-                message={(appContext.lastNotification && appContext.lastNotification.error) ? appContext.lastNotification.message || t('requestError') : undefined} 
-                onDismissError={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+            <ErrorSnackbar testID="startupError" error={appAlertContext.error} 
+                message={appAlertContext.error ? appAlertContext.message || t('requestError') : undefined} 
+                onDismissError={() => appAlertDispatch({ type: AppAlertReducerActionType.ClearNotification, payload: {}  })} />
             <SuccessSnackbar testID="startupSuccess" 
-                message={(appContext.lastNotification && !appContext.lastNotification.error) ? appContext.lastNotification.message : undefined} 
-                onDismissSuccess={() => appDispatch({ type: AppReducerActionType.ClearNotification, payload: undefined  })} />
+                message={!appAlertContext.error ? appAlertContext.message : undefined} 
+                onDismissSuccess={() => appAlertDispatch({ type: AppAlertReducerActionType.ClearNotification, payload: {} })} />
         </GestureHandlerRootView>
     } else {
         <ErrorSnackbar testID="fontLoadError" error={fontError || undefined} message={fontError ? t('requestError') : undefined} onDismissError={() => {}} />

@@ -44,12 +44,12 @@ const SearchBox = ({ onChange, value, testID }: SearchBoxProps) => {
 interface ProximitySelectorProps {
     value: LocationSearchOptions
     onChange: (newVal: LocationSearchOptions) => void
-    testID: string
+    testID?: string
 }
 
 const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
     return <View style={{ flexDirection: 'column', alignContent: 'stretch', paddingBottom: 10 }}>
-        <LocationEdit small style={{ paddingLeft: 10 }} location={value?.referenceLocation} 
+        <LocationEdit testID="searchAddress" small style={{ paddingLeft: 10 }} location={value?.referenceLocation} 
             onLocationChanged={newLocation => {
                 onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation, 
                     excludeUnlocated: value.excludeUnlocated,
@@ -59,7 +59,7 @@ const ProximitySelector = ({ value, onChange }: ProximitySelectorProps) => {
             onDeleteRequested={() => {
                 onChange({ distanceToReferenceLocation: value.distanceToReferenceLocation, 
                     excludeUnlocated: value.excludeUnlocated,
-                    referenceLocation: undefined,
+                    referenceLocation: null,
                 })
             }} />
         { value?.referenceLocation && 
@@ -96,7 +96,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
             searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                 categories: searchFilterContext.filter.categories, 
                 options: searchFilterContext.filter.options,
-                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress === null ? undefined : defaultAddress } } })
+                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress! } } })
         }
     }, [loadingAddress])
 
@@ -109,7 +109,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
     }, [debouncedFilters])
 
     return loadingAddress ? 
-        <ActivityIndicator /> : 
+        <ActivityIndicator color={primaryColor} /> : 
         <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
                 <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
@@ -151,7 +151,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                     }} />
             </AccordionItem>
 
-            <LoadedList style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
+            <LoadedList testID="foundResources" style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 
                 error={searchFilterContext.results.error} data={searchFilterContext.results.data}
                 displayItem={(res, idx) => {

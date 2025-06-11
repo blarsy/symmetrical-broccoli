@@ -1,9 +1,12 @@
 "use client"
-import ClientLayout from "@/components/ClientLayout"
+import ClientLayout from "@/components/scaffold/ClientLayout"
 import Recover from "@/components/user/Recover"
+import { usePagePath } from "@/lib/utils"
 
-export default function Recovery({ params }: { params: { id: string, version: string } }) {
-    return <ClientLayout version={params.version}>
-        <Recover recoveryId={params.id} />
+export default function Recovery() {
+    const { version, param } = usePagePath()
+
+    return <ClientLayout version={version}>
+        <Recover recoveryId={param} />
     </ClientLayout>
 }

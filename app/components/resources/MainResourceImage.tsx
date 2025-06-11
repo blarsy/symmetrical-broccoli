@@ -4,7 +4,6 @@ import { Resource } from "@/lib/schema"
 import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import React from "react"
 import { Image, ImageStyle, StyleProp } from "react-native"
-import { primaryColor } from "../layout/constants"
 
 interface Props {
     resource: Resource
@@ -59,7 +58,6 @@ export const ResourceImage = ({ resource, size }: ResourceImageProps) => {
         const imgData = resource.images[0]
         return <Image source={imgSourceFromPublicId(imgData.publicId!)} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
     }
-    //return <Images.Photos width={size} height={size} style={{ borderRadius: IMAGE_BORDER_RADIUS }}/>
     return <Image source={require('@/assets/img/placeholder.png')} style={{ width: size, height: size, borderRadius: IMAGE_BORDER_RADIUS }} />
 }
 

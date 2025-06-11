@@ -22,12 +22,25 @@ export interface RouteProps {
     navigation: NavigationHelpers<ParamListBase>
 }
 
+export const DEFAUT_LOCATION: Location = {
+    latitude: 50.6058984,
+    longitude: 3.3881915,
+    address: ''
+}
+
+export const STANDARD_APPBAR_TITLE_FONTSIZE = 36
 export const mdScreenWidth = 600
-export const appBarsTitleFontSize = 36
+let appBarsTitleFontSize: number | undefined = undefined
 
 export const aboveMdWidth = (): Boolean => Dimensions.get("window").width >= mdScreenWidth
 export const hasMinWidth = (minWidth: number) => Dimensions.get("window").width >= minWidth
 export const percentOfWidth = (percent: number) => Dimensions.get('window').width / 100 * percent
+export const getAppBarsTitleFontSize = () => {
+  if(!appBarsTitleFontSize) {
+    appBarsTitleFontSize = Dimensions.get("window").width < 400 ? 30 : STANDARD_APPBAR_TITLE_FONTSIZE
+  }
+  return appBarsTitleFontSize
+}
 
 export const fontSizeLarge = aboveMdWidth() ? 24 : 20
 export const fontSizeMedium = aboveMdWidth() ? 20 : 16
@@ -40,6 +53,7 @@ export enum ScreenSize {
 }
 
 export const MAX_DISTANCE = 50
+export const SMALL_IMAGEBUTTON_SIZE = 30
 
 export const getTheme = (): ThemeProp => ({
   fonts: configureFonts({ config: { 
@@ -165,6 +179,7 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       email
       id
       name
+      willingToContribute
       imageByAvatarImageId {
         publicId
       }
@@ -197,8 +212,11 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       longitude
       id
     }
+    suspended
+    paidUntil
     created
     deleted
+    subjectiveValue
   }
 }`
 
@@ -221,8 +239,8 @@ export const versionChecker = (serverVersion: string) => {
 export const userFriendlyTime = (time: Date) => {
   const djTime = dayjs.utc(time)
   const millisecondsEllapsed = Math.abs(djTime.diff())
-  const epoch = time.valueOf()
-  
+  const epoch = djTime.valueOf()
+
   if(millisecondsEllapsed < 10 * 60 * 1000)
     return djTime.local().fromNow()
   else if (millisecondsEllapsed < Math.abs(djTime.startOf('day').diff(djTime))) {
@@ -247,3 +265,10 @@ export const regionFromLocation = (loc : Location) => ({
   longitude: loc.longitude,
   latitude: loc.latitude
 })
+
+export const daysFromNow = (days: number) => new Date(new Date().valueOf() + days * 24 * 60 * 60 * 1000)
+
+export enum AuthProviders {
+  google = 0,
+  apple = 1
+}

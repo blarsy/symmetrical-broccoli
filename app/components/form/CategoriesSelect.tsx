@@ -57,9 +57,10 @@ interface Props {
     labelVariant?: VariantProp<never> | undefined
     inline?: boolean
     testID: string
+    isMandatory?: boolean
 }
 
-const CategoriesSelect = ({ value, onChange, labelVariant, label, inline, testID }: Props) => {
+const CategoriesSelect = ({ value, onChange, labelVariant, label, inline, testID, isMandatory }: Props) => {
     const appContext = useContext(AppContext)
     const [ open, setOpen ] = useState(false)
 
@@ -69,7 +70,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label, inline, testID
         { appContext.categories.data ? <View>
             <TouchableOpacity testID={ `${testID}:Button` } onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TransparentTextInput inlineMode={inline} label={<StyledLabel variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
+                    <TransparentTextInput inlineMode={inline} label={<StyledLabel isMandatory={isMandatory} variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
                         value={( value.map(cat => cat.name).join(', '))} right={<TextInput.Icon color="#000" onPress={openModal} size={26} icon="chevron-right"/>} 
                         style={{ margin: 0, flex: 1, backgroundColor: 'transparent' }}/>
                 </View>

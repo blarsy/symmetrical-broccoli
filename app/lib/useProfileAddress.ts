@@ -1,8 +1,7 @@
-import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "@/components/AppContextProvider"
 import { useContext, useEffect, useState } from "react"
 import { Location, parseLocationFromGraph } from "./schema"
 import { fromData, fromError, initial } from "./DataLoadState"
-import { t } from "@/i18n"
 import { gql, useLazyQuery } from "@apollo/client"
 
 export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
@@ -19,7 +18,7 @@ export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
 
 export default () => {
     const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+    const appAlertDispatch = useContext(AppAlertDispatchContext)
     const [getLocation] = useLazyQuery(ACCOUNT_LOCATION)
     const [state, setState] = useState(initial(true, null as Location | null))
 
@@ -30,8 +29,8 @@ export default () => {
 
             setState(fromData(defaultLocation))
         } catch(e) {
-            setState(fromError(e, t('requestError')))
-            appDispatch({ type: AppReducerActionType.DisplayNotification,  payload: { error: e }})
+            setState(fromError(e))
+            appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification,  payload: { error: e as Error }})
         }
     }
 

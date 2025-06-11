@@ -1,7 +1,12 @@
+import dayjs from 'dayjs'
 import './globals.css'
 import { Inter } from 'next/font/google'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/fr'
 
 const inter = Inter({ subsets: ['latin'] })
+
+dayjs.extend(relativeTime)
 
 export const metadata = {
   title: 'Tope-la',
@@ -29,6 +34,7 @@ export default function RootLayout({
   
             gtag('config', 'G-JV8DL8LGWS');`
           }} />
+        <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" defer></script>
       </head>
       <body className={inter.className}>
         <noscript dangerouslySetInnerHTML={{

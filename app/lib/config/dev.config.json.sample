@@ -1,13 +1,15 @@
 {
     "apiUrl": "http://localhost:3000",
+    "appleAuthRedirectUri": "https://www.tope-la.com/apple-auth",
+    "appleServiceId": "com.tope-la.android",
     "graphQlApiUrl": "http://localhost:3000/graphql",
     "subscriptionsUrl": "ws://localhost:3000/graphql",
     "linksUrl": "http://localhost:3002/api/link/",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
     "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
-    "clientVersion": "0.6.0",
     "googleMapsApiKey": "<ApiKey>",
     "googleAuthWebClienttId": "<WebClientId>",
+    "googleAuthIOSClientID": "940052967066-sc7nhl39md08efgkca8i64076i5uskic.apps.googleusercontent.com",
     "diagnostic": true
 }

@@ -4,7 +4,7 @@ import { Dimensions, Linking, ScrollView } from "react-native"
 import { Text } from "react-native-paper"
 import * as yup from 'yup'
 import { ErrorText, Hr, OrangeButton, StyledLabel, TransparentTextInput } from "../layout/lib"
-import { graphQlApiUrl, clientVersion, linksUrl, subscriptionsUrl, apiUrl } from "@/lib/settings"
+import * as settings from "@/lib/settings"
 import ViewField from "../ViewField"
 import { t } from "@/i18n"
 import { AppContext } from "../AppContextProvider"
@@ -21,13 +21,18 @@ export default () => {
             const windowDims = Dimensions.get('window')
             const screenDims = Dimensions.get('screen')
             const supportInfo = {
-                graphQlApiUrl, apiUrl, subscriptionsUrl, linksUrl, clientVersion: nativeApplicationVersion || clientVersion,
+                apiUrl: settings.apiUrl, appleAuthRedirectUri: settings.appleAuthRedirectUri, 
+                appleServiceId: settings.appleServiceId, cloudinaryCloud: settings.cloudinaryCloud, 
+                cloudinaryRestUrl: settings.cloudinaryRestUrl, googleAuthIOSClientID: settings.googleAuthIOSClientID, 
+                googleAuthWebClienttId: settings.googleAuthWebClienttId, graphQlApiUrl: settings.graphQlApiUrl, 
+                linksUrl: settings.linksUrl, subscriptionsUrl: settings.subscriptionsUrl, 
+                clientVersion: nativeApplicationVersion,
                 windowWidth: windowDims.width.toFixed(1), windowHeight: windowDims.height.toFixed(1), screenWidth: screenDims.width.toFixed(1),
                 screenHeight: screenDims.height.toFixed(1), account: appContext.account?.id, logActivityId: activityId
             }
             setSupportInfo(fromData(supportInfo))
         } catch (e) {
-            setSupportInfo(fromError(e, t('requestError')))
+            setSupportInfo(fromError(e))
         }
     }
 
@@ -42,8 +47,8 @@ export default () => {
             message: yup.string().required(t('field_required'))
         })} onSubmit={values => Linking.openURL(`mailto:topela.hello@gmail.com?subject=${encodeURI(t('support_mail_subject'))}&body=${encodeURI(values.message)}${encodeURI('\n\n')}${t('support_info')}${encodeURI(' :\n\n')}${JSON.stringify(supportInfo)}`)}>
             {({ values, handleChange, handleBlur, submitForm }) => <>
-                <TransparentTextInput mode="outlined" multiline 
-                    label={<StyledLabel label={t('support_message_label') + ' *'} />} 
+                <TransparentTextInput mode="flat" multiline 
+                    label={<StyledLabel isMandatory label={t('support_message_label')} />} 
                     value={values.message} onChangeText={handleChange('message')} 
                     onBlur={handleBlur('message')} style={{ marginBottom: 10 }} />
                 <ErrorMessage component={ErrorText} name="message" />

@@ -1,12 +1,14 @@
 {
     "apiUrl": "https://test.tope-la.com/v0_8",
+    "appleAuthRedirectUri": "https://www.tope-la.com/apple-auth",
+    "appleServiceId": "com.tope-la.android",
     "graphQlApiUrl": "https://test.tope-la.com/v0_8/graphql",
     "subscriptionsUrl": "wss://test.tope-la.com/v0_8/graphql",
     "cloudinaryCloud": "cloudid",
     "cloudinaryUploadPreset": "presetname",
-    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/",
-    "clientVersion": "0.6.0",
+    "cloudinaryRestUrl": "https://api.cloudinary.com/v1_1/"
     "googleMapsApiKey": "<ApiKey>",
     "googleAuthWebClienttId": "<WebClientId>",
+    "googleAuthIOSClientID": "<IOSClientId>",
     "diagnostic": true
 }

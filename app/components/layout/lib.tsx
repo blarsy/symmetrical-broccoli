@@ -1,14 +1,16 @@
-import React, { useState } from "react"
-import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps } from "react-native-paper"
+import React, { PropsWithChildren, ReactNode, RefObject, useState } from "react"
+import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps, Tooltip } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { ColorValue, Platform, View } from "react-native"
+import { ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { aboveMdWidth, getLanguage } from "@/lib/utils"
+import { aboveMdWidth, getLanguage, SMALL_IMAGEBUTTON_SIZE } from "@/lib/utils"
+import BareIconButton from "./BareIconButton"
+import Images from "@/Images"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -27,45 +29,77 @@ interface SubmitButtonProps extends ButtonProps {
     testID: string
 }
 
-export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 20, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
+export const SubmitButton = (props: SubmitButtonProps) => <View style={{ marginTop: 10, marginBottom: 10, width: aboveMdWidth() ? '60%' : '80%', alignSelf: 'center' }}>
 { props.submitCount > 0 && !props.isValid && <props.ErrorTextComponent>{t('someDataInvalid')}</props.ErrorTextComponent> }
     <props.Component disabled={props.updating} onPress={e => props.handleSubmit()} loading={props.updating} {...props}>
         {t('save_label')}
     </props.Component>
 </View>
 
-export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor="#fff"
-    {...props} style={mergeWith({ borderRadius: 5 } , props.style )}/>
+export const WhiteButton = (props: ButtonProps) => <Button mode="contained" textColor="#000" buttonColor={lightPrimaryColor}
+    {...props} style={mergeWith({ borderRadius: 15 } , props.style )}/>
     
 export const OrangeButton = (props: ButtonProps) => <Button mode="contained" textColor="#fff" buttonColor={primaryColor}
-    {...props} style={mergeWith({ borderRadius: 5 } , props.style )} />
+    {...props} style={mergeWith({ borderRadius: 15, padding: 10 } , props.style )} />
     
-export function ErrorText(props: TextProps<never>) {
+export const ErrorText= (props: PropsWithChildren) => {
     return <Text variant="bodyMedium" style={{ color: 'red' }}>{props.children}</Text>
 }
 
-export const OrangeBackedErrorText = (props: TextProps<never>) => <Text variant="bodyMedium" style={{
+export const OrangeBackedErrorText = (props: PropsWithChildren) => <Text variant="bodyMedium" style={{
     backgroundColor: 'orange', color: '#fff'
 }}>{props.children}</Text>
 
-export const StyledLabel = ({ label, color, variant }: { label: string, color?: ColorValue, variant?: VariantProp<never> | undefined }) => <Text variant={variant || 'labelSmall'} style={{ color: color }}>{label}</Text>
+interface StyledLabelProps {
+    label: string
+    color?: ColorValue
+    variant?: VariantProp<never> | undefined
+    isMandatory?: boolean
+    style?: StyleProp<TextStyle>
+}
 
-export const OrangeTextInput = (props: TextInputProps) => <TextInput 
+export const StyledLabel = ({ label, color, variant, isMandatory, style }: StyledLabelProps) => 
+    <Text variant={variant || 'labelSmall'} style={{ color, ...(style as object) }}>
+        {label} {isMandatory && <Icon source="asterisk" size={20} color={color?.toString()}/>}
+    </Text>
+
+
+interface TextInputWithRefProps extends TextInputProps {
+    innerRef?: RefObject<TextInput> | null
+}
+
+export const OrangeTextInput = (props: TextInputWithRefProps) => <TextInput 
+    underlineColor="#fff"
+    activeUnderlineColor="#fff"
     {...props}
-    placeholderTextColor="#ddd" mode="flat" textColor="#fff" underlineColor="#fff"
-    activeUnderlineColor="#fff" selectionColor="#fff"
     theme={{ colors: { onSurfaceVariant: '#ddd'} }}
-    contentStyle={{
-        color: '#fff'
-    }} style={Object.assign({
+    placeholderTextColor="#ddd" mode="flat" textColor="#fff" selectionColor="#fff"
+    contentStyle={{ color: '#fff' }} style={Object.assign({
         backgroundColor: primaryColor,
         marginTop: 10,
-    }, props.style)}/>
+    }, props.style)}
+    ref={props.innerRef} />
 
 interface TransparentTextInput extends TextInputProps {
     inlineMode?: boolean
     disableEmojis? : boolean
 }
+
+interface WhiteReadOnlyFieldProps {
+    label: string
+    value: string | ReactNode
+    style?: StyleProp<ViewStyle>
+    testID?: string
+}
+
+export const WhiteReadOnlyField = (p: WhiteReadOnlyFieldProps) => <View style={{ paddingTop: 22, paddingLeft: 16, paddingBottom: 4, paddingRight: 16, ...(p.style as object) }}>
+    <StyledLabel label={p.label} color="#ffa38b"/>
+    { typeof p.value === 'string' ?
+        <Text testID={p.testID} variant="bodyMedium" style={{ color: '#fff' }}>{p.value}</Text>
+        :
+        p.value
+    }
+</View>
 
 export const TransparentTextInput = (props: TransparentTextInput) => {
     return <TextInput keyboardType={props.disableEmojis ? Platform.OS == 'ios' ? "ascii-capable": "visible-password" : undefined } dense={props.inlineMode}
@@ -76,11 +110,12 @@ export const TransparentTextInput = (props: TransparentTextInput) => {
             color: '#000',
             padding: props.inlineMode ? 0 : undefined
         }} 
-        style={Object.assign({
+        {...props}
+        style={{
             backgroundColor: 'transparent',
-            marginTop: 10
-        }, props.style)} 
-        {...props}/>
+            marginTop: 10,
+            ...(props.style as object)}}
+        />
 }
 
 interface CheckboxGroupProps {
@@ -92,11 +127,12 @@ interface CheckboxGroupProps {
     onChanged: (values: { [name: string]: boolean }, oldValues: { [name: string]: boolean }) => void
     selectedColor?: ColorValue
     color?: ColorValue
-    testID: string
+    testID?: string
+    isMandatory?: boolean
 }
 
 export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexDirection: 'column', alignContent: 'center', marginTop: 5 }}>
-    { props.title && <Text variant="labelSmall" style={{ marginLeft: 16, color: props.color }}>{props.title}</Text> }
+    { props.title && <StyledLabel style={{ marginLeft: 16 }} color={props.color} isMandatory={props.isMandatory} label={props.title}/> }
     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
         { Object.entries(props.options).map((p, idx) => <OptionSelect testID={`${props.testID}:${p[0]}`} selectedColor={props.selectedColor} color={props.color} key={idx} title={p[1]} value={props.values[p[0]]} onChange={newValue => {
             const oldValues = {...props.values}
@@ -104,6 +140,33 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => <View style={{ flexD
             props.onChanged(props.values, oldValues)
         }}/>) }
     </View>
+</View>
+
+interface RightAlignedModifyButtonsProps {
+    editing: boolean
+    onEditRequested: () => void
+    saveButtonDisabled: boolean
+    saveButtonColor?: ColorValue
+    onSave: () => void
+    onDelete?: () => void
+    onCancelEdit?: () => void
+    testID?: string
+}
+
+export const RightAlignedModifyButtons = (p: RightAlignedModifyButtonsProps) => <View style={{ position: 'absolute', flexDirection: 'row', right: 0, bottom: 5, gap: 3 }}>
+    { !p.editing && <BareIconButton testID={`${p.testID}:Modify`} Image={Images.ModifyInCircle} size={SMALL_IMAGEBUTTON_SIZE} color="#000" 
+        onPress={p.onEditRequested}/> }
+    { p.editing && <BareIconButton testID={`${p.testID}:Save`} disabled={p.saveButtonDisabled} Image={Images.Check} size={SMALL_IMAGEBUTTON_SIZE} 
+        color={p.saveButtonColor || '#000'} onPress={p.onSave}/> }
+    { ((p.onDelete && !p.editing) || p.editing) && <BareIconButton Image={Images.Remove} size={SMALL_IMAGEBUTTON_SIZE} 
+                                                    color={lightPrimaryColor} 
+                                                    onPress={() => {
+                                                        if(p.editing && p.onCancelEdit) {
+                                                            p.onCancelEdit()
+                                                        } else {
+                                                            p.onDelete!()
+                                                        }
+                                                    }} />}
 </View>
 
 interface DateTimePickerFieldProps {
@@ -118,15 +181,24 @@ interface DateTimePickerFieldProps {
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10 }}
-        onPress={() => setDateOpen(true)}>
+    return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-        <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('noDate')}</Text>
-        <View style={{ marginRight: 14 }}>
-            <Icon source="chevron-right" size={26} color="#000" />
+        <View>
+            <OptionSelect title={t('noDate')} value={!props.value} onChange={() => {
+                    props.onChange(undefined)
+                }} />
+            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
+                onPress={() => setDateOpen(true)}>
+                <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('setDate')}</Text>
+                <View style={{ marginRight: 14 }}>
+                    <Icon source="chevron-right" size={26} color="#000" />
+                </View>
+            </TouchableOpacity>
         </View>
-        <DatePickerModal testID={`${props.testID}:Picker`}
+        <DatePickerModal
+            testID={`${props.testID}:Picker`}
             locale={getLanguage()}
+            saveLabel={t('selectButtonCaption')}
             mode="single"
             visible={dateOpen}
             onDismiss={() => setDateOpen(false)}
@@ -140,11 +212,14 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
                 setDateOpen(false)
             }}
         />
-    </TouchableOpacity>
+    </View>
 }
-
 
 export const Hr = ({ color, thickness, margin }: { color?: ColorValue, thickness?: number, margin?: number }) => 
     <View style={{ backgroundColor: color || '#343434', 
         height: thickness || 1, transform: 'scaleY(0.5)', 
         marginVertical: margin || 5 }}></View>
+
+export const InfoIcon = ({ text }: { text: string }) => <Tooltip enterTouchDelay={1} title={text}>
+    <Icon source="help-circle" size={20} />
+</Tooltip>
