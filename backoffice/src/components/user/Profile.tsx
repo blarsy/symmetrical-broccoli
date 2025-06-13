@@ -4,7 +4,7 @@ import { useContext, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
 import * as yup from "yup"
-import { Backdrop, CircularProgress, TextField, Typography } from "@mui/material"
+import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Switch, TextField, Typography } from "@mui/material"
 import { ErrorText, FieldTitle, RightAlignedModifyButtons } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import AvatarEdit from "./AvatarEdit"
@@ -12,12 +12,19 @@ import { gql, useMutation } from "@apollo/client"
 import EditLinks from "./EditLinks"
 import EditAddress from "./EditAddress"
 import Feedback from "../scaffold/Feedback"
+import useAccountFunctions from "@/lib/useAccountFunctions"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
       input: {name: $name, avatarPublicId: $avatarPublicId}
     ) {
       integer
+    }
+}`
+
+const DELETE_ACCOUNT = gql`mutation DeleteAccount {
+    deleteAccount(input: {}) {
+        integer
     }
 }`
 
@@ -71,7 +78,7 @@ const InlineFormTextInput = (p: Props) => {
                 }} onDelete={p.onDelete} />
             <ErrorMessage component={ErrorText} name="value" />
             { submitCount > 0 && !isValid && <Stack style={{ marginTop: 20, alignSelf: 'center' }}>
-                <ErrorText>{appContext.i18n.translator('someDataInvalid')}</ErrorText>
+                <ErrorText>{t('someDataInvalid')}</ErrorText>
             </Stack>}
         </Stack>
     }}
@@ -85,11 +92,21 @@ const Profile = () => {
     const [newEmailMustBeActivated, setNewEmailMustBeActivated] = useState(false)
     const [updateAccount, { error: updateError, reset, loading: updatingAccount }] = useMutation(UPDATE_ACCOUNT)
     const [updateAccountEmail, { error: updateEmailError, reset: resetEmail, loading: updatingEmail}] = useMutation(UPDATE_ACCOUNT_EMAIL)
+    const [deletingAccount, setDeletingAccount] = useState(false)
+    const [deletionConfirmed, setDeletionConfirmed] = useState(false)
+    const [deleteAccount] = useMutation(DELETE_ACCOUNT)
     const t = appContext.i18n.translator
+    const { disconnect } = useAccountFunctions(appContext.version)
 
     return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
-        { publicInfo.profileData.data && <Stack sx={{ maxWidth: '40rem', gap: '1rem', paddingBottom: '1rem' }}>
-            <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('profilePageTitle')}</Typography>
+        { publicInfo.profileData.data && <Stack sx={theme => ({ 
+            gap: '1rem', paddingBottom: '1rem',
+            width: '100%',
+            [ theme.breakpoints.up('sm')]: {
+                width: '80%'
+            },
+        })}>
+            <Typography textAlign="center" color="primary" variant="h1">{t('profilePageTitle')}</Typography>
             <AvatarEdit initialValue={ appContext.account!.avatarPublicId } onChange={async newPublicId => {
                 const updatedAccount = { ...appContext.account }
                 updatedAccount.avatarPublicId = newPublicId
@@ -115,10 +132,18 @@ const Profile = () => {
             <Feedback visible={!!newEmailMustBeActivated} severity="success" detail={t('newEmailMustBeActivated')} />
             <EditLinks onDone={newLinks => publicInfo.updatePublicInfo(newLinks, publicInfo.profileData.data!.location)} 
                 links={publicInfo.profileData.data.links}/>
-            <FieldTitle title={appContext.i18n.translator('addressEditTitle')} sx={{ alignSelf: 'flex-start'}} />
+            <FieldTitle title={t('addressEditTitle')} sx={{ alignSelf: 'flex-start'}} />
             <EditAddress value={publicInfo.profileData.data.location} onChange={newLocation => {
                 publicInfo.updatePublicInfo(publicInfo.profileData.data!.links, newLocation)
             }} />
+            <Stack>
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="overline" color="primary">{t('deleteMyAccountCompletely')}</Typography>
+                    <Button color="primary" variant="contained" onClick={() => {
+                        setDeletingAccount(true)
+                    }}>{t('deleteAccountButton')}</Button>
+                </Stack>
+            </Stack>
         </Stack> }
         <Backdrop
             open={updatingAccount || updatingEmail}
@@ -127,6 +152,24 @@ const Profile = () => {
         </Backdrop>
         <Feedback severity="error" onClose={reset} visible={!!updateError} />
         <Feedback severity="error" onClose={resetEmail} visible={!!updateEmailError} />
+        <Dialog open={deletingAccount} fullWidth>
+            <DialogTitle>{t('confirmAccountDeletionDialogTitle')}</DialogTitle>
+            <DialogContent sx={{ alignItems: 'center' }}>
+                <Typography variant="body2" color="primary">{t('accountWillBeDefinitivelyDeleted')}</Typography>
+                <Stack direction="row" alignItems="center" justifyContent="center">
+                    <Typography variant="body1" color="primary">{t('iAmSure')}</Typography>
+                    <Switch value={deletionConfirmed} onChange={() => setDeletionConfirmed(prev => !prev)} />
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={ () => setDeletingAccount(false) }>{t('cancelButton')}</Button>
+                <Button disabled={!deletionConfirmed} onClick={async () => {
+                    await deleteAccount()
+                    disconnect()
+                    setDeletingAccount(false)
+                }}>{t('okButton')}</Button>
+            </DialogActions>
+        </Dialog>
     </LoadedZone>
 }
 

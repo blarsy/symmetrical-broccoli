@@ -3,8 +3,8 @@ import TopBar from "./TopBar"
 import { PropsWithVersion } from "@/lib/utils"
 import { useContext } from "react"
 import { AppContext } from "./AppContextProvider"
-import ConnectForm from "../user/ConnectForm"
-import { Snackbar, SnackbarContent, Stack, Typography } from "@mui/material"
+import Login from "../user/Login"
+import { Stack } from "@mui/material"
 
 interface Props extends PropsWithVersion {
     allowAnonymous?: boolean
@@ -14,15 +14,17 @@ const ConnectContent = (p: Props) => {
     const appContext = useContext(AppContext)
 
     if(!appContext.account && !p.allowAnonymous) {
-        return [
-            <TopBar key="topbar" version={ p.version }/>,
-            <ConnectForm key="connect" onClose={() => {}} version={p.version}/>
-        ]
+        return <>
+            <TopBar version={ p.version }/>
+            <Stack padding="1rem">
+                <Login version={p.version} />
+            </Stack>
+        </>
     } else {
-        return [
-            <TopBar key="topbar" version={ p.version }/>,
-            p.children
-        ]
+        return <>
+            <TopBar version={ p.version }/>
+            {p.children}
+        </>
     }
 }
 

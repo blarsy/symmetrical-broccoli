@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab"
-import { TextField, Button, Alert } from "@mui/material"
+import { TextField, Button, Alert, Link } from "@mui/material"
 import { Stack } from "@mui/system"
 import { Formik, Form, ErrorMessage } from "formik"
 import * as yup from "yup"
@@ -11,36 +11,36 @@ import { useGoogleLogin } from '@react-oauth/google'
 import GoogleLogo from '../../app/img/google-logo.svg'
 import AppleLogo from '../../app/img/apple-logo.svg'
 import Feedback from "../scaffold/Feedback"
-import { AuthProviders } from "@/lib/utils"
 import { appleAuthHelpers } from 'react-apple-signin-auth'
 import { v4 as uuid } from 'uuid'
 import { getCommonConfig } from "@/config"
 import { fromError } from "@/lib/DataLoadState"
+import { AuthProviders } from "@/lib/utils"
 
 interface Props {
-    onClose: () => void
+    onClose?: () => void
     version: string
+    onRegisterRequested: () => void
+    onRegisterExternalAuthProviderRequested: (suggestedName: string, email: string, token: string, provider: AuthProviders) => void
 }
 
 
 const ConnectForm = (p: Props) => {
     const appContext = useContext(AppContext)
-    const { connectGoogleWithAccessCode, login, registerViaAuthProvider, connectApple } = useAccountFunctions(p.version)
+    const { connectGoogleWithAccessCode, login, connectApple } = useAccountFunctions(p.version)
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const t = appContext.i18n.translator
     const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
-    const [registering, setRegistering] = useState<{ suggestedName: string, email: string, token: string}>()
 
     const triggerGoogleLogin = useGoogleLogin({
         onSuccess: async res => {
             setConnectionStatus({ loading: true })
             try {
-                await connectGoogleWithAccessCode(res.code, async (name, email, token) => {
-                    setRegistering({ suggestedName: name, email, token })
-                    //return registerViaAuthProvider(name, email, appContext.i18n.lang, token, AuthProviders.google)
+                const done = await connectGoogleWithAccessCode(res.code, async (name, email, token) => {
+                    p.onRegisterExternalAuthProviderRequested(name, email, token, AuthProviders.google)
                 })
                 setConnectionStatus({ loading: false })
-                p.onClose()
+                if(done) p.onClose && p.onClose()
             } catch(e) {
                 setConnectionStatus({ loading: false, error: e as Error })
             }
@@ -64,7 +64,7 @@ const ConnectForm = (p: Props) => {
                 nonce: rawNonce,
                 usePopup: true
             },
-            onSuccess: (res: any) => {
+            onSuccess: async (res: any) => {
                 // {
                 //     "authorization": {
                 //         "state": "[STATE]", // The state string we used in the initApple function
@@ -80,12 +80,11 @@ const ConnectForm = (p: Props) => {
                 //         }
                 //     }
                 // }
-                connectApple(res.authorization.id_token, rawNonce, res.user?.firstName, res.user?.lastName, async (name, email, token) => {
-                    setRegistering({ suggestedName: name, email, token })
-                    //return registerViaAuthProvider(name, email, appContext.i18n.lang, token, AuthProviders.apple)
+                const done = await connectApple(res.authorization.id_token, rawNonce, res.user?.firstName, res.user?.lastName, async (name, email, token) => {
+                    p.onRegisterExternalAuthProviderRequested(name, email, token, AuthProviders.apple)
                 })
                 setConnectionStatus({ loading: false })
-                p.onClose()
+                if(done) p.onClose && p.onClose()
             },
             onError: (e: any) => {
                 setConnectionStatus(fromError(e as Error, appContext.i18n.translator('requestError')))
@@ -102,7 +101,7 @@ const ConnectForm = (p: Props) => {
             try {
                 await login(values.email, values.password)
                 setConnectionStatus({ loading: false })
-                p.onClose()
+                p.onClose && p.onClose()
             } catch(e) {
                 setConnectionStatus({ loading: false, error: e as Error})
             }
@@ -118,9 +117,14 @@ const ConnectForm = (p: Props) => {
                         <ErrorMessage component={ErrorText} name="email"/>
                         <TextField id="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
                         <ErrorMessage component={ErrorText} name="password" />
-                        <Stack direction="row" alignSelf="flex-end">
-                            <Button color="secondary" onClick={() => p.onClose()}>{t('cancelButton')}</Button>
-                            <LoadingButton loading={connectionStatus.loading} type="submit">{t('connectButton')}</LoadingButton>
+                        <Stack>
+                            <Stack direction="row" alignSelf="flex-end">
+                                { p.onClose && <Button color="secondary" onClick={() => p.onClose!()}>{t('cancelButton')}</Button> }
+                                <LoadingButton loading={connectionStatus.loading} type="submit">{t('connectButton')}</LoadingButton>
+                            </Stack>
+                            <Link component="button" onClick={() => {
+                                p.onRegisterRequested()
+                            }}>{appContext.i18n.translator('noAccountYetButtonLink')}</Link>
                         </Stack>
                         <Feedback visible={!!connectionStatus.error} onClose={() => {
                             setConnectionStatus({ loading: false })

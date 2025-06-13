@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@mui/material"
 import { useContext } from "react"
 import { AppContext  } from "../scaffold/AppContextProvider"
-import ConnectForm from "./ConnectForm"
+import Login from "./Login"
 
 interface Props {
     visible: boolean
@@ -13,10 +13,10 @@ const ConnectDialog = (p: Props) => {
     const appContext = useContext(AppContext)
     const t = appContext.i18n.translator
 
-    return <Dialog open={p.visible}>
+    return <Dialog open={p.visible} fullWidth>
         <DialogTitle>{t('connectDialogTitle')}</DialogTitle>
         <DialogContent>
-            <ConnectForm version={p.version} onClose={p.onClose}/>
+            <Login version={p.version} onClose={p.onClose}/>
         </DialogContent>
     </Dialog>
 }

@@ -18,7 +18,6 @@ import { useMutation } from "@apollo/client"
 import Images from "@/Images"
 import TokenSettings from "../tokens/TokenSettings"
 import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
-import { useNavigation } from "@react-navigation/native"
 
 const Tab = createMaterialBottomTabNavigator()
 

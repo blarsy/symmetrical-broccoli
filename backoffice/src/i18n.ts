@@ -37,6 +37,8 @@ const resources = {
             "mustBeValidEmail": "must be a valid email address",
             "requiredField": "must be provided",
             "passwordLabel": "Password",
+            "repeatPasswordLabel": "Repeat password",
+            "accountNameLabel": "Account name",
             "connectButton": "Connect",
             "preferencesMenuCaption": "Preferences",
             "someDataInvalid": "Save failed: values missing or invalid",
@@ -96,7 +98,16 @@ const resources = {
             "linksLabel": "Links",
             "accountLocationLabel": "Location",
             "availableResources": "Available resources",
-            "pleaseTypeTheAddress": "Please type the address here, or click the location on the map"
+            "pleaseTypeTheAddress": "Please type the address here, or click the location on the map",
+            "noAccountYetButtonLink": "No account yet ?",
+            "passwordInvalid": "The password must be at least 8 characters long, with at least one uppercase and at least one non-letter character.",
+            "passwordsDontMatch": "Provided passwords are not identical.",
+            "registerButton": "Create account",
+            "deleteMyAccountCompletely": "Delete my account (completely)",
+            "accountWillBeDefinitivelyDeleted": "Deleting your account will erase all information we have about you.\nYou will not be able to connect anymore, and Tope-là will not be able to retrieve your information.",
+            "confirmAccountDeletionDialogTitle": "Confirmation of account deletion",
+            "deleteAccountButton": "Delete",
+            "iAmSure": "This is what I want"
         }
     },
     fr: { 
@@ -134,6 +145,8 @@ const resources = {
             "mustBeValidEmail": "doit être une adresse email valide",
             "requiredField": "doit être remplis",
             "passwordLabel": "Mot de passe",
+            "repeatPasswordLabel": "Répétez le mot de passe",
+            "accountNameLabel": "Nom du compte",
             "connectButton": "Se connecter",
             "preferencesMenuCaption": "Préférences",
             "someDataInvalid": "Echec: valeurs manquantes ou invalides",
@@ -193,7 +206,16 @@ const resources = {
             "linksLabel": "Liens",
             "accountLocationLabel": "Localisation",
             "availableResources": "Ressources disponibles",
-            "pleaseTypeTheAddress": "Tapez l'adresse ici, ou cliquez l'endroit sur la carte"
+            "pleaseTypeTheAddress": "Tapez l'adresse ici, ou cliquez l'endroit sur la carte",
+            "noAccountYetButtonLink": "Pas encore de compte ?",
+            "passwordInvalid": "Le mot de passe doit comporter au moins 8 caractères, au moins une majustcule et un caractère non-alphabétique.",
+            "passwordsDontMatch": "Les mots de passe fournis ne sont pas identiques.",
+            "registerButton": "Créez le compte",
+            "deleteMyAccountCompletely": "Effacer mon compte (complètement)",
+            "accountWillBeDefinitivelyDeleted": "Effacer votre compte éliminera toute les informations que nous détenons de vous.\nIl ne vous sera plus possible de vous reconnecter, et Tope-là ne sera plus en mesure de retrouver vos informations.",
+            "confirmAccountDeletionDialogTitle": "Confirmation d'effacement du compte",
+            "deleteAccountButton": "Effacer",
+            "iAmSure": "C'est bien ce que je veux"
         }
     }
 }

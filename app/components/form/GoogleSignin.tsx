@@ -1,5 +1,5 @@
 import { apiUrl, googleAuthIOSClientID, googleAuthWebClienttId } from "@/lib/settings"
-import { GoogleSignin, GoogleSigninButton, User } from "@react-native-google-signin/google-signin"
+import { GoogleSignin, User } from "@react-native-google-signin/google-signin"
 import React, { useEffect, useState } from "react"
 import { ErrorSnackbar } from "../OperationFeedback"
 import { t } from "@/i18n"
@@ -65,7 +65,8 @@ export default ({ onDone, onAccountRegistrationRequired }: Props) => {
                             }
                         } else {
                             try {
-                                const authenticateRes = await authenticateExternalAuth({ variables: { email: res.data.user.email, token: res.data.idToken!, authProvider: AuthProviders.google } })
+                                const authenticateRes = await authenticateExternalAuth({ variables: { 
+                                    email: res.data.user.email, token: res.data.idToken!, authProvider: AuthProviders.google } })
                                 onDone && onDone(authenticateRes.data.authenticateExternalAuth.jwtToken)
                             } catch(e) {
                                 setAuthStatus(fromError(e as Error))
