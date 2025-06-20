@@ -1,10 +1,11 @@
-import { gql, useMutation } from "@apollo/client"
+import { gql } from "@apollo/client"
 import { getApolloClient } from "./apolloClient"
-import { Dispatch, useContext } from "react"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
+import { useContext } from "react"
+import { AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
 import config from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
+import { UiDispatchContext, UiReducerActionType } from "@/components/scaffold/UiContextProvider"
 
 export interface AccountInfo {
     name: string
@@ -19,7 +20,7 @@ export interface AccountInfo {
 }
 
 export const GET_SESSION_DATA = gql`query GetSessionData {
-    getSessionData {
+    getSessionDataWeb {
       accountId
       email
       name
@@ -33,38 +34,6 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       unlimitedUntil
     }
   }`
-
-export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
-    messageReceived {
-        event
-        message {
-            id
-            text
-            created
-            received
-            imageByImageId {
-                publicId
-            }
-            participantByParticipantId {
-                id
-                accountByAccountId {
-                    id
-                    name
-                    imageByAvatarImageId {
-                        publicId
-                    }
-                }
-                conversationByConversationId {
-                    id
-                    resourceByResourceId {
-                        id
-                        title
-                    }
-                }
-            }
-        }
-    }
-}`
 
 const AUTHENTICATE_EXTERNAL_AUTH = gql`mutation AuthenticateExternalAuth($token: String, $email: String, $authProvider: Int) {
     authenticateExternalAuth(
@@ -82,16 +51,6 @@ const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: Str
     }
 }`
 
-export const createMessageHandler = (appDispatch: Dispatch<{
-    type: AppReducerActionType;
-    payload: any;
-}>) => (payload: any) => {
-    if(payload.data.messageReceived) {
-        console.log('payload', payload)
-        appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
-    }
-}
-
 export const AUTHENTICATE = gql`mutation Authenticate($email: String, $password: String) {
     authenticate(input: {email: $email, password: $password}) {
         jwtToken
@@ -108,36 +67,43 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
 
 const useAccountFunctions = (version: string) => {
     const appDispatch = useContext(AppDispatchContext)
+    const uiDispatch = useContext(UiDispatchContext)
     const { apiUrl } = config(version)
-    //const [registerAccountMutation] = useMutation(REGISTER_ACCOUNT)
 
-    const connectWithToken = async (token: string) => {
+    const connectWithToken = async (token: string, otherSessionProps: any) => {
         const client = getApolloClient(version, token)
         const res = await client.query({ query: GET_SESSION_DATA })
 
-        if(!res.data.getSessionData) {
+        if(!res.data.getSessionDataWeb) {
             localStorage.removeItem('token')
-            return undefined
+            uiDispatch({ type: UiReducerActionType.Load, payload: otherSessionProps })
+            appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
+                token: '',
+                unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
+                unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
+                account: undefined} })
         }
 
-        const subscriber = client.subscribe({ query: MESSAGE_RECEIVED })
-        const subscription = subscriber.subscribe({ next: createMessageHandler(appDispatch) })
-    
         const account: AccountInfo = {
-            id: res.data.getSessionData.accountId, 
-            name: res.data.getSessionData.name, 
-            email: res.data.getSessionData.email, 
-            avatarPublicId: res.data.getSessionData.avatarPublicId,
-            activated: res.data.getSessionData.activated,
-            willingToContribute: res.data.getSessionData.willingToContribute,
-            amountOfTokens: res.data.getSessionData.amountOfTokens,
-            unlimitedUntil: res.data.getSessionData.unlimitedUntil || null,
+            id: res.data.getSessionDataWeb.accountId, 
+            name: res.data.getSessionDataWeb.name, 
+            email: res.data.getSessionDataWeb.email, 
+            avatarPublicId: res.data.getSessionDataWeb.avatarPublicId,
+            activated: res.data.getSessionDataWeb.activated,
+            willingToContribute: res.data.getSessionDataWeb.willingToContribute,
+            amountOfTokens: res.data.getSessionDataWeb.amountOfTokens,
+            unlimitedUntil: res.data.getSessionDataWeb.unlimitedUntil || null,
             lastChangeTimestamp: new Date()
         }
 
         localStorage.setItem('token', token)
-        return { account, subscription, subscriber, unreadConversations: res.data.getSessionData.unreadConversations,
-            unreadNotifications: res.data.getSessionData.unreadNotifications }
+
+        uiDispatch({ type: UiReducerActionType.Load, payload: otherSessionProps })
+        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
+            token,
+            unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
+            unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
+            account} })
     }
 
     const disconnect = () => {
@@ -145,29 +111,10 @@ const useAccountFunctions = (version: string) => {
         appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
     }
 
-    const restoreSession = async (token: string, otherSessionProps: any) => {
-        const res = await connectWithToken(token)
-        if(!res) token = ''
-
-        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
-            token,
-            unreadConversations: res?.unreadConversations, 
-            unreadNotifications: res?.unreadNotifications, 
-            account: res?.account, 
-            messageSubscription: res?.subscription,
-            messageSubscriber: res?.subscriber} })
-    }
-
     const login = async (email: string, password: string) => {
         const client = getApolloClient(version)
         const tokenRes = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } })
-        const res = await connectWithToken(tokenRes.data.authenticate.jwtToken)
-        appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, 
-            token: tokenRes.data.authenticate.jwtToken,
-            messageSubscription: res?.subscription,
-            messageSubscriber: res?.subscriber,
-            unreadConversations: res?.unreadConversations, 
-            unreadNotifications: res?.unreadNotifications } })
+        return connectWithToken(tokenRes.data.authenticate.jwtToken, {})
     }
 
     const connectGoogleWithAccessCode = async (code: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
@@ -181,26 +128,14 @@ const useAccountFunctions = (version: string) => {
 
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken, authProvider } })
         
-        const connectRes = await connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
-        appDispatch({ type: AppReducerActionType.Login, payload: { account: connectRes?.account, 
-            token: res.data.registerAccountExternalAuth.jwtToken,
-            messageSubscription: connectRes?.subscription, 
-            unreadConversations: connectRes?.unreadConversations,
-            messageSubscriber: connectRes?.subscriber,
-            unreadNotifications: connectRes?.unreadNotifications } })
+        return connectWithToken(res.data.registerAccountExternalAuth.jwtToken, {})
     }
 
     const completeExternalAuth = async (email: string, idToken: string, authProvider: AuthProviders) => {
         //Important to use the imperative form of Apollo here (no useQuery, useMutation, ...), otherwise some page prerenders fail during the NextJs build, trying to create an Apollo client prematurely
         const client = getApolloClient(version)
         const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_EXTERNAL_AUTH, variables: { email, token: idToken, authProvider } })
-        const res = await connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
-        appDispatch({ type: AppReducerActionType.Login, payload: { account: res?.account, 
-            token: authenticateRes.data.authenticateExternalAuth.jwtToken,
-            messageSubscription: res?.subscription, 
-            messageSubscriber: res?.subscriber,
-            unreadConversations: res?.unreadConversations, 
-            unreadNotifications: res?.unreadNotifications } })
+        return connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken, {})
     }
 
     const connectApple = async (id_token: string, nonce: string, firstName: string, lastName: string, onNewAccountNeeded: (name: string, email: string, token: string) => void) => {
@@ -263,17 +198,10 @@ const useAccountFunctions = (version: string) => {
     const registerAccount = async (email: string, password: string, name: string, language: string) => {
         const client = getApolloClient(version)
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT, variables: { email, password, name, language } })
-        const connectRes = await connectWithToken(res.data.registerAccount.jwtToken)
-
-        appDispatch({ type: AppReducerActionType.Login, payload: { account: connectRes?.account, 
-        token: res.data.registerAccount.jwtToken,
-        messageSubscription: connectRes?.subscription, 
-        messageSubscriber: connectRes?.subscriber,
-        unreadConversations: connectRes?.unreadConversations, 
-        unreadNotifications: connectRes?.unreadNotifications } })
+        return connectWithToken(res.data.registerAccount.jwtToken, {})
     }
 
-    return { login, connectGoogleWithAccessCode, connectApple, completeExternalAuth, restoreSession, disconnect, 
+    return { login, connectGoogleWithAccessCode, connectApple, completeExternalAuth, connectWithToken, disconnect, 
         registerViaAuthProvider, registerAccount }
 }
 

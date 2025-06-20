@@ -5,7 +5,6 @@ import * as yup from 'yup'
 import { ErrorText } from "../misc"
 import Feedback from "../scaffold/Feedback"
 import { useContext, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { isValidPassword } from "@/utils"
 import GoogleLogo from '../../app/img/google-logo.svg'
 import AppleLogo from '../../app/img/apple-logo.svg'
@@ -16,6 +15,7 @@ import { appleAuthHelpers } from "react-apple-signin-auth"
 import { getCommonConfig } from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import useAccountFunctions from "@/lib/useAccountFunctions"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface Props {
     onClose: () => void
@@ -24,9 +24,9 @@ interface Props {
 }
 
 const RegisterForm = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [registrationStatus, setRegistrationStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
-    const t = appContext.i18n.translator
+    const t = uiContext.i18n.translator
     const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
     const { connectGoogleWithAccessCode, connectApple, registerAccount } = useAccountFunctions(p.version)
 
@@ -67,7 +67,7 @@ const RegisterForm = (p: Props) => {
                 p.onClose()
             },
             onError: (e: any) => {
-                setRegistrationStatus(fromError(e as Error, appContext.i18n.translator('requestError')))
+                setRegistrationStatus(fromError(e as Error, uiContext.i18n.translator('requestError')))
             }
         })
     }
@@ -85,7 +85,7 @@ const RegisterForm = (p: Props) => {
         })} onSubmit={async values => {
             setRegistrationStatus({ loading: true })
             try {
-                await registerAccount(values.email, values.password, values.name, appContext.i18n.lang.toLowerCase())
+                await registerAccount(values.email, values.password, values.name, uiContext.i18n.lang.toLowerCase())
                 setRegistrationStatus({ loading: false })
                 p.onClose()
             } catch(e) {
@@ -94,11 +94,11 @@ const RegisterForm = (p: Props) => {
         }}>
             { ({ handleChange, handleBlur, handleSubmit }) =>
                 <Form onSubmit={handleSubmit}>
-                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: appContext.lightMode ? 'light': 'dark' }}>
+                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<GoogleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerGoogleLogin}>{appContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
+                            onClick={triggerGoogleLogin}>{uiContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<AppleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerAppleLogin}>{appContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
+                            onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
                         <TextField id="name" name="name" placeholder={t('accountNameLabel')} onChange={handleChange('name')} onBlur={handleBlur('name')}/>
                         <ErrorMessage component={ErrorText} name="name"/>
                         <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>

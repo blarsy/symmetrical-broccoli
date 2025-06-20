@@ -10,9 +10,9 @@ const Page = () => {
       <Chat sx={{ flex: 1, overflow: 'auto', maxHeight: '100%' }} 
         onConversationSelected={(target, current) => {
           if(current) {
-            window.history.replaceState(null, '', `${target}`)
+            window.history.replaceState({...window.history.state}, '', `${target}`)
           } else {
-            window.history.replaceState(null, '', `chat/${target}`)
+            window.history.replaceState({...window.history.state}, '', `chat/${target}`)
           }
         }}/>
     </ConnectedLayout>

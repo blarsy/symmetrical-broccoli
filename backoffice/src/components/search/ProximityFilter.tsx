@@ -1,10 +1,10 @@
 import { Checkbox, FormControlLabel, IconButton, Slider, Stack, SxProps, Theme, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import EditIcon from '@mui/icons-material/EditOutlined'
 import { Location } from '@/lib/schema'
 import SetLocationDialog from "./SetLocationDialog"
-import NoLocation from "./NoCocation"
+import NoLocation from "./NoLocation"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface ProximitySettingsProps {
     address: string
@@ -21,10 +21,10 @@ interface ProximityParameters {
 }
 
 const Settings = (p: ProximitySettingsProps) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
 
     return <Stack>
-        <Typography variant="body1" color="primary">{`${p.distance} ${appContext.i18n.translator('distanceTo')}`}</Typography>
+        <Typography variant="body1" color="primary">{`${p.distance} ${uiContext.i18n.translator('distanceTo')}`}</Typography>
         <Stack direction="row" alignItems="center" gap="1rem">
             <Typography variant="body1" color="primary">{p.address}</Typography>
             <IconButton onClick={p.onSetNewLocationRequest}>
@@ -34,7 +34,7 @@ const Settings = (p: ProximitySettingsProps) => {
         <Slider color="primary" min={1} max={50} value={p.distance} onChange={(e, val) => p.onChange(val as number, p.excludeUnlocated) } />
         <FormControlLabel control={<Checkbox checked={!p.excludeUnlocated} onChange={e => {
             p.onChange(p.distance, !p.excludeUnlocated)
-        }} />} label={appContext.i18n.translator('includeUnlocatedResourcesLabel')} sx={{
+        }} />} label={uiContext.i18n.translator('includeUnlocatedResourcesLabel')} sx={{
             '& .MuiFormControlLabel-label': {
                 color: 'primary.main'
             }
@@ -49,7 +49,7 @@ interface Props {
 }
 
 const ProximityFilter = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [currentParameters, setCurrentParameters] = useState(p.value)
     const [settingLocation, setSettingLocation] = useState(false)
 
@@ -58,7 +58,7 @@ const ProximityFilter = (p: Props) => {
     }, [currentParameters])
 
     return <Stack sx={p.sx} alignItems="center">
-        <Typography variant="h4" textAlign="center" color="primary">{appContext.i18n.translator('proximityTitle')}</Typography>
+        <Typography variant="h4" textAlign="center" color="primary">{uiContext.i18n.translator('proximityTitle')}</Typography>
         { currentParameters.referenceLocation ? <Settings 
             address={ currentParameters.referenceLocation!.address } 
             distance={currentParameters.distanceToReferenceLocation} 

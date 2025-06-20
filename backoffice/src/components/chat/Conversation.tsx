@@ -1,17 +1,17 @@
 import { Stack, SxProps, Theme, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useContext, useEffect, useState } from "react"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
+import { AppContext } from "../scaffold/AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
 import ConversationHeader from "./ConversationHeader"
-import { ConversationDisplayData, ConversationState, Message } from "./lib"
+import { ConversationDisplayData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
-import { createMessageHandler } from "@/lib/useAccountFunctions"
-import { Subscription } from "zen-observable-ts"
+import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -134,19 +134,20 @@ export const asMessage = (msg: any): Message => {
 
 interface Props {
     sx?: SxProps<Theme>
-    conversationId?: number
 }
 
 const fromRawConversation = (rawConversation: any, currentAccountId: number, categories: Category[]): { conversation: ConversationDisplayData, messages: Message[] } => {
+    const participantId = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId === currentAccountId)).id
     const otherParticipant = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId != currentAccountId))
     const rawResource = rawConversation.conversationById.resourceByResourceId
     
     return {
         conversation: {
             id: rawConversation.conversationById.id,
-            participantId: otherParticipant.id,
+            participantId,
             otherAccount: {
                 id: otherParticipant.accountByAccountId.id,
+                participantId: otherParticipant.id,
                 name: otherParticipant.accountByAccountId.name,
                 willingToContribute: otherParticipant.accountByAccountId.willingToContribute,
                 imagePublicId: otherParticipant.accountByAccountId.imageByAvatarImageId.publicId
@@ -159,12 +160,15 @@ const fromRawConversation = (rawConversation: any, currentAccountId: number, cat
 
 const Conversation = (p: Props) => {
     const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+    const uiContext = useContext(UiContext)
+    const chatContext = useContext(ChatContext)
+    const chatDispatch = useContext(ChatDispatchContext)
     const [getConversation] = useLazyQuery(CONVERSATION_MESSAGES)
     const categories = useCategories()
     const [conversationData, setConversationData] = useState<ConversationState>(initial(false))
     const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
     const [currentMessages, setCurrentMessages] = useState<Message[]>()
+    const [conversationHasNewMessages, setConversationHasNewMessages] = useState(false)
 
     const loadConversation = async (id: number) => {
         setConversationData(initial(true))
@@ -178,49 +182,63 @@ const Conversation = (p: Props) => {
               otherAccountId: conversationData.conversation.otherAccount.id
             } })
             setTimeout(() => {
-              appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationData.conversation.participantId })
-            })
+              chatDispatch({ type: ChatReducerActionType.SetConversationRead, payload: conversationData.conversation.id })
+            }, 0)
         } catch (e) {
-            setConversationData(fromError(e, appContext.i18n.translator('requestError')))
+            setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
 
-    const setMessageSubscription = (handler: (raw: any) => void) => {
-      appContext.messageSubscription?.unsubscribe()
-      const newSubscription = appContext.messageSubscriber?.subscribe(handler)
-      appDispatch({ type: AppReducerActionType.SetMessageReceivedHandler, payload: newSubscription })
-    }
-
     const handleMessageOnCurrentConversation = (rawMsg: any) => {
-        console.log('examining msg', rawMsg)
-        if(rawMsg.data.messageReceived.message.participantByParticipantId.conversationByConversationId.id === p.conversationId ) {
-          setCurrentMessages(prev => ([ ...(prev || []), asMessage(rawMsg.data.messageReceived.message) ]))
-        } else {
-          createMessageHandler(appDispatch)(rawMsg.data.messageReceived.message)
+        if(rawMsg && rawMsg.participantByParticipantId.conversationByConversationId.id === chatContext.currentConversationId ) {
+          setCurrentMessages(prev => ([ ...(prev || []), asMessage(rawMsg) ]))
+          setConversationHasNewMessages(true)
         }
       }
 
     useEffect(() => {
-        if(p.conversationId && appContext.categories.data) {
-            loadConversation(p.conversationId)
-            setMessageSubscription(handleMessageOnCurrentConversation)
-            return () => {
-              setMessageSubscription(createMessageHandler(appDispatch))
-            }
+        if(chatContext.currentConversationId && uiContext.categories.data) {
+          loadConversation(chatContext.currentConversationId)
+          chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: handleMessageOnCurrentConversation })
+          
+          return () => {
+            chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: undefined })
+          }
         }
-    }, [p.conversationId, appContext.categories.data])
+    }, [chatContext.currentConversationId, uiContext.categories.data])
 
     return <Stack sx={p.sx}>
-        { p.conversationId ?
+        { chatContext.currentConversationId ?
             <LoadedZone loading={conversationData?.loading} error={conversationData?.error} containerStyle={{ maxHeight: '100%', flex: '1' }}>
                 { conversationData.data && [
-                    <ConversationHeader key="header" sx={{ borderTop: '1px solid #555', borderBottom: '1px solid #555' }} data={conversationData.data!.conversation}  />,
-                    <ConversationMessages key="messages" data={currentMessages!} />,
-                    <MessageComposer key="composer" conversation={conversationData.data.conversation} />
+                    <ConversationHeader key="header" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }} data={conversationData.data!.conversation}  />,
+                    <ConversationMessages hasNew={conversationHasNewMessages} key="messages" data={currentMessages!} 
+                      onBottom={() => setConversationHasNewMessages(false)}/>,
+                    <MessageComposer key="composer" conversation={conversationData.data.conversation} 
+                      onMessageSent={(id, text, imagePublicId) => {
+                        const newMessage = {
+                          createdAt: new Date(), text, image: imagePublicId, 
+                          user: { id: appContext.account!.id, name: appContext.account!.name, avatar: appContext.account!.avatarPublicId },
+                          id
+                        }
+                        setCurrentMessages(prev => ([ ...(prev || []), newMessage]))
+                        chatDispatch({ type: ChatReducerActionType.SetNewChatMessage, payload: {
+                          conversationId: conversationData.data?.conversation.id,
+                          created: new Date(),
+                          resourceId: conversationData.data?.conversation.resource?.id,
+                          resourceName: conversationData.data?.conversation.resource?.title,
+                          senderName: appContext.account!.name,
+                          text,
+                          resourceImage: (conversationData.data?.conversation.resource?.images && conversationData.data?.conversation.resource?.images.length > 0) ? conversationData.data?.conversation.resource?.images[0].publicId : '',
+                          image: imagePublicId,
+                          senderImage: appContext.account!.avatarPublicId
+                        } as NewMessage })
+                        setConversationHasNewMessages(true)
+                      }}/>
                 ]}
             </LoadedZone>
         :
-            <Typography variant="overline" align="center">{appContext.i18n.translator('noConversationSelected')}</Typography>
+            <Typography color="primary" variant="overline" align="center">{uiContext.i18n.translator('noConversationSelected')}</Typography>
         }
     </Stack>
 }

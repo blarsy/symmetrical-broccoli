@@ -11,6 +11,7 @@ import Link from "next/link"
 import { AccountAvatar, ResponsivePhotoBox } from "../misc"
 import { urlFromPublicId } from "@/lib/images"
 import DisplayLocation from "../user/DisplayLocation"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 const GET_RESOURCE = gql`query GetResource($id: Int!) {
     resourceById(id: $id) {
@@ -68,7 +69,7 @@ const ViewResource = (p: Props) => {
     const {loading, error, data} = useQuery(GET_RESOURCE, { variables: { id: p.resourceId }})
     const [resource, setResource] = useState<Resource>()
     const [zoomedImg, setZoomedImg] = useState<string>()
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
 
     useEffect(() => {
         if(data && categories.data) {
@@ -99,15 +100,15 @@ const ViewResource = (p: Props) => {
                     </Stack>
                 </Link>,
                 <Stack key="cats" direction="row" gap="0.5rem">
-                  <Typography color="primary" variant="body1">{appContext.i18n.translator('categoriesTitle')}</Typography>
+                  <Typography color="primary" variant="body1">{uiContext.i18n.translator('categoriesTitle')}</Typography>
                   {resource.categories.map(cat => <Chip key={cat.code} label={cat.name}/>)}
                 </Stack>,
                 <Typography key="desc" variant="body1" color="primary">{resource.description}</Typography>
             )
             if(resource.expiration) {
-                fields.push(<Tooltip key="exp" placement="bottom-start" title={dayjs(resource.expiration).format(appContext.i18n.translator('fulldateFormat'))}>
+                fields.push(<Tooltip key="exp" placement="bottom-start" title={dayjs(resource.expiration).format(uiContext.i18n.translator('fulldateFormat'))}>
                     <Stack direction="row">
-                        <Typography color="primary" variant="body1">{appContext.i18n.translator('expirationFieldLabel')}</Typography>
+                        <Typography color="primary" variant="body1">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
                         <Hourglass color="primary"/>
                         <Typography color="primary" variant="body1">{dayjs(resource.expiration).fromNow()}</Typography>
                     </Stack>
@@ -115,20 +116,20 @@ const ViewResource = (p: Props) => {
             }
             fields.push(
               <Stack direction="row" gap="0.5rem" key="nature">
-                <Typography color="primary" variant="body1">{appContext.i18n.translator('natureOptionsLabel')}</Typography>
-                { resource.isProduct && <Chip label={appContext.i18n.translator('isProduct')}/> }
-                { resource.isService && <Chip label={appContext.i18n.translator('isService')}/> }
+                <Typography color="primary" variant="body1">{uiContext.i18n.translator('natureOptionsLabel')}</Typography>
+                { resource.isProduct && <Chip label={uiContext.i18n.translator('isProduct')}/> }
+                { resource.isService && <Chip label={uiContext.i18n.translator('isService')}/> }
               </Stack>,
               <Stack direction="row" gap="0.5rem" key="type">
-                <Typography color="primary" variant="body1">{appContext.i18n.translator('exchangeTypeOptionsLabel')}</Typography>
-                { resource.canBeGifted && <Chip label={appContext.i18n.translator('canBeGifted')}/> }
-                { resource.canBeExchanged && <Chip label={appContext.i18n.translator('canBeExchanged')}/> }
+                <Typography color="primary" variant="body1">{uiContext.i18n.translator('exchangeTypeOptionsLabel')}</Typography>
+                { resource.canBeGifted && <Chip label={uiContext.i18n.translator('canBeGifted')}/> }
+                { resource.canBeExchanged && <Chip label={uiContext.i18n.translator('canBeExchanged')}/> }
               </Stack>)
             if(resource.canBeDelivered || resource.canBeTakenAway) {
               fields.push(<Stack direction="row" gap="0.5rem" key="deliv">
-                <Typography color="primary" variant="body1">{appContext.i18n.translator('deliveryOptionsLabel')}</Typography>
-                { resource.canBeDelivered && <Chip label={appContext.i18n.translator('canBeDelivered')}/> }
-                { resource.canBeTakenAway && <Chip label={appContext.i18n.translator('canBeTakenAway')}/> }
+                <Typography color="primary" variant="body1">{uiContext.i18n.translator('deliveryOptionsLabel')}</Typography>
+                { resource.canBeDelivered && <Chip label={uiContext.i18n.translator('canBeDelivered')}/> }
+                { resource.canBeTakenAway && <Chip label={uiContext.i18n.translator('canBeTakenAway')}/> }
               </Stack>)
             }
             if(resource.specificLocation) {

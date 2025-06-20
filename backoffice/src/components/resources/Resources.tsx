@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Typography } from '@mui/material'
+import { Button, Card, CardActions, CardContent, Dialog, IconButton, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import { useContext, useState } from 'react'
 import { AppContext } from '../scaffold/AppContextProvider'
@@ -13,6 +13,7 @@ import { urlFromPublicId } from '@/lib/images'
 import ExpirationIndicator from './ExpirationIndicator'
 import { ConfirmDialog } from '../misc'
 import Link from 'next/link'
+import { UiContext } from '../scaffold/UiContextProvider'
 
 export const RESOURCES = gql`query MyResources {
     myResources {
@@ -68,6 +69,7 @@ export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
 
 const Resources = () => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
@@ -76,7 +78,7 @@ const Resources = () => {
     return <Stack gap="1rem" overflow="auto">
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
             <Button variant="contained" startIcon={<PlusIcon/>}>
-              <Link href={{ pathname: `/webapp/${appContext.version}/resources/0` }}>{appContext.i18n.translator('addResourceButtonCaption')}</Link>
+              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
             </Button>
             <IconButton color="primary" onClick={() => refetch()}>
                 <RefreshIcon/>
@@ -99,7 +101,7 @@ const Resources = () => {
                     flex: '0 1 100%'
                 } })}>
                 <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                    <Typography noWrap component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${res.deleted ? `(${appContext.i18n.translator('deletedLabel')})` : ''} ${res.title}`}</Typography>
+                    <Typography noWrap component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${res.deleted ? `(${uiContext.i18n.translator('deletedLabel')})` : ''} ${res.title}`}</Typography>
                     <ExpirationIndicator value={res.expiration} />
                     <PictureGallery sx={{ justifyContent: "center" }} 
                         images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
@@ -107,11 +109,11 @@ const Resources = () => {
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-around' }}>
                     <Button startIcon={<EditIcon/>}>
-                      <Link href={{ pathname: `/webapp/${appContext.version}/resources/${res.id}` }}>{appContext.i18n.translator('modifyButtonCaption')}</Link>
+                      <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${res.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link>
                     </Button>
                     <Button onClick={() => {
 
-                    }} startIcon={<DeleteIcon/>}>{appContext.i18n.translator('deleteButtonCaption')}</Button>
+                    }} startIcon={<DeleteIcon/>}>{uiContext.i18n.translator('deleteButtonCaption')}</Button>
                 </CardActions>
             </Card>) }
             <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
@@ -124,7 +126,7 @@ const Resources = () => {
                 await deleteResource({ variables: { resourceId: deletingResourceId }})
               }
               setDeletingResourceId(undefined)
-            }} title={appContext.i18n.translator('confirmDeleteResourceTitle')} />
+            }} title={uiContext.i18n.translator('confirmDeleteResourceTitle')} />
         </LoadedZone>
     </Stack>
 }

@@ -1,62 +1,65 @@
-import { gql, useQuery } from "@apollo/client"
+import { gql, useLazyQuery, useQuery } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { Stack, SxProps, Theme, Typography } from "@mui/material"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { maxLength } from "@/lib/utils"
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { ConversationData } from "./lib"
 import ConversationImage from "./ConversationImage"
+import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export const MY_CONVERSATIONS = gql`query MyConversations {
-    myConversations {
-      nodes {
-        id
+  myConversations {
+    nodes {
+      id
+      created
+      messageByLastMessage {
+        text
         created
-        messageByLastMessage {
-          text
-          created
-        }
-        participantsByConversationId {
-          nodes {
-            id
-            unreadMessagesByParticipantId {
-              totalCount
-            }
-            accountByAccountId {
-              id
-              name
-              email
-              imageByAvatarImageId {
-                publicId
-              }
-            }
-          }
-        }
-        resourceByResourceId {
+      }
+      participantsByConversationId {
+        nodes {
           id
-          canBeGifted
-          canBeExchanged
-          title
+          unreadMessagesByParticipantId {
+            totalCount
+          }
           accountByAccountId {
-            name
             id
+            name
             email
             imageByAvatarImageId {
               publicId
             }
           }
-          resourcesImagesByResourceId {
-            nodes {
-              imageByImageId {
-                publicId
-              }
+          conversationId
+        }
+      }
+      resourceByResourceId {
+        id
+        canBeGifted
+        canBeExchanged
+        title
+        accountByAccountId {
+          name
+          id
+          email
+          imageByAvatarImageId {
+            publicId
+          }
+        }
+        resourcesImagesByResourceId {
+          nodes {
+            imageByImageId {
+              publicId
             }
           }
         }
       }
     }
-  }`
+  }
+}`
 
 const getConversationData = (rawConv:any, currentAccountId: number): ConversationData => {
     const rawRes = rawConv.resourceByResourceId
@@ -77,37 +80,65 @@ const getConversationData = (rawConv:any, currentAccountId: number): Conversatio
 interface Props {
     sx?: SxProps<Theme>
     currentConversation?: number
-    onConversationSelected: (conversationId: number) => void
+    onConversationSelected: (newConversationId: number, currentConversationId?: number) => void
 }
 
+interface ConversationCardProps {
+  conversation: ConversationData
+  onSelect: (newConversationId: number, currentConversationId?: number) => void
+}
+
+const ConversationCard = (p: ConversationCardProps) => {
+  const uiContext = useContext(UiContext)
+  const chatContext = useContext(ChatContext)
+  const chatDispatch = useContext(ChatDispatchContext)
+  const hasUnread = chatContext.unreadConversations.includes(p.conversation.id)
+
+  return <Stack direction="row" gap="0.5rem"
+      sx={theme => ({ 
+        cursor: 'pointer', 
+        backgroundColor: p.conversation.id === chatContext.currentConversationId ? theme.palette.primary.contrastText : 'initial',
+        alignItems: 'center'
+      })} onClick={ () => {
+        chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: p.conversation.id })
+        p.onSelect(p.conversation.id, chatContext.currentConversationId)
+      } }>
+      <ConversationImage accountImagePublicId={p.conversation.imagePublicId}
+        accountName={p.conversation.accountName} resourceImagePublicId={p.conversation.resourceImagePublicId} />
+      <Stack alignSelf="flex-start" flex="1">
+          <Typography color="primary" variant="overline" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{p.conversation.accountName || uiContext.i18n.translator('deletedAccount')}</Typography>
+          <Typography color="primary" variant="caption">{p.conversation.resourceName}</Typography>
+          <Typography color="primary" variant="body1" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{ maxLength(p.conversation.lastMessage, 50) }</Typography>
+      </Stack>
+      { hasUnread && <FiberManualRecordIcon color="primary" /> }
+  </Stack>
+}
 
 const Conversations = (p: Props) => {
-    const { data, loading, error } = useQuery(MY_CONVERSATIONS)
+    const { data, loading, error }= useQuery(MY_CONVERSATIONS)
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
+    const chatDispatch = useContext(ChatDispatchContext)
+    const chatContext = useContext(ChatContext)
+
+    useEffect(() => {
+      if(data) {
+        const conversations = data.myConversations.nodes.toReversed().map((rawConv: any) => getConversationData(rawConv, appContext.account!.id))
+        chatDispatch({ type: ChatReducerActionType.SetConversations, payload: conversations })
+      }
+    }, [data])
 
     return <LoadedZone loading={loading} error={error} containerStyle={[{
       padding: '0.5rem',
       overflow: 'auto'
     }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
-        { data && data.myConversations.nodes.toReversed().map((rawConv: any, idx: number) => {
-            const conversationData = getConversationData(rawConv, appContext.account!.id)
-            const hasUnread = appContext.unreadConversations.includes(rawConv.id)
-            return <Stack key={idx} direction="row" gap="0.5rem"
-              sx={theme => ({ 
-                cursor: 'pointer', 
-                backgroundColor: rawConv.id === p.currentConversation ? theme.palette.primary.contrastText : 'initial',
-                alignItems: 'center'
-              })} onClick={ () => p.onConversationSelected(conversationData.id) }>
-              <ConversationImage accountImagePublicId={conversationData.imagePublicId}
-                accountName={conversationData.accountName} resourceImagePublicId={conversationData.resourceImagePublicId} />
-              <Stack alignSelf="flex-start" flex="1">
-                  <Typography color="primary" variant="overline" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{conversationData.accountName || appContext.i18n.translator('deletedAccount')}</Typography>
-                  <Typography color="primary" variant="caption">{conversationData.resourceName}</Typography>
-                  <Typography color="primary" variant="body1" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{ maxLength(conversationData.lastMessage, 50) }</Typography>
-              </Stack>
-              { hasUnread && <FiberManualRecordIcon color="primary" /> }
-          </Stack>
-        }) }
+        { data && data.myConversations.nodes.length === 0 && 
+          <Typography color="primary" variant="caption">{uiContext.i18n.translator('noConversationYet')}</Typography>
+        }
+        { chatContext.conversations && chatContext.conversations.map((conv, idx) => <ConversationCard key={idx}
+          conversation={conv}
+          onSelect={p.onConversationSelected} />)
+        }
     </LoadedZone>
 }
 

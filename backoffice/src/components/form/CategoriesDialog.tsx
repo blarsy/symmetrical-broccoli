@@ -1,9 +1,9 @@
 import { Category } from "@/lib/schema"
 import { useContext, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material"
 import CategoriesSelector from "./CategoriesSelector"
 import useCategories from "@/lib/useCategories"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface Props {
     visible: boolean
@@ -12,12 +12,12 @@ interface Props {
 }
 
 const CategoriesDialog = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [currentCategories, setCurrentCategories] = useState<Category[]>(p.value)
     const categories = useCategories()
 
     return <Dialog maxWidth="xl" open={p.visible} onClose={() => p.onClose()}>
-        <DialogTitle>{appContext.i18n.translator('selectCategoriesDialogTitle')}</DialogTitle>
+        <DialogTitle>{uiContext.i18n.translator('selectCategoriesDialogTitle')}</DialogTitle>
         <DialogContent sx={{ width: '100%', height: '100vh' }}>
             <CategoriesSelector values={p.value.map(c => c.code)} 
                 onSelectionChanged={e => {
@@ -27,10 +27,10 @@ const CategoriesDialog = (p: Props) => {
                 }} />
         </DialogContent>
         <DialogActions>
-            <Button onClick={ () => p.onClose() }>{appContext.i18n.translator('cancelButton')}</Button>
+            <Button onClick={ () => p.onClose() }>{uiContext.i18n.translator('cancelButton')}</Button>
             <Button disabled={currentCategories.length === 0} onClick={() => {
                 p.onClose(currentCategories)
-            }}>{appContext.i18n.translator('okButton')}</Button>
+            }}>{uiContext.i18n.translator('okButton')}</Button>
         </DialogActions>
     </Dialog>
 }

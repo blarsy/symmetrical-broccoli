@@ -1,10 +1,10 @@
 import { Checkbox, FormControlLabel, Stack, Typography } from "@mui/material"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { useContext } from "react"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 const OptionLine = (p: { label: string, values: {[name: string]: boolean}, onChange: (newValues: {[name: string]: boolean}) => void}) => {
-    const appContext = useContext(AppContext)
-    const t = appContext.i18n.translator
+    const uiContext = useContext(UiContext)
+    const t = uiContext.i18n.translator
     
     return <Stack direction="row" alignItems="center" gap="1rem" margin="0 1rem">
         <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{p.label}</Typography>

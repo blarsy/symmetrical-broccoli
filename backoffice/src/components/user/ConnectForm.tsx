@@ -16,6 +16,7 @@ import { v4 as uuid } from 'uuid'
 import { getCommonConfig } from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import { AuthProviders } from "@/lib/utils"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface Props {
     onClose?: () => void
@@ -27,9 +28,10 @@ interface Props {
 
 const ConnectForm = (p: Props) => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const { connectGoogleWithAccessCode, login, connectApple } = useAccountFunctions(p.version)
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
-    const t = appContext.i18n.translator
+    const t = uiContext.i18n.translator
     const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
 
     const triggerGoogleLogin = useGoogleLogin({
@@ -87,7 +89,7 @@ const ConnectForm = (p: Props) => {
                 if(done) p.onClose && p.onClose()
             },
             onError: (e: any) => {
-                setConnectionStatus(fromError(e as Error, appContext.i18n.translator('requestError')))
+                setConnectionStatus(fromError(e as Error, uiContext.i18n.translator('requestError')))
             }
         })
     }
@@ -108,11 +110,11 @@ const ConnectForm = (p: Props) => {
         }}>
             { ({ handleChange, handleBlur, handleSubmit }) =>
                 <Form onSubmit={handleSubmit}>
-                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: appContext.lightMode ? 'light': 'dark' }}>
+                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<GoogleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerGoogleLogin}>{appContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
+                            onClick={triggerGoogleLogin}>{uiContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<AppleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerAppleLogin}>{appContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
+                            onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
                         <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
                         <TextField id="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
@@ -124,7 +126,7 @@ const ConnectForm = (p: Props) => {
                             </Stack>
                             <Link component="button" onClick={() => {
                                 p.onRegisterRequested()
-                            }}>{appContext.i18n.translator('noAccountYetButtonLink')}</Link>
+                            }}>{uiContext.i18n.translator('noAccountYetButtonLink')}</Link>
                         </Stack>
                         <Feedback visible={!!connectionStatus.error} onClose={() => {
                             setConnectionStatus({ loading: false })

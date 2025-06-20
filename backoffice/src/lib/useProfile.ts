@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react"
 import { Link, Location, parseLocationFromGraph } from "@/lib/schema"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
+import { UiContext } from "@/components/scaffold/UiContextProvider"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
     accountById(id: $id) {
@@ -55,6 +56,7 @@ const emptyProfileData = { links: [], location: null, preferences: { chatMessage
 
 function useProfile () {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [getPublicInfo, { data: publicInfoData, error: publicInfoError }] = useLazyQuery(GET_ACCOUNT_INFO)
     const [updateAccountPublicInfo] = useMutation(UPDATE_ACCOUNT_PUBLIC_INFO)
     const [profileData, setProfileData] = useState<DataLoadState<ProfileData>>(initial(true, emptyProfileData))
@@ -75,7 +77,6 @@ function useProfile () {
 
     useEffect(() => {
         if(appContext.account && !publicInfoData) {
-            console.log('loadig account public info')
             getPublicInfo({ variables: { id: appContext.account!.id } })
         }
     }, [appContext.account?.id])
@@ -93,7 +94,7 @@ function useProfile () {
                 }
             }))
         } else if(publicInfoError){
-            setProfileData(fromError(publicInfoError, appContext.i18n.translator('requestError')))
+            setProfileData(fromError(publicInfoError, uiContext.i18n.translator('requestError')))
         } else {
             setProfileData(initial(true, profileData.data || emptyProfileData))
         }

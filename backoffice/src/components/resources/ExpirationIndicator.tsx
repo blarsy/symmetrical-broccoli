@@ -3,10 +3,10 @@ import dayjs from "dayjs"
 import HourglassRemaining from "@mui/icons-material/HourglassTop"
 import HourGlassElapsed from '@mui/icons-material/HourglassBottom'
 import { useContext } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 const ExpirationIndicator = ({ value }: { value?: Date }) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const typedDate = typeof value === 'string' ? new Date(value) : value
     let content
 
@@ -22,12 +22,12 @@ const ExpirationIndicator = ({ value }: { value?: Date }) => {
             content =             [
                 <HourGlassElapsed key="icon" />,
                 <Typography key="text" variant="body1">
-                    { appContext.i18n.translator('expired')}
+                    { uiContext.i18n.translator('expired')}
                 </Typography>
             ]
         }
     } else {
-        content = <Typography key="text" variant="body1"> { appContext.i18n.translator('doesNotExpire') }</Typography>
+        content = <Typography key="text" variant="body1"> { uiContext.i18n.translator('doesNotExpire') }</Typography>
     }
 
     return <Stack flexDirection="row" alignItems="center">

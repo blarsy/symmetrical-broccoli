@@ -1,7 +1,6 @@
 import { Link, LinkTypes } from "@/lib/schema"
 import { Box, Button, IconButton, Popover, Stack, TextField, Typography } from "@mui/material"
 import { useContext, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import FacebookIcon from '@mui/icons-material/Facebook'
 import InstagramIcon from '@mui/icons-material/Instagram'
 import TwitterIcon from '@mui/icons-material/Twitter'
@@ -11,6 +10,7 @@ import { ConfirmDialog, ErrorText, FieldTitle, RightAlignedModifyButtons } from 
 import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface LinkIconEditProps {
     value: LinkTypes
@@ -77,23 +77,23 @@ interface Props {
 }
 
 const EditLinks = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [editedLinks, setEditedLinks] = useState<number[]>([])
     const [currentLinks, setCurrentLinks] = useState<Link[]>(p.links)
     const [linkToDelete, setLinkToDelete] = useState<number | null>(null)
     const [deleteLinkState, setDeleteLinkState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
     return <Stack padding="5px">
-        <FieldTitle title={appContext.i18n.translator('linksEditTitle')} />
+        <FieldTitle title={uiContext.i18n.translator('linksEditTitle')} />
         <Button startIcon={<PlusIcon/>} onClick={() => {
             setCurrentLinks([ ...currentLinks, { id: 0, label: '', url: '', type: LinkTypes.web } ])
             setEditedLinks([...editedLinks, currentLinks.length])
-        }}>{appContext.i18n.translator('addLinkButtonCaption')}</Button>
+        }}>{uiContext.i18n.translator('addLinkButtonCaption')}</Button>
 
         { currentLinks.map((link, idx) => {
             return <Formik key={idx} initialValues={{...link, ...{ index: idx }}} validationSchema={yup.object().shape({
                 label: yup.string(),
-                url: yup.string().url(appContext.i18n.translator('mustBeWellFormedURL')).required('required_field')
+                url: yup.string().url(uiContext.i18n.translator('mustBeWellFormedURL')).required('required_field')
             })} onSubmit={values => {
                 const newLinks = [...currentLinks]
                 newLinks[idx] = values
@@ -129,7 +129,7 @@ const EditLinks = (p: Props) => {
                     }}
                     onDelete={() => setLinkToDelete(idx)}
                     saveButtonDisabled={!f.dirty} />
-                    <ConfirmDialog processing={deleteLinkState.loading} title={ appContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
+                    <ConfirmDialog processing={deleteLinkState.loading} title={ uiContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
                         onClose={ response => {
                             if(response) {
                                 setCurrentLinks(prev => {
@@ -139,7 +139,7 @@ const EditLinks = (p: Props) => {
                                         try {
                                             p.onDone(newLinks)
                                         } catch(e) {
-                                            setDeleteLinkState(fromError(e as Error, appContext.i18n.translator('requestError')))
+                                            setDeleteLinkState(fromError(e as Error, uiContext.i18n.translator('requestError')))
                                         } finally {
                                             setDeleteLinkState(fromData(undefined))
                                         }

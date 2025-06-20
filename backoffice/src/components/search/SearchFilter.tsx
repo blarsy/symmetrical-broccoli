@@ -12,6 +12,7 @@ import { Location } from "@/lib/schema"
 import ResourceAttributesFilter from "./ResourceAttributesFilter"
 import ProximityFilter from "./ProximityFilter"
 import { useDebounce } from "use-debounce"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export interface SearchParameters {
     canBeDelivered: boolean
@@ -34,6 +35,7 @@ interface Props {
 
 const SearchFilter = (p: Props) => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [searchParameters, setSearchParameters] = useState(p.value)
     const [debouncedSearchParameters] = useDebounce(searchParameters, 700)
     const [showOptions, setShowOptions] = useState(false)
@@ -49,7 +51,7 @@ const SearchFilter = (p: Props) => {
     return <Stack flex="1" paddingLeft="2rem" paddingRight="2rem">
         <Stack direction="row">
             <Button variant="contained" endIcon={showOptions ? <ExpandLess /> : <ExpandMore />} onClick={e => setShowOptions(prev => !prev)}>
-                {appContext.i18n!.translator('moreOptions')}
+                {uiContext.i18n!.translator('moreOptions')}
             </Button>
             <OutlinedInput endAdornment={<InputAdornment position="end">
                 <Search sx={{ color: primaryColor}}/>
@@ -73,7 +75,7 @@ const SearchFilter = (p: Props) => {
             </IconButton>
             <ResourceAttributesFilter sx={{ flex: 1 }} searchParameters={searchParameters} onChange={setParams} />
             <Stack sx={{ flex: 1, alignItems: 'center' }}>
-                <Typography variant="h4" textAlign="center" color="primary">{appContext.i18n.translator('categoriesTitle')}</Typography>
+                <Typography variant="h4" textAlign="center" color="primary">{uiContext.i18n.translator('categoriesTitle')}</Typography>
                 <CategoriesSelector values={searchParameters.categoryCodes} onSelectionChanged={selectedCats => setParams({ categoryCodes: selectedCats })}/>
             </Stack>
             <ProximityFilter sx={{ flex: 1 }}

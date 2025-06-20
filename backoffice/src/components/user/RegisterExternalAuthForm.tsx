@@ -2,13 +2,13 @@ import { AuthProviders } from "@/lib/utils"
 import { ErrorMessage, Form, Formik } from "formik"
 import { useContext, useState } from "react"
 import * as yup from 'yup'
-import { AppContext } from "../scaffold/AppContextProvider"
 import { gql, useMutation } from "@apollo/client"
 import { Button, Stack, TextField } from "@mui/material"
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
 import { ErrorText } from "../misc"
 import useAccountFunctions from "@/lib/useAccountFunctions"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface Props {
     suggestedName: string
@@ -28,8 +28,8 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
 }`
 
 const RegisterExternalAuthForm = (p: Props) => {
-    const appContext = useContext(AppContext)
-    const t = appContext.i18n.translator
+    const uiContext = useContext(UiContext)
+    const t = uiContext.i18n.translator
     const [registrationStatus, setRegistrationStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const [registerAccount, { loading }] = useMutation(REGISTER_ACCOUNT_EXTERNAL_AUTH)
     const { completeExternalAuth } = useAccountFunctions(p.version)
@@ -41,7 +41,7 @@ const RegisterExternalAuthForm = (p: Props) => {
             setRegistrationStatus({ loading: true })
             try {
                 const res = await registerAccount({ variables: { accountName: values.name, email: p.email, 
-                    language: appContext.i18n.lang.toLowerCase(), token: p.token, authProvider: p.provider } } )
+                    language: uiContext.i18n.lang.toLowerCase(), token: p.token, authProvider: p.provider } } )
                 setRegistrationStatus({ loading: false })
                 if(res.data) {
                     if(!res.data.registerAccountExternalAuth.jwtToken) {
@@ -56,8 +56,8 @@ const RegisterExternalAuthForm = (p: Props) => {
         }}>
             { ({ handleChange, handleBlur, handleSubmit }) =>
                 <Form onSubmit={handleSubmit}>
-                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: appContext.lightMode ? 'light': 'dark' }}>
-                        <TextField id="name" name="name" onChange={handleChange('name')} onBlur={handleBlur('name')} placeholder={appContext.i18n.translator('accountNameLabel')}/>
+                    <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
+                        <TextField id="name" name="name" onChange={handleChange('name')} onBlur={handleBlur('name')} placeholder={uiContext.i18n.translator('accountNameLabel')}/>
                         <ErrorMessage component={ErrorText} name="name"/>
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">

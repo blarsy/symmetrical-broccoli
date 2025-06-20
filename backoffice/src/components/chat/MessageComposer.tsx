@@ -7,6 +7,7 @@ import Send from '@mui/icons-material/Send'
 import { gql, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { AppContext } from "../scaffold/AppContextProvider"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
     createMessage(
@@ -19,6 +20,7 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
 
 interface Props {
     conversation: ConversationDisplayData
+    onMessageSent: (id: number, text: string, imagePublicId?: string) => void
 }
 
 const MessageComposer = (p: Props) => {
@@ -27,19 +29,21 @@ const MessageComposer = (p: Props) => {
     const theme = useTheme()
     const [createMessage] = useMutation(CREATE_MESSAGE)
     const [sendMessageStatus, setSendMessageStatus] = useState(initial<undefined>(false))
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
 
     const sendMessage = async (message: string, imagePublicId?: string) => {
         setSendMessageStatus(initial(true))
         try {
-            await createMessage({ variables: { 
-                text: message, 
+            const res = await createMessage({ variables: { 
+                text: message,
                 resourceId: p.conversation.resource!.id, 
                 otherAccountId: p.conversation.otherAccount.id,
                 imagePublicId } })
             setSendMessageStatus(fromData(undefined))
+            setDraftMessage('')
+            p.onMessageSent(res.data.createMessage.integer, message, imagePublicId)
         } catch(e) {
-            setSendMessageStatus(fromError(e, appContext.i18n.translator('requestError')))
+            setSendMessageStatus(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
 

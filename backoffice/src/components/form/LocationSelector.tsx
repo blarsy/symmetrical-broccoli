@@ -3,12 +3,12 @@ import {APIProvider, Map, Marker, useMarkerRef} from '@vis.gl/react-google-maps'
 import { Location } from '@/lib/schema'
 import { useContext, useEffect, useState } from 'react'
 import { setDefaults, setLanguage, fromLatLng, OutputFormat } from "react-geocode"
-import { AppContext } from '../scaffold/AppContextProvider'
 import { CircularProgress, Stack } from '@mui/material'
 import { primaryColor } from '@/utils'
 import { DEFAULT_LOCATION_LAT_LNG } from '@/lib/constants'
 import Feedback from '../scaffold/Feedback'
 import LocationAutoComplete from './LocationAutoComplete'
+import { UiContext } from '../scaffold/UiContextProvider'
 
 const { mapsApiKey } = getCommonConfig()
 
@@ -24,11 +24,11 @@ interface Props {
 const LocationSelector = (p: Props) => {
     const [currentLocation, setCurrentLocation] = useState<Location | null>(p.value)
     const [addressQueryState, setAddressQueryState] = useState<{ querying: boolean, error?: Error }>({ querying: false })
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [markerRef, marker] = useMarkerRef()
 
     useEffect(() => {
-        setLanguage(appContext.i18n.lang)
+        setLanguage(uiContext.i18n.lang)
     }, [])
 
     useEffect(() => {

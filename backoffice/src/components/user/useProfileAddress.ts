@@ -3,6 +3,7 @@ import { gql, useLazyQuery } from "@apollo/client"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { parseLocationFromGraph, Location } from "@/lib/schema"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
     accountById(id: $id) {
@@ -18,6 +19,7 @@ export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
 
 export default () => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [getLocation] = useLazyQuery(ACCOUNT_LOCATION)
     const [state, setState] = useState(initial(true, null as Location | null))
 
@@ -28,7 +30,7 @@ export default () => {
 
             setState(fromData(defaultLocation))
         } catch(e) {
-            setState(fromError(e, appContext.i18n.translator('requestError')))
+            setState(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
 

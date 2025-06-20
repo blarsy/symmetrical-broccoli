@@ -1,11 +1,12 @@
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { useContext, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
-import { Alert, Backdrop, CircularProgress, FormControl, FormControlLabel, IconButton, Popover, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material"
+import { Backdrop, CircularProgress, FormControl, FormControlLabel, IconButton, Popover, Radio, RadioGroup, Stack, TextField, Typography } from "@mui/material"
 import { FieldTitle } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import SmartPhone from '@mui/icons-material/Vibration'
 import Feedback from "../scaffold/Feedback"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
     accountById(id: $id) {
@@ -35,7 +36,7 @@ interface PrefSelectorProps {
 }
 
 const PrefSelector = (p: PrefSelectorProps) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [currentValue, setCurrentValue] = useState<{ numberOfDaysBetweenSummaries: number | null | '' }>(p.value)
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -52,7 +53,7 @@ const PrefSelector = (p: PrefSelectorProps) => {
                 }}>
                 <FormControlLabel color="primary" value="push" control={<Radio />}
                     label={<Stack direction="row" gap="1rem" alignItems="center">
-                        <Typography variant="body1" color="primary">{appContext.i18n.translator('notificationOptionPushLabel')}</Typography>
+                        <Typography variant="body1" color="primary">{uiContext.i18n.translator('notificationOptionPushLabel')}</Typography>
                         <IconButton onMouseEnter={e => setAnchorEl(e.currentTarget)}>
                             <SmartPhone color="primary"/>
                         </IconButton>
@@ -60,11 +61,11 @@ const PrefSelector = (p: PrefSelectorProps) => {
                             vertical: 'bottom',
                             horizontal: 'left',
                         }} onClose={() => setAnchorEl(null)}>
-                            <Typography sx={{ padding: '0.5rem' }} color="primary" variant="body1">{appContext.i18n.translator('requiresTheAppPopover')}</Typography>
+                            <Typography sx={{ padding: '0.5rem' }} color="primary" variant="body1">{uiContext.i18n.translator('requiresTheAppPopover')}</Typography>
                         </Popover>
                     </Stack>} />
                 <FormControlLabel color="primary" value="emailSummary" control={<Radio />}
-                    label={<Typography variant="body1" color="primary">{appContext.i18n.translator('notificationOptionEmailSummaryLabel')}</Typography>} />
+                    label={<Typography variant="body1" color="primary">{uiContext.i18n.translator('notificationOptionEmailSummaryLabel')}</Typography>} />
             </RadioGroup>
         </FormControl>
         <RadioGroup sx={{ paddingLeft: '3rem' }} name="emailSummaryInterval" value={currentValue.numberOfDaysBetweenSummaries} 
@@ -79,7 +80,7 @@ const PrefSelector = (p: PrefSelectorProps) => {
                 [1, 3, 7, 30].map(val => <FormControlLabel key={val} disabled={currentValue.numberOfDaysBetweenSummaries === null} 
                     color="primary" value={val} control={<Radio />}
                     label={<Typography variant="body1" color="primary">
-                        {`${appContext.i18n.translator('maximum')} ${val} ${appContext.i18n.translator('days')}`}
+                        {`${uiContext.i18n.translator('maximum')} ${val} ${uiContext.i18n.translator('days')}`}
                     </Typography>} />
                 )
             }
@@ -89,6 +90,7 @@ const PrefSelector = (p: PrefSelectorProps) => {
 
 const Preferences = () => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const { data, loading, error } = useQuery(GET_PREFERENCES, { variables: { id: appContext.account?.id } })
     const [update, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_BROADCAST_PREFS)
 
@@ -110,13 +112,13 @@ const Preferences = () => {
 
     return <LoadedZone loading={loading} error={error} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         <Stack sx={{ maxWidth: '40rem', paddingBottom: '1rem', gap: '2rem' }}>
-            <Typography textAlign="center" color="primary" variant="h1">{appContext.i18n.translator('prefPageTitle')}</Typography>
-            <PrefSelector value={ prefs.pref1 } title={appContext.i18n.translator('chatMessageNotificationsTitle')}
+            <Typography textAlign="center" color="primary" variant="h1">{uiContext.i18n.translator('prefPageTitle')}</Typography>
+            <PrefSelector value={ prefs.pref1 } title={uiContext.i18n.translator('chatMessageNotificationsTitle')}
                 onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
                     { eventType: 1, daysBetweenSummaries: numberOfDaysBetweenSummaries},
                     { eventType: 2, daysBetweenSummaries: prefs.pref2.numberOfDaysBetweenSummaries }
                 ] } })} />
-            <PrefSelector value={ prefs.pref2 }  title={appContext.i18n.translator('newResourceNotificationsTitle')}
+            <PrefSelector value={ prefs.pref2 }  title={uiContext.i18n.translator('newResourceNotificationsTitle')}
                 onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
                     { eventType: 1, daysBetweenSummaries: prefs.pref1.numberOfDaysBetweenSummaries},
                     { eventType: 2, daysBetweenSummaries: numberOfDaysBetweenSummaries }

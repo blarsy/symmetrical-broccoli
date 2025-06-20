@@ -1,6 +1,5 @@
-import { Stack, Button, Typography, Alert } from '@mui/material'
+import { Stack, Button, Typography } from '@mui/material'
 import { useContext, useRef, useState } from 'react'
-import { AppContext } from '../scaffold/AppContextProvider'
 import ReactCrop, { type Crop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { LoadingButton } from '@mui/lab'
@@ -8,6 +7,7 @@ import { fromData, fromError, initial } from '@/lib/DataLoadState'
 import { STANDARD_RESOURCE_IMAGE_SQUARE_SIZE } from '@/lib/constants'
 import { uploadImage } from '@/lib/images'
 import Feedback from '../scaffold/Feedback'
+import { UiContext } from '../scaffold/UiContextProvider'
 
 const previewCroppedImage = async (canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop) => {
     const ctx = canvas.getContext('2d')
@@ -116,7 +116,7 @@ interface Props {
 }
 
 const ImageUpload = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [imageFile, setImageFile] = useState<File | undefined>()
     const [uploadState, setUploadState] = useState(initial(false, undefined))
     const [crop, setCrop] = useState<Crop>()
@@ -143,8 +143,8 @@ const ImageUpload = (p: Props) => {
                     setImageFile(file)
                 }
             }}/>
-        <Button variant="outlined" onClick={() => fileInputRef.current?.click()} color="primary">{appContext.i18n.translator('selectLocalFileButton')}</Button>
-        <Typography color="primary" variant="caption">{appContext.i18n.translator('dragImageHere')}</Typography>
+        <Button variant="outlined" onClick={() => fileInputRef.current?.click()} color="primary">{uiContext.i18n.translator('selectLocalFileButton')}</Button>
+        <Typography color="primary" variant="caption">{uiContext.i18n.translator('dragImageHere')}</Typography>
         { imageFile && <Stack gap="0.5rem">
             <ReactCrop key="crop"
                 crop={crop} onComplete={(c) => setCompleteCrop(c)} 
@@ -153,7 +153,7 @@ const ImageUpload = (p: Props) => {
                 <img ref={imgRef} src={URL.createObjectURL(imageFile)} style={{ width: '100%' }} alt="preview" />
             </ReactCrop>
             <Stack>
-                { !crop && <Typography textAlign="center" variant="body1">{appContext.i18n.translator('drawASquareWithinTheImage')}</Typography> }
+                { !crop && <Typography textAlign="center" variant="body1">{uiContext.i18n.translator('drawASquareWithinTheImage')}</Typography> }
                 <LoadingButton disabled={!crop} loading={uploadState.loading} key="button" variant="contained" onClick={async () => {
                     if(imgRef.current && completeCrop) {
                         try {
@@ -166,7 +166,7 @@ const ImageUpload = (p: Props) => {
                             setUploadState(fromError(e as Error, (e as Error).message))
                         }
                     }
-                }}>{appContext.i18n.translator('uploadButtonCaption')}</LoadingButton>
+                }}>{uiContext.i18n.translator('uploadButtonCaption')}</LoadingButton>
             </Stack>
         </Stack> }
         <Feedback severity="error" message={uploadState.error?.message} visible={!!uploadState.error}

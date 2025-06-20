@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 import { useState } from "react"
 import { Location } from '@/lib/schema'
-import NoLocation from "../search/NoCocation"
+import NoLocation from "../search/NoLocation"
 import SetLocationDialog from "../search/SetLocationDialog"
 import DisplayLocation from "./DisplayLocation"
 

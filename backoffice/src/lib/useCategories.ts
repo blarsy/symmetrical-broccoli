@@ -1,7 +1,7 @@
 import { gql, useLazyQuery } from "@apollo/client"
 import { useContext, useEffect } from "react"
-import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
 import { fromData, fromError, initial } from "./DataLoadState"
+import { UiContext, UiDispatchContext, UiReducerActionType } from "@/components/scaffold/UiContextProvider"
 
 export const GET_CATEGORIES = gql`query Categories($locale: String) {
     allResourceCategories(condition: {locale: $locale}) {
@@ -10,31 +10,31 @@ export const GET_CATEGORIES = gql`query Categories($locale: String) {
           name
         }
       }
-  }
+}
 `
 
 function useCategories () {
-    const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+    const uiContext = useContext(UiContext)
+    const uiDispatch = useContext(UiDispatchContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
 
     const loadCategories = async (lang: string) => {
         try {
-            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: initial(true, undefined) })
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: initial(true, undefined) })
             const res = await getCategories({ variables: { locale: lang } })
-            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
-            appDispatch({ type: AppReducerActionType.SetCategoriesState, payload: fromError(e, appContext.i18n.translator('requestError')) })
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
         }
     }
 
     useEffect(() => {
-        if(!appContext.categories.data && !appContext.categories.loading) {
-            loadCategories(appContext.i18n.lang)
+        if(!uiContext.categories.data && !uiContext.categories.loading) {
+            loadCategories(uiContext.i18n.lang)
         }
-    }, [appContext.i18n.lang])
+    }, [uiContext.i18n.lang])
 
-    return appContext.categories
+    return uiContext.categories
 }
 
 export default useCategories

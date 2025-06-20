@@ -1,12 +1,12 @@
 import { DEFAULT_LOCATION_LAT_LNG } from "@/lib/constants"
-import { Autocomplete, AutocompleteRenderInputParams, Stack, TextField } from "@mui/material"
+import { Autocomplete, AutocompleteRenderInputParams, TextField } from "@mui/material"
 import { CSSProperties, useContext, useEffect, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { useDebounce } from "use-debounce"
 import { setLanguage } from "react-geocode"
 import { Location } from "@/lib/schema"
 import LoadedZone from "../scaffold/LoadedZone"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 interface DebouncedTextFieldProps {
     params: AutocompleteRenderInputParams
@@ -44,20 +44,19 @@ interface Props {
 }
 
 const LocationAutoComplete = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [suggestions, setSuggestions] = useState<google.maps.places.PlacePrediction[]>([])
     const [loadingState, setLoadingState] = useState(initial(true, undefined))
     
     const load = async () => {
         try {
+            setLanguage(uiContext.i18n.lang)
             if(!google.maps.places) {
                 await google.maps.importLibrary('places')
             }
-            setLanguage(appContext.i18n.lang)
-        } catch(e) {
-            setLoadingState(fromError(e, appContext.i18n.translator('reaquestError')))
-        } finally {
             setLoadingState(fromData(undefined))
+        } catch(e) {
+            setLoadingState(fromError(e, uiContext.i18n.translator('reaquestError')))
         }
     }
 
@@ -97,14 +96,14 @@ const LocationAutoComplete = (p: Props) => {
             renderInput={(params) => {
                 return <DebouncedTextField params={params} debounceDelay={700}
                     value={p.value?.address || ''}
-                    label={appContext.i18n.translator('pleaseTypeTheAddress')}
+                    label={uiContext.i18n.translator('pleaseTypeTheAddress')}
                     onChange={newVal => {
                         p.onChange({ 
                             latitude: p.value?.latitude || DEFAULT_LOCATION_LAT_LNG.latitude,
                             longitude: p.value?.longitude || DEFAULT_LOCATION_LAT_LNG.longitude,
                             address: newVal
                         })
-                        google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({ language: appContext.i18n.lang, input: newVal })
+                        google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({ language: uiContext.i18n.lang, input: newVal })
                         .then(res => {
                             setSuggestions(res.suggestions.map(s => s.placePrediction!).filter(pp => pp.text && pp.text.text))
                         })

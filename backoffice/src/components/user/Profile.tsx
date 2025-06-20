@@ -13,6 +13,7 @@ import EditLinks from "./EditLinks"
 import EditAddress from "./EditAddress"
 import Feedback from "../scaffold/Feedback"
 import useAccountFunctions from "@/lib/useAccountFunctions"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
@@ -45,7 +46,7 @@ interface Props {
 }
 
 const InlineFormTextInput = (p: Props) => {
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [editing, setEditing] = useState(false)
     const textInputRef = useRef<HTMLInputElement>()
 
@@ -78,7 +79,7 @@ const InlineFormTextInput = (p: Props) => {
                 }} onDelete={p.onDelete} />
             <ErrorMessage component={ErrorText} name="value" />
             { submitCount > 0 && !isValid && <Stack style={{ marginTop: 20, alignSelf: 'center' }}>
-                <ErrorText>{t('someDataInvalid')}</ErrorText>
+                <ErrorText>{uiContext.i18n.translator('someDataInvalid')}</ErrorText>
             </Stack>}
         </Stack>
     }}
@@ -87,6 +88,7 @@ const InlineFormTextInput = (p: Props) => {
 
 const Profile = () => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const appDispatch = useContext(AppDispatchContext)
     const publicInfo = useProfile()
     const [newEmailMustBeActivated, setNewEmailMustBeActivated] = useState(false)
@@ -95,8 +97,8 @@ const Profile = () => {
     const [deletingAccount, setDeletingAccount] = useState(false)
     const [deletionConfirmed, setDeletionConfirmed] = useState(false)
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
-    const t = appContext.i18n.translator
-    const { disconnect } = useAccountFunctions(appContext.version)
+    const t = uiContext.i18n.translator
+    const { disconnect } = useAccountFunctions(uiContext.version)
 
     return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         { publicInfo.profileData.data && <Stack sx={theme => ({ 

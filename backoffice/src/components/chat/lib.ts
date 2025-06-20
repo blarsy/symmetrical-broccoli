@@ -5,7 +5,7 @@ export interface ConversationDisplayData {
     id: number
     participantId: number
     resource?: Resource
-    otherAccount: { id: number, name: string, willingToContribute: boolean, imagePublicId: string } 
+    otherAccount: { id: number, participantId: number, name: string, willingToContribute: boolean, imagePublicId: string } 
 }
 
 export interface ConversationState extends DataLoadState<{
@@ -37,4 +37,16 @@ export interface ConversationData {
     numberOfUnreadMessages: number
     lastMessage?: string
     lastMessageDate?: Date
+}
+
+export interface NewMessage {
+    conversationId: number
+    senderName: string
+    senderImage?: string
+    resourceId: number
+    resourceName: string
+    resourceImage?: string
+    text: string
+    image?: string
+    created: Date
 }

@@ -2,8 +2,8 @@ import { IconButton, Stack, SxProps, Theme, Typography, useTheme } from "@mui/ma
 import { useContext, useState } from "react"
 import Arrow from '@/app/img/fleche.svg'
 import EmptyImage from '@/app/img/PHOTOS.svg'
-import { AppContext } from "./AppContextProvider"
 import { ResponsivePhotoBox } from "../misc"
+import { UiContext } from "./UiContextProvider"
 
 interface Props {
     images: {
@@ -19,7 +19,7 @@ interface Props {
 
 const PictureGallery = (p: Props) => {
     const theme = useTheme()
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [currentImage, setCurrentImage] = useState(0)
 
     if(p.images.length === 0){
@@ -28,7 +28,7 @@ const PictureGallery = (p: Props) => {
              ...p.sx }}>
             <ResponsivePhotoBox>
                 <EmptyImage fill={theme.palette.primary.main} width="100%"/>
-                <Typography variant="body1" textAlign="center">{appContext.i18n.translator('noPicture')}</Typography>
+                <Typography variant="body1" textAlign="center">{uiContext.i18n.translator('noPicture')}</Typography>
             </ResponsivePhotoBox>
         </Stack>
     }

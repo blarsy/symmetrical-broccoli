@@ -107,7 +107,8 @@ const resources = {
             "accountWillBeDefinitivelyDeleted": "Deleting your account will erase all information we have about you.\nYou will not be able to connect anymore, and Tope-là will not be able to retrieve your information.",
             "confirmAccountDeletionDialogTitle": "Confirmation of account deletion",
             "deleteAccountButton": "Delete",
-            "iAmSure": "This is what I want"
+            "iAmSure": "This is what I want",
+            "noConversationYet": "No converstation yet ..."
         }
     },
     fr: { 
@@ -215,7 +216,8 @@ const resources = {
             "accountWillBeDefinitivelyDeleted": "Effacer votre compte éliminera toute les informations que nous détenons de vous.\nIl ne vous sera plus possible de vous reconnecter, et Tope-là ne sera plus en mesure de retrouver vos informations.",
             "confirmAccountDeletionDialogTitle": "Confirmation d'effacement du compte",
             "deleteAccountButton": "Effacer",
-            "iAmSure": "C'est bien ce que je veux"
+            "iAmSure": "C'est bien ce que je veux",
+            "noConversationYet": "Aucune conversation encore ..."
         }
     }
 }

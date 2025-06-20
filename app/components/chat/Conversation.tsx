@@ -74,9 +74,9 @@ const Conversation = ({ route }: RouteProps) => {
 
     const setConversationRead = () => {
       if(conversationContext.conversationState.data?.resource && conversationContext.messagesState.messages.data) {
-          setParticipantRead({ variables: { 
-          resourceId: conversationContext.conversationState.data?.resource?.id, 
-          otherAccountId: conversationContext.conversationState.data?.otherAccount.id
+        setParticipantRead({ variables: { 
+            resourceId: conversationContext.conversationState.data?.resource?.id, 
+            otherAccountId: conversationContext.conversationState.data?.otherAccount.id
         } })
         appDispatch({ type: AppReducerActionType.SetConversationRead, payload: conversationContext.conversationState.data?.participantId })
       }

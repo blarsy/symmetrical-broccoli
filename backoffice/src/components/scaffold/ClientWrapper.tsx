@@ -1,10 +1,10 @@
 "use client"
 import createTheme from '@/theme'
-import {  CssBaseline, Snackbar, Stack, ThemeProvider, Typography } from '@mui/material'
+import {  CssBaseline, ThemeProvider } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
-import AppContextProvider, { AppContext, AppDispatchContext, AppReducerActionType } from './AppContextProvider'
+import AppContextProvider, { AppContext } from './AppContextProvider'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -18,6 +18,8 @@ import { PropsWithVersion } from '@/lib/utils'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { getCommonConfig } from '@/config'
 import useAccountFunctions from '@/lib/useAccountFunctions'
+import ChatContextProvider from './ChatContextProvider'
+import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
 
 dayjs.extend(relativeTime)
 
@@ -32,11 +34,12 @@ const getNavigatorLanguage = () => {
 const { googleApiKey } = getCommonConfig()
 
 const Translatable = ({ children, version }: PropsWithVersion) => {
-    const appDispatcher = useContext(AppDispatchContext)
+    const uiDispatcher = useContext(UiDispatchContext)
     const appContext = useContext(AppContext)
+    const uiContext= useContext(UiContext)
     const [theme, setTheme] = useState(undefined as Theme | undefined)
     const defaultDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
-    const { restoreSession } = useAccountFunctions(version)
+    const { connectWithToken } = useAccountFunctions(version)
 
     const load = async () => {
         const token = localStorage.getItem('token')
@@ -50,41 +53,35 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         dayjs.locale(uiLanguage)
 
         if(!token) {
-            appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
+            uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
         } else {
             try {
-                await restoreSession(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
+                await connectWithToken(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
             } catch(e) {
                 // TODO: handle expired token
 
-                appDispatcher({ type: AppReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
+                uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
             }
         }
     }
     useEffect(() => { 
-        setTheme(createTheme(appContext.lightMode === undefined ? defaultDark : !appContext.lightMode)) 
-    }, [defaultDark, appContext.lightMode])
+        setTheme(createTheme(uiContext.lightMode === undefined ? defaultDark : !uiContext.lightMode)) 
+    }, [defaultDark, uiContext.lightMode])
 
     useEffect(() => {
         load()
     }, [])
 
-    return <LoadedZone loading={appContext.loading || !theme} error={appContext.error} containerStyle={{ 
+    return <LoadedZone loading={uiContext.loading || !theme} error={uiContext.error} containerStyle={{ 
             height: '100vh', 
             overflow: 'clip', 
             display: 'flex'
         }}>
         <ApolloProvider client={getApolloClient(version, appContext.token)}>
-            { !appContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={appContext.i18n.lang}>
+            { !uiContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
                 <ThemeProvider theme={theme!}>
                     <CssBaseline />
                     {children}
-                    <Snackbar open={!!appContext.newChatMessage} key="msg" autoHideDuration={null}>
-                        { appContext.newChatMessage && <Stack flexDirection="column" padding="0.5rem" sx={theme => ({ backgroundColor: theme.palette.primary.contrastText }) }>
-                            <Typography color="text" variant="body1">{appContext.newChatMessage.participantByParticipantId.accountByAccountId.name || appContext.i18n.translator('deletedAccount')}</Typography>
-                            <Typography color="text" variant="body2">{appContext.newChatMessage.text || '<Image>'}</Typography>
-                        </Stack> }
-                    </Snackbar>
                 </ThemeProvider>
             </LocalizationProvider>}
         </ApolloProvider>
@@ -93,11 +90,15 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
 
 export const ClientWrapper = ({ children, version }: PropsWithVersion) => {
     return <AppContextProvider>
-        <GoogleOAuthProvider clientId={googleApiKey}>
-            <Translatable version={version}>
-                { children }
-            </Translatable>
-        </GoogleOAuthProvider>
+        <ChatContextProvider>
+            <UiContextProvider>
+                <GoogleOAuthProvider clientId={googleApiKey}>
+                    <Translatable version={version}>
+                        { children }
+                    </Translatable>
+                </GoogleOAuthProvider>
+            </UiContextProvider>
+        </ChatContextProvider>
     </AppContextProvider>
 }
 

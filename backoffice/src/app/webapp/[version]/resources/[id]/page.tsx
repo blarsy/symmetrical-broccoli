@@ -9,6 +9,7 @@ import { fromServerGraphResource, Resource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import EditResource from "@/components/resources/EditResource"
+import { UiContext } from "@/components/scaffold/UiContextProvider"
 
 const GET_RESOURCE = gql`query GetResource($id: Int!) {
     resourceById(id: $id) {
@@ -61,7 +62,7 @@ const Wrapped = (p: { resourceId: number }) => {
     const [resource, setResource] = useState<DataLoadState<Resource | undefined>>(initial(true, undefined))
     const [getResource] = useLazyQuery(GET_RESOURCE)
     const categories = useCategories()
-    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
 
     const loadResource = async () => {
         try {
@@ -72,7 +73,7 @@ const Wrapped = (p: { resourceId: number }) => {
                 setResource(fromData(undefined))
             }
         } catch (e) {
-            setResource(fromError(e, appContext.i18n.translator('requestError')))
+            setResource(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
     useEffect(() => {
