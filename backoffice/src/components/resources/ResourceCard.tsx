@@ -54,9 +54,10 @@ const ResourceCard = (p: Props) => {
     } else {
         avatar = <img style={{ borderRadius: '25px', width: '5rem', height: '5rem' }} alt="image" src={urlFromPublicId(p.resource.images[0])} />
     }
-    return <Card key={p.resource.id} sx={theme => ({
+    return <Card key={p.resource.id} onClick={() => router.push(`/webapp/${p.version}/view/${p.resource.id}`)} sx={theme => ({
         display: 'flex',
         flexDirection: 'column',
+        cursor: 'pointer',
         flex: '0 1 23%',
         [theme.breakpoints.down('lg')]: {
             flex: '0 1 30%'
@@ -68,11 +69,7 @@ const ResourceCard = (p: Props) => {
             flex: '0 1 100%'
         }
     })}>
-      <CardHeader avatar={avatar} titleTypographyProps={{ 
-        sx: { cursor: 'pointer'},
-        onClick: () => {
-            router.push(`/webapp/${p.version}/view/${p.resource.id}`)
-        } }} title={p.resource.title} subheader={<ExpirationIndicator value={p.resource.expiration} />} />
+      <CardHeader avatar={avatar} title={p.resource.title} subheader={<ExpirationIndicator value={p.resource.expiration} />} />
         <CardMedia>
             <PictureGallery sx={{ justifyContent: "center" }} images={p.resource.images.map((publicId, idx: number) => 
                 ({ uri: urlFromPublicId(publicId), alt: idx.toString() }))} onImageClicked={img => setZoomedImg(img.uri)}/>
@@ -80,7 +77,10 @@ const ResourceCard = (p: Props) => {
       <CardContent>{limitTextLength(p.resource.description, 70)}</CardContent>
         <Dialog open={!!zoomedImg} onClose={() => setZoomedImg(undefined)} fullScreen>
             <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }}>
-                <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={() => setZoomedImg(undefined)} />
+                <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={e => {
+                    e.stopPropagation()
+                    setZoomedImg(undefined)
+                }} />
             </Stack>
         </Dialog>
     </Card>

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import LocationSelector from './LocationSelector'
-import { appContextDecorator } from '@/lib/storiesUtil'
+import { uiContextDecorator } from '@/lib/storiesUtil'
 import { Stack } from '@mui/material'
 
 const meta = {
@@ -12,7 +12,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {},
   args: {  },
-  decorators: [appContextDecorator(), Story => <Stack sx={{ height: '100vh', width: '100vw' }}>
+  decorators: [uiContextDecorator(), Story => <Stack sx={{ height: '100vh', width: '100vw' }}>
         <Story />
     </Stack>]
 } satisfies Meta<typeof LocationSelector>

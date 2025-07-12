@@ -1,2 +1,9 @@
 export const STANDARD_RESOURCE_IMAGE_SQUARE_SIZE = 400
 export const DEFAULT_LOCATION_LAT_LNG = {latitude: 50.6058984, longitude: 3.3881915}
+
+export const SWITCH_TO_CONTRIBUTION_MODE_REWARD = 30
+export const ADD_LOGO_REWARD = 20
+export const ADD_LOCATION_REWARD = 20
+export const ADD_LINK_REWARD = 20
+export const ADD_RESOURCE_PICTURE_REWARD = 5
+export const CREATE_RESOURCE_REWARD = 5

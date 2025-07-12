@@ -1,7 +1,7 @@
 import { Alert, AlertColor, Stack, Tooltip, Typography } from "@mui/material"
 import InfoIcon from '@mui/icons-material/Info'
 import { useContext } from "react"
-import { AppContext } from "./AppContextProvider"
+import { UiContext } from "./UiContextProvider"
 
 interface Props {
     message?: string
@@ -12,8 +12,8 @@ interface Props {
 }
 
 const Feedback = ({ message, detail, severity, onClose, visible = true }: Props) => {
-    const appContext = useContext(AppContext)
-    if(!message) message = appContext.i18n?.translator('requestError')
+    const uiContext = useContext(UiContext)
+    if(!message) message = uiContext.i18n?.translator('requestError')
 
     if(visible) {
         return <Alert severity={severity} onClose={onClose}>

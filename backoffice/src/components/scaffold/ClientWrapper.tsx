@@ -7,6 +7,7 @@ import 'dayjs/locale/fr'
 import AppContextProvider, { AppContext } from './AppContextProvider'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useContext, useEffect, useState } from 'react'
 import { Theme } from '@emotion/react'
@@ -22,6 +23,7 @@ import ChatContextProvider from './ChatContextProvider'
 import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
 
 dayjs.extend(relativeTime)
+dayjs.extend(utc)
 
 const getNavigatorLanguage = () => {
     navigator.languages.forEach(lang => {
@@ -52,14 +54,12 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         const translator = await i18n(uiLanguage)
         dayjs.locale(uiLanguage)
 
-        if(!token) {
-            uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
-        } else {
+        uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
+        if(token) {
             try {
                 await connectWithToken(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
             } catch(e) {
                 // TODO: handle expired token
-
                 uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
             }
         }

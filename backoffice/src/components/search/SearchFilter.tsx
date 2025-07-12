@@ -1,7 +1,6 @@
-import { Button, InputAdornment, OutlinedInput, Typography, Checkbox, FormControlLabel, IconButton } from "@mui/material"
+import { Button, InputAdornment, OutlinedInput, Typography, IconButton } from "@mui/material"
 import { Stack } from "@mui/system"
 import { useContext, useEffect, useState } from "react"
-import { AppContext } from "../scaffold/AppContextProvider"
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import Close from '@mui/icons-material/Close'
@@ -34,7 +33,6 @@ interface Props {
 }
 
 const SearchFilter = (p: Props) => {
-    const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const [searchParameters, setSearchParameters] = useState(p.value)
     const [debouncedSearchParameters] = useDebounce(searchParameters, 700)

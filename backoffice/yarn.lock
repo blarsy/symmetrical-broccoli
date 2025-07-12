@@ -4836,6 +4836,7 @@ __metadata:
     i18next-browser-languagedetector: ^7.2.0
     jsonwebtoken: ^9.0.0
     jwt-decode: ^4.0.0
+    keen-slider: ^6.8.6
     next: latest
     nocodb-sdk: ^0.108.1
     pg: ^8.11.3
@@ -8858,6 +8859,13 @@ __metadata:
   version: 4.0.0
   resolution: "jwt-decode@npm:4.0.0"
   checksum: 390e2edcb31a92e86c8cbdd1edeea4c0d62acd371f8a8f0a8878e499390c0ecf4c658b365c4e941e4ef37d0170e4ca650aaa49f99a45c0b9695a235b210154b0
+  languageName: node
+  linkType: hard
+
+"keen-slider@npm:^6.8.6":
+  version: 6.8.6
+  resolution: "keen-slider@npm:6.8.6"
+  checksum: f87e65d72e3b2e73cbd52b1908c1458b253ec5a2a2d3e1e34bd1a831172d18568649188cf3e4ad679c7988568929195ae91d4b7a1c0bd3d6da592a453be3723a
   languageName: node
   linkType: hard
 

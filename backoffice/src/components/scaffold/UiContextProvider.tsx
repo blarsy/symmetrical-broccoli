@@ -46,7 +46,6 @@ const uiReducer = (previousState: UiStateData, action: { type: UiReducerActionTy
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
-
   return {...previousState, ...newState}
 }
 

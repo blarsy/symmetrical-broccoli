@@ -10,6 +10,7 @@ import EditNotifications from '@mui/icons-material/EditNotifications'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LogoutIcon from '@mui/icons-material/Logout'
+import TokensIcon from '@mui/icons-material/Toll'
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { ChatContext } from "./ChatContextProvider"
 import { UiContext, UiDispatchContext, UiReducerActionType } from "./UiContextProvider"
@@ -36,17 +37,22 @@ const TopBar = ({ version }: Props) => {
                     <Badge color="secondary" badgeContent={chatContext.unreadConversations.length}>
                         <Link href={{ pathname: `/webapp/${uiContext.version}/chat` }}>{uiContext.i18n.translator('chatButtonCaption')}</Link>
                     </Badge>
-                </Button>,                
+                </Button>,
+                <Button key="notifs">
+                    <Badge color="secondary" badgeContent={appContext.unreadNotifications.length}>
+                        <Link href={{ pathname: `/webapp/${uiContext.version}/notifications` }}>{uiContext.i18n.translator('notificationsButtonCaption')}</Link>
+                    </Badge>
+                </Button>
             ]}
         </Stack>
         <Stack direction="row" gap="2rem">
             <Stack direction="row" alignItems="center">
-                <LightModeIcon color="primary" /> 
+                <DarkModeIcon color="primary" />
                 <Switch value={uiContext.lightMode} color="primary" onChange={e => {
                     localStorage.setItem('lightMode', uiContext.lightMode ? '': 'Y')
                     uiDispatcher({ type: UiReducerActionType.SwitchLightMode, payload: undefined })
                 }}/>
-                <DarkModeIcon color="primary" />
+                <LightModeIcon color="primary" /> 
             </Stack>
             <IconButton color="primary" onClick={e => {
                 if(appContext.account) {
@@ -86,6 +92,18 @@ const TopBar = ({ version }: Props) => {
                             <EditNotifications fontSize="small" />
                         </Box>
                         {uiContext.i18n.translator('preferencesMenuCaption')}
+                    </Box>
+                </Link>
+            </MenuItem>
+            <MenuItem onClick={() => {
+                setUserMenuAnchorEl(null)
+            }}>
+                <Link href={{ pathname: `/webapp/${version}/profile/tokens`}}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                        <Box sx={{ minWidth: '36px' }}>
+                            <TokensIcon fontSize="small" />
+                        </Box>
+                        {uiContext.i18n.translator('tokensMenuCaption')}
                     </Box>
                 </Link>
             </MenuItem>

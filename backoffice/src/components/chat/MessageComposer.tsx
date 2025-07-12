@@ -1,12 +1,11 @@
 import { CircularProgress, Dialog, IconButton, Stack, TextField, useTheme } from "@mui/material"
-import { ConversationDisplayData } from "./lib"
+import { ConversationHeaderyData } from "./lib"
 import ImageIcon from '@/app/img/PHOTOS.svg'
 import { useContext, useState } from "react"
 import ImageUpload from "../user/ImageUpload"
 import Send from '@mui/icons-material/Send'
 import { gql, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { UiContext } from "../scaffold/UiContextProvider"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
@@ -19,7 +18,7 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
 
 
 interface Props {
-    conversation: ConversationDisplayData
+    conversation: ConversationHeaderyData
     onMessageSent: (id: number, text: string, imagePublicId?: string) => void
 }
 

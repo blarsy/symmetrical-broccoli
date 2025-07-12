@@ -1,11 +1,9 @@
 import { Button, Card, CardActions, CardContent, Dialog, IconButton, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import { useContext, useState } from 'react'
-import { AppContext } from '../scaffold/AppContextProvider'
 import PlusIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { gql, useMutation, useQuery } from '@apollo/client'
-import LoadedZone from '../scaffold/LoadedZone'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PictureGallery from '../scaffold/PictureGallery'
@@ -14,6 +12,9 @@ import ExpirationIndicator from './ExpirationIndicator'
 import { ConfirmDialog } from '../misc'
 import Link from 'next/link'
 import { UiContext } from '../scaffold/UiContextProvider'
+import LoadedList from '../scaffold/LoadedList'
+import { primaryColor } from '@/utils'
+import dayjs from 'dayjs'
 
 export const RESOURCES = gql`query MyResources {
     myResources {
@@ -67,8 +68,81 @@ export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
   }
 }`
 
+interface ResourceCardProps {
+  id: number
+  deleted: boolean
+  onImageClicked?: (uri: string) => void
+  onDeleteRequested?: () => void
+  expiration?: Date
+  title: string
+  images: { alt: string, uri: string }[]
+  isExample?: boolean
+}
+
+const ResourceCard = (p: ResourceCardProps) => {
+  const uiContext = useContext(UiContext)
+  return <Stack sx={theme => ({
+      backgroundColor: p.deleted ? theme.palette.primary.light: 'inherit',
+      position: 'relative',
+      flexDirection: 'column',
+      flex: '0 1 23%',
+      [theme.breakpoints.down('lg')]: {
+          flex: '0 1 30%'
+      },
+      [theme.breakpoints.down('md')]: {
+          flex: '0 1 45%'
+      },
+      [theme.breakpoints.down('sm')]: {
+          flex: '0 1 100%'
+      } })}>
+    <Card key={p.id} sx={{
+      opacity: p.isExample ? '0.6': 'inherit',
+      }}>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <Typography noWrap component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${p.deleted ? `(${uiContext.i18n.translator('deletedLabel')})` : ''} ${p.title}`}</Typography>
+          <ExpirationIndicator value={p.expiration} />
+          <PictureGallery sx={{ justifyContent: "center" }}
+              images={p.images}
+              onImageClicked={p.onImageClicked ? img => p.onImageClicked!(img.uri) : undefined} />
+      </CardContent>
+      <CardActions sx={{ justifyContent: 'space-around' }}>
+          <Button startIcon={<EditIcon/>}>
+            <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${p.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link>
+          </Button>
+          <Button onClick={() => {
+            p.onDeleteRequested && p.onDeleteRequested()
+          }} startIcon={<DeleteIcon/>}>{uiContext.i18n.translator('deleteButtonCaption')}</Button>
+      </CardActions>
+    </Card>
+    { p.isExample && <Typography color="contrastText" 
+      sx={{ backgroundColor: primaryColor, position: 'absolute', top: '3rem', left: '2rem', transform: 'rotate(-13deg)', padding: '0rem 0.5rem' }} 
+      variant="overline">
+      {uiContext.i18n.translator('ExampleLabel')}
+    </Typography>}
+  </Stack>
+}
+
+const ExampleResources = () => {
+  const uiContext = useContext(UiContext)
+  return <Stack alignItems="center">
+    <Typography variant="overline">{uiContext.i18n.translator('noResourceYet')}</Typography>
+    <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }}>
+      <ResourceCard id={1} deleted={false} title={uiContext.i18n.translator('childClothExampleResourceTitle')}
+        expiration={dayjs().add(10, 'days').toDate()}
+        images={[{ alt: 'example picture', uri: urlFromPublicId('uyn4yzdh6iiqzkrd33py') }]}
+        isExample />
+      <ResourceCard id={2} deleted={false} title={uiContext.i18n.translator('mangasResourceTitle')}
+        expiration={dayjs().add(20, 'days').toDate()}
+        images={[{ alt: 'example picture', uri: urlFromPublicId('he265cbgcsaqegbdsxy8') }]}
+        isExample />
+      <ResourceCard id={3} deleted={false} title={uiContext.i18n.translator('equipmentForRentResourceTitle')}
+        expiration={undefined}
+        images={[{ alt: 'example picture', uri: urlFromPublicId('jqmyhsmx1led7nhvilp3') }]}
+        isExample />
+    </Stack>
+  </Stack>
+}
 const Resources = () => {
-    const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
@@ -84,50 +158,26 @@ const Resources = () => {
                 <RefreshIcon/>
             </IconButton>
         </Stack>
-        <LoadedZone loading={loading} error={error} 
-            containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }}>
-            { data && data.myResources.nodes.map((res: any) => <Card key={res.id} sx={theme => ({
-                backgroundColor: res.deleted ? theme.palette.primary.light: 'inherit',
-                display: 'flex',
-                flexDirection: 'column',
-                flex: '0 1 23%',
-                [theme.breakpoints.down('lg')]: {
-                    flex: '0 1 30%'
-                },
-                [theme.breakpoints.down('md')]: {
-                    flex: '0 1 45%'
-                },
-                [theme.breakpoints.down('sm')]: {
-                    flex: '0 1 100%'
-                } })}>
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                    <Typography noWrap component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${res.deleted ? `(${uiContext.i18n.translator('deletedLabel')})` : ''} ${res.title}`}</Typography>
-                    <ExpirationIndicator value={res.expiration} />
-                    <PictureGallery sx={{ justifyContent: "center" }} 
-                        images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}
-                        onImageClicked={img => setZoomedImg(img.uri)} />
-                </CardContent>
-                <CardActions sx={{ justifyContent: 'space-around' }}>
-                    <Button startIcon={<EditIcon/>}>
-                      <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${res.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link>
-                    </Button>
-                    <Button onClick={() => {
-
-                    }} startIcon={<DeleteIcon/>}>{uiContext.i18n.translator('deleteButtonCaption')}</Button>
-                </CardActions>
-            </Card>) }
-            <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
-                <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg(undefined)}>
-                    <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
-                </Stack>
-            </Dialog>
-            <ConfirmDialog processing={deleting} error={deleteError} visible={!!deletingResourceId} onClose={async res => {
-              if(res) {
-                await deleteResource({ variables: { resourceId: deletingResourceId }})
-              }
-              setDeletingResourceId(undefined)
-            }} title={uiContext.i18n.translator('confirmDeleteResourceTitle')} />
-        </LoadedZone>
+        <LoadedList loading={loading} error={error} items={(data && data.myResources && data.myResources.nodes) || []}
+            containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }} 
+            renderNodata={ExampleResources}
+            renderItem={(res: any) => <ResourceCard key={res.id} id={res.id} deleted={res.deleted} title={res.title} 
+              expiration={res.expiration} onImageClicked={(uri: string) => setZoomedImg(uri)}
+              onDeleteRequested={() => setDeletingResourceId(res.id)}
+              images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}/>}
+        />
+        <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
+            <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg(undefined)}>
+                <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
+            </Stack>
+        </Dialog>
+        <ConfirmDialog processing={deleting} error={deleteError} visible={!!deletingResourceId} onClose={async res => {
+          if(res) {
+            await deleteResource({ variables: { resourceId: deletingResourceId }})
+            refetch()
+          }
+          setDeletingResourceId(undefined)
+        }} title={uiContext.i18n.translator('confirmDeleteResourceTitle')} />
     </Stack>
 }
 

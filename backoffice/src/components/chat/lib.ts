@@ -1,15 +1,23 @@
 import DataLoadState from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
 
-export interface ConversationDisplayData {
+export interface ConversationHeaderyData {
     id: number
     participantId: number
     resource?: Resource
-    otherAccount: { id: number, participantId: number, name: string, willingToContribute: boolean, imagePublicId: string } 
+    otherAccount: ConversationOtherAccountData
+}
+
+export interface ConversationOtherAccountData  { 
+    id: number
+    participantId: number
+    name: string
+    willingToContribute: boolean
+    imagePublicId?: string 
 }
 
 export interface ConversationState extends DataLoadState<{
-    conversation: ConversationDisplayData
+    conversation: ConversationHeaderyData
     messages: Message[]
 } | undefined> {}
 

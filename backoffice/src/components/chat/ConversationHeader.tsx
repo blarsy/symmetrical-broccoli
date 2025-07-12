@@ -1,10 +1,10 @@
 import { SxProps } from "@mui/system"
-import { ConversationDisplayData } from "./lib"
-import ConversationImage from "./ConversationImage"
+import { ConversationHeaderyData } from "./lib"
+import ResourceImage from "../ResourceImage"
 import { Stack, Theme, Typography } from "@mui/material"
 
 interface Props {
-    data: ConversationDisplayData
+    data: ConversationHeaderyData
     sx?: SxProps<Theme>
 }
 
@@ -13,7 +13,7 @@ const ConversationHeader = (p: Props) => {
     return <Stack direction="row" sx={[{
             padding: '0.5rem'
         }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
-            <ConversationImage accountName={p.data.otherAccount.name} 
+            <ResourceImage accountName={p.data.otherAccount.name} 
                 accountImagePublicId={p.data.otherAccount.imagePublicId} resourceImagePublicId={resourceImagePublicId} />
             <Stack>
             <Typography variant="overline" color="primary">{p.data.otherAccount.name}</Typography>

@@ -1,4 +1,4 @@
-cd /home/symbro_test/docker/environments/test/
+cd /home/symbro/docker/environments/prod/
 docker compose down
 cd maintenance
 docker compose build --no-cache

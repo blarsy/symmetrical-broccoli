@@ -2,7 +2,6 @@ import { alpha, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typogr
 import { ErrorMessage, Form, Formik } from "formik"
 import { useContext, useState } from "react"
 import * as yup from 'yup'
-import { AppContext } from "../scaffold/AppContextProvider"
 import { ErrorText } from "../misc"
 import OptionLine from "../form/OptionLine"
 import { Category, Resource } from "@/lib/schema"
@@ -14,13 +13,14 @@ import useCategories from "@/lib/useCategories"
 import Edit from "@mui/icons-material/Edit"
 import CategoriesDialog from "../form/CategoriesDialog"
 import EditAddress from "../user/EditAddress"
-import { gql, useMutation } from "@apollo/client"
+import { ApolloError, gql, useMutation } from "@apollo/client"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
 import EditImage from "./EditImage"
 import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
+import ExplainToken from "../token/ExplainToken"
 
 interface Props {
     value?: Resource
@@ -55,6 +55,12 @@ export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int]
     }
   }`
 
+export const SWITCH_TO_CONTRIBUTION_MODE = gql`mutation SwitchToContributionMode {
+    switchToContributionMode(input: {}) {
+        integer
+    }
+}`
+
 const blankResource: Resource = {
     canBeDelivered: false, 
     canBeExchanged: false,
@@ -82,6 +88,10 @@ const EditResource = (p: Props) => {
     const [editedCategories, setEditedCategories] = useState<Category[] | undefined>(undefined)
     const [createResource] = useMutation(CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
+    const [switchToContributionMode] = useMutation(SWITCH_TO_CONTRIBUTION_MODE)
+    const [explainingToken, setExplainingToken] = useState(false)
+
+
     const [saveState, setSaveState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
     return <LoadedZone loading={profileAddress.loading || categories.loading} error={profileAddress.error}>
@@ -104,6 +114,14 @@ const EditResource = (p: Props) => {
                 setSaveState(fromData(undefined))
                 router.push('.')
             } catch(e) {
+                if((e as ApolloError).message === 'ACCOUNT_CANNOT_CREATE_NON_FREE_RESOURCES') {
+                    try{
+                        await switchToContributionMode()
+                        setExplainingToken(true)
+                    } catch(e2) {
+                        setSaveState(fromError(e2, uiContext.i18n.translator('requestError')))
+                    }
+                }
                 setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }} validationSchema={yup.object().shape({
@@ -149,6 +167,7 @@ const EditResource = (p: Props) => {
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
+                            <ErrorMessage component={ErrorText} name="isProduct" />
                             <Stack direction="row">
                                 <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
                                 <FormControlLabel sx={{ 
@@ -185,10 +204,12 @@ const EditResource = (p: Props) => {
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
+                            <ErrorMessage component={ErrorText} name="canBeGifted" />
                             <OptionLine label={uiContext.i18n.translator('deliveryOptionsLabel')} values={{ canBeTakenAway: f.values.canBeTakenAway, canBeDelivered: f.values.canBeDelivered }}
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
+                            <ErrorMessage component={ErrorText} name="canBeTakenAway" />
                             <Typography variant="body1" color="primary">{uiContext.i18n.translator('addressEditTitle')}</Typography>
                             <Stack alignItems="center">
                                 <EditAddress value={f.values.specificLocation}
@@ -220,6 +241,7 @@ const EditResource = (p: Props) => {
                 </Form>
             }}
         </Formik> }
+        <ExplainToken visible={explainingToken} onClose={() => setExplainingToken(false)} />
     </LoadedZone>
 }
 

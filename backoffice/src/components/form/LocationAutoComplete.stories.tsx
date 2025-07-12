@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import LocationAutoComplete from './LocationAutoComplete'
-import { appContextDecorator, MapsProviderDecorator } from '@/lib/storiesUtil'
+import { uiContextDecorator, MapsProviderDecorator } from '@/lib/storiesUtil'
 
 const meta = {
   component: LocationAutoComplete,
@@ -10,7 +10,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {},
-  decorators: [ appContextDecorator(), MapsProviderDecorator ]
+  decorators: [ uiContextDecorator(), MapsProviderDecorator ]
 } satisfies Meta<typeof LocationAutoComplete>
 
 export default meta

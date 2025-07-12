@@ -1,5 +1,5 @@
 import getConfig from '@/config/index'
-import { createHttpLink, split, ApolloClient, from, InMemoryCache } from "@apollo/client"
+import { createHttpLink, split, ApolloClient, from, InMemoryCache, gql } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
@@ -103,3 +103,50 @@ export const getApolloClient = (version: string, token?: string) => {
       }
     })
 }
+
+export const GET_RESOURCE = gql`query GetResource($id: Int!) {
+  resourceById(id: $id) {
+    accountByAccountId {
+      email
+      id
+      name
+      willingToContribute
+      imageByAvatarImageId {
+        publicId
+      }
+    }
+    canBeDelivered
+    canBeExchanged
+    canBeGifted
+    canBeTakenAway
+    description
+    id
+    isProduct
+    isService
+    expiration
+    title
+    resourcesResourceCategoriesByResourceId {
+      nodes {
+        resourceCategoryCode
+      }
+    }
+    resourcesImagesByResourceId {
+      nodes {
+        imageByImageId {
+          publicId
+        }
+      }
+    }
+    locationBySpecificLocationId {
+      address
+      latitude
+      longitude
+      id
+    }
+    suspended
+    paidUntil
+    created
+    deleted
+    subjectiveValue
+  }
+}`

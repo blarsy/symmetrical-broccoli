@@ -4,6 +4,7 @@ import { DocumentNode } from "@apollo/client"
 import { MockedResponse, MockedProvider } from '@apollo/react-testing'
 import { APIProvider } from "@vis.gl/react-google-maps"
 import { fromData } from "./DataLoadState"
+import UiContextProvider, { UiStateData } from "@/components/scaffold/UiContextProvider"
 const { mapsApiKey } = getCommonConfig()
 
 export interface GraphQlOp {
@@ -31,13 +32,26 @@ export const MapsProviderDecorator = (Story: React.ElementType) => {
     </APIProvider>
 }
 
+export const uiContextDecorator = (initial?: UiStateData) => {
+    if(!initial){
+        initial = {
+            loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
+            version: 'v0_10',
+            categories: fromData([])
+        }
+
+    }
+    return (StoryElement: React.ElementType) => 
+        <UiContextProvider initial={initial}>
+            <StoryElement/>
+        </UiContextProvider>
+}
+
 export const appContextDecorator = (initial?: AppStateData) => {
     if(!initial){
         initial = {
-            loading: false, token: '', i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
-            version: 'v0_9',
-            categories: fromData([]),
-            unreadConversations: [], unreadNotifications: []
+            token: '',
+            unreadNotifications: []
         }
 
     }

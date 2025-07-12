@@ -7,56 +7,9 @@ import { gql, useLazyQuery } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
-import { AppContext } from "@/components/scaffold/AppContextProvider"
 import EditResource from "@/components/resources/EditResource"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
-
-const GET_RESOURCE = gql`query GetResource($id: Int!) {
-    resourceById(id: $id) {
-      accountByAccountId {
-        email
-        id
-        name
-        willingToContribute
-        imageByAvatarImageId {
-          publicId
-        }
-      }
-      canBeDelivered
-      canBeExchanged
-      canBeGifted
-      canBeTakenAway
-      description
-      id
-      isProduct
-      isService
-      expiration
-      title
-      resourcesResourceCategoriesByResourceId {
-        nodes {
-          resourceCategoryCode
-        }
-      }
-      resourcesImagesByResourceId {
-        nodes {
-          imageByImageId {
-            publicId
-          }
-        }
-      }
-      locationBySpecificLocationId {
-        address
-        latitude
-        longitude
-        id
-      }
-      suspended
-      paidUntil
-      created
-      deleted
-      subjectiveValue
-    }
-}`
+import { GET_RESOURCE } from "@/lib/apolloClient"
 
 const Wrapped = (p: { resourceId: number }) => {
     const [resource, setResource] = useState<DataLoadState<Resource | undefined>>(initial(true, undefined))

@@ -59,23 +59,28 @@ export const FieldTitle = ({ title, sx }: { title: string, sx?: SxProps<Theme> }
 interface ResponsiveImageProps {
     publicId?: string
     baseSize?: number
-    style?: SxProps<Theme>
+    sx?: SxProps<Theme>
+    onClick?: () => void
 }
 
 export const ResponsiveImage = (p: ResponsiveImageProps) => {
     const theme = useTheme()
 
-    return <ResponsivePhotoBox style={p.style} baseSize={p.baseSize}>
+    return <ResponsivePhotoBox sx={p.sx} baseSize={p.baseSize}>
+        <Stack>
         { p.publicId ? 
-        <img style={{ cursor: 'pointer', borderRadius: '10px', width: '100%' }} alt="resource" src={urlFromPublicId(p.publicId)} />
-        :
-        <EmptyImage fill={theme.palette.primary.main} width="100%"/> }
+            <img style={{ cursor: 'pointer', borderRadius: '10px', width: '100%', height: '100%' }} alt="resource" 
+                src={urlFromPublicId(p.publicId)} onClick={p.onClick}/>
+            :
+            <EmptyImage fill={theme.palette.primary.main} width="100%"/>
+        }
+        </Stack>
     </ResponsivePhotoBox>
 }
 
 interface ResponsivePhotoBoxProps extends PropsWithChildren {
     baseSize?: number
-    style?: SxProps<Theme>
+    sx?: SxProps<Theme>
 }
 
 export const ResponsivePhotoBox = (p: ResponsivePhotoBoxProps) => {
@@ -97,7 +102,7 @@ export const ResponsivePhotoBox = (p: ResponsivePhotoBoxProps) => {
                 height: makePxSize(actualBaseSize, screenSizesCoefficients[2]),
                 width: makePxSize(actualBaseSize, screenSizesCoefficients[2])
             },
-        }), ...(Array.isArray(p.style) ? p.style : [p.style])]}>
+        }), ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
         { p.children }
     </Box>
 }
@@ -115,18 +120,31 @@ interface AccountAvatarProps {
 
 export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, onClick}: AccountAvatarProps) => {
     let avatar: JSX.Element
+    let clickableSx: SxProps<Theme> = theme => ({
+        '&:hover': {
+            border: `2px solid ${theme.palette.primary.main}`
+        }
+    })
+
+    const avatarSx : SxProps<Theme>= [{ width: '100%', height: '100%', cursor: 'pointer' }, 
+        ...(Array.isArray(sx) ? sx : [sx]), 
+        onClick ? clickableSx : {}]
+
     if(avatarImagePublicId) {      
-        avatar = <Avatar sx={[{ width: '100%', height: '100%', cursor: 'pointer' }, ...(Array.isArray(sx) ? sx : [sx])]} 
+        avatar = <Avatar sx={avatarSx} 
             src={urlFromPublicId(avatarImagePublicId)} alt={name} />
     } else if(avatarImageUrl) {
-        avatar = <Avatar sx={[{ width: '100%', height: '100%', cursor: 'pointer' }, ...(Array.isArray(sx) ? sx : [sx])]} 
+        avatar = <Avatar sx={avatarSx} 
             src={avatarImageUrl} alt={name} />
     } else {
-        avatar = <Avatar sx={[{ width: '100%', height: '100%', cursor: 'pointer' }, ...(Array.isArray(sx) ? sx : [sx])]} 
+        avatar = <Avatar sx={avatarSx} 
             alt={name}>{makeAvatarLetters(name)}</Avatar>
     }
     if(onClick) {
-        return <Stack onClick={onClick}>
+        return <Stack onClick={e => {
+            e.stopPropagation()
+            onClick()
+        }}>
             {avatar}
         </Stack>
     }

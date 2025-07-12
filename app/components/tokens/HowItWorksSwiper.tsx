@@ -99,7 +99,7 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                 </View>
             </View>
             <View style={ { ...childStyle, ...{ alignItems: 'flex-start' } }}>
-                <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('howItWorksStep5Title')}</Text>
+                <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('howItWorksStep4Title')}</Text>
                 <Text variant="bodyLarge" style={{ alignSelf: 'center' }}>{t('earnTokens')}</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 20, marginTop: 50, alignItems: 'center' }}>
                     <WinToken />
@@ -123,7 +123,7 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                 </View>
             </View>
             { !appContext.account?.willingToContribute && <View style={childStyle}>
-                <Text variant="headlineLarge">{t('howItWorksStep6Title')}</Text>
+                <Text variant="headlineLarge">{t('howItWorksStep5Title')}</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
                     <Text variant="bodyLarge">{t('youAlreadyHave')}</Text>
                 </View>

@@ -5,11 +5,12 @@ export interface AppStateData {
   token: string
   account?: AccountInfo
   unreadNotifications: number[]
+  notificationCustomHandler?: (notif: any) => void
 }
 
 const blankAppContext = { 
     token: '',
-    unreadNotifications: []
+    unreadNotifications: [],
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -40,6 +41,15 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         break
       case AppReducerActionType.UpdateAccount:
         newState = { account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } } }
+        break
+      case AppReducerActionType.NotificationRead:
+        newState = { unreadNotifications: previousState.unreadNotifications.filter((currentId => currentId != action.payload))}
+        break
+      case AppReducerActionType.SetNewNotificationHandler:
+        newState = { notificationCustomHandler: action.payload }
+        break
+      case AppReducerActionType.NotificationReceived:
+        newState = { unreadNotifications: [...previousState.unreadNotifications, action.payload.id] }
         break
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)

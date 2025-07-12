@@ -30,7 +30,6 @@ const ConversationMessages = ((p: Props) => {
     const messageLisRef = useRef<null | HTMLDivElement>(null)
 
     const isBottom = (el: Element) => {
-        console.log(Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)))
         return Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)) <= 50
     }
 

@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useQuery } from "@apollo/client"
+import { gql, useQuery } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { Stack, SxProps, Theme, Typography } from "@mui/material"
 import { useContext, useEffect } from "react"
@@ -6,7 +6,7 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import { maxLength } from "@/lib/utils"
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { ConversationData } from "./lib"
-import ConversationImage from "./ConversationImage"
+import ResourceImage from "../ResourceImage"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
 import { UiContext } from "../scaffold/UiContextProvider"
 
@@ -94,16 +94,18 @@ const ConversationCard = (p: ConversationCardProps) => {
   const chatDispatch = useContext(ChatDispatchContext)
   const hasUnread = chatContext.unreadConversations.includes(p.conversation.id)
 
+  const isSelected = chatContext.newConversationState ? (p.conversation.id === -1) : (p.conversation.id === chatContext.currentConversationId)
+
   return <Stack direction="row" gap="0.5rem"
       sx={theme => ({ 
         cursor: 'pointer', 
-        backgroundColor: p.conversation.id === chatContext.currentConversationId ? theme.palette.primary.contrastText : 'initial',
+        backgroundColor: isSelected ? theme.palette.primary.contrastText : 'initial',
         alignItems: 'center'
       })} onClick={ () => {
         chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: p.conversation.id })
         p.onSelect(p.conversation.id, chatContext.currentConversationId)
       } }>
-      <ConversationImage accountImagePublicId={p.conversation.imagePublicId}
+      <ResourceImage accountImagePublicId={p.conversation.imagePublicId}
         accountName={p.conversation.accountName} resourceImagePublicId={p.conversation.resourceImagePublicId} />
       <Stack alignSelf="flex-start" flex="1">
           <Typography color="primary" variant="overline" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{p.conversation.accountName || uiContext.i18n.translator('deletedAccount')}</Typography>
@@ -123,7 +125,24 @@ const Conversations = (p: Props) => {
 
     useEffect(() => {
       if(data) {
-        const conversations = data.myConversations.nodes.toReversed().map((rawConv: any) => getConversationData(rawConv, appContext.account!.id))
+        const conversationsInDb = data.myConversations.nodes.toReversed().map((rawConv: any) => getConversationData(rawConv, appContext.account!.id))
+        let conversations: ConversationData[] = []
+        
+        if(chatContext.newConversationState) {
+          conversations = [{ 
+            accountName: chatContext.newConversationState.resource.account!.name,
+            id: -1,
+            numberOfUnreadMessages: 0,
+            resourceId: chatContext.newConversationState.resource.id,
+            resourceName: chatContext.newConversationState.resource.title,
+            imagePublicId: chatContext.newConversationState.resource.account!.avatarImageUrl,
+            resourceImagePublicId: chatContext.newConversationState.resource.images.length > 0 ?
+              chatContext.newConversationState.resource.images[0].publicId:
+              undefined
+           }, ...conversationsInDb]
+        } else {
+          conversations = conversationsInDb
+        }
         chatDispatch({ type: ChatReducerActionType.SetConversations, payload: conversations })
       }
     }, [data])

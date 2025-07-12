@@ -1,5 +1,6 @@
 import { createContext, Dispatch, useReducer } from "react"
 import { ConversationData, NewMessage } from "../chat/lib"
+import { Resource } from "@/lib/schema"
 
 export interface ChatStateData {
   unreadConversations: number[]
@@ -7,6 +8,9 @@ export interface ChatStateData {
   newChatMessage?: NewMessage
   conversations: ConversationData[]
   chatMessageCustomHandler?: (msg: any) => void
+  newConversationState?: {
+    resource: Resource
+  }
 }
 
 const blankChatContext = { 
@@ -20,7 +24,8 @@ export enum ChatReducerActionType {
   SetCurrentConversationId,
   SetNewChatMessage,
   SetChatMessageCustomHandler,
-  SetConversations
+  SetConversations,
+  SetNewConversation
 }
 
 const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerActionType, payload: any }): ChatStateData => {
@@ -68,10 +73,13 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
     case ChatReducerActionType.SetConversations:
         newState = { conversations: action.payload }
         break
+    case ChatReducerActionType.SetNewConversation:
+        newState = { newConversationState: { resource: action.payload } }
+        break
     default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
-  //console.log('action.type', action.type,'newState', newState)
+  console.log('action.type', action.type,'newState', newState, 'prev', previousState, 'new', {...previousState, ...newState})
   return {...previousState, ...newState}
 }
 
@@ -86,7 +94,7 @@ const ChatContextProvider = ({ children, initial }: Props) => {
     const [chatState, dispatch] = useReducer<(previousState: ChatStateData, action: { type: ChatReducerActionType, payload: any }) => ChatStateData>(chatReducer, initial || blankChatContext)
 
     return <ChatContext.Provider value={chatState}>
-        <ChatDispatchContext.Provider value={dispatch} >
+        <ChatDispatchContext.Provider value={dispatch}>
             {children}
         </ChatDispatchContext.Provider>
     </ChatContext.Provider>

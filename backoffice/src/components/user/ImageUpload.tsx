@@ -149,7 +149,7 @@ const ImageUpload = (p: Props) => {
             <ReactCrop key="crop"
                 crop={crop} onComplete={(c) => setCompleteCrop(c)} 
                 onChange={(c) => setCrop(c)}
-                aspect={1} style={{ overflow: 'auto' }}>
+                aspect={1}>
                 <img ref={imgRef} src={URL.createObjectURL(imageFile)} style={{ width: '100%' }} alt="preview" />
             </ReactCrop>
             <Stack>

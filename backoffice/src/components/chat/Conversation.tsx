@@ -7,7 +7,7 @@ import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
 import ConversationHeader from "./ConversationHeader"
-import { ConversationDisplayData, ConversationState, Message, NewMessage } from "./lib"
+import { ConversationHeaderyData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
@@ -136,7 +136,12 @@ interface Props {
     sx?: SxProps<Theme>
 }
 
-const fromRawConversation = (rawConversation: any, currentAccountId: number, categories: Category[]): { conversation: ConversationDisplayData, messages: Message[] } => {
+interface ConversationDisplayData { 
+    conversation: ConversationHeaderyData,
+    messages: Message[] 
+}
+
+const fromRawConversation = (rawConversation: any, currentAccountId: number, categories: Category[]): ConversationDisplayData => {
     const participantId = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId === currentAccountId)).id
     const otherParticipant = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId != currentAccountId))
     const rawResource = rawConversation.conversationById.resourceByResourceId
@@ -190,25 +195,47 @@ const Conversation = (p: Props) => {
     }
 
     const handleMessageOnCurrentConversation = (rawMsg: any) => {
-        if(rawMsg && rawMsg.participantByParticipantId.conversationByConversationId.id === chatContext.currentConversationId ) {
-          setCurrentMessages(prev => ([ ...(prev || []), asMessage(rawMsg) ]))
-          setConversationHasNewMessages(true)
-        }
+      if(rawMsg && rawMsg.participantByParticipantId.conversationByConversationId.id === chatContext.currentConversationId ) {
+        setCurrentMessages(prev => ([ ...(prev || []), asMessage(rawMsg) ]))
+        setConversationHasNewMessages(true)
       }
+    }
 
     useEffect(() => {
-        if(chatContext.currentConversationId && uiContext.categories.data) {
-          loadConversation(chatContext.currentConversationId)
-          chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: handleMessageOnCurrentConversation })
-          
-          return () => {
-            chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: undefined })
+        if(uiContext.categories.data) {
+          if(chatContext.newConversationState) {
+            setCurrentMessages([])
+            const newConversationState: ConversationDisplayData = {
+              conversation: {
+                id: -1,
+                otherAccount: {
+                  id: chatContext.newConversationState.resource.account!.id,
+                  name: chatContext.newConversationState.resource.account!.name,
+                  willingToContribute: chatContext.newConversationState.resource.account!.willingToContribute || false,
+                  imagePublicId: chatContext.newConversationState.resource.account!.avatarImageUrl,
+                  participantId: 0
+                },
+                participantId: 0,
+                resource: chatContext.newConversationState.resource
+              },
+              messages: []
+            }
+            setConversationData(fromData(newConversationState))
+            return
+          }
+          if(chatContext.currentConversationId) {
+            loadConversation(chatContext.currentConversationId)
+            chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: handleMessageOnCurrentConversation })
+            
+            return () => {
+              chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: undefined })
+            }
           }
         }
-    }, [chatContext.currentConversationId, uiContext.categories.data])
+    }, [chatContext.currentConversationId, chatContext.newConversationState, uiContext.categories.data])
 
     return <Stack sx={p.sx}>
-        { chatContext.currentConversationId ?
+        { chatContext.currentConversationId || chatContext.newConversationState ?
             <LoadedZone loading={conversationData?.loading} error={conversationData?.error} containerStyle={{ maxHeight: '100%', flex: '1' }}>
                 { conversationData.data && [
                     <ConversationHeader key="header" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }} data={conversationData.data!.conversation}  />,

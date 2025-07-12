@@ -21,6 +21,7 @@ const PictureGallery = (p: Props) => {
     const theme = useTheme()
     const uiContext = useContext(UiContext)
     const [currentImage, setCurrentImage] = useState(0)
+    const [hovered, setHovered] = useState(false)
 
     if(p.images.length === 0){
         return <Stack direction="row" sx={{
@@ -35,22 +36,49 @@ const PictureGallery = (p: Props) => {
 
     return <Stack direction="row" sx={{
         alignItems: 'center',
+        gap: '0.25rem',
          ...p.sx }}>
-        <IconButton sx={{ visibility: currentImage === 0 ? 'hidden' : 'visible', height: 30, transform: 'scaleX(-1)' }} 
+        <IconButton sx={theme => ({ 
+                visibility: currentImage === 0 ? 'hidden' : 'visible', 
+                height: 30, 
+                width: 30,
+                transform: 'scaleX(-1)',
+                '&:hover': {
+                    border: `1px solid ${theme.palette.primary.main}`
+                }
+            })} 
             onClick={e => {
+                e.stopPropagation()
                 setCurrentImage(prev => prev - 1)
             }}>
             <Arrow fill={ theme.palette.primary.contrastText } height="100%"/>
         </IconButton>
         <ResponsivePhotoBox>
-            <img style={{ cursor: 'pointer', borderRadius: '25px' }} alt={p.images[currentImage].alt} 
+            <img style={{ 
+                cursor: 'pointer', 
+                borderRadius: '25px',
+                border: hovered ? `2px solid ${theme.palette.primary.main}`: ''
+            }} alt={p.images[currentImage].alt}
                 src={p.images[currentImage].uri} height="100%" 
+                onMouseEnter={() => {
+                    if(p.onImageClicked) setHovered(true)}
+                }
+                onMouseLeave={() => setHovered(false)}
                 onClick={e => {
+                    e.stopPropagation()
                     p.onImageClicked && p.onImageClicked(p.images[currentImage])
                 }}/>
         </ResponsivePhotoBox>
-        <IconButton sx={{ visibility: currentImage === (p.images.length - 1) ? 'hidden' : 'visible', height: 30 }} 
+        <IconButton sx={theme => ({ 
+                visibility: currentImage === (p.images.length - 1) ? 'hidden' : 'visible', 
+                height: 30, 
+                width: 30,
+                '&:hover': {
+                    border: `1px solid ${theme.palette.primary.main}`
+                }
+            })} 
             onClick={e => {
+                e.stopPropagation()
                 setCurrentImage(prev => prev + 1)
             } }>
             <Arrow fill={ theme.palette.primary.contrastText } height="100%"/>

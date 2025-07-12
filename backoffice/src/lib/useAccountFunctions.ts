@@ -5,7 +5,6 @@ import { AppDispatchContext, AppReducerActionType } from "@/components/scaffold/
 import config from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
-import { UiDispatchContext, UiReducerActionType } from "@/components/scaffold/UiContextProvider"
 
 export interface AccountInfo {
     name: string
@@ -67,7 +66,6 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
 
 const useAccountFunctions = (version: string) => {
     const appDispatch = useContext(AppDispatchContext)
-    const uiDispatch = useContext(UiDispatchContext)
     const { apiUrl } = config(version)
 
     const connectWithToken = async (token: string, otherSessionProps: any) => {
@@ -76,7 +74,6 @@ const useAccountFunctions = (version: string) => {
 
         if(!res.data.getSessionDataWeb) {
             localStorage.removeItem('token')
-            uiDispatch({ type: UiReducerActionType.Load, payload: otherSessionProps })
             appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
                 token: '',
                 unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
@@ -98,7 +95,6 @@ const useAccountFunctions = (version: string) => {
 
         localStorage.setItem('token', token)
 
-        uiDispatch({ type: UiReducerActionType.Load, payload: otherSessionProps })
         appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
             token,
             unreadConversations: res.data.getSessionDataWeb.unreadConversations, 

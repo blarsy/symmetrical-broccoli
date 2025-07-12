@@ -1,13 +1,13 @@
 import { Box } from "@mui/material"
-import { makePxSize, screenSizesCoefficients, ResponsiveImage, ResponsivePhotoBox, AccountAvatar } from "../misc"
+import { makePxSize, screenSizesCoefficients, ResponsiveImage, ResponsivePhotoBox, AccountAvatar } from "./misc"
 
-interface ConversationImageProps {
+interface ResourceImageProps {
     accountName: string
     accountImagePublicId?: string
     resourceImagePublicId?: string
 }
 
-const ConversationImage = (p: ConversationImageProps) => {
+const ResourceImage = (p: ResourceImageProps) => {
     const baseSize = 75
     const totalSize = baseSize * 1.5
     return <Box sx={theme => ({ 
@@ -28,7 +28,7 @@ const ConversationImage = (p: ConversationImageProps) => {
             }
         })}>
         <ResponsiveImage baseSize={baseSize} publicId={p.resourceImagePublicId}/>
-        <ResponsivePhotoBox baseSize={baseSize} style={theme => {
+        <ResponsivePhotoBox baseSize={baseSize} sx={theme => {
             const delta = baseSize / 3
             return { 
                 position: 'absolute',
@@ -53,4 +53,4 @@ const ConversationImage = (p: ConversationImageProps) => {
     </Box>
 }
 
-export default ConversationImage
+export default ResourceImage

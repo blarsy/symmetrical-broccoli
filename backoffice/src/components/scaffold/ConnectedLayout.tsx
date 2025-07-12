@@ -8,6 +8,7 @@ import { Snackbar, Stack, Typography } from "@mui/material"
 import useRealtimeChatMessages from "@/lib/useRealtimeChatMessages"
 import { UiContext } from "./UiContextProvider"
 import { ChatContext } from "./ChatContextProvider"
+import { useRouter } from 'next/navigation'
 
 interface Props extends PropsWithVersion {
     allowAnonymous?: boolean
@@ -37,13 +38,14 @@ const ConnectContent = (p: Props) => {
 const ChatMessageSnackbar = () => {
     const uiContext = useContext(UiContext)
     const chatContext = useContext(ChatContext)
+    const router = useRouter()
 
     return <Snackbar open={!!chatContext.newChatMessage} key="msg" autoHideDuration={10000} >
         { chatContext.newChatMessage && <Stack flexDirection="column" padding="0.5rem" 
             sx={theme => ({ backgroundColor: theme.palette.primary.contrastText }) }
-            onClick={() => window.history.pushState(undefined, '', `/webapp/${uiContext.version}/chat/${chatContext.newChatMessage!.conversationId}`)}>
-            <Typography color="text" variant="body1">{chatContext.newChatMessage.senderName || uiContext.i18n.translator('deletedAccount')}</Typography>
-            <Typography color="text" variant="body2">{chatContext.newChatMessage.text || '<Image>'}</Typography>
+            onClick={() => router.push(`/webapp/${uiContext.version}/chat/${chatContext.newChatMessage!.conversationId}`) }>
+            <Typography color="primary" variant="body1">{chatContext.newChatMessage.senderName || uiContext.i18n.translator('deletedAccount')}</Typography>
+            <Typography color="primary" variant="body2">{chatContext.newChatMessage.text || '<Image>'}</Typography>
         </Stack> }
     </Snackbar>
 }

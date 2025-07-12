@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CategoriesSelector from './CategoriesSelector'
-import { apolloClientMocksDecorator, appContextDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, uiContextDecorator } from '@/lib/storiesUtil'
 import { GET_CATEGORIES } from '@/lib/useCategories'
 import { initial } from '@/lib/DataLoadState'
 
@@ -26,12 +26,10 @@ const meta = {
             }
         }
     }
-  ]), appContextDecorator({ i18n: { lang: 'fr', translator: val => (val as string) }, 
+  ]), uiContextDecorator({ i18n: { lang: 'fr', translator: val => (val as string) }, 
     categories: initial(true, []),
-    version: '0_9',
-    loading: false,
-    token: 'token',
-    unreadConversations: [], unreadNotifications: []
+    version: '0_10',
+    loading: false
   })]
 } satisfies Meta<typeof CategoriesSelector>
 
