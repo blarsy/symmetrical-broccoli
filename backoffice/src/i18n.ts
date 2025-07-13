@@ -172,7 +172,9 @@ const resources = {
             "lowAmountOfTokenNotificationHeadline": "You are running low on Topes",
             "lowAmountOfTokenNotificationHeadline2": "Avoid the suspension of your resources by making sure you have enough Topes for them.",
             "lowAmountOfTokenNotificationDetails": "See how to grab some Topes",
-
+            "transferTokensDialogTitle": "Send tope's to {{destinatorAccount}}",
+            "confirmSendTokens":"Send {{amount}} Topes to {{destinatorAccount}} ?",
+            "insufficientTokenAmount": "OOps, there is not enough Topes on your account for this transfer ..."
         }
     },
     fr: { 
@@ -345,6 +347,9 @@ const resources = {
             "tokensSentHeadline1": "Topes envoyés",
             "tokensSentHeadline2": "Tu as envoyé des Topes",
             "tokensSentDetails": "Tu as envoyé {{amountSent}} Topes à {{toAccount}}",
+            "transferTokensDialogTitle": "Envoyer des topes à {{destinatorAccount}}",
+            "confirmSendTokens":"Envoyer {{amount}} Topes à {{destinatorAccount}} ?",
+            "insufficientTokenAmount": "Oups, pas assez de Topes sur votre compte pour exécuter ce tranfer ..."
         }
     }
 }

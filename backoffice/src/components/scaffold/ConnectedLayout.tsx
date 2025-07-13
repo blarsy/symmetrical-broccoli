@@ -4,7 +4,7 @@ import { PropsWithVersion } from "@/lib/utils"
 import { useContext } from "react"
 import { AppContext } from "./AppContextProvider"
 import Login from "../user/Login"
-import { Snackbar, Stack, Typography } from "@mui/material"
+import { CircularProgress, Snackbar, Stack, Typography } from "@mui/material"
 import useRealtimeChatMessages from "@/lib/useRealtimeChatMessages"
 import { UiContext } from "./UiContextProvider"
 import { ChatContext } from "./ChatContextProvider"
@@ -16,8 +16,12 @@ interface Props extends PropsWithVersion {
 
 const ConnectContent = (p: Props) => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     useRealtimeChatMessages()
 
+    if(uiContext.loading || appContext.loading) {
+        return <CircularProgress color="primary" />
+    }
 
     if(!appContext.account && !p.allowAnonymous) {
         return <>

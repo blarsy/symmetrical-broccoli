@@ -11,6 +11,8 @@ import ResourceImage from "../ResourceImage"
 import NotificationsActive from '@mui/icons-material/NotificationsActive'
 import { userFriendlyTime } from "@/lib/utils"
 import useCategories from "@/lib/useCategories"
+import { makePxSize, ResponsivePhotoBox, screenSizesCoefficients } from "../misc"
+import FiberManualRecord from '@mui/icons-material/FiberManualRecord'
 
 interface NotificationData {
     id: number
@@ -332,18 +334,32 @@ const useNotifications = (version: string) => {
     return { ...notificationData, loadEarlier, refetch: refetchResourcesAndNotifications }
 }
 
+const NOTIFICATION_IMAGE_BASE_SIZE = 120
 const NotificationImage = ({ image } : { image: string | {
     resource: Resource;
     account: { id: number, name: string, avatarImageUrl?: string };
 } | undefined }) => {
     if(typeof image === 'string') {
-        return <img style={{ width: 70, height: 70, borderRadius: 10 }} src={image} />
+        return <ResponsivePhotoBox baseSize={NOTIFICATIONS_PAGE_SIZE}>
+            <img style={{ borderRadius: 10 }} color="primary" src={image} />
+        </ResponsivePhotoBox>
     } else if (!image) {
-        return <NotificationsActive width={70} />
+        return <NotificationsActive color="primary" sx={theme => ({ 
+            fontSize: makePxSize(NOTIFICATION_IMAGE_BASE_SIZE),
+            [theme.breakpoints.down('lg')]: {
+                fontSize: makePxSize(NOTIFICATION_IMAGE_BASE_SIZE, screenSizesCoefficients[0]),
+            },
+            [theme.breakpoints.down('md')]: {
+                fontSize: makePxSize(NOTIFICATION_IMAGE_BASE_SIZE, screenSizesCoefficients[1]),
+            },
+            [theme.breakpoints.down('sm')]: {
+                fontSize: makePxSize(NOTIFICATION_IMAGE_BASE_SIZE, screenSizesCoefficients[2]),
+            }
+        })} />
     } else {
         return <ResourceImage accountName={image.account.name} 
-            accountImagePublicId={image.account.avatarImageUrl} 
-            resourceImagePublicId={image.resource.images.length > 0 ? image.resource.images[0].publicId : undefined}  />
+            accountImagePublicId={image.account.avatarImageUrl} baseWidth={NOTIFICATION_IMAGE_BASE_SIZE}
+            resourceImagePublicId={image.resource.images.length > 0 ? image.resource.images[0].publicId : undefined} />
     }
 }
 
@@ -380,26 +396,42 @@ const Notifications = ({ version }: { version: string }) => {
         }
     }, [data?.data])
 
-    return <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []} 
-        containerStyle={theme => ({
-            alignItems: 'center',
-            overflow: 'auto'
-        })} onBottom={() => {
-            loadEarlier()
-        }}
-        renderItem={(notif: NotificationData) => {
-            return <Link key={notif.id} onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
-                <Stack direction="row" gap="1rem" sx={{ cursor: 'pointer' }}>
+    return <Stack sx={{
+        overflow: 'auto'
+    }}>
+        <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []} 
+            containerStyle={theme => ({
+                alignItems: 'stretch',
+                margin: 'auto',
+                width: makePxSize(900),
+                [theme.breakpoints.down('lg')]: {
+                    width: makePxSize(900, 0.8),
+                },
+                [theme.breakpoints.down('md')]: {
+                    width: makePxSize(900, 0.5),
+                },
+                [theme.breakpoints.down('sm')]: {
+                    width: '100%',
+                }
+            })} onBottom={() => {
+                loadEarlier()
+            }}
+            renderItem={(notif: NotificationData) => {
+                const fontWeight = notif.read ? 'initial': 'bolder'
+                return <Stack key={notif.id} direction="row" gap="1rem" sx={{ cursor: 'pointer' }}>
                     <NotificationImage image={notif.image} />
-                    <Stack>
-                        <Typography variant="body1">{notif.headline1}</Typography>
-                        <Typography variant="body1">{notif.headline2}</Typography>
-                        <Typography variant="body1">{notif.text}</Typography>
+                    <Link flex="1" onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline1}</Typography>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline2}</Typography>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.text}</Typography>
+                    </Link>
+                    <Stack alignItems="flex-end">
+                        <Typography variant="body1" flex="0 0 20%" color="primary" fontWeight={fontWeight}>{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
+                        { !notif.read && <FiberManualRecord color="primary" /> }
                     </Stack>
-                    <Typography variant="body1">{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
                 </Stack>
-            </Link>
-        }} />
+            }} />
+    </Stack>
 }
 
 export default Notifications

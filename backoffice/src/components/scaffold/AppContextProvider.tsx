@@ -6,11 +6,13 @@ export interface AppStateData {
   account?: AccountInfo
   unreadNotifications: number[]
   notificationCustomHandler?: (notif: any) => void
+  loading: boolean
 }
 
 const blankAppContext = { 
     token: '',
     unreadNotifications: [],
+    loading: true
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -34,7 +36,7 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
   let newState : any
   switch(action.type) {
       case AppReducerActionType.Login:
-        newState = action.payload
+        newState = { loading: false, ...action.payload }
         break
       case AppReducerActionType.Logout:
         newState = { token: '', account: undefined }

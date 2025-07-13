@@ -105,7 +105,7 @@ const ConversationCard = (p: ConversationCardProps) => {
         chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: p.conversation.id })
         p.onSelect(p.conversation.id, chatContext.currentConversationId)
       } }>
-      <ResourceImage accountImagePublicId={p.conversation.imagePublicId}
+      <ResourceImage accountImagePublicId={p.conversation.imagePublicId} baseWidth={120}
         accountName={p.conversation.accountName} resourceImagePublicId={p.conversation.resourceImagePublicId} />
       <Stack alignSelf="flex-start" flex="1">
           <Typography color="primary" variant="overline" sx={{ fontWeight: hasUnread ? "bolder" : undefined }}>{p.conversation.accountName || uiContext.i18n.translator('deletedAccount')}</Typography>

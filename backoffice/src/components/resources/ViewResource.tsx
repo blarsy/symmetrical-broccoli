@@ -15,6 +15,8 @@ import Chat from '@/app/img/CHAT.svg'
 import { primaryColor } from "@/utils"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { GET_RESOURCE } from "@/lib/apolloClient"
+import GiveIcon from '@mui/icons-material/VolunteerActivism'
+import TransferTokensDialog, { TokenTransferInfo } from "../token/TransferTokensDialog"
 
 interface Props {
     resourceId: number
@@ -27,6 +29,7 @@ const ViewResource = (p: Props) => {
     const [zoomedImg, setZoomedImg] = useState<string>()
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
     const uiContext = useContext(UiContext)
+    const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
 
     const loadResource = async() => {
         try {
@@ -83,74 +86,85 @@ const ViewResource = (p: Props) => {
           </Stack>)
         }
         if(resource.data) {
-        elements.push(
-          <Stack key="info" flex="0 1 50%" sx={theme => ({
-            padding: '2rem',
-            flex: '0 1 ' + (resource.data?.images && resource.data?.images.length > 0 ? '50%' : '100%'),
-            overflow: 'auto',
-            [theme.breakpoints.down('sm')]: {
-                padding: '1rem',
-                flex: '1',
-                overflow: 'visible'
-            }})}>
-            <Stack gap="0.5rem">
-              {(() => {
-                const fields = []
-                fields.push(
-                    <Typography key="title" variant="h1" color="primary">{resource.data.title}</Typography>,
-                    <Stack key="creator" direction="row" gap="1rem" justifyContent="space-between" alignItems="center">
-                      <Link href={`../account/${resource.data.account!.id}`}>
-                          <Stack direction="row" gap="1rem" alignItems="center">
-                              <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={resource.data.account!.name}
-                                avatarImageUrl={resource.data.account?.avatarImageUrl} />
-                              <Typography flex="1" color="primary" variant="overline">{resource.data.account?.name}</Typography>
-                          </Stack>
-                      </Link>
-                      <Link href={`/webapp/${uiContext.version}/chat/new/${resource.data!.id}`}>
-                        <IconButton color="primary">
-                          <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
-                        </IconButton>
-                      </Link>
-                    </Stack>,
-                    <Typography key="catLabel" color="primary" variant="body1">{uiContext.i18n.translator('categoriesTitle')}</Typography>,
-                    <Stack key="cats" direction="row">{resource.data.categories.map(cat => <Chip key={`cat${cat.code}`} label={cat.name}/>)}</Stack>,
-                    <Typography key="desc" variant="body1" color="primary">{resource.data.description}</Typography>
-                )
-                if(resource.data.expiration) {
-                    fields.push(<Tooltip key="exp" placement="bottom-start" title={dayjs(resource.data.expiration).format(uiContext.i18n.translator('fulldateFormat'))}>
+          elements.push(
+            <Stack key="info" flex="0 1 50%" sx={theme => ({
+              padding: '2rem',
+              flex: '0 1 ' + (resource.data?.images && resource.data?.images.length > 0 ? '50%' : '100%'),
+              overflow: 'auto',
+              [theme.breakpoints.down('sm')]: {
+                  padding: '1rem',
+                  flex: '1',
+                  overflow: 'visible'
+              }})}>
+              <Stack gap="0.5rem">
+                {(() => {
+                  const fields = []
+                  fields.push(
+                      <Typography key="title" variant="h1" color="primary">{resource.data.title}</Typography>,
+                      <Stack key="creator" direction="row" gap="1rem" justifyContent="space-between" alignItems="center">
+                        <Link href={`../account/${resource.data.account!.id}`}>
+                            <Stack direction="row" gap="1rem" alignItems="center">
+                                <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={resource.data.account!.name}
+                                  avatarImageUrl={resource.data.account?.avatarImageUrl} />
+                                <Typography flex="1" color="primary" variant="overline">{resource.data.account?.name}</Typography>
+                            </Stack>
+                        </Link>
                         <Stack direction="row">
-                            <Typography color="primary" variant="body1">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
-                            <Hourglass color="primary"/>
-                            <Typography color="primary" variant="body1">{dayjs(resource.data.expiration).fromNow()}</Typography>
+                          <Link href={`/webapp/${uiContext.version}/chat/new/${resource.data!.id}`}>
+                            <IconButton color="primary">
+                              <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
+                            </IconButton>
+                          </Link>
+                          <IconButton color="primary" onClick={() => {
+                            setTokenTransferInfo({ destinatorAccount: resource.data!.account!.name, 
+                              destinatorId: resource.data!.account!.id
+                            })
+                          }}>
+                            <GiveIcon sx={{ fontSize: '2.5rem' }} />
+                          </IconButton>
                         </Stack>
-                    </Tooltip>)
-                }
-                fields.push(
-                  <Typography key="natureLabel" color="primary" variant="body1">{uiContext.i18n.translator('natureOptionsLabel')}</Typography>,
-                  <Stack direction="row" gap="0.5rem" key="nature">
-                    { resource.data.isProduct && <Chip label={uiContext.i18n.translator('isProduct')}/> }
-                    { resource.data.isService && <Chip label={uiContext.i18n.translator('isService')}/> }
-                  </Stack>,
-                  <Typography key="exTypeLabel" color="primary" variant="body1">{uiContext.i18n.translator('exchangeTypeOptionsLabel')}</Typography>,
-                  <Stack direction="row" gap="0.5rem" key="type">
-                    { resource.data.canBeGifted && <Chip label={uiContext.i18n.translator('canBeGifted')}/> }
-                    { resource.data.canBeExchanged && <Chip label={uiContext.i18n.translator('canBeExchanged')}/> }
-                  </Stack>)
-                if(resource.data.canBeDelivered || resource.data.canBeTakenAway) {
-                  fields.push( <Typography key="delivLabel" color="primary" variant="body1">{uiContext.i18n.translator('deliveryOptionsLabel')}</Typography>,
-                  <Stack direction="row" gap="0.5rem" key="deliv">
-                    { resource.data.canBeDelivered && <Chip label={uiContext.i18n.translator('canBeDelivered')}/> }
-                    { resource.data.canBeTakenAway && <Chip label={uiContext.i18n.translator('canBeTakenAway')}/> }
-                  </Stack>)
-                }
-                if(resource.data.specificLocation) {
-                  fields.push(<DisplayLocation key="loc" value={resource.data.specificLocation}/>)
-                }
-                return fields
-              })()}
+                      </Stack>,
+                      <Typography key="catLabel" color="primary" variant="body1">{uiContext.i18n.translator('categoriesTitle')}</Typography>,
+                      <Stack key="cats" direction="row">{resource.data.categories.map(cat => <Chip key={`cat${cat.code}`} label={cat.name}/>)}</Stack>,
+                      <Typography key="desc" variant="body1" color="primary">{resource.data.description}</Typography>
+                  )
+                  if(resource.data.expiration) {
+                      fields.push(<Tooltip key="exp" placement="bottom-start" title={dayjs(resource.data.expiration).format(uiContext.i18n.translator('fulldateFormat'))}>
+                          <Stack direction="row">
+                              <Typography color="primary" variant="body1">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
+                              <Hourglass color="primary"/>
+                              <Typography color="primary" variant="body1">{dayjs(resource.data.expiration).fromNow()}</Typography>
+                          </Stack>
+                      </Tooltip>)
+                  }
+                  fields.push(
+                    <Typography key="natureLabel" color="primary" variant="body1">{uiContext.i18n.translator('natureOptionsLabel')}</Typography>,
+                    <Stack direction="row" gap="0.5rem" key="nature">
+                      { resource.data.isProduct && <Chip label={uiContext.i18n.translator('isProduct')}/> }
+                      { resource.data.isService && <Chip label={uiContext.i18n.translator('isService')}/> }
+                    </Stack>,
+                    <Typography key="exTypeLabel" color="primary" variant="body1">{uiContext.i18n.translator('exchangeTypeOptionsLabel')}</Typography>,
+                    <Stack direction="row" gap="0.5rem" key="type">
+                      { resource.data.canBeGifted && <Chip label={uiContext.i18n.translator('canBeGifted')}/> }
+                      { resource.data.canBeExchanged && <Chip label={uiContext.i18n.translator('canBeExchanged')}/> }
+                    </Stack>)
+                  if(resource.data.canBeDelivered || resource.data.canBeTakenAway) {
+                    fields.push( <Typography key="delivLabel" color="primary" variant="body1">{uiContext.i18n.translator('deliveryOptionsLabel')}</Typography>,
+                    <Stack direction="row" gap="0.5rem" key="deliv">
+                      { resource.data.canBeDelivered && <Chip label={uiContext.i18n.translator('canBeDelivered')}/> }
+                      { resource.data.canBeTakenAway && <Chip label={uiContext.i18n.translator('canBeTakenAway')}/> }
+                    </Stack>)
+                  }
+                  if(resource.data.specificLocation) {
+                    fields.push(<DisplayLocation key="loc" value={resource.data.specificLocation}/>)
+                  }
+                  return fields
+                })()}
+              </Stack>
+              <TransferTokensDialog transferInfo={tokenTransferInfo} onClose={() => setTokenTransferInfo(undefined)} />
             </Stack>
-          </Stack>
-        )}
+          )
+        }
 
         return elements
       })()}

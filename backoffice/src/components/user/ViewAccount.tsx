@@ -1,11 +1,13 @@
-import { Link, Stack, Typography } from "@mui/material"
+import { IconButton, Link, Stack, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
 import { gql, useQuery } from "@apollo/client"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import DisplayLocation from "./DisplayLocation"
 import { AccountAvatar } from "../misc"
 import ResourceCard from "../resources/ResourceCard"
 import { UiContext } from "../scaffold/UiContextProvider"
+import GiveIcon from '@mui/icons-material/VolunteerActivism'
+import TransferTokensDialog, { TokenTransferInfo } from "../token/TransferTokensDialog"
 
 interface Props {
     accountId: number
@@ -70,6 +72,7 @@ const GET_ACCOUNT = gql`query Account($id: Int!) {
 const ViewAccount = (p: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id: p.accountId } })
     const uiContext = useContext(UiContext)
+    const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
 
     return <LoadedZone loading={loading} error={error} containerStyle={{ 
         overflow: 'auto', paddingBottom: '1rem', paddingLeft: '2rem', paddingRight: '2rem', gap: '0.5rem'
@@ -79,6 +82,13 @@ const ViewAccount = (p: Props) => {
                 <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.accountById.name}
                     avatarImagePublicId={data.accountById.imageByAvatarImageId?.publicId} />
                 <Typography flex="1" color="primary" variant="h1">{data.accountById.name}</Typography>
+                <IconButton color="primary" onClick={() => {
+                  setTokenTransferInfo({ destinatorAccount: data.accountById.name, 
+                    destinatorId: data.accountById.id
+                  })
+                }}>
+                  <GiveIcon sx={{ fontSize: '3rem' }} />
+                </IconButton>
             </Stack>
             { data.accountById.accountsLinksByAccountId && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&
                 <Stack>
@@ -108,6 +118,7 @@ const ViewAccount = (p: Props) => {
                 </Stack>
             } 
         </>}
+        <TransferTokensDialog transferInfo={tokenTransferInfo} onClose={() => setTokenTransferInfo(undefined)} />
     </LoadedZone>
 }
 

@@ -18,12 +18,12 @@ interface OneTimeTaskProps {
 }
 
 const OneTimeTask = ({ text, checked, onClick, loading, reward }: OneTimeTaskProps) => <Stack direction="row" gap="1rem">
-    <Typography variant="body1" style={{ flex: 1 }}>{text}</Typography>
+    <Typography variant="body1" sx={theme => ({ flex: 1, color: theme.palette.primary.contrastText })}>{text}</Typography>
     { loading ? <CircularProgress color="primary" /> :
         checked ? <Check fill="#4BB543" width="2rem"/>
         :
         <Stack direction="row" alignItems="center">
-            <Typography variant="body1">+ {reward}</Typography>
+            <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText })}>+ {reward}</Typography>
             <IconButton onClick={onClick}>
                 <ArrowForward />
             </IconButton>
@@ -43,19 +43,19 @@ const ReccurringTask = ({ text, remainingAmount, remainingText, loading, reward,
     let content
     if(loading){ 
         content = [
-            <Typography key="txt" variant="body1" flex="1">{text}</Typography>,
+            <Typography key="txt" variant="body1" sx={theme => ({ flex: 1, color: theme.palette.primary.contrastText })}>{text}</Typography>,
             <CircularProgress key="spinner" color="primary" />
         ] 
     } else {
         content = [
             <Stack key="txt" flex="1">
-                <Typography key="txt" variant="body1" flex="1">{text}</Typography>
-                { remainingAmount > 0 && <Typography variant="body1">{`${remainingAmount} ${remainingText}`}</Typography> }
+                <Typography key="txt" variant="body1" sx={theme => ({ flex: 1, color: theme.palette.primary.contrastText })}>{text}</Typography>
+                { remainingAmount > 0 && <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText })}>{`${remainingAmount} ${remainingText}`}</Typography> }
             </ Stack>
         ]
         if(remainingAmount === 0) content.push(<Check key="check" fill="#4BB543"  width="2rem" />)
         else content.push(<Stack direction="row" key="action" alignItems="center">
-            <Typography variant="body1">+ {reward}</Typography>
+            <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText })}>+ {reward}</Typography>
             <IconButton onClick={onClick}>
                 <ArrowForward />
             </IconButton>
@@ -71,9 +71,9 @@ interface PermanentTaskProps {
 }
 
 const PermanentTask = ({ text, reward, onClick }: PermanentTaskProps) => <Stack direction="row" alignItems="center" gap="1rem">
-    <Typography variant="body1" flex="1">{text}</Typography>
+    <Typography variant="body1" sx={theme => ({ flex: 1, color: theme.palette.primary.contrastText })}>{text}</Typography>
     <Stack direction="row" alignItems="center">
-        <Typography variant="body1">+ {reward}</Typography>
+        <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText })}>+ {reward}</Typography>
         <IconButton onClick={onClick}>
             <ArrowForward />
         </IconButton>

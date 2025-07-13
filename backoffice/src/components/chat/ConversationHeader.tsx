@@ -13,7 +13,7 @@ const ConversationHeader = (p: Props) => {
     return <Stack direction="row" sx={[{
             padding: '0.5rem'
         }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
-            <ResourceImage accountName={p.data.otherAccount.name} 
+            <ResourceImage accountName={p.data.otherAccount.name} baseWidth={120}
                 accountImagePublicId={p.data.otherAccount.imagePublicId} resourceImagePublicId={resourceImagePublicId} />
             <Stack>
             <Typography variant="overline" color="primary">{p.data.otherAccount.name}</Typography>

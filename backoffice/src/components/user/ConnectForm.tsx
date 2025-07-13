@@ -27,7 +27,6 @@ interface Props {
 
 
 const ConnectForm = (p: Props) => {
-    const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const { connectGoogleWithAccessCode, login, connectApple } = useAccountFunctions(p.version)
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
@@ -67,21 +66,6 @@ const ConnectForm = (p: Props) => {
                 usePopup: true
             },
             onSuccess: async (res: any) => {
-                // {
-                //     "authorization": {
-                //         "state": "[STATE]", // The state string we used in the initApple function
-                //         "code": "[CODE]", // A single-use authentication code that is valid for five minutes. We won't be using this for now.
-                //         "id_token": "[ID_TOKEN]" // This is what we're really interested in. This is JSON web token we'll be decoding in the backend.
-                //     },
-                //     "user": {
-                //         // User details object, we'll be storing this data in the backend as well.
-                //         "email": "[EMAIL]",
-                //         "name": {
-                //         "firstName": "[FIRST_NAME]",
-                //         "lastName": "[LAST_NAME]"
-                //         }
-                //     }
-                // }
                 const done = await connectApple(res.authorization.id_token, rawNonce, res.user?.firstName, res.user?.lastName, async (name, email, token) => {
                     p.onRegisterExternalAuthProviderRequested(name, email, token, AuthProviders.apple)
                 })

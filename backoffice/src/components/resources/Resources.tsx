@@ -171,7 +171,7 @@ const Resources = () => {
                 <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
             </Stack>
         </Dialog>
-        <ConfirmDialog processing={deleting} error={deleteError} visible={!!deletingResourceId} onClose={async res => {
+        <ConfirmDialog visible={!!deletingResourceId} onClose={async res => {
           if(res) {
             await deleteResource({ variables: { resourceId: deletingResourceId }})
             refetch()

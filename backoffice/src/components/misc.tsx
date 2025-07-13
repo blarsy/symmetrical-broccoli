@@ -36,8 +36,6 @@ interface ConfirmDialogProps {
     title: string
     onClose: (response: boolean) => void
     visible: boolean
-    processing: boolean
-    error?: Error
 }
 
 export const ConfirmDialog = (p: ConfirmDialogProps) => {

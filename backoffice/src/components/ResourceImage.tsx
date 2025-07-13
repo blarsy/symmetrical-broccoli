@@ -5,26 +5,26 @@ interface ResourceImageProps {
     accountName: string
     accountImagePublicId?: string
     resourceImagePublicId?: string
+    baseWidth: number
 }
 
 const ResourceImage = (p: ResourceImageProps) => {
-    const baseSize = 75
-    const totalSize = baseSize * 1.5
+    const baseSize = p.baseWidth / 1.5
     return <Box sx={theme => ({ 
             position: 'relative', 
             padding: '0.25rem 0 0 0.25rem',
-            flex: `0 0 ${makePxSize(totalSize)}`, height: makePxSize(totalSize),
+            flex: `0 0 ${makePxSize(p.baseWidth)}`, height: makePxSize(p.baseWidth),
             [theme.breakpoints.down('lg')]: {
-                flex: `0 0 ${makePxSize(totalSize, screenSizesCoefficients[0])}`, 
-                height: makePxSize(totalSize, screenSizesCoefficients[0]),
+                flex: `0 0 ${makePxSize(p.baseWidth, screenSizesCoefficients[0])}`, 
+                height: makePxSize(p.baseWidth, screenSizesCoefficients[0]),
             },
             [theme.breakpoints.down('md')]: {
-                flex: `0 0 ${makePxSize(totalSize, screenSizesCoefficients[1])}`, 
-                height: makePxSize(totalSize, screenSizesCoefficients[1]),
+                flex: `0 0 ${makePxSize(p.baseWidth, screenSizesCoefficients[1])}`, 
+                height: makePxSize(p.baseWidth, screenSizesCoefficients[1]),
             },
             [theme.breakpoints.down('sm')]: {
-                flex: `0 0 ${makePxSize(totalSize, screenSizesCoefficients[2])}`, 
-                height: makePxSize(totalSize, screenSizesCoefficients[2]),
+                flex: `0 0 ${makePxSize(p.baseWidth, screenSizesCoefficients[2])}`, 
+                height: makePxSize(p.baseWidth, screenSizesCoefficients[2]),
             }
         })}>
         <ResponsiveImage baseSize={baseSize} publicId={p.resourceImagePublicId}/>
