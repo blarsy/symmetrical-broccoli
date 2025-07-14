@@ -1,4 +1,4 @@
-import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Switch } from "@mui/material"
+import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, SvgIconTypeMap, Switch, Typography } from "@mui/material"
 import { Stack } from "@mui/system"
 import Link from "next/link"
 import { useContext, useState } from "react"
@@ -14,10 +14,45 @@ import TokensIcon from '@mui/icons-material/Toll'
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { ChatContext } from "./ChatContextProvider"
 import { UiContext, UiDispatchContext, UiReducerActionType } from "./UiContextProvider"
+import { OverridableComponent } from "@mui/material/OverridableComponent"
+import MenuIcon from '@mui/icons-material/Menu'
+import Tokens from '@/app/img/TOKENS.svg'
+
+interface LinkMenuProps {
+    url: string
+    text: string
+    Icon?: OverridableComponent<SvgIconTypeMap<{}, "svg">>
+    badgeContent?: number
+}
+
+const LinkMenu = (p: LinkMenuProps) => {
+    if(p.badgeContent) {
+        return <Link href={{ pathname: p.url }}>
+            <Badge color="secondary" badgeContent={p.badgeContent}>
+                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                    { p.Icon && <Box sx={{ minWidth: '36px' }}>
+                        <p.Icon fontSize="small" />
+                    </Box> }
+                    {p.text}
+                </Box>
+            </Badge>
+        </Link>
+    } else {
+        return <Link href={{ pathname: p.url }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                { p.Icon && <Box sx={{ minWidth: '36px' }}>
+                    <p.Icon fontSize="small" />
+                </Box> }
+                {p.text}
+            </Box>
+        </Link>
+    }
+} 
 
 interface Props {
     version: string
 }
+
 
 const TopBar = ({ version }: Props) => {
     const appContext = useContext(AppContext)
@@ -25,27 +60,94 @@ const TopBar = ({ version }: Props) => {
     const chatContext = useContext(ChatContext)
     const uiDispatcher = useContext(UiDispatchContext)
     const [connecting, setConnecting] = useState(false)
+    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
     const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null)
     const { disconnect } = useAccountFunctions(version)
 
-    return <Stack direction="row" justifyContent="space-between">
-        <Stack direction="row">
-            <Button><Link href={{ pathname: `/webapp/${uiContext.version}` }}>{uiContext.i18n.translator('searchButtonCaption')}</Link></Button>
-            { appContext.account && [
-                <Button key="resources"><Link href={{ pathname: `/webapp/${uiContext.version}/resources` }}>{uiContext.i18n.translator('resourcesButtonCaption')}</Link></Button>,
-                <Button key="chat">
-                    <Badge color="secondary" badgeContent={chatContext.unreadConversations.length}>
-                        <Link href={{ pathname: `/webapp/${uiContext.version}/chat` }}>{uiContext.i18n.translator('chatButtonCaption')}</Link>
-                    </Badge>
-                </Button>,
-                <Button key="notifs">
-                    <Badge color="secondary" badgeContent={appContext.unreadNotifications.length}>
-                        <Link href={{ pathname: `/webapp/${uiContext.version}/notifications` }}>{uiContext.i18n.translator('notificationsButtonCaption')}</Link>
+    const linksInfo = [
+        { url: `/webapp/${uiContext.version}`, textI18n: 'searchButtonCaption', needsLogin: false },
+        { url: `/webapp/${uiContext.version}/resources`, textI18n: 'resourcesButtonCaption', needsLogin: true },
+        { url: `/webapp/${uiContext.version}/chat`, textI18n: 'chatButtonCaption', badgeContent: chatContext.unreadConversations.length, needsLogin: true },
+        { url: `/webapp/${uiContext.version}/notifications`, textI18n: 'notificationsButtonCaption', badgeContent: appContext.unreadNotifications.length, needsLogin: true },
+    ]
+
+    const makeButtonsMenu = () => {
+        let actualLinks = linksInfo
+        if(!appContext.account) {
+            actualLinks = linksInfo.filter(l => l.needsLogin === false)
+        }
+
+        return actualLinks.map((info, idx) => {
+            if(info.badgeContent) {
+                return <Button key={idx}>
+                    <Badge color="secondary" badgeContent={info.badgeContent}>
+                        <Link href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
                     </Badge>
                 </Button>
-            ]}
+            } else {
+                return <Button key={idx}>
+                    <Link href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
+                </Button>
+            }
+        })
+    }
+
+    const makeItemsMenu = () => {
+        let actualLinks = linksInfo
+        if(!appContext.account) {
+            actualLinks = linksInfo.filter(l => l.needsLogin === false)
+        }
+
+        return actualLinks.map((info, idx) => {
+            return <MenuItem key={idx} onClick={() => {
+                setMenuAnchorEl(null)
+            }}>
+                <LinkMenu text={uiContext.i18n.translator(info.textI18n)}
+                    url={ info.url } badgeContent={info.badgeContent} />
+            </MenuItem>
+        })
+    }
+
+    return <Stack direction="row" justifyContent="space-between">
+        <Stack sx={theme => ({ 
+            [theme.breakpoints.down('sm')]: {
+                display: 'none'
+            }
+         })} direction="row">
+            {makeButtonsMenu()}
         </Stack>
-        <Stack direction="row" gap="2rem">
+        <IconButton color="primary" sx={theme => ({
+                [theme.breakpoints.up('sm')]: {
+                    display: 'none'
+                }
+            })} onClick={e => {
+            setMenuAnchorEl(e.currentTarget)
+        }}>
+            <MenuIcon />
+        </IconButton>
+        <Menu
+            id="menu"
+            anchorEl={menuAnchorEl}
+            open={!!menuAnchorEl}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            disableScrollLock
+            onClose={() => setMenuAnchorEl(null)}>
+            {makeItemsMenu()}
+        </Menu>
+        <Stack direction="row" sx={theme => ({
+            gap: '2rem',
+            [theme.breakpoints.down('md')]: {
+                gap: '0.5rem'
+            }
+        })}>
+            { appContext.account &&  <Link style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
+                <Stack direction="row" alignItems="center" sx={{
+                    cursor: 'pointer'
+                }}>
+                    <Typography variant="caption" color="primary"> { appContext.account.amountOfTokens }</Typography>
+                    <Tokens style={{ width: '2rem', height: '2rem' }}/>
+                </Stack>
+            </Link> }
             <Stack direction="row" alignItems="center">
                 <DarkModeIcon color="primary" />
                 <Switch value={uiContext.lightMode} color="primary" onChange={e => {
@@ -74,38 +176,20 @@ const TopBar = ({ version }: Props) => {
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <Link href={{ pathname: `/webapp/${version}/profile` }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                        <Box sx={{ minWidth: '36px' }}>
-                            <ConnectedAccount fontSize="small" />
-                        </Box>
-                        {appContext.account?.name}
-                    </Box>
-                </Link>
+                <LinkMenu text={appContext.account?.name || ''} Icon={ConnectedAccount}
+                    url={ `/webapp/${version}/profile`} />
             </MenuItem>
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <Link href={{ pathname: `/webapp/${version}/profile/prefs`}}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                        <Box sx={{ minWidth: '36px' }}>
-                            <EditNotifications fontSize="small" />
-                        </Box>
-                        {uiContext.i18n.translator('preferencesMenuCaption')}
-                    </Box>
-                </Link>
+                <LinkMenu text={uiContext.i18n.translator('preferencesMenuCaption')} Icon={EditNotifications}
+                    url={`/webapp/${version}/profile/prefs`} />
             </MenuItem>
             <MenuItem onClick={() => {
                 setUserMenuAnchorEl(null)
             }}>
-                <Link href={{ pathname: `/webapp/${version}/profile/tokens`}}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                        <Box sx={{ minWidth: '36px' }}>
-                            <TokensIcon fontSize="small" />
-                        </Box>
-                        {uiContext.i18n.translator('tokensMenuCaption')}
-                    </Box>
-                </Link>
+                <LinkMenu text={uiContext.i18n.translator('tokensMenuCaption')} Icon={TokensIcon}
+                    url={`/webapp/${version}/profile/tokens`} />
             </MenuItem>
             <MenuItem onClick={() => {
                 disconnect()

@@ -12,7 +12,7 @@ const Tokens = ({version} : { version: string }) => {
     const uiContext = useContext(UiContext)
     const [explainingToken, setExplainingToken] = useState(false)
     
-    return <Stack sx={{ alignItems: 'center', overflow: 'auto' }}>
+    return <Stack sx={{ alignItems: 'center', overflow: 'auto', padding: '3px' }}>
         <Typography color="primary" variant="overline">{uiContext.i18n.translator('youHave')}</Typography>
         <Stack direction="row" gap="0.5rem">
             <Typography color="primary" variant="h2" sx={{ paddingTop: 0 }}>{appContext.account?.amountOfTokens}</Typography>
