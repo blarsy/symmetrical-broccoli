@@ -6,7 +6,6 @@ import * as yup from "yup"
 import { ErrorText } from "../misc"
 import { useContext, useState } from "react"
 import useAccountFunctions from "@/lib/useAccountFunctions"
-import { AppContext } from "../scaffold/AppContextProvider"
 import { useGoogleLogin } from '@react-oauth/google'
 import GoogleLogo from '../../app/img/google-logo.svg'
 import AppleLogo from '../../app/img/apple-logo.svg'
@@ -22,6 +21,7 @@ interface Props {
     onClose?: () => void
     version: string
     onRegisterRequested: () => void
+    onPasswordRecoveryRequested: () => void
     onRegisterExternalAuthProviderRequested: (suggestedName: string, email: string, token: string, provider: AuthProviders) => void
 }
 
@@ -111,6 +111,9 @@ const ConnectForm = (p: Props) => {
                             <Link component="button" onClick={() => {
                                 p.onRegisterRequested()
                             }}>{uiContext.i18n.translator('noAccountYetButtonLink')}</Link>
+                            <Link component="button" onClick={() => {
+                                p.onPasswordRecoveryRequested()
+                            }}>{uiContext.i18n.translator('forgotPasswordButtonLink')}</Link>
                         </Stack>
                         <Feedback visible={!!connectionStatus.error} onClose={() => {
                             setConnectionStatus({ loading: false })

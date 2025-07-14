@@ -19,6 +19,7 @@ export enum AppReducerActionType {
   SetAuthToken,
   Login,
   Logout,
+  Load,
   UpdateAccount,
   DisplayNotification,
   ClearNotification,
@@ -37,6 +38,9 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
   switch(action.type) {
       case AppReducerActionType.Login:
         newState = { loading: false, ...action.payload }
+        break
+      case AppReducerActionType.Load:
+        newState = { loading: false }
         break
       case AppReducerActionType.Logout:
         newState = { token: '', account: undefined }

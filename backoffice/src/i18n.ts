@@ -101,6 +101,7 @@ const resources = {
             "availableResources": "Available resources",
             "pleaseTypeTheAddress": "Please type the address here, or click the location on the map",
             "noAccountYetButtonLink": "No account yet ?",
+            "forgotPasswordButtonLink": "Forgot password ?",
             "passwordInvalid": "The password must be at least 8 characters long, with at least one uppercase and at least one non-letter character.",
             "passwordsDontMatch": "Provided passwords are not identical.",
             "registerButton": "Create account",
@@ -174,7 +175,9 @@ const resources = {
             "lowAmountOfTokenNotificationDetails": "See how to grab some Topes",
             "transferTokensDialogTitle": "Send tope's to {{destinatorAccount}}",
             "confirmSendTokens":"Send {{amount}} Topes to {{destinatorAccount}} ?",
-            "insufficientTokenAmount": "OOps, there is not enough Topes on your account for this transfer ..."
+            "insufficientTokenAmount": "Oops, there is not enough Topes on your account for this transfer ...",
+            "recoverButton": "Restore access",
+            "followInstructionsInRecoveryMail": "An email was sent to you, please follow the instructions in it to restore access to your account."
         }
     },
     fr: { 
@@ -276,6 +279,7 @@ const resources = {
             "availableResources": "Ressources disponibles",
             "pleaseTypeTheAddress": "Tape l'adresse ici, ou clique l'endroit sur la carte",
             "noAccountYetButtonLink": "Pas encore de compte ?",
+            "forgotPasswordButtonLink": "Mot de passe oublié ?",
             "passwordInvalid": "Le mot de passe doit comporter au moins 8 caractères, au moins une majustcule et un caractère non-alphabétique.",
             "passwordsDontMatch": "Les mots de passe fournis ne sont pas identiques.",
             "registerButton": "Créer le compte",
@@ -349,7 +353,9 @@ const resources = {
             "tokensSentDetails": "Tu as envoyé {{amountSent}} Topes à {{toAccount}}",
             "transferTokensDialogTitle": "Envoyer des topes à {{destinatorAccount}}",
             "confirmSendTokens":"Envoyer {{amount}} Topes à {{destinatorAccount}} ?",
-            "insufficientTokenAmount": "Oups, pas assez de Topes sur votre compte pour exécuter ce tranfer ..."
+            "insufficientTokenAmount": "Oups, pas assez de Topes sur votre compte pour exécuter ce tranfer ...",
+            "recoverButton": "Restaurer l'accès",
+            "followInstructionsInRecoveryMail": "Un email vous a été envoyé, suis les instruction qui y figurent pour restaurer l'accès à ton compte."
         }
     }
 }

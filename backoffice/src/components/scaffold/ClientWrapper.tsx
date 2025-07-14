@@ -4,7 +4,7 @@ import {  CssBaseline, ThemeProvider } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
-import AppContextProvider, { AppContext } from './AppContextProvider'
+import AppContextProvider, { AppContext, AppDispatchContext, AppReducerActionType } from './AppContextProvider'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -38,6 +38,7 @@ const { googleApiKey } = getCommonConfig()
 const Translatable = ({ children, version }: PropsWithVersion) => {
     const uiDispatcher = useContext(UiDispatchContext)
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const uiContext= useContext(UiContext)
     const [theme, setTheme] = useState(undefined as Theme | undefined)
     const defaultDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
@@ -62,6 +63,8 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
                 // TODO: handle expired token
                 uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
             }
+        } else {
+            appDispatch({ type: AppReducerActionType.Load, payload: undefined })
         }
     }
     useEffect(() => { 
