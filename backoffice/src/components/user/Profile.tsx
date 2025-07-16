@@ -4,7 +4,7 @@ import { useContext, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
 import * as yup from "yup"
-import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Switch, TextField, Typography } from "@mui/material"
+import { Alert, Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Switch, TextField, Typography } from "@mui/material"
 import { ErrorText, FieldTitle, RightAlignedModifyButtons } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"
 import AvatarEdit from "./AvatarEdit"
@@ -14,6 +14,7 @@ import EditAddress from "./EditAddress"
 import Feedback from "../scaffold/Feedback"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { UiContext } from "../scaffold/UiContextProvider"
+import ChangePasswordDialog from "./ChangePasswordDialog"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
@@ -95,10 +96,12 @@ const Profile = () => {
     const [updateAccount, { error: updateError, reset, loading: updatingAccount }] = useMutation(UPDATE_ACCOUNT)
     const [updateAccountEmail, { error: updateEmailError, reset: resetEmail, loading: updatingEmail}] = useMutation(UPDATE_ACCOUNT_EMAIL)
     const [deletingAccount, setDeletingAccount] = useState(false)
+    const [changingPassword, setChangingPassword] = useState(false)
     const [deletionConfirmed, setDeletionConfirmed] = useState(false)
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
     const t = uiContext.i18n.translator
     const { disconnect } = useAccountFunctions(uiContext.version)
+    const [ passwordChanged, setPasswordChanged ] = useState(false)
 
     return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         { publicInfo.profileData.data && <Stack sx={theme => ({ 
@@ -138,7 +141,15 @@ const Profile = () => {
             <EditAddress value={publicInfo.profileData.data.location} onChange={newLocation => {
                 publicInfo.updatePublicInfo(publicInfo.profileData.data!.links, newLocation)
             }} />
-            <Stack>
+            <Stack gap="1rem">
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="overline" color="primary">{t('changePasswordButton')}</Typography>
+                    <Button color="primary" variant="outlined" onClick={() => {
+                        setChangingPassword(true)
+                    }}>{t('changePasswordButton')}</Button>
+                </Stack>
+                { passwordChanged && <Alert severity="success"
+                    onClose={() => setPasswordChanged(false)}>{uiContext.i18n.translator('successPasswordChanged')}</Alert> }
                 <Stack direction="row" justifyContent="space-between">
                     <Typography variant="overline" color="primary">{t('deleteMyAccountCompletely')}</Typography>
                     <Button color="primary" variant="contained" onClick={() => {
@@ -172,6 +183,12 @@ const Profile = () => {
                 }}>{t('okButton')}</Button>
             </DialogActions>
         </Dialog>
+        <ChangePasswordDialog visible={changingPassword} onClose={success => {
+            if(success) {
+                setPasswordChanged(true)
+            }
+            setChangingPassword(false)
+        }} />
     </LoadedZone>
 }
 

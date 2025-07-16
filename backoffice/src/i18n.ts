@@ -177,7 +177,15 @@ const resources = {
             "confirmSendTokens":"Send {{amount}} Topes to {{destinatorAccount}} ?",
             "insufficientTokenAmount": "Oops, there is not enough Topes on your account for this transfer ...",
             "recoverButton": "Restore access",
-            "followInstructionsInRecoveryMail": "An email was sent to you, please follow the instructions in it to restore access to your account."
+            "followInstructionsInRecoveryMail": "An email was sent to you, please follow the instructions in it to restore access to your account.",
+            "noResource": "No active resource",
+            "changePasswordDialogTitle": "Change your password",
+            "currentPasswordLabel": "Current password",
+            "newPasswordLabel": "New password",
+            "repeatNewPasswordLabel": "Repeat new password",
+            "confirmChangePassword": "Are you sure you want to change the password ?",
+            "changePasswordButton": "Change password",
+            "successPasswordChanged": "Password changed successfully"
         }
     },
     fr: { 
@@ -355,7 +363,15 @@ const resources = {
             "confirmSendTokens":"Envoyer {{amount}} Topes à {{destinatorAccount}} ?",
             "insufficientTokenAmount": "Oups, pas assez de Topes sur votre compte pour exécuter ce tranfer ...",
             "recoverButton": "Restaurer l'accès",
-            "followInstructionsInRecoveryMail": "Un email vous a été envoyé, suis les instruction qui y figurent pour restaurer l'accès à ton compte."
+            "followInstructionsInRecoveryMail": "Un email vous a été envoyé, suis les instruction qui y figurent pour restaurer l'accès à ton compte.",
+            "noResource": "Pas de ressource active",
+            "changePasswordDialogTitle": "Change ton mot de passe",
+            "currentPasswordLabel": "Mot de passe",
+            "newPasswordLabel": "Nouveau mont de passe",
+            "repeatNewPasswordLabel": "Répéter le nouveau mot de passe",
+            "confirmChangePassword": "Es-tu sûr de vouloir changer le mot de passe ?",
+            "changePasswordButton": "Changer le mot de passe",
+            "successPasswordChanged": "Mot de passe changé avec succès"
         }
     }
 }

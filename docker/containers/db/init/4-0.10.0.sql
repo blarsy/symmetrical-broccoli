@@ -214,6 +214,39 @@ $BODY$;
 ALTER FUNCTION sb.create_resource(character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location)
     OWNER TO sb;
 
+CREATE OR REPLACE FUNCTION sb.change_password(
+	old_password character varying,
+	new_password character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE cnt numeric;
+DECLARE new_salt text;
+DECLARE old_hash text;
+begin
+	SELECT gen_salt('md5') INTO new_salt;
+	SELECT crypt(old_password, (SELECT salt FROM sb.accounts WHERE id = sb.current_account_id())) INTO old_hash;
+	
+	UPDATE sb.accounts a
+	SET hash = crypt(new_password, new_salt), salt = new_salt
+	WHERE a.id = sb.current_account_id() AND a.hash = hash;
+	
+	GET DIAGNOSTICS cnt = ROW_COUNT;
+	
+	IF cnt = 0 THEN
+		RAISE EXCEPTION 'Invalid password';
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.change_password(character varying, character varying)
+    OWNER TO sb;
+
+
 DO
 $body$
 BEGIN

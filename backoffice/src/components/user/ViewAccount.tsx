@@ -1,13 +1,16 @@
 import { IconButton, Link, Stack, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
 import { gql, useQuery } from "@apollo/client"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import DisplayLocation from "./DisplayLocation"
 import { AccountAvatar } from "../misc"
 import ResourceCard from "../resources/ResourceCard"
 import { UiContext } from "../scaffold/UiContextProvider"
 import GiveIcon from '@mui/icons-material/VolunteerActivism'
 import TransferTokensDialog, { TokenTransferInfo } from "../token/TransferTokensDialog"
+import { fromServerGraphResource, Resource } from "@/lib/schema"
+import dayjs from "dayjs"
+import useCategories from "@/lib/useCategories"
 
 interface Props {
     accountId: number
@@ -73,6 +76,16 @@ const ViewAccount = (p: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id: p.accountId } })
     const uiContext = useContext(UiContext)
     const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
+    const [accountResources, setAccountResources] = useState<Resource[]>([])
+    useCategories()
+
+    useEffect(() => {
+        if(data && data.accountById.resourcesByAccountId.nodes && uiContext.categories.data) {
+            setAccountResources(data.accountById.resourcesByAccountId.nodes
+                .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
+                .map((res:any) => fromServerGraphResource(res, uiContext.categories.data!)))
+        }
+    }, [data, uiContext.categories.data])
 
     return <LoadedZone loading={loading} error={error} containerStyle={{ 
         overflow: 'auto', paddingBottom: '1rem', paddingLeft: '2rem', paddingRight: '2rem', gap: '0.5rem'
@@ -106,14 +119,14 @@ const ViewAccount = (p: Props) => {
                 </Stack>
             }
             <Typography variant="caption" color="primary">{uiContext.i18n.translator('availableResources')}</Typography>
-            { data.accountById.resourcesByAccountId.nodes.length === 0 ?
+            { accountResources.length === 0 ?
                 <Typography variant="body1" textAlign="center" color="primary">{uiContext.i18n.translator('noResource')}</Typography>
                 :
                 <Stack direction="row" flexWrap="wrap" gap="1rem" justifyContent="center">
-                    { data.accountById.resourcesByAccountId.nodes.map((res: any, idx: number) => <ResourceCard 
+                    { accountResources.map((res, idx) => <ResourceCard 
                         key={idx} version={p.version} resource={{
                             id: res.id, title: res.title, description: res.description, expiration: res.expiration,
-                            images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId)
+                            images: res.images.map((img) => img.publicId!)
                         }}/>)}
                 </Stack>
             } 

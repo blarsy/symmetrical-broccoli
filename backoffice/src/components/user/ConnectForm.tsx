@@ -101,7 +101,7 @@ const ConnectForm = (p: Props) => {
                             onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
                         <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
-                        <TextField id="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
+                        <TextField type="password" id="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
                         <ErrorMessage component={ErrorText} name="password" />
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react"
 import { UiContext } from "../scaffold/UiContextProvider"
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
 import { gql, useMutation } from "@apollo/client"
 import { ConfirmDialog } from "../misc"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
