@@ -231,7 +231,7 @@ begin
 	
 	UPDATE sb.accounts a
 	SET hash = crypt(new_password, new_salt), salt = new_salt
-	WHERE a.id = sb.current_account_id() AND a.hash = hash;
+	WHERE a.id = sb.current_account_id() AND a.hash = old_hash;
 	
 	GET DIAGNOSTICS cnt = ROW_COUNT;
 	
