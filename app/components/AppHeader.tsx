@@ -76,7 +76,7 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
 
     const components: ReactNode[] = []
 
-    if(appContext.account?.willingToContribute) {
+    if(appContext.account) {
         components.push(
             <TokenCounter key="counter" onPress={onTokenCounterPressed} 
                 size={getAppBarsTitleFontSize() * 50/STANDARD_APPBAR_TITLE_FONTSIZE} 

@@ -21,7 +21,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-    //await cleanupTestAccounts([account])
+    await cleanupTestAccounts([account])
 })
 
 test('Adding a resource above the free tier works without needing to become contributor', async() => {

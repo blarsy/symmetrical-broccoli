@@ -1,4 +1,3 @@
-import { Pool } from 'pg'
 import { postgraphile, PostGraphileOptions, makePluginHook } from "postgraphile"
 import { Config, createPool } from './config'
 import SubscriptionPlugin from './SubscriptionPlugin'

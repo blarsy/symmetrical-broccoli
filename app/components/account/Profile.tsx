@@ -101,7 +101,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
         { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Images.Preferences height="30" width="30" fill={p.color} /> }, component: Preferences },
     ]
 
-    const actualScreens = appContext.account?.willingToContribute ? 
+    const actualScreens = appContext.account ? 
         [
             fixedScreens[0],
             { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: (p: any) => <Images.TokensBlack fill={p.color} width={30} height={30} />}, component: TokenSettings }, 

@@ -59,13 +59,14 @@ interface Props {
 const HowItWorksSwiper = ({ width, style }: Props) => {
     const appContext = useContext(AppContext)
     const childWidth = width, childPadding = 10, childActualSpace = childWidth - (childPadding * 2)
-    const childStyle: StyleProp<ViewStyle> = { width: childWidth, gap: 15, padding: childPadding, alignItems: 'center' }
+    const childStyle: StyleProp<ViewStyle> = { width: childWidth, gap: 15, padding: childPadding, alignItems: 'flex-start' }
     const [swipedToEnd, setSwipedToEnd] = useState(false)
 
     return <View style={{ flexDirection: 'row', alignItems: 'center', position: 'relative', ...(style as object) }}>
         <SwiperFlatList onEndReached={() => setSwipedToEnd(true)} >
             <View style={childStyle}>
                 <Text variant="headlineLarge">{t('howItWorksStep1Title')}</Text>
+                <Text variant="bodyLarge">{t('weNeedToGrow')}</Text>
                 <Text variant="bodyLarge">{t('chickenOrEgg')}</Text>
                 <View style={{ flexDirection: 'row', paddingTop: 50 }}>
                     <ChickenEgg width="100%" height={childActualSpace / (702 / 400)} />

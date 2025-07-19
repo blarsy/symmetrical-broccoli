@@ -12,8 +12,17 @@ import Arrow from '@/app/img/fleche.svg'
 import Close from '@/app/img/CROSS.svg'
 import Tokens from '@/app/img/TOKENS.svg'
 import Check from '@/app/img/CHECK.svg'
-import { AppContext } from "../scaffold/AppContextProvider"
-import theme from "@/theme"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
+import { gql, useMutation } from "@apollo/client"
+import { LoadingButton } from "@mui/lab"
+import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
+import Feedback from "../scaffold/Feedback"
+
+export const SWITCH_TO_CONTRIBUTION_MODE = gql`mutation SwitchToContributionMode {
+    switchToContributionMode(input: {}) {
+        integer
+    }
+}`
 
 interface SlideProps extends PropsWithChildren {
     title: string
@@ -76,11 +85,13 @@ const NumberedImages = (p: NumberedImagesProps) => {
 interface Props {
     visible: boolean
     onClose: () => void
+    pureExplain?: boolean
 }
 
 const ExplainToken = (p: Props) => {
     const uiContext = useContext(UiContext)
     const appContext = useContext(AppContext)
+    const appDispatchContext = useContext(AppDispatchContext)
     const [currentSlide, setCurrentSlide] = useState(0)
     const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({ 
         slideChanged(slider) {
@@ -90,10 +101,12 @@ const ExplainToken = (p: Props) => {
             setCurrentSlide(0)
         }
     })
+    const [switchToContributionMode] = useMutation(SWITCH_TO_CONTRIBUTION_MODE)
+    const [switchStatus, setSwitchStatus] = useState<DataLoadState<undefined>>(initial(false))
     const theme = useTheme()
     const sm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
     const md = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
-    const numberOfSlides = appContext.account?.willingToContribute ? 4 : 5
+    const numberOfSlides = (appContext.account?.willingToContribute || p.pureExplain) ? 4 : 5
 
     let ratio = 1
     if(sm) {
@@ -110,6 +123,7 @@ const ExplainToken = (p: Props) => {
         </Stack>
         <Stack direction="row" ref={sliderRef} className="keen-slider">
             <Slide title={uiContext.i18n.translator("howItWorksStep1Title")} sx={{ gap: '1rem' }}>
+                <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('weNeedToGrow')}</Typography>
                 <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('chickenOrEgg')}</Typography>
                 <Stack sx={theme => ({ 
                     margin: 'auto', width: '500px',
@@ -179,13 +193,25 @@ const ExplainToken = (p: Props) => {
                     </Stack>
                 )}
             </Slide>
-            { !appContext.account?.willingToContribute &&<Slide title={uiContext.i18n.translator("howItWorksStep5Title")} sx={{ gap: '1rem' }}>
+            { !appContext.account?.willingToContribute && !p.pureExplain && <Slide title={uiContext.i18n.translator("howItWorksStep5Title")} sx={{ gap: '1rem' }}>
                 <Typography variant="body1" color="contrastText">
                     <span>{uiContext.i18n.translator('youAlreadyHave') + ' '}</span> 
                     <span style={{ fontWeight: 'bolder', fontSize: '1.5rem' }}>{appContext.account?.amountOfTokens}</span>
                     <span> Topes</span>
                 </Typography>
-                <Button variant="contained" color="primary" onClick={p.onClose}>{uiContext.i18n.translator('becomeContributorButton')}</Button>
+                <Feedback severity="error" detail={switchStatus.error?.detail} 
+                    message={switchStatus.error?.message} visible={!!switchStatus.error} onClose={() => setSwitchStatus(initial(false))} />
+                <LoadingButton variant="contained" color="primary" onClick={async () => {
+                    setSwitchStatus(initial(true))
+                    try {
+                        await switchToContributionMode()
+                        appDispatchContext({ type: AppReducerActionType.UpdateAccount, payload: { ...appContext.account, ...{ willingToContribute: true } } })
+                        setSwitchStatus(fromData(undefined))
+                        p.onClose()
+                    } catch(e) {
+                        setSwitchStatus(fromError(e, uiContext.i18n.translator('requestError')))
+                    }
+                }}>{uiContext.i18n.translator('becomeContributorButton')}</LoadingButton>
             </Slide> }
         </Stack>
         <Stack direction="row" justifyContent="space-between">

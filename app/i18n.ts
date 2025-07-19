@@ -221,7 +221,8 @@ const resources = {
       "lowAmountOfTokenNotificationDetails": "See how to grab some Topes",
       "showMe": "Show me",
       "contributionExplainationDialogTitle": "Contributing",
-      "howItWorksStep1Title": "Tope-là needs to grow",
+      "howItWorksStep1Title": "Thank you for using Tope-là !",
+      "weNeedToGrow": "Tope-là needs to grow.",
       "chickenOrEgg": "A chicken or the egg situation: no resource, no topper, no topper, no resource.",
       "howItWorksStep2Title": "For everyone",
       "freeResources": "You have two active resources at any time, without any restriction.",
@@ -235,7 +236,7 @@ const resources = {
       "completeProfile": "Complete your profile",
       "howItWorksStep5Title": "Let's go together ?",
       "youAlreadyHave": "We counted, and you already have:",
-      "becomeContributorButton": "I contribute",
+      "becomeContributorButton": "Got it",
       "selectButtonCaption": "Select",
       "expired": "Expired",
       "day": "day",
@@ -253,7 +254,6 @@ const resources = {
       "tokensSentHeadline2": "You sent some Topes",
       "tokensSentDetails": "You sent {{amountSent}} Topes to {{toAccount}}",
       "exchangeResourcesAgainsTokens": "Swap resources against Topes",
-      "understoodBecomingContributor": "I understood all the hereabove aspeects",
       "signInApple": "Sign in with Apple",
       "signInGoogle": "Sign in with Google"
    }
@@ -471,7 +471,8 @@ const resources = {
       "lowAmountOfTokenNotificationDetails": "Voir comment en gagner",
       "showMe": "Montre-moi",
       "contributionExplainationDialogTitle": "Contribuer",
-      "howItWorksStep1Title": "Tope-là a besoin de grandir",
+      "howItWorksStep1Title": "Merci d'utiliser Tope-là !",
+      "weNeedToGrow": "Tope-là a besoin de grandir.",
       "chickenOrEgg": "C'est l'oeuf ou la poule: pas de toppeur, pas de ressource, et pas de ressource, pas de toppeur.",
       "howItWorksStep2Title": "Pour tout le monde",
       "freeResources": "Tu peux avoir deux ressources actives à tout moment, sans aucune restriction.",
@@ -485,7 +486,7 @@ const resources = {
       "completeProfile": "Compléter son profil",
       "howItWorksStep5Title": "On y va, ensemble ?",
       "youAlreadyHave": "On a commencé à compter, et tu as déjà:",
-      "becomeContributorButton": "Je contribue",
+      "becomeContributorButton": "J'ai compris",
       "selectButtonCaption": "Selectionner",
       "expired": "Expiré",
       "day": "jour",
@@ -503,7 +504,6 @@ const resources = {
       "tokensSentHeadline2": "Tu as envoyé des Topes",
       "tokensSentDetails": "Tu as envoyé {{amountSent}} Topes à {{toAccount}}",
       "exchangeResourcesAgainsTokens": "Echanger contre des Topes",
-      "understoodBecomingContributor": "J'ai bien compris tous les aspects ci-dessus",
       "signInApple": "Connexion avec Apple",
       "signInGoogle": "Connexion avec Google"
     }

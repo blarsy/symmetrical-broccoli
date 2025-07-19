@@ -11,7 +11,7 @@ import { View } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import React from "react"
 import ResourceCard from "./ResourceCard"
-import { AppAlertContext, AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
@@ -83,7 +83,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const appDispatch = useContext(AppDispatchContext)
     const appAlertDispatch = useContext(AppAlertDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
-    const [askingSwitchToContributionMode, setAskingSwitchToContributionMode] = useState(false)
+    const [explainingContributionMode, setExplainingContributionMode] = useState(false)
     const [resources, setResources] = useState<Resource[]>([])
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
@@ -110,12 +110,12 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
       }
     }, [data, appContext.lastResourceChangedTimestamp])
 
-    const ensureContributionEnforced = (resources: Resource[], addRequested: () => void) => {
+    const ensureContributionExplained = (resources: Resource[], addRequested: () => void) => {
       if(resources.filter((res => !res.deleted && ((res.expiration && new Date(res.expiration) > new Date()) || res.expiration === null))).length < NUMBER_OF_FREE_RESOURCES){
         addRequested()
       } else {
         if(!appContext.account!.willingToContribute && (!appContext.account?.unlimitedUntil || appContext.account?.unlimitedUntil < new Date())) {
-          setAskingSwitchToContributionMode(true)
+          setExplainingContributionMode(true)
         } else {
           addRequested()
         }
@@ -141,7 +141,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
         { appContext.account ?
           <AppendableList testID="ResourcesAppendableList" state={{ data: resources, loading, error } as LoadState} dataFromState={state => state.data}
             onAddRequested={() => {
-              ensureContributionEnforced(resources, addRequested)
+              ensureContributionExplained(resources, addRequested)
             }} onRefreshRequested={() => {
               refetch()
             }} noDataLabel={<NoResourceYet/>}
@@ -177,9 +177,9 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
               }
             }} onDismiss={() => setDeletingResource(0)}/>
         <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={() => {
-          setAskingSwitchToContributionMode(false)
+          setExplainingContributionMode(false)
           addRequested()
-        }} onDismiss={() => setAskingSwitchToContributionMode(false)} visible={askingSwitchToContributionMode}
+        }} onDismiss={() => setExplainingContributionMode(false)} visible={explainingContributionMode}
             title={t('contributionExplainationDialogTitle')} />
     </>
 }

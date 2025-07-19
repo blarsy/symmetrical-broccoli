@@ -10,7 +10,6 @@ import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import { Text } from "react-native-paper"
 import Images from "@/Images"
 import { t } from "@/i18n"
-import OptionSelect from "../OptionSelect"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 interface Props {
@@ -31,7 +30,6 @@ const ContributeDialog = (p: Props) => {
     const [switchToContributionMode] = useMutation(GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE)
     const { reloadAccount } = useUserConnectionFunctions()
     const [ becomingContributor, setBecomingContributor] = useState(false)
-    const [understood, setUnderstood] = useState(false)
 
     return <ThemedDialog testID={p.testID} onDismiss={p.onDismiss} visible={p.visible} 
         style={{
@@ -42,11 +40,8 @@ const ContributeDialog = (p: Props) => {
                 <View style={{ justifyContent: 'space-between' }}>
                     <HowItWorksSwiper width={childWidth}/>
                     { !appContext.account?.willingToContribute && <View style={{ flex: 0, alignItems: 'center' }}>
-                        <OptionSelect testID="UnderstoodContributionCheck" title={t('understoodBecomingContributor')} value={understood} onChange={val => {
-                            setUnderstood(prev => !prev)
-                        }} />
                         <OrangeButton testID={`SwitchToContributionModeDialog:YesButton`} loading={becomingContributor} 
-                            labelStyle={{ alignItems: 'center' }} disabled={!understood}
+                            labelStyle={{ alignItems: 'center' }}
                             onPress={ async () => {
                                 setBecomingContributor(true)
                                 try {
@@ -61,7 +56,7 @@ const ContributeDialog = (p: Props) => {
                                 <Text style={{ color: '#fff' }} variant="bodySmall">+ 30</Text>
                                 <Images.TokensBlack fill="#fff" style={{ width: 25, height: 25 }}/>
                                 </View>}><View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                                    <Text style={{ color: '#fff' }} variant="bodyLarge">{`${t('yes')} ${t('becomeContributorButton')}`}</Text>
+                                    <Text style={{ color: '#fff' }} variant="bodyLarge">{t('becomeContributorButton')}</Text>
                                 </View>
                         </OrangeButton>
                     </View>}

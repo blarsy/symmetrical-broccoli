@@ -147,7 +147,8 @@ const Resources = () => {
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
-    const [deleteResource, { loading: deleting, error: deleteError}] = useMutation(DELETE_RESOURCE)
+    const [deleteResource] = useMutation(DELETE_RESOURCE)
+    const [explainingToken, setExplainingToken] = useState(false)
 
     return <Stack gap="1rem" overflow="auto">
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">

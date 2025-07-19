@@ -91,38 +91,43 @@ const EditResource = (p: Props) => {
     const [switchToContributionMode] = useMutation(SWITCH_TO_CONTRIBUTION_MODE)
     const [explainingToken, setExplainingToken] = useState(false)
 
+    const trySave = async (value: Resource) => {
+        setSaveState(beginOperation())
+        if(value.id) {
+            await updateResource({ variables: { resourceId: value.id, canBeDelivered: value.canBeDelivered, canBeExchanged: value.canBeExchanged, 
+                canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
+                description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
+                isProduct: value.isProduct, isService: value.isService, title: value.title, 
+                specificLocation: value.specificLocation, subjectiveValue: value.subjectiveValue ? Number(value.subjectiveValue) : null } })
+        } else {
+            await createResource({ variables: { canBeDelivered: value.canBeDelivered, canBeExchanged: value.canBeExchanged, 
+                canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
+                description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
+                isProduct: value.isProduct, isService: value.isService, title: value.title, 
+                specificLocation: value.specificLocation, subjectiveValue: value.subjectiveValue ? Number(value.subjectiveValue) : null } })
+        } 
+        setSaveState(fromData(undefined))
+    }
 
     const [saveState, setSaveState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
     return <LoadedZone loading={profileAddress.loading || categories.loading} error={profileAddress.error}>
-        { profileAddress.data && categories.data && <Formik initialValues={p.value || blankResource} onSubmit={async values => {
+        { categories.data && <Formik initialValues={p.value || blankResource} onSubmit={async values => {
             try {
-                setSaveState(beginOperation())
-                if(values.id) {
-                    await updateResource({ variables: { resourceId: values.id, canBeDelivered: values.canBeDelivered, canBeExchanged: values.canBeExchanged, 
-                        canBeGifted: values.canBeGifted, canBeTakenAway: values.canBeTakenAway, categoryCodes: values.categories.map(c => c.code), 
-                        description: values.description, expiration: values.expiration, imagesPublicIds: values.images.map(img => img.publicId), 
-                        isProduct: values.isProduct, isService: values.isService, title: values.title, 
-                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue ? Number(values.subjectiveValue) : null } })
-                } else {
-                    await createResource({ variables: { canBeDelivered: values.canBeDelivered, canBeExchanged: values.canBeExchanged, 
-                        canBeGifted: values.canBeGifted, canBeTakenAway: values.canBeTakenAway, categoryCodes: values.categories.map(c => c.code), 
-                        description: values.description, expiration: values.expiration, imagesPublicIds: values.images.map(img => img.publicId), 
-                        isProduct: values.isProduct, isService: values.isService, title: values.title, 
-                        specificLocation: values.specificLocation, subjectiveValue: values.subjectiveValue ? Number(values.subjectiveValue) : null } })
-                } 
-                setSaveState(fromData(undefined))
+                await trySave(values)
                 router.push('.')
             } catch(e) {
                 if((e as ApolloError).message === 'ACCOUNT_CANNOT_CREATE_NON_FREE_RESOURCES') {
                     try{
                         await switchToContributionMode()
+                        await trySave(values)
                         setExplainingToken(true)
                     } catch(e2) {
                         setSaveState(fromError(e2, uiContext.i18n.translator('requestError')))
                     }
+                } else {
+                    setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
                 }
-                setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }} validationSchema={yup.object().shape({
             title: yup.string().max(30, t('max30Chars')).required(t('required_field')),
@@ -196,7 +201,7 @@ const EditResource = (p: Props) => {
                                 <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
                             </Stack>
                             <ErrorMessage component={ErrorText} name="categories" />
-                            <TextField size="small" id="subjectiveValue" name="subjectiveValue" value={f.values.subjectiveValue}
+                            <TextField size="small" id="subjectiveValue" name="subjectiveValue" value={f.values.subjectiveValue || undefined}
                                 placeholder={uiContext.i18n.translator('subjectiveValueLabel')}
                                 onChange={f.handleChange('subjectiveValue')} onBlur={f.handleBlur('subjectiveValue')}/>
                             <ErrorMessage component={ErrorText} name="subjectiveValue" />
@@ -241,7 +246,7 @@ const EditResource = (p: Props) => {
                 </Form>
             }}
         </Formik> }
-        <ExplainToken visible={explainingToken} onClose={() => setExplainingToken(false)} />
+        <ExplainToken visible={explainingToken} pureExplain onClose={() => router.push('.')} />
     </LoadedZone>
 }
 

@@ -51,7 +51,7 @@ export const ChatHeader = (p: ChatHeaderProps) => {
                     { resourceDeleted && <Text variant="headlineSmall">{t('resource_deleted', { deleted: dayjs(resourceDeleted).format(t('dateFormat')) })}</Text> }
                 </View>
                 <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => p.onResourceShowRequested(conversationContext.conversationState.data!.resource!.id)} />
-                { conversationContext.conversationState.data.otherAccount.willingToContribute && appContext.account && 
+                { appContext.account && 
                     <IconButton style={{ borderRadius: 0 }} size={40} iconColor="#000" 
                         icon="hand-coin" 
                         onPress={() => setSendingTokensTo(conversationContext.conversationState.data!.otherAccount.id)} /> }

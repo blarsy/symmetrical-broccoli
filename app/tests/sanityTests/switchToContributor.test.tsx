@@ -35,7 +35,6 @@ test(`become contributor when creating one's 3rd resource`, async () => {
     //Check the switch to contribution mode screen is displayed
     await waitFor(() => expect(screen.getByTestId(`SwitchToContributionModeDialog`)).toBeOnTheScreen())
 
-    fireEvent.press(screen.getByTestId('UnderstoodContributionCheck:Button'))
     fireEvent.press(screen.getByTestId('SwitchToContributionModeDialog:YesButton'))
     await waitFor(() => expect(screen.getByTestId(`BackButton`)).toBeOnTheScreen(), { timeout: 4000 })
 

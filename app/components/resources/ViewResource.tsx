@@ -131,7 +131,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                         }))
                     })
                 } } Image={Images.Chat} /> }
-                { resource.data.account?.id != appState.account?.id && resource.data.account?.willingToContribute && appState.account?.willingToContribute &&
+                { resource.data.account?.id != appState.account?.id && 
                     <BareIconButton testID={`${baseTestId}:SendTokens`} size={35} onPress={() => {
                         ensureConnected('introduce_yourself', '', () => {
                             setSendingTokensTo(resource.data.account!.id)
