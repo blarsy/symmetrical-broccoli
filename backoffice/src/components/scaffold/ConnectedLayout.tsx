@@ -1,7 +1,7 @@
 import ClientWrapper from "./ClientWrapper"
 import TopBar from "./TopBar"
 import { PropsWithVersion } from "@/lib/utils"
-import { useContext } from "react"
+import { PropsWithChildren, useContext } from "react"
 import { AppContext } from "./AppContextProvider"
 import Login from "../user/Login"
 import { CircularProgress, Snackbar, Stack, Typography } from "@mui/material"
@@ -14,10 +14,15 @@ interface Props extends PropsWithVersion {
     allowAnonymous?: boolean
 }
 
+const Connected = (p: PropsWithChildren) => {
+    useRealtimeChatMessages()
+
+    return p.children
+}
+
 const ConnectContent = (p: Props) => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
-    useRealtimeChatMessages()
 
     if(uiContext.loading || appContext.loading) {
         return <CircularProgress color="primary" />
@@ -30,12 +35,17 @@ const ConnectContent = (p: Props) => {
                 <Login version={p.version} />
             </Stack>
         </>
-    } else {
+    } else if(!appContext.account) {
         return <>
             <TopBar version={ p.version }/>
             {p.children}
-            <ChatMessageSnackbar />
         </>
+    } else {
+        return <Connected>
+            <TopBar version={ p.version }/>
+            {p.children}
+            <ChatMessageSnackbar />
+        </Connected>
     }
 }
 

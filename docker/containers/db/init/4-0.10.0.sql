@@ -246,6 +246,50 @@ $BODY$;
 ALTER FUNCTION sb.change_password(character varying, character varying)
     OWNER TO sb;
 
+CREATE OR REPLACE FUNCTION sb.switch_to_contribution_mode(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+BEGIN
+	IF NOT EXISTS(SELECT * FROM sb.accounts WHERE id = sb.current_account_id() AND willing_to_contribute) THEN
+		PERFORM sb.grant_applicable_rewards();
+		
+		-- When switching to contribution mode: 30 topes reward
+		UPDATE sb.accounts
+		SET willing_to_contribute = true, amount_of_tokens = amount_of_tokens + 30
+		WHERE id = sb.current_account_id();
+		
+		INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+		VALUES (sb.current_account_id(), 7, 30);
+	
+		PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
+			'event', 'account_changed',
+			'subject', sb.current_account_id()
+		)::text);
+		PERFORM sb.create_notification(sb.current_account_id(), json_build_object(
+			'info', 'WELCOME_TOKEN_USER'
+		));
+	
+	
+		RETURN 1;
+	END IF;
+	
+	RETURN 0;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.switch_to_contribution_mode()
+    OWNER TO sb;
+
+REVOKE ALL ON FUNCTION sb.switch_to_contribution_mode() FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO sb;
 
 DO
 $body$

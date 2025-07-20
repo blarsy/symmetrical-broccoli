@@ -79,7 +79,7 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
     default:
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
-  console.log('action.type', action.type,'newState', newState, 'prev', previousState, 'new', {...previousState, ...newState})
+  //console.log('action.type', action.type,'newState', newState, 'prev', previousState, 'new', {...previousState, ...newState})
   return {...previousState, ...newState}
 }
 

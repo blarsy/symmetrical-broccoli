@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 import { getApolloClient } from "./apolloClient"
 import { useContext } from "react"
-import { AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
+import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
 import config from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
@@ -64,8 +64,38 @@ const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth(
   }
 }`
 
+export const NOTFICATION_RECEIVED = gql`subscription NotificationSubscription {
+  notificationReceived {
+    event
+    notification {
+      data
+      id
+      created
+      read
+    }
+  }
+}`
+
+export const ACCOUNT_CHANGE = gql`subscription AccountChange {
+    accountChangeReceived {
+      account {
+        willingToContribute
+        name
+        language
+        email
+        imageByAvatarImageId {
+            publicId
+        }
+        amountOfTokens
+        activated
+        id
+      }
+    }
+}`
+
 const useAccountFunctions = (version: string) => {
     const appDispatch = useContext(AppDispatchContext)
+    const appContext = useContext(AppContext)
     const { apiUrl } = config(version)
 
     const connectWithToken = async (token: string, otherSessionProps: any) => {
@@ -80,6 +110,27 @@ const useAccountFunctions = (version: string) => {
                 unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
                 account: undefined} })
         }
+
+        const subscriptions = [
+            client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
+                const updatedAccount: AccountInfo = {
+                    activated: payload.data.accountChangeReceived.account.activated,
+                    amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
+                    lastChangeTimestamp: new Date(),
+                    avatarPublicId: payload.data.accountChangeReceived.account.imageByAvatarImageId?.publicId,
+                    email: payload.data.accountChangeReceived.account.email,
+                    id: payload.data.accountChangeReceived.account.id,
+                    name: payload.data.accountChangeReceived.account.name,
+                    willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
+                    unlimitedUntil: payload.data.unlimitedUntil || null
+                }
+                
+                appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
+            }}),
+            client.subscribe({query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
+                appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
+            }})
+        ]
 
         const account: AccountInfo = {
             id: res.data.getSessionDataWeb.accountId, 
@@ -98,11 +149,13 @@ const useAccountFunctions = (version: string) => {
         appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
             token,
             unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
-            unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
+            unreadNotifications: res.data.getSessionDataWeb.unreadNotifications,
+            subscriptions,
             account} })
     }
 
     const disconnect = () => {
+        appContext.subscriptions.forEach(s => s.unsubscribe())
         localStorage.removeItem('token')
         appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
     }

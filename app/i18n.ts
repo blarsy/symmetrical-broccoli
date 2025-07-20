@@ -253,6 +253,9 @@ const resources = {
       "tokensSentHeadline1": "Topes sent",
       "tokensSentHeadline2": "You sent some Topes",
       "tokensSentDetails": "You sent {{amountSent}} Topes to {{toAccount}}",
+      "welcomeTokenUserHeadline1": "Thank you for using Topes !",
+      "welcomeTokenUserHeadline2": "We created many handy features to help you make the best out of it.",
+      "welcomeTokenUserDetails": "On your contribution profile, discover how to earn Topes, your transactions history, and more goodies.",
       "exchangeResourcesAgainsTokens": "Swap resources against Topes",
       "signInApple": "Sign in with Apple",
       "signInGoogle": "Sign in with Google"
@@ -503,6 +506,9 @@ const resources = {
       "tokensSentHeadline1": "Topes envoyés",
       "tokensSentHeadline2": "Tu as envoyé des Topes",
       "tokensSentDetails": "Tu as envoyé {{amountSent}} Topes à {{toAccount}}",
+      "welcomeTokenUserHeadline1": "Merci d'utiliser les Topes !",
+      "welcomeTokenUserHeadline2": "On a créé des outils pour que tu en tire le meilleur.",
+      "welcomeTokenUserDetails": "Sur ton profil de contributeur, découvre comment gagner des Topes, ton historique de transactions, et d'autres chouettes outils.",
       "exchangeResourcesAgainsTokens": "Echanger contre des Topes",
       "signInApple": "Connexion avec Apple",
       "signInGoogle": "Connexion avec Google"

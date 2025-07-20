@@ -45,7 +45,7 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
 function useRealtimeChatMessages() {
     const chatDispatch = useContext(ChatDispatchContext)
     const chatContext = useContext(ChatContext)
-    const { data } = useSubscription(MESSAGE_RECEIVED)
+    const { data, loading, error } = useSubscription(MESSAGE_RECEIVED)
 
     useEffect(() => {
         if(data) {

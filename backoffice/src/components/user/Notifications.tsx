@@ -196,112 +196,140 @@ const useNotifications = (version: string) => {
 
         // other notifications
         rawNotifications.data.myNotifications.edges.forEach((rawNotification: any) => {
-            if(rawNotification.node.data.info === 'COMPLETE_PROFILE') {
-                otherNotifs.push({
-                    id: rawNotification.node.id,
-                    created: rawNotification.node.created, 
-                    headline1: t('welcomeNotificationHeadline'),
-                    headline2: t('completeProcessNotificationHeadline'),
-                    read: rawNotification.node.read,
-                    text: t('completeProcessNotificationDetails'),
-                    image: undefined,
-                    onClick: async () => {
-                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/profile`)
-                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                            if (notif.id === rawNotification.node.id) {
-                                return { ...notif, ...{ read: true } }
-                            }
-                            return notif
-                        }) } } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                    }
-                })
-            } else if(rawNotification.node.data.info === 'SOME_RESOURCES_SUSPENDED') {
-                otherNotifs.push({
-                    id: rawNotification.node.id,
-                    created: rawNotification.node.created, 
-                    headline1: t('resourcesSuspendedNotificationHeadline'),
-                    headline2: t('checkTokensNotificationHeadline'),
-                    read: rawNotification.node.read,
-                    text: t('checkTokensNotificationDetails'),
-                    image: undefined,
-                    onClick: async () => {
-                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/resources`)
-                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                            if (notif.id === rawNotification.node.id) {
-                                return { ...notif, ...{ read: true } }
-                            }
-                            return notif
-                        }) } } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                    }
-                })
-            } else if (rawNotification.node.data.info === 'WARNING_LOW_TOKEN_AMOUNT') {
-                otherNotifs.push({
-                    id: rawNotification.node.id,
-                    created: rawNotification.node.created, 
-                    headline1: t('lowAmountOfTokenNotificationHeadline'),
-                    headline2: t('lowAmountOfTokenNotificationHeadline2'),
-                    read: rawNotification.node.read,
-                    text: t('lowAmountOfTokenNotificationDetails'),
-                    image: undefined,
-                    onClick: async () => {
-                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/profile/tokens`)
-                        
-                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                            if (notif.id === rawNotification.node.id) {
-                                return { ...notif, ...{ read: true } }
-                            }
-                            return notif
-                        }) } } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                    }
-                })
-            } else if (rawNotification.node.data.info === 'TOKENS_RECEIVED') {
-                otherNotifs.push({
-                    id: rawNotification.node.id,
-                    created: rawNotification.node.created, 
-                    headline1: t('tokensReceivedHeadline1'),
-                    headline2: t('tokensReceivedHeadline2'),
-                    read: rawNotification.node.read,
-                    text: t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }),
-                    image: undefined,
-                    onClick: async () => {
-                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/profile/tokens`)
-                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                            if (notif.id === rawNotification.node.id) {
-                                return { ...notif, ...{ read: true } }
-                            }
-                            return notif
-                        }) } } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                    }
-                })
-            } else if (rawNotification.node.data.info === 'TOKENS_SENT') {
-                otherNotifs.push({
-                    id: rawNotification.node.id,
-                    created: rawNotification.node.created, 
-                    headline1: t('tokensSentHeadline1'),
-                    headline2: t('tokensSentHeadline2'),
-                    read: rawNotification.node.read,
-                    text: t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }),
-                    image: undefined,
-                    onClick: async () => {
-                        setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/profile/tokens`)
-                        setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                            if (notif.id === rawNotification.node.id) {
-                                return { ...notif, ...{ read: true } }
-                            }
-                            return notif
-                        }) } } }))
-                        appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                    }
-                })
+            switch(rawNotification.node.data.info) {
+                case 'COMPLETE_PROFILE':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('welcomeNotificationHeadline'),
+                        headline2: t('completeProcessNotificationHeadline'),
+                        read: rawNotification.node.read,
+                        text: t('completeProcessNotificationDetails'),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/profile`)
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
+                case 'SOME_RESOURCES_SUSPENDED':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('resourcesSuspendedNotificationHeadline'),
+                        headline2: t('checkTokensNotificationHeadline'),
+                        read: rawNotification.node.read,
+                        text: t('checkTokensNotificationDetails'),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/resources`)
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
+                case 'WARNING_LOW_TOKEN_AMOUNT':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('lowAmountOfTokenNotificationHeadline'),
+                        headline2: t('lowAmountOfTokenNotificationHeadline2'),
+                        read: rawNotification.node.read,
+                        text: t('lowAmountOfTokenNotificationDetails'),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/profile/tokens`)
+                            
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
+                case 'TOKENS_RECEIVED':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('tokensReceivedHeadline1'),
+                        headline2: t('tokensReceivedHeadline2'),
+                        read: rawNotification.node.read,
+                        text: t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/profile/tokens`)
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
+                case 'TOKENS_SENT':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('tokensSentHeadline1'),
+                        headline2: t('tokensSentHeadline2'),
+                        read: rawNotification.node.read,
+                        text: t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/profile/tokens`)
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
+                case 'WELCOME_TOKEN_USER':
+                    otherNotifs.push({
+                        id: rawNotification.node.id,
+                        created: rawNotification.node.created, 
+                        headline1: t('welcomeTokenUserHeadline1'),
+                        headline2: t('welcomeTokenUserHeadline2'),
+                        read: rawNotification.node.read,
+                        text: t('welcomeTokenUserDetails'),
+                        image: undefined,
+                        onClick: async () => {
+                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+                            router.push(`/webapp/${version}/profile/tokens`)
+                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                                if (notif.id === rawNotification.node.id) {
+                                    return { ...notif, ...{ read: true } }
+                                }
+                                return notif
+                            }) } } }))
+                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+                        }
+                    })
+                    break
             }
         })
 

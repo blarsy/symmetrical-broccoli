@@ -7,12 +7,14 @@ export interface AppStateData {
   unreadNotifications: number[]
   notificationCustomHandler?: (notif: any) => void
   loading: boolean
+  subscriptions: {unsubscribe: () => void}[]
 }
 
 const blankAppContext = { 
     token: '',
     unreadNotifications: [],
-    loading: true
+    loading: true,
+    subscriptions: []
 } as AppStateData
 
 export enum AppReducerActionType {
@@ -43,10 +45,13 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = { loading: false }
         break
       case AppReducerActionType.Logout:
-        newState = { token: '', account: undefined }
+        newState = { ...blankAppContext, ...{ loading: false }}
         break
       case AppReducerActionType.UpdateAccount:
         newState = { account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } } }
+        break
+      case AppReducerActionType.AccountChanged:
+        newState = { account: action.payload }
         break
       case AppReducerActionType.NotificationRead:
         newState = { unreadNotifications: previousState.unreadNotifications.filter((currentId => currentId != action.payload))}
@@ -55,6 +60,10 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = { notificationCustomHandler: action.payload }
         break
       case AppReducerActionType.NotificationReceived:
+        if(previousState.notificationCustomHandler){
+          previousState.notificationCustomHandler(action.payload)
+        }
+
         newState = { unreadNotifications: [...previousState.unreadNotifications, action.payload.id] }
         break
       default:
