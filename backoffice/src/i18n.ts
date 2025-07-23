@@ -16,12 +16,14 @@ const resources = {
             "moreOptions": "More options",
             "natureOptionsLabel": "Nature",
             "exchangeTypeOptionsLabel": "Exchange type",
-            "deliveryOptionsLabel": "Acheminement",
+            "deliveryOptionsLabel": "Transport",
             "isProduct": "Product",
             "isService": "Service",
             "canBeGifted": "Gift",
-            "canBeExchanged": "Barter",
+            "canBeExchanged": "Exchange/barter",
             "canBeTakenAway": "Take away",
+            "onSite": "On site",
+            "placeToBeAgreed": "Place to be agreed",
             "canBeDelivered": "Delivery",
             "categoriesTitle": "Categories",
             "filtersTitle": "Filters",
@@ -189,7 +191,8 @@ const resources = {
             "repeatNewPasswordLabel": "Repeat new password",
             "confirmChangePassword": "Are you sure you want to change the password ?",
             "changePasswordButton": "Change password",
-            "successPasswordChanged": "Password changed successfully"
+            "successPasswordChanged": "Password changed successfully",
+            "addressRequiredWhenResourceOnSite": "Address is required",
         }
     },
     fr: { 
@@ -210,8 +213,10 @@ const resources = {
             "isProduct": "Produit",
             "isService": "Service",
             "canBeGifted": "Don",
-            "canBeExchanged": "Troc",
+            "canBeExchanged": "Echange/troc",
             "canBeTakenAway": "A emporter",
+            "onSite": "A l'adresse donnée",
+            "placeToBeAgreed": "Lieu à convenir",
             "canBeDelivered": "Livraison",
             "categoriesTitle": "Categories",
             "filtersTitle": "Filtres",
@@ -379,7 +384,8 @@ const resources = {
             "repeatNewPasswordLabel": "Répéter le nouveau mot de passe",
             "confirmChangePassword": "Es-tu sûr de vouloir changer le mot de passe ?",
             "changePasswordButton": "Changer le mot de passe",
-            "successPasswordChanged": "Mot de passe changé avec succès"
+            "successPasswordChanged": "Mot de passe changé avec succès",
+            "addressRequiredWhenResourceOnSite": "Une adresse est requise",
         }
     }
 }

@@ -143,6 +143,9 @@ const EditResource = (p: Props) => {
             }),
             canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', t('required_field'), (val, ctx) => {
                 return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
+            }),
+            specificLocation: yup.object().nullable().test('addressRequiredWhenResourceOnSite', t('addressRequiredWhenResourceOnSite'), (val, ctx) => {
+                return !ctx.parent.canBeTakenAway || (ctx.parent.canBeTakenAway && val)
             })
         })}>
             { f => {
@@ -168,7 +171,11 @@ const EditResource = (p: Props) => {
                                 placeholder={uiContext.i18n.translator('descriptionLabel')} 
                                 onChange={f.handleChange('description')} onBlur={f.handleBlur('description')}/>
                             <ErrorMessage component={ErrorText} name="description" />
-                            <OptionLine label={uiContext.i18n.translator('natureOptionsLabel')} values={{ isProduct: f.values.isProduct, isService: f.values.isService }}
+                            <OptionLine labels={{ 
+                                title: uiContext.i18n.translator('natureOptionsLabel'), 
+                                isProduct: 'isProduct',
+                                isService: 'isService'
+                            }} values={{ isProduct: f.values.isProduct, isService: f.values.isService }}
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
@@ -205,12 +212,20 @@ const EditResource = (p: Props) => {
                                 placeholder={uiContext.i18n.translator('subjectiveValueLabel')}
                                 onChange={f.handleChange('subjectiveValue')} onBlur={f.handleBlur('subjectiveValue')}/>
                             <ErrorMessage component={ErrorText} name="subjectiveValue" />
-                            <OptionLine label={uiContext.i18n.translator('exchangeTypeOptionsLabel')} values={{ canBeGifted: f.values.canBeGifted, canBeExchanged: f.values.canBeExchanged }}
+                            <OptionLine labels={{ 
+                                title: uiContext.i18n.translator('exchangeTypeOptionsLabel'),
+                                canBeGifted: 'canBeGifted',
+                                canBeExchanged: 'canBeExchanged'
+                            }} values={{ canBeGifted: f.values.canBeGifted, canBeExchanged: f.values.canBeExchanged }}
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <ErrorMessage component={ErrorText} name="canBeGifted" />
-                            <OptionLine label={uiContext.i18n.translator('deliveryOptionsLabel')} values={{ canBeTakenAway: f.values.canBeTakenAway, canBeDelivered: f.values.canBeDelivered }}
+                            <OptionLine labels={{ 
+                                title: uiContext.i18n.translator('deliveryOptionsLabel'),
+                                canBeTakenAway: f.values.isProduct ? 'canBeTakenAway' : 'onSite',
+                                canBeDelivered: f.values.isProduct ? 'canBeDelivered': 'placeToBeAgreed'
+                            }} values={{ canBeTakenAway: f.values.canBeTakenAway, canBeDelivered: f.values.canBeDelivered }}
                                 onChange={val => { 
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
@@ -220,6 +235,7 @@ const EditResource = (p: Props) => {
                                 <EditAddress value={f.values.specificLocation}
                                     onChange={newLoc => f.setFieldValue('specificLocation', newLoc)} />
                             </Stack>
+                            <ErrorMessage component={ErrorText} name="specificLocation" />
                         </Stack>
                         <Stack padding="1rem 2rem" sx={theme => ({ bottom: 0, left: 0, position: 'fixed', width: '100%', backgroundColor: alpha(theme.palette.secondary.main, 0.5) })} >
                             <Feedback severity="error" visible={!!saveState.error}

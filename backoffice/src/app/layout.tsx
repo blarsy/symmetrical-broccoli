@@ -10,7 +10,7 @@ dayjs.extend(relativeTime)
 
 export const metadata = {
   title: 'Tope-la',
-  description: 'Don & Troc',
+  description: 'Don, échanges, troc',
 }
 
 export default function RootLayout({

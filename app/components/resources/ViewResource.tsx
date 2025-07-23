@@ -190,15 +190,13 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </ViewField>
                 <Hr thickness={2}/>
             </> }
-            { resource.data.isProduct && <>
-                <ViewField title={t('transport_label')} titleOnOwnLine>
-                    <View style={{ flexDirection: 'row', gap: 1 }}>
-                        { resource.data.canBeTakenAway && <ResourceInfoChip testID={`${baseTestId}:canBeTakenAway`}>{t('canBeTakenAway_label')}</ResourceInfoChip>}
-                        { resource.data.canBeDelivered && <ResourceInfoChip testID={`${baseTestId}:canBeDelivered`}>{t('canBeDelivered_label')}</ResourceInfoChip>}
-                    </View>
-                </ViewField>
-                <Hr thickness={2}/>
-            </> }
+            <ViewField title={t('transport_label')} titleOnOwnLine>
+                <View style={{ flexDirection: 'row', gap: 1 }}>
+                    { resource.data.canBeTakenAway && <ResourceInfoChip testID={`${baseTestId}:canBeTakenAway`}>{t(resource.data.isProduct ? 'canBeTakenAway_label': 'onSite')}</ResourceInfoChip>}
+                    { resource.data.canBeDelivered && <ResourceInfoChip testID={`${baseTestId}:canBeDelivered`}>{t(resource.data.isProduct ? 'canBeDelivered_label': 'placeToBeAgreed')}</ResourceInfoChip>}
+                </View>
+            </ViewField>
+            <Hr thickness={2}/>
             <ViewField title={t('type_label')} titleOnOwnLine>
                 <View style={{ flexDirection: 'row', gap: 1 }}>
                     { resource.data.canBeGifted && <ResourceInfoChip testID={`${baseTestId}:canBeGifted`}>{t('canBeGifted_label')}</ResourceInfoChip>}

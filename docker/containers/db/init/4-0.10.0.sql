@@ -291,6 +291,43 @@ GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO identified_account
 
 GRANT EXECUTE ON FUNCTION sb.switch_to_contribution_mode() TO sb;
 
+CREATE SEQUENCE IF NOT EXISTS sb.bids_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE sb.bids_id_seq
+    OWNER TO sb;
+
+GRANT USAGE ON SEQUENCE sb.bids_id_seq TO identified_account;
+
+GRANT ALL ON SEQUENCE sb.bids_id_seq TO sb;
+
+CREATE TABLE sb.bids
+(
+    id integer NOT NULL DEFAULT nextval('bids_id_seq'::regclass),
+    resource_id integer NOT NULL,
+    amount_of_tokens integer NOT NULL,
+    valid_until timestamp without time zone NOT NULL,
+    accepted timestamp with time zone,
+    deleted timestamp with time zone,
+    refused timestamp with time zone,
+    created timestamp with time zone NOT NULL DEFAULT now(),
+    PRIMARY KEY (id),
+    CONSTRAINT bids_resources_fk FOREIGN KEY (resource_id)
+        REFERENCES sb.resources (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS sb.bids
+    OWNER to sb;
+
+GRANT INSERT, SELECT, UPDATE ON TABLE sb.bids TO identified_account;
+
 DO
 $body$
 BEGIN

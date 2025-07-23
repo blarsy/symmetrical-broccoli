@@ -1,5 +1,5 @@
 # Tope Là (codename Symmetrical-broccoli)
-Tope là creates opportunities for associations to receive gifts from organizations & individuals, and barter any kind of resources between one another.
+Tope là creates opportunities for associations to receive gifts from organizations & individuals, and exchange any kind of resources between one another.
 ## Installation
 Git clone the repo on a local folder (/home/code/symmetrical-broccoli in this document)
 ### Run the database docker container locally

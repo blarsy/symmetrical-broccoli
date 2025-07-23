@@ -67,11 +67,14 @@ export default ({ route, navigation }:RouteProps) => {
             isProduct: yup.bool().test('natureIsPresent', t('nature_required'), (val, ctx) => {
                 return val || ctx.parent.isService
             }),
-            canBeGifted: yup.bool().test('transportIsPresent', t('transport_required'), (val, ctx) => {
+            canBeGifted: yup.bool().test('exchangeTypeIsPresent', t('exchangeType_required'), (val, ctx) => {
                 return val || ctx.parent.canBeExchanged
             }),
-            canBeTakenAway: yup.bool().test('exchangeTypeIsPresent', t('exchangeType_required'), (val, ctx) => {
+            canBeTakenAway: yup.bool().test('transportIsPresent', t('transport_required'), (val, ctx) => {
                 return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
+            }),
+            specificLocation: yup.object().nullable().test('addressRequiredWhenResourceOnSite', t('addressRequiredWhenResourceOnSite'), (val, ctx) => {
+                return !ctx.parent.canBeTakenAway || (ctx.parent.canBeTakenAway && val)
             })
         })} onSubmit={async (values) => {
             ensureConnected('connect_to_create_ressource', 'resource_is_free', () => {
@@ -142,27 +145,26 @@ export default ({ route, navigation }:RouteProps) => {
                     }} />
                     <ErrorMessage component={ErrorText} name="canBeGifted" />
                     <Hr />
-                    { values.isProduct && <>
-                        <CheckboxGroup testID="transport" isMandatory title={t('transport_label')} onChanged={val => {
-                            setFieldValue('canBeTakenAway', val.canBeTakenAway)
-                            setTouched({ canBeTakenAway: true })
-                            setFieldValue('canBeDelivered', val.canBeDelivered)
-                            setTouched({ canBeDelivered: true })
-                        }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} options={{
-                            canBeTakenAway: t('canBeTakenAway_label'), 
-                            canBeDelivered: t('canBeDelivered_label')
-                        }} />
-                        <ErrorMessage component={ErrorText} name="canBeTakenAway" />
-                        <Hr />
-                    </> }
-                    <LocationEdit testID="resourceAddress" style={{ marginLeft: 16 }} location={values.specificLocation} 
+                    <CheckboxGroup testID="transport" isMandatory title={t('transport_label')} onChanged={val => {
+                        setFieldValue('canBeTakenAway', val.canBeTakenAway)
+                        setTouched({ canBeTakenAway: true })
+                        setFieldValue('canBeDelivered', val.canBeDelivered)
+                        setTouched({ canBeDelivered: true })
+                    }} values={{ canBeTakenAway: values.canBeTakenAway, canBeDelivered: values.canBeDelivered }} options={{
+                        canBeTakenAway: t(formikState.values.isProduct ? 'canBeTakenAway_label': 'onSite'), 
+                        canBeDelivered: t(formikState.values.isProduct ? 'canBeDelivered_label': 'placeToBeAgreed')
+                    }} />
+                    <ErrorMessage component={ErrorText} name="canBeTakenAway" />
+                    <Hr />
+                    <LocationEdit isMandatory={values.canBeTakenAway} testID="resourceAddress" style={{ marginLeft: 16 }} location={values.specificLocation} 
                         onDeleteRequested={() => {
                             setFieldValue('specificLocation', null)
                         }}
                         onLocationChanged={newLocation => {
                             setFieldValue('specificLocation', newLocation)
-                        }} 
+                        }}
                         orangeBackground={false}/>
+                    <ErrorMessage component={ErrorText} name="specificLocation" />
                     <Portal>
                         <OperationFeedback testID="resourceEditionFeedback" error={saveResourceState.error}
                             onDismissError={() => setSaveResourcestate(initial(false, false))}

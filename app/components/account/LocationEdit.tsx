@@ -11,6 +11,7 @@ import ConfirmDialog from "../ConfirmDialog"
 import Images from "@/Images"
 import BareIconButton from "../layout/BareIconButton"
 import EditAddressModal from "./EditAddressModal"
+import { StyledLabel } from "../layout/lib"
 
 interface Props {
     location: Location | null
@@ -20,9 +21,10 @@ interface Props {
     orangeBackground?: boolean
     small?: boolean
     testID: string
+    isMandatory?: boolean
 }
 
-export default ({ location, style, onLocationChanged, onDeleteRequested, orangeBackground, small, testID }: Props) => {
+export default ({ location, style, onLocationChanged, onDeleteRequested, orangeBackground, small, testID, isMandatory }: Props) => {
     const [editedLocation, setEditedLocation] = useState<Location | undefined>(undefined)
     const [currentLocation, setCurrentLocation] = useState<Location | null>(location)
     const [deleteRequested, setDeleteRequested] = useState(false)
@@ -34,6 +36,7 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
     const color = orangeBackground ? '#fff' : '#000'
 
     return <View style={{ gap: 20, alignContent: 'stretch', ...(style as object)}}>
+            <StyledLabel isMandatory={isMandatory} label={t('addressLabel')}/>
         { currentLocation ?
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text testID={`${testID}:address`} variant="headlineSmall" lineBreakMode="tail" numberOfLines={2} style={{ color, flexShrink: 1 }}>{currentLocation.address}</Text>

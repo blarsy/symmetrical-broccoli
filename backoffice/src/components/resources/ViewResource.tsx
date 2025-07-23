@@ -151,8 +151,8 @@ const ViewResource = (p: Props) => {
                   if(resource.data.canBeDelivered || resource.data.canBeTakenAway) {
                     fields.push( <Typography key="delivLabel" color="primary" variant="body1">{uiContext.i18n.translator('deliveryOptionsLabel')}</Typography>,
                     <Stack direction="row" gap="0.5rem" key="deliv">
-                      { resource.data.canBeDelivered && <Chip label={uiContext.i18n.translator('canBeDelivered')}/> }
-                      { resource.data.canBeTakenAway && <Chip label={uiContext.i18n.translator('canBeTakenAway')}/> }
+                      { resource.data.canBeDelivered && <Chip label={uiContext.i18n.translator(resource.data.isProduct ? 'canBeDelivered' : 'placeToBeAgreed')}/> }
+                      { resource.data.canBeTakenAway && <Chip label={uiContext.i18n.translator(resource.data.isProduct ? 'canBeTakenAway' : 'onSite')}/> }
                     </Stack>)
                   }
                   if(resource.data.specificLocation) {
