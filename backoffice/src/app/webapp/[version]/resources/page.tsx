@@ -5,7 +5,7 @@ import { usePagePath } from "@/lib/utils"
 
 const Page = () => {
     const { version } = usePagePath()
-    return <ConnectedLayout version={version} allowAnonymous>
+    return <ConnectedLayout version={version}>
         <Resources/>
     </ConnectedLayout>
 }

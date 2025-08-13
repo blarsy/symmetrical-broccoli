@@ -29,6 +29,7 @@ interface Props {
         images: string[]
         accountId?: number
     }
+    testId: string
 }
 
 const ResourceCard = (p: Props) => {
@@ -54,7 +55,7 @@ const ResourceCard = (p: Props) => {
     } else {
         avatar = <img style={{ borderRadius: '25px', width: '5rem', height: '5rem' }} alt="image" src={urlFromPublicId(p.resource.images[0])} />
     }
-    return <Card key={p.resource.id} onClick={() => router.push(`/webapp/${p.version}/view/${p.resource.id}`)} sx={theme => ({
+    return <Card data-testid={p.testId} key={p.resource.id} onClick={() => router.push(`/webapp/${p.version}/view/${p.resource.id}`)} sx={theme => ({
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
@@ -74,7 +75,7 @@ const ResourceCard = (p: Props) => {
             <PictureGallery sx={{ justifyContent: "center" }} images={p.resource.images.map((publicId, idx: number) => 
                 ({ uri: urlFromPublicId(publicId), alt: idx.toString() }))} onImageClicked={img => setZoomedImg(img.uri)}/>
         </CardMedia>
-      <CardContent>{limitTextLength(p.resource.description, 70)}</CardContent>
+        <CardContent>{limitTextLength(p.resource.description, 70)}</CardContent>
         <Dialog open={!!zoomedImg} onClose={() => setZoomedImg(undefined)} fullScreen>
             <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }}>
                 <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={e => {

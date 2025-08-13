@@ -15,6 +15,7 @@ import Feedback from "../scaffold/Feedback"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { UiContext } from "../scaffold/UiContextProvider"
 import ChangePasswordDialog from "./ChangePasswordDialog"
+import { useRouter } from "next/navigation"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
     updateAccount(
@@ -24,7 +25,7 @@ const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId
     }
 }`
 
-const DELETE_ACCOUNT = gql`mutation DeleteAccount {
+export const DELETE_ACCOUNT = gql`mutation DeleteAccount {
     deleteAccount(input: {}) {
         integer
     }
@@ -102,6 +103,7 @@ const Profile = () => {
     const t = uiContext.i18n.translator
     const { disconnect } = useAccountFunctions(uiContext.version)
     const [ passwordChanged, setPasswordChanged ] = useState(false)
+    const router = useRouter()
 
     return <LoadedZone loading={publicInfo.profileData.loading} containerStyle={{ alignItems: 'center', overflow: 'auto' }}>
         { publicInfo.profileData.data && <Stack sx={theme => ({ 
@@ -180,6 +182,7 @@ const Profile = () => {
                     await deleteAccount()
                     disconnect()
                     setDeletingAccount(false)
+                    router.push(`/webapp/${uiContext.version}`)
                 }}>{t('okButton')}</Button>
             </DialogActions>
         </Dialog>

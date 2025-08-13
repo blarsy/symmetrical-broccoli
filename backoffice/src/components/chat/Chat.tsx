@@ -61,8 +61,8 @@ const Chat = (p: Props) => {
         }
     }, [uiContext.categories.data])
     
-    return <LoadedZone loading={loadState.loading} error={loadState.error} containerStyle={{ overflow: 'auto' }}>
-        <Stack direction="row" flex="1" sx={p.sx}>
+    return <LoadedZone loading={loadState.loading} error={loadState.error} containerStyle={[ { overflow: 'auto' }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
+        <Stack direction="row" flex="1" maxHeight="100%">
             <Conversations onConversationSelected={p.onConversationSelected} sx={{ flex: '0 0 30%', borderRight: '1px solid #ccc', borderTop: '1px solid #ccc', maxHeight: '100%' }}/>
             <Conversation sx={{ flex: '0 0 70%', maxHeight: '100%', borderTop: '1px solid #ccc' }}/>
         </Stack>

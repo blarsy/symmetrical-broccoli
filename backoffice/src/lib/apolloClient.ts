@@ -16,6 +16,7 @@ import { createClient } from 'graphql-ws'
 
 export const getApolloClient = (version: string, token?: string) => {
     const config = getConfig(version)
+    
     let webSocketImpl
     let customFetch
     if(typeof WebSocket  === 'undefined') {
@@ -107,7 +108,6 @@ export const getApolloClient = (version: string, token?: string) => {
 export const GET_RESOURCE = gql`query GetResource($id: Int!) {
   resourceById(id: $id) {
     accountByAccountId {
-      email
       id
       name
       willingToContribute
@@ -147,6 +147,6 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
     paidUntil
     created
     deleted
-    subjectiveValue
+    price
   }
 }`

@@ -45,7 +45,7 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = { loading: false }
         break
       case AppReducerActionType.Logout:
-        newState = { ...blankAppContext, ...{ loading: false }}
+        newState = { ...blankAppContext, ...{ loading: false, account: undefined }}
         break
       case AppReducerActionType.UpdateAccount:
         newState = { account: { ...action.payload, ...{ lastChangeTimestamp: new Date() } } }
@@ -57,11 +57,11 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         newState = { unreadNotifications: previousState.unreadNotifications.filter((currentId => currentId != action.payload))}
         break
       case AppReducerActionType.SetNewNotificationHandler:
-        newState = { notificationCustomHandler: action.payload }
+        newState = { notificationCustomHandler: action.payload.handler }
         break
       case AppReducerActionType.NotificationReceived:
         if(previousState.notificationCustomHandler){
-          previousState.notificationCustomHandler(action.payload)
+          setTimeout(() => previousState.notificationCustomHandler!(action.payload), 0)
         }
 
         newState = { unreadNotifications: [...previousState.unreadNotifications, action.payload.id] }

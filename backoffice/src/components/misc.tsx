@@ -3,9 +3,10 @@ import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import EmptyImage from '@/app/img/PHOTOS.svg'
-import { Avatar, Box, Dialog, DialogActions, DialogTitle, IconButton, Stack, SxProps, Theme, Typography, useTheme } from "@mui/material"
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Typography, useTheme } from "@mui/material"
 import { PropsWithChildren } from "react"
 import { urlFromPublicId } from "@/lib/images"
+import Tokens from '@/app/img/TOKENS.svg'
 
 export const screenSizesCoefficients = [0.8, 0.7, 0.5]
 export const makePxSize = (baseSize: number, coeff?: number) => `${(baseSize * (coeff || 1)).toFixed(2)}px`
@@ -36,14 +37,28 @@ interface ConfirmDialogProps {
     title: string
     onClose: (response: boolean) => void
     visible: boolean
+    text?: string
+    okButtonCaption?: string
+    cancelButtonCaption?: string
+    testID?: string
 }
 
 export const ConfirmDialog = (p: ConfirmDialogProps) => {
     return <Dialog open={p.visible} disableScrollLock>
         <DialogTitle>{p.title}</DialogTitle>
+        { p.text && <DialogContentText sx={{ padding: '1rem' }}>{p.text}</DialogContentText>}
         <DialogActions sx={{ justifyContent: 'center' }}>
-            <IconButton color="success" onClick={() => p.onClose(true)}><Check /></IconButton>
-            <IconButton color="error" onClick={() => p.onClose(false)}><Close /></IconButton>
+            { p.okButtonCaption ?  
+                <Button data-testid={`${p.testID}:ConfirmDialog:ConfirmButton`} color="success" endIcon={<Check />} onClick={() => p.onClose(true)}>{p.okButtonCaption}</Button>
+                : 
+                <IconButton data-testid={`${p.testID}:ConfirmDialog:ConfirmButton`} color="success" onClick={() => p.onClose(true)}><Check /></IconButton>
+            }
+            { p.cancelButtonCaption ?  
+                <Button color="error" endIcon={<Close />} onClick={() => p.onClose(false)}>{p.cancelButtonCaption}</Button>
+                : 
+                <IconButton color="error" onClick={() => p.onClose(false)}><Close /></IconButton>
+            }
+            
         </DialogActions>
     </Dialog>
 }
@@ -65,9 +80,9 @@ export const ResponsiveImage = (p: ResponsiveImageProps) => {
     const theme = useTheme()
 
     return <ResponsivePhotoBox sx={p.sx} baseSize={p.baseSize}>
-        <Stack>
+        <Stack sx={{ cursor: p.onClick && 'pointer' }}>
         { p.publicId ? 
-            <img style={{ cursor: 'pointer', borderRadius: '10px', width: '100%', height: '100%' }} alt="resource" 
+            <img style={{ borderRadius: '10px', width: '100%', height: '100%' }} alt="resource" 
                 src={urlFromPublicId(p.publicId)} onClick={p.onClick}/>
             :
             <EmptyImage fill={theme.palette.primary.main} width="100%"/>
@@ -124,7 +139,7 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
         }
     })
 
-    const avatarSx : SxProps<Theme>= [{ width: '100%', height: '100%', cursor: 'pointer' }, 
+    const avatarSx : SxProps<Theme>= [{ width: '100%', height: '100%', cursor: onClick && 'pointer' }, 
         ...(Array.isArray(sx) ? sx : [sx]), 
         onClick ? clickableSx : {}]
 
@@ -147,4 +162,12 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
         </Stack>
     }
     return avatar
+}
+
+export const PriceTag = ({ value, label }: { value: number, label?: string }) => {
+    return <Stack direction="row" gap="0.5rem" alignItems="center">
+        { label && <Typography color="primary" variant="body1">{label} </Typography> }
+        <Typography color="primary" variant="h6">{value} </Typography>
+        <Tokens style={{ width: '2rem', height: '2rem' }}/>
+    </Stack>
 }

@@ -18,7 +18,7 @@ interface Props {
 }
 
 const GET_ACCOUNT = gql`query Account($id: Int!) {
-    accountById(id: $id) {
+    getAccountPublicInfo(id: $id) {
       email
       name
       id

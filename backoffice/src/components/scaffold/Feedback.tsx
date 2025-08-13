@@ -1,7 +1,8 @@
-import { Alert, AlertColor, Stack, Tooltip, Typography } from "@mui/material"
+import { Alert, AlertColor, Stack, SxProps, Theme, Tooltip, Typography } from "@mui/material"
 import InfoIcon from '@mui/icons-material/Info'
 import { useContext } from "react"
 import { UiContext } from "./UiContextProvider"
+import { p } from "graphql-ws/dist/common-DY-PBNYy"
 
 interface Props {
     message?: string
@@ -9,16 +10,18 @@ interface Props {
     severity: AlertColor
     onClose?: () => void
     visible?: boolean
+    sx?: SxProps<Theme>
+    testID?: string
 }
 
-const Feedback = ({ message, detail, severity, onClose, visible = true }: Props) => {
+const Feedback = ({ message, detail, severity, onClose, sx, testID, visible = true }: Props) => {
     const uiContext = useContext(UiContext)
     if(!message) message = uiContext.i18n?.translator('requestError')
 
     if(visible) {
-        return <Alert severity={severity} onClose={onClose}>
+        return <Alert sx={sx} severity={severity} onClose={onClose}>
             <Stack>
-                <Stack direction="row" justifyItems="space-between" gap="1rem">
+                <Stack direction="row" justifyItems="space-between" gap="1rem" data-testid={testID}>
                     <Typography>{message}</Typography>
                     {detail && <Tooltip title={detail}>
                         <InfoIcon/>

@@ -88,8 +88,8 @@ export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture 
     }
   }`
 
-const GET_ACCOUNT = gql`query Account($id: Int!) {
-    accountById(id: $id) {
+const GET_ACCOUNT = gql`query Account {
+    me {
         email
         name
         id
@@ -147,7 +147,7 @@ const EarningTokens = ({ version }: { version: string }) => {
     const uiContext = useContext(UiContext)
     const router = useRouter()
 
-    const {data, loading, error, refetch} = useQuery(GET_ACCOUNT, { variables: { id: appContext.account?.id } })
+    const {data, loading, error, refetch} = useQuery(GET_ACCOUNT)
     const { data: resWithoutPics, loading: resWithoutPicsLoading, error: resWithoutPicsError } = useQuery(GET_RESOURCES_WITHOUT_PIC)
     const t = uiContext.i18n.translator
     useEffect(() => {

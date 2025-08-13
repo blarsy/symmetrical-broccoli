@@ -57,7 +57,7 @@ const RegisterExternalAuthForm = (p: Props) => {
             { ({ handleChange, handleBlur, handleSubmit }) =>
                 <Form onSubmit={handleSubmit}>
                     <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
-                        <TextField id="name" name="name" onChange={handleChange('name')} onBlur={handleBlur('name')} placeholder={uiContext.i18n.translator('accountNameLabel')}/>
+                        <TextField id="name" name="name" onChange={handleChange('name')} onBlur={handleBlur('name')} label={uiContext.i18n.translator('accountNameLabel')}/>
                         <ErrorMessage component={ErrorText} name="name"/>
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">

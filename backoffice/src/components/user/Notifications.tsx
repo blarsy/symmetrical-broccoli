@@ -90,7 +90,7 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
         paidUntil
         created
         deleted
-        subjectiveValue
+        price
       }
     }
 }`
@@ -103,6 +103,8 @@ const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: 
 
 const NOTIFICATIONS_PAGE_SIZE = 15
 
+
+
 const useNotifications = (version: string) => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
@@ -111,7 +113,7 @@ const useNotifications = (version: string) => {
     const [getNotifications, { refetch }] = useLazyQuery(GET_NOTIFICATIONS, { fetchPolicy: 'network-only' })
     const router = useRouter()
     const refetchResourcesAndNotifications = () => {
-        getResources().then(() => {
+        return getResources().then(() => {
             refetch()
         })
     }
@@ -127,7 +129,7 @@ const useNotifications = (version: string) => {
                 const resNotifs = await getNotifications({ variables: { first: NOTIFICATIONS_PAGE_SIZE, after: notificationData.data?.endCursor } })
                 const allNotifs = await getNotificationDataFromRaw(resNotifs)
                 setNotificationData(prev => {
-                    return { loading: false, data: { ...allNotifs, ...{ data: [...prev.data!.data, ...allNotifs.data] }}}
+                    return { loading: false, data: { ...allNotifs, ...{ data: [...prev.data?.data || [], ...allNotifs.data] }}}
                 })
             } catch(e) {
                 setNotificationData({ loading: false, error: e as Error, data: notificationData.data })
@@ -180,6 +182,27 @@ const useNotifications = (version: string) => {
         return result
     }
 
+    const createOtherNotification = (headline1: string, headline2: string, details: string, url: string, rawNotification: any, image?: string): NotificationData => ({
+        id: rawNotification.node.id,
+        created: rawNotification.node.created, 
+        headline1,
+        headline2,
+        read: rawNotification.node.read,
+        text: details,
+        image,
+        onClick: async () => {
+            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
+            router.push(url)
+            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
+                if (notif.id === rawNotification.node.id) {
+                    return { ...notif, ...{ read: true } }
+                }
+                return notif
+            }) } } }))
+            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
+        }
+    })
+
     const getNotificationDataFromRaw = async (rawNotifications: any): Promise<NotificationPage> => {
         let newResourceNotifs: NotificationData[] = []
         const otherNotifs: NotificationData[] = []
@@ -189,146 +212,91 @@ const useNotifications = (version: string) => {
         if(resIds.length > 0) {
             const resourcesData = await getResources({ variables: { resourceIds: resIds } })
             newResourceNotifs = makeNotificationsData(notificationsAboutResource, resourcesData.data)
-        } else {
-            console.log('{ loading: false, data: undefined }')
-            setNotificationData({ loading: false, data: undefined })
         }
 
         // other notifications
         rawNotifications.data.myNotifications.edges.forEach((rawNotification: any) => {
             switch(rawNotification.node.data.info) {
                 case 'COMPLETE_PROFILE':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('welcomeNotificationHeadline'),
-                        headline2: t('completeProcessNotificationHeadline'),
-                        read: rawNotification.node.read,
-                        text: t('completeProcessNotificationDetails'),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/profile`)
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('welcomeNotificationHeadline'), t('completeProcessNotificationHeadline'), 
+                            t('completeProcessNotificationDetails'), `/webapp/${version}/profile`, rawNotification)
+                        )
                     break
                 case 'SOME_RESOURCES_SUSPENDED':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('resourcesSuspendedNotificationHeadline'),
-                        headline2: t('checkTokensNotificationHeadline'),
-                        read: rawNotification.node.read,
-                        text: t('checkTokensNotificationDetails'),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/resources`)
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('resourcesSuspendedNotificationHeadline'), t('checkTokensNotificationHeadline'), 
+                            t('checkTokensNotificationDetails'), `/webapp/${version}/resources`, rawNotification)
+                        )
                     break
                 case 'WARNING_LOW_TOKEN_AMOUNT':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('lowAmountOfTokenNotificationHeadline'),
-                        headline2: t('lowAmountOfTokenNotificationHeadline2'),
-                        read: rawNotification.node.read,
-                        text: t('lowAmountOfTokenNotificationDetails'),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/profile/tokens`)
-                            
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('lowAmountOfTokenNotificationHeadline'), t('lowAmountOfTokenNotificationHeadline2'), 
+                            t('lowAmountOfTokenNotificationDetails'), `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
                     break
                 case 'TOKENS_RECEIVED':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('tokensReceivedHeadline1'),
-                        headline2: t('tokensReceivedHeadline2'),
-                        read: rawNotification.node.read,
-                        text: t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/profile/tokens`)
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('tokensReceivedHeadline1'), t('tokensReceivedHeadline2'), 
+                            t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
                     break
                 case 'TOKENS_SENT':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('tokensSentHeadline1'),
-                        headline2: t('tokensSentHeadline2'),
-                        read: rawNotification.node.read,
-                        text: t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/profile/tokens`)
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('tokensSentHeadline1'), t('tokensSentHeadline2'), 
+                            t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
                     break
                 case 'WELCOME_TOKEN_USER':
-                    otherNotifs.push({
-                        id: rawNotification.node.id,
-                        created: rawNotification.node.created, 
-                        headline1: t('welcomeTokenUserHeadline1'),
-                        headline2: t('welcomeTokenUserHeadline2'),
-                        read: rawNotification.node.read,
-                        text: t('welcomeTokenUserDetails'),
-                        image: undefined,
-                        onClick: async () => {
-                            setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                            router.push(`/webapp/${version}/profile/tokens`)
-                            setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
-                                if (notif.id === rawNotification.node.id) {
-                                    return { ...notif, ...{ read: true } }
-                                }
-                                return notif
-                            }) } } }))
-                            appDispatch({ type: AppReducerActionType.NotificationRead, payload: rawNotification.node.id })
-                        }
-                    })
+                    otherNotifs.push(
+                        createOtherNotification(t('welcomeTokenUserHeadline1'), t('welcomeTokenUserHeadline2'), 
+                            t('welcomeTokenUserDetails'), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
+                    break
+                case 'BID_RECEIVED':
+                    otherNotifs.push(
+                         createOtherNotification(t('bidReceivedHeadline1'), t('bidReceivedHeadline2', { sender: rawNotification.node.data.receivedFrom }), 
+                            t('bidReceivedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'BID_REFUSED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidRefusedHeadline1'), t('bidRefusedHeadline2', { refuser: rawNotification.node.data.refusedBy }), 
+                            t('bidRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'BID_ACCEPTED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidAcceptedHeadline1'), t('bidAcceptedHeadline2', { accepter: rawNotification.node.data.acceptedBy }), 
+                            t('bidAcceptedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { cancelledBy: rawNotification.node.data.resourceAuthor }), 
+                            t('bidExpiredHeadlineDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'BID_CANCELLED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidDeletedHeadline1'), t('bidDeletedHeadline2', { cancelledBy: rawNotification.node.data.cancelledBy }), 
+                            t('bidDeletedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )                    
+                    break
+                case 'BID_EXPIRED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
+                            t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
                     break
             }
         })
@@ -368,7 +336,7 @@ const NotificationImage = ({ image } : { image: string | {
     account: { id: number, name: string, avatarImageUrl?: string };
 } | undefined }) => {
     if(typeof image === 'string') {
-        return <ResponsivePhotoBox baseSize={NOTIFICATIONS_PAGE_SIZE}>
+        return <ResponsivePhotoBox baseSize={NOTIFICATION_IMAGE_BASE_SIZE}>
             <img style={{ borderRadius: 10 }} color="primary" src={image} />
         </ResponsivePhotoBox>
     } else if (!image) {
@@ -424,42 +392,41 @@ const Notifications = ({ version }: { version: string }) => {
         }
     }, [data?.data])
 
-    return <Stack sx={{
-        overflow: 'auto'
-    }}>
-        <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []} 
-            containerStyle={theme => ({
-                alignItems: 'stretch',
-                margin: 'auto',
-                width: makePxSize(900),
-                [theme.breakpoints.down('lg')]: {
-                    width: makePxSize(900, 0.8),
-                },
-                [theme.breakpoints.down('md')]: {
-                    width: makePxSize(900, 0.5),
-                },
-                [theme.breakpoints.down('sm')]: {
-                    width: '100%',
-                }
-            })} onBottom={() => {
-                loadEarlier()
-            }}
-            renderItem={(notif: NotificationData) => {
-                const fontWeight = notif.read ? 'initial': 'bolder'
-                return <Stack key={notif.id} direction="row" gap="1rem" sx={{ cursor: 'pointer' }}>
-                    <NotificationImage image={notif.image} />
-                    <Link flex="1" onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
-                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline1}</Typography>
-                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline2}</Typography>
-                        <Typography variant="body1" fontWeight={fontWeight}>{notif.text}</Typography>
-                    </Link>
-                    <Stack alignItems="flex-end">
-                        <Typography variant="body1" flex="0 0 20%" color="primary" fontWeight={fontWeight}>{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
-                        { !notif.read && <FiberManualRecord color="primary" /> }
-                    </Stack>
+    return <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []} 
+        containerStyle={{
+            alignItems: 'center',
+            overflow: 'auto',
+            width: '100%',
+        }} onBottom={() => {
+            loadEarlier()
+        }}
+        renderItem={(notif: NotificationData) => {
+            const fontWeight = notif.read ? 'initial': 'bolder'
+            return <Stack data-testid={`Notification:${notif.id}`} key={notif.id} direction="row" gap="1rem" sx={theme => ({ 
+                    cursor: 'pointer' ,
+                    width: makePxSize(900),
+                    [theme.breakpoints.down('lg')]: {
+                        width: makePxSize(900, 0.8),
+                    },
+                    [theme.breakpoints.down('md')]: {
+                        width: makePxSize(900, 0.5),
+                    },
+                    [theme.breakpoints.down('sm')]: {
+                        width: '100%',
+                    }
+                })}>
+                <NotificationImage image={notif.image} />
+                <Link flex="1" onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
+                    <Typography variant="body1" fontWeight={fontWeight}>{notif.headline1}</Typography>
+                    <Typography variant="body1" fontWeight={fontWeight}>{notif.headline2}</Typography>
+                    <Typography variant="body1" fontWeight={fontWeight}>{notif.text}</Typography>
+                </Link>
+                <Stack alignItems="flex-end">
+                    <Typography variant="body1" flex="0 0 20%" color="primary" fontWeight={fontWeight}>{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
+                    { !notif.read && <FiberManualRecord color="primary" /> }
                 </Stack>
-            }} />
-    </Stack>
+            </Stack>
+    }} />
 }
 
 export default Notifications

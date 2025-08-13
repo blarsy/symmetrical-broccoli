@@ -67,8 +67,16 @@ export interface Resource {
     created: Date,
     deleted: Date | null,
     specificLocation: Location | null,
-    subjectiveValue: number | null
+    price: number | null
 }
+
+export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
+    name: rawAccount.name,
+    id: rawAccount.id,
+    email: rawAccount.email,
+    avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId),
+    willingToContribute: rawAccount.willingToContribute
+})
 
 export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
@@ -83,17 +91,23 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
-        account: { 
-            name: rawRes.accountByAccountId.name,
-            id: rawRes.accountByAccountId.id,
-            email: rawRes.accountByAccountId.email,
-            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId),
-            willingToContribute: rawRes.accountByAccountId.willingToContribute
-        },
+        account: fromServerGraphAccount(rawRes.accountByAccountId),
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         suspended:  rawRes.suspended && new Date(rawRes.suspended),
         paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
-        images, subjectiveValue: rawRes.subjectiveValue
+        images, price: rawRes.price
 } as Resource
+}
+
+export interface Bid {
+    id: number
+    amountOfTokens: number
+    resource: Resource
+    account: Account
+    created: Date
+    refused?: Date
+    deleted?: Date
+    accepted?: Date
+    validUntil: Date
 }

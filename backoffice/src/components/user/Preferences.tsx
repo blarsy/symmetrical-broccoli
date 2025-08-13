@@ -8,8 +8,8 @@ import SmartPhone from '@mui/icons-material/Vibration'
 import Feedback from "../scaffold/Feedback"
 import { UiContext } from "../scaffold/UiContextProvider"
 
-export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
-    accountById(id: $id) {
+export const GET_PREFERENCES = gql`query Preferences {
+    me {
       id
       broadcastPrefsByAccountId {
         nodes {
@@ -91,20 +91,24 @@ const PrefSelector = (p: PrefSelectorProps) => {
 const Preferences = () => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
-    const { data, loading, error } = useQuery(GET_PREFERENCES, { variables: { id: appContext.account?.id } })
+    const { data, loading, error } = useQuery(GET_PREFERENCES)
     const [update, { loading: updating, error: updateError, reset }] = useMutation(UPDATE_ACCOUNT_BROADCAST_PREFS)
 
     const prefsFromData = (data: any): { pref1: {
         numberOfDaysBetweenSummaries: number | null
     }, pref2: {
         numberOfDaysBetweenSummaries: number | null
+    }, pref3: {
+        numberOfDaysBetweenSummaries: number | null
     } } => {
         const 
             rawPref1 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 1),
-            rawPref2 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 2)
+            rawPref2 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 2),
+            rawPref3 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 3)
         return {
-            pref1: { numberOfDaysBetweenSummaries : rawPref1 && rawPref1.daysBetweenSummaries != -1 ? rawPref1.daysBetweenSummaries : 1 },
-            pref2: { numberOfDaysBetweenSummaries : rawPref2 && rawPref2.daysBetweenSummaries != -1 ? rawPref2.daysBetweenSummaries : 1 }
+            pref1: { numberOfDaysBetweenSummaries : rawPref1 ? rawPref1.daysBetweenSummaries : null },
+            pref2: { numberOfDaysBetweenSummaries : rawPref2 ? rawPref2.daysBetweenSummaries : null },
+            pref3: { numberOfDaysBetweenSummaries : rawPref3 ? rawPref3.daysBetweenSummaries : null }
         }
     }
 
@@ -116,12 +120,20 @@ const Preferences = () => {
             <PrefSelector value={ prefs.pref1 } title={uiContext.i18n.translator('chatMessageNotificationsTitle')}
                 onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
                     { eventType: 1, daysBetweenSummaries: numberOfDaysBetweenSummaries},
-                    { eventType: 2, daysBetweenSummaries: prefs.pref2.numberOfDaysBetweenSummaries }
+                    { eventType: 2, daysBetweenSummaries: prefs.pref2.numberOfDaysBetweenSummaries},
+                    { eventType: 3, daysBetweenSummaries: prefs.pref3.numberOfDaysBetweenSummaries}
                 ] } })} />
             <PrefSelector value={ prefs.pref2 }  title={uiContext.i18n.translator('newResourceNotificationsTitle')}
                 onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
                     { eventType: 1, daysBetweenSummaries: prefs.pref1.numberOfDaysBetweenSummaries},
-                    { eventType: 2, daysBetweenSummaries: numberOfDaysBetweenSummaries }
+                    { eventType: 2, daysBetweenSummaries: numberOfDaysBetweenSummaries },
+                    { eventType: 3, daysBetweenSummaries: prefs.pref3.numberOfDaysBetweenSummaries}
+                ] } })} />
+            <PrefSelector value={ prefs.pref3 }  title={uiContext.i18n.translator('newNotificationTitle')}
+                onChange={numberOfDaysBetweenSummaries =>  update({ variables: { prefs: [
+                    { eventType: 1, daysBetweenSummaries: prefs.pref1.numberOfDaysBetweenSummaries},
+                    { eventType: 2, daysBetweenSummaries: prefs.pref2.numberOfDaysBetweenSummaries},
+                    { eventType: 3, daysBetweenSummaries: numberOfDaysBetweenSummaries}
                 ] } })} />
             <Backdrop
                 open={updating}

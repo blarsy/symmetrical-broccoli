@@ -5,8 +5,8 @@ import { AppContext } from "@/components/scaffold/AppContextProvider"
 import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
 
-export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
-    accountById(id: $id) {
+export const GET_ACCOUNT_INFO = gql`query AccountInfoById {
+    me {
       id
       accountsLinksByAccountId {
         nodes {
@@ -23,19 +23,6 @@ export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
         latitude
         longitude
         id
-      }
-    }
-}`
-
-export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
-    accountById(id: $id) {
-      id
-      broadcastPrefsByAccountId {
-        nodes {
-          eventType
-          id
-          daysBetweenSummaries
-        }
       }
     }
 }`
@@ -77,7 +64,7 @@ function useProfile () {
 
     useEffect(() => {
         if(appContext.account && !publicInfoData) {
-            getPublicInfo({ variables: { id: appContext.account!.id } })
+            getPublicInfo()
         }
     }, [appContext.account?.id])
 

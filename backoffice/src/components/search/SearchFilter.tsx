@@ -51,7 +51,7 @@ const SearchFilter = (p: Props) => {
             <Button variant="contained" endIcon={showOptions ? <ExpandLess /> : <ExpandMore />} onClick={e => setShowOptions(prev => !prev)}>
                 {uiContext.i18n!.translator('moreOptions')}
             </Button>
-            <OutlinedInput endAdornment={<InputAdornment position="end">
+            <OutlinedInput data-testid="SearchText" endAdornment={<InputAdornment position="end">
                 <Search sx={{ color: primaryColor}}/>
             </InputAdornment> } sx={{ flex: 1  }} id="search" name="search" value={searchParameters.searchTerm} 
                 onChange={e => setParams({ searchTerm: e.target.value || '' })}></OutlinedInput>

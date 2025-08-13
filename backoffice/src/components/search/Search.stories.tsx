@@ -11,7 +11,7 @@ const makeResourceData = (id: number, title: string, description: string, accoun
   title,
   description,
   suspended: null,
-  subjectiveValue: null,
+  price: null,
   paidUntil: null,
   accountByAccountId: {
     id,

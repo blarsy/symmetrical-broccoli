@@ -39,7 +39,7 @@ const TriggerPasswordRecovery = (p: Props) => {
             { ({ handleChange, handleBlur, handleSubmit }) =>
                 <Form onSubmit={handleSubmit}>
                     <Stack alignItems="stretch" gap="1rem" >
-                        <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
+                        <TextField id="email" name="email" label="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">

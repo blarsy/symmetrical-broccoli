@@ -1,7 +1,7 @@
 import DataLoadState from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
 
-export interface ConversationHeaderyData {
+export interface ResourceHeaderyData {
     id: number
     participantId: number
     resource?: Resource
@@ -12,12 +12,12 @@ export interface ConversationOtherAccountData  {
     id: number
     participantId: number
     name: string
-    willingToContribute: boolean
-    imagePublicId?: string 
+    imagePublicId?: string
+    avatarImageUrl?: string
 }
 
 export interface ConversationState extends DataLoadState<{
-    conversation: ConversationHeaderyData
+    conversation: ResourceHeaderyData
     messages: Message[]
 } | undefined> {}
 

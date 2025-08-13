@@ -123,8 +123,8 @@ const ExplainToken = (p: Props) => {
         </Stack>
         <Stack direction="row" ref={sliderRef} className="keen-slider">
             <Slide title={uiContext.i18n.translator("howItWorksStep1Title")} sx={{ gap: '1rem' }}>
-                <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('weNeedToGrow')}</Typography>
-                <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('chickenOrEgg')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('weNeedToGrow')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('chickenOrEgg')}</Typography>
                 <Stack sx={theme => ({ 
                     margin: 'auto', width: '500px',
                     [theme.breakpoints.down('md')]: {
@@ -138,7 +138,7 @@ const ExplainToken = (p: Props) => {
                 </Stack>
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep2Title")} sx={{ gap: '1rem' }}>
-                <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('freeResources')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('freeResources')}</Typography>
                 <NumberedImages ratio={ratio} start={1} images={[<Microwave height="100%"/>,<Cap height="100%"/>]} sx={{ 
                     margin: 'auto', gap: '2rem'
                 }} imageBoxSx={theme => ({ 
@@ -156,8 +156,8 @@ const ExplainToken = (p: Props) => {
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep3Title")} sx={{ gap: '3rem' }}>
                 <Stack>
-                    <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('needContribution')}</Typography>
-                    <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('resourceConsumption')}</Typography>
+                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('needContribution')}</Typography>
+                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('resourceConsumption')}</Typography>
                 </ Stack>
                 <Stack position="relative" margin="auto" sx={theme => ({
                     width: '400px',
@@ -182,19 +182,19 @@ const ExplainToken = (p: Props) => {
                 </Stack>
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep4Title")} sx={{ gap: '1rem' }}>
-                <Typography variant="body1" color="contrastText">{uiContext.i18n.translator('earnTokens')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('earnTokens')}</Typography>
                 {[uiContext.i18n.translator('newResource'), uiContext.i18n.translator('nicePic'), uiContext.i18n.translator('completeProfile'), uiContext.i18n.translator('exchangeResourcesAgainsTokens'), '...'].map((text, idx) => 
                     <Stack key={idx} direction="row" gap="1rem" alignItems="center">
                         <Stack direction="row">
                             <Check fill="#4BB543" width="40" />
                             <Tokens width="40" />
                         </Stack>
-                        <Typography variant="body1" color="contrastText">{text}</Typography>
+                        <Typography variant="body1" color="primary.contrastText">{text}</Typography>
                     </Stack>
                 )}
             </Slide>
             { !appContext.account?.willingToContribute && !p.pureExplain && <Slide title={uiContext.i18n.translator("howItWorksStep5Title")} sx={{ gap: '1rem' }}>
-                <Typography variant="body1" color="contrastText">
+                <Typography variant="body1" color="primary.contrastText">
                     <span>{uiContext.i18n.translator('youAlreadyHave') + ' '}</span> 
                     <span style={{ fontWeight: 'bolder', fontSize: '1.5rem' }}>{appContext.account?.amountOfTokens}</span>
                     <span> Topes</span>

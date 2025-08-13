@@ -5,8 +5,8 @@ import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { parseLocationFromGraph, Location } from "@/lib/schema"
 import { UiContext } from "../scaffold/UiContextProvider"
 
-export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
-    accountById(id: $id) {
+export const ACCOUNT_LOCATION = gql`query AccountLocation {
+    me {
       id
       locationByLocationId {
         address
@@ -25,7 +25,7 @@ export default () => {
 
     const loadLocationAndReset = async () => {
         try {
-            const res = await getLocation({ variables: { id: appContext.account!.id }, fetchPolicy: "network-only" })
+            const res = await getLocation({ fetchPolicy: "network-only" })
             const defaultLocation = parseLocationFromGraph(res.data.accountById.locationByLocationId)
 
             setState(fromData(defaultLocation))

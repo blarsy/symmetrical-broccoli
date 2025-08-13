@@ -7,7 +7,7 @@ const Page = () => {
     const { version } = usePagePath()
 
     return <ConnectedLayout version={version}>
-      <Chat sx={{ flex: 1, overflow: 'auto', maxHeight: '100%' }} 
+      <Chat sx={{ flex: 1, overflow: 'clip', minHeight: 0  }} 
         onConversationSelected={(target, current) => {
           if(current) {
             window.history.replaceState({...window.history.state}, '', `${target}`)

@@ -99,13 +99,13 @@ const RegisterForm = (p: Props) => {
                             onClick={triggerGoogleLogin}>{uiContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<AppleLogo width={'1.5rem'} height={'1.5rem'} />}
                             onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
-                        <TextField id="name" name="name" placeholder={t('accountNameLabel')} onChange={handleChange('name')} onBlur={handleBlur('name')}/>
+                        <TextField id="name" name="name" label={t('accountNameLabel')} onChange={handleChange('name')} onBlur={handleBlur('name')}/>
                         <ErrorMessage component={ErrorText} name="name"/>
-                        <TextField id="email" name="email" placeholder="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
+                        <TextField id="email" name="email" label="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
-                        <TextField id="password" type="password" name="password" placeholder={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
+                        <TextField id="password" type="password" name="password" label={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>
                         <ErrorMessage component={ErrorText} name="password" />
-                        <TextField id="repeatPassword" type="password" name="repeatPassword" placeholder={t('repeatPasswordLabel')} onChange={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')}/>
+                        <TextField id="repeatPassword" type="password" name="repeatPassword" label={t('repeatPasswordLabel')} onChange={handleChange('repeatPassword')} onBlur={handleBlur('repeatPassword')}/>
                         <ErrorMessage component={ErrorText} name="repeatPassword" />
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">

@@ -17,17 +17,19 @@ import { UiContext, UiDispatchContext, UiReducerActionType } from "./UiContextPr
 import { OverridableComponent } from "@mui/material/OverridableComponent"
 import MenuIcon from '@mui/icons-material/Menu'
 import Tokens from '@/app/img/TOKENS.svg'
+import { useRouter } from "next/navigation"
 
 interface LinkMenuProps {
     url: string
     text: string
     Icon?: OverridableComponent<SvgIconTypeMap<{}, "svg">>
     badgeContent?: number
+    testID?: string
 }
 
 const LinkMenu = (p: LinkMenuProps) => {
     if(p.badgeContent) {
-        return <Link href={{ pathname: p.url }}>
+        return <Link data-testid={p.testID} href={{ pathname: p.url }}>
             <Badge color="secondary" badgeContent={p.badgeContent}>
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     { p.Icon && <Box sx={{ minWidth: '36px' }}>
@@ -38,7 +40,7 @@ const LinkMenu = (p: LinkMenuProps) => {
             </Badge>
         </Link>
     } else {
-        return <Link href={{ pathname: p.url }}>
+        return <Link data-testid={p.testID} href={{ pathname: p.url }}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 { p.Icon && <Box sx={{ minWidth: '36px' }}>
                     <p.Icon fontSize="small" />
@@ -63,12 +65,14 @@ const TopBar = ({ version }: Props) => {
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
     const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null)
     const { disconnect } = useAccountFunctions(version)
+    const router = useRouter()
 
     const linksInfo = [
-        { url: `/webapp/${uiContext.version}`, textI18n: 'searchButtonCaption', needsLogin: false },
-        { url: `/webapp/${uiContext.version}/resources`, textI18n: 'resourcesButtonCaption', needsLogin: true },
-        { url: `/webapp/${uiContext.version}/chat`, textI18n: 'chatButtonCaption', badgeContent: chatContext.unreadConversations.length, needsLogin: true },
-        { url: `/webapp/${uiContext.version}/notifications`, textI18n: 'notificationsButtonCaption', badgeContent: appContext.unreadNotifications.length, needsLogin: true },
+        { url: `/webapp/${uiContext.version}`, textI18n: 'searchButtonCaption', needsLogin: false , testID: 'SearchMenuLink'},
+        { url: `/webapp/${uiContext.version}/resources`, textI18n: 'resourcesButtonCaption', needsLogin: true , testID: 'ResourcesMenuLink' },
+        { url: `/webapp/${uiContext.version}/bids`, textI18n: 'bidsButtonCaption', needsLogin: true , testID: 'BidsMenuLink' },
+        { url: `/webapp/${uiContext.version}/chat`, textI18n: 'chatButtonCaption', badgeContent: chatContext.unreadConversations.length, needsLogin: true, testID: 'ChatMenuLink' },
+        { url: `/webapp/${uiContext.version}/notifications`, textI18n: 'notificationsButtonCaption', badgeContent: appContext.unreadNotifications.length, needsLogin: true, testID: 'NotificationsMenuLink' },
     ]
 
     const makeButtonsMenu = () => {
@@ -81,12 +85,12 @@ const TopBar = ({ version }: Props) => {
             if(info.badgeContent) {
                 return <Button key={idx}>
                     <Badge color="secondary" badgeContent={info.badgeContent}>
-                        <Link href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
+                        <Link data-testid={info.testID} href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
                     </Badge>
                 </Button>
             } else {
                 return <Button key={idx}>
-                    <Link href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
+                    <Link data-testid={info.testID} href={{ pathname: info.url }}>{uiContext.i18n.translator(info.textI18n)}</Link>
                 </Button>
             }
         })
@@ -102,7 +106,7 @@ const TopBar = ({ version }: Props) => {
             return <MenuItem key={idx} onClick={() => {
                 setMenuAnchorEl(null)
             }}>
-                <LinkMenu text={uiContext.i18n.translator(info.textI18n)}
+                <LinkMenu testID={info.testID} text={uiContext.i18n.translator(info.textI18n)}
                     url={ info.url } badgeContent={info.badgeContent} />
             </MenuItem>
         })
@@ -144,7 +148,7 @@ const TopBar = ({ version }: Props) => {
                 <Stack direction="row" alignItems="center" sx={{
                     cursor: 'pointer'
                 }}>
-                    <Typography variant="caption" color="primary"> { appContext.account.amountOfTokens }</Typography>
+                    <Typography data-testid="TokenCounter" variant="caption" color="primary"> { appContext.account.amountOfTokens }</Typography>
                     <Tokens style={{ width: '2rem', height: '2rem' }}/>
                 </Stack>
             </Link> }
@@ -194,6 +198,7 @@ const TopBar = ({ version }: Props) => {
             <MenuItem onClick={() => {
                 disconnect()
                 setUserMenuAnchorEl(null)
+                router.push(`/webapp/${uiContext.version}`)
             }}>
                 <ListItemIcon>
                     <LogoutIcon fontSize="small" />

@@ -29,13 +29,13 @@ interface Props {
 export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], 
     $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, 
     $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], 
-    $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $subjectiveValue: Int) {
+    $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
     updateResource(
       input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, 
         canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, 
         description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, 
         isProduct: $isProduct, isService: $isService, title: $title, 
-        specificLocation: $specificLocation, subjectiveValue: $subjectiveValue}
+        specificLocation: $specificLocation, price: $price}
     ) {
       integer
     }
@@ -44,12 +44,12 @@ export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $ca
 export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int], $canBeDelivered: Boolean, 
     $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, 
     $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, 
-    $description: String, $specificLocation: NewLocationInput = {}, $subjectiveValue: Int) {
+    $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
     createResource(
       input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, 
         canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, 
         expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, 
-        title: $title, specificLocation: $specificLocation, subjectiveValue: $subjectiveValue}
+        title: $title, specificLocation: $specificLocation, price: $price}
     ) {
       integer
     }
@@ -76,7 +76,7 @@ const blankResource: Resource = {
     created: new Date(),
     deleted: null,
     specificLocation: null,
-    subjectiveValue: null
+    price: null
 }
 
 const EditResource = (p: Props) => {
@@ -98,13 +98,13 @@ const EditResource = (p: Props) => {
                 canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
-                specificLocation: value.specificLocation, subjectiveValue: value.subjectiveValue ? Number(value.subjectiveValue) : null } })
+                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null } })
         } else {
             await createResource({ variables: { canBeDelivered: value.canBeDelivered, canBeExchanged: value.canBeExchanged, 
                 canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
-                specificLocation: value.specificLocation, subjectiveValue: value.subjectiveValue ? Number(value.subjectiveValue) : null } })
+                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null } })
         } 
         setSaveState(fromData(undefined))
     }
@@ -133,7 +133,10 @@ const EditResource = (p: Props) => {
             title: yup.string().max(30, t('max30Chars')).required(t('required_field')),
             description: yup.string(),
             expiration: yup.date().nullable().min(new Date(), t('dateMustBeFuture')),
-            subjectiveValue: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber')),
+            price: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber'))
+                .test('priceSetIfCanBeExchanged', t('required_field'), (val, ctx) => {
+                    return !ctx.parent.canBeExchanged || !!val
+                }),
             categories: yup.array().min(1, t('required_field')),
             isProduct: yup.bool().test('natureIsPresent', t('required_field'), (val, ctx) => {
                 return val || ctx.parent.isService
@@ -145,7 +148,7 @@ const EditResource = (p: Props) => {
                 return !ctx.parent.isProduct || (val || ctx.parent.canBeDelivered)
             }),
             specificLocation: yup.object().nullable().test('addressRequiredWhenResourceOnSite', t('addressRequiredWhenResourceOnSite'), (val, ctx) => {
-                return !ctx.parent.canBeTakenAway || (ctx.parent.canBeTakenAway && val)
+                return !ctx.parent.canBeTakenAway || !!val
             })
         })}>
             { f => {
@@ -164,14 +167,18 @@ const EditResource = (p: Props) => {
                             </Stack>}
                             <EditImage initialValue="" onDeleteRequested={() => {}} onChange={publicId => f.setFieldValue('images', [...f.values.images, { publicId }])} />
                             <TextField size="small" id="title" name="title" value={f.values.title}
-                                placeholder={uiContext.i18n.translator('titleLabel')} 
+                                label={uiContext.i18n.translator('titleLabel')} 
                                 onChange={f.handleChange('title')} onBlur={f.handleBlur('title')}/>
                             <ErrorMessage component={ErrorText} name="title" />
                             <TextField size="small" multiline id="description" name="description" value={f.values.description}
-                                placeholder={uiContext.i18n.translator('descriptionLabel')} 
+                                label={uiContext.i18n.translator('descriptionLabel')} 
                                 onChange={f.handleChange('description')} onBlur={f.handleBlur('description')}/>
                             <ErrorMessage component={ErrorText} name="description" />
-                            <OptionLine labels={{ 
+                            <TextField size="small" id="price" name="price" value={f.values.price || 0}
+                                label={uiContext.i18n.translator('Label')}
+                                onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
+                            <ErrorMessage component={ErrorText} name="price" />
+                            <OptionLine sx={{ margin: 0 }} labels={{ 
                                 title: uiContext.i18n.translator('natureOptionsLabel'), 
                                 isProduct: 'isProduct',
                                 isService: 'isService'
@@ -180,7 +187,7 @@ const EditResource = (p: Props) => {
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <ErrorMessage component={ErrorText} name="isProduct" />
-                            <Stack direction="row">
+                            <Stack direction="row" alignItems="flex-start" gap="1rem">
                                 <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
                                 <FormControlLabel sx={{ 
                                     flex: 1,
@@ -208,11 +215,7 @@ const EditResource = (p: Props) => {
                                 <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
                             </Stack>
                             <ErrorMessage component={ErrorText} name="categories" />
-                            <TextField size="small" id="subjectiveValue" name="subjectiveValue" value={f.values.subjectiveValue || undefined}
-                                placeholder={uiContext.i18n.translator('subjectiveValueLabel')}
-                                onChange={f.handleChange('subjectiveValue')} onBlur={f.handleBlur('subjectiveValue')}/>
-                            <ErrorMessage component={ErrorText} name="subjectiveValue" />
-                            <OptionLine labels={{ 
+                            <OptionLine sx={{ margin: 0 }} labels={{ 
                                 title: uiContext.i18n.translator('exchangeTypeOptionsLabel'),
                                 canBeGifted: 'canBeGifted',
                                 canBeExchanged: 'canBeExchanged'
@@ -221,7 +224,7 @@ const EditResource = (p: Props) => {
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <ErrorMessage component={ErrorText} name="canBeGifted" />
-                            <OptionLine labels={{ 
+                            <OptionLine sx={{ margin: 0 }} labels={{ 
                                 title: uiContext.i18n.translator('deliveryOptionsLabel'),
                                 canBeTakenAway: f.values.isProduct ? 'canBeTakenAway' : 'onSite',
                                 canBeDelivered: f.values.isProduct ? 'canBeDelivered': 'placeToBeAgreed'

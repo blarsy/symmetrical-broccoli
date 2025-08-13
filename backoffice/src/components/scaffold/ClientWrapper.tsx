@@ -1,6 +1,4 @@
 "use client"
-import createTheme from '@/theme'
-import {  CssBaseline, ThemeProvider } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fr'
@@ -8,9 +6,7 @@ import AppContextProvider, { AppContext, AppDispatchContext, AppReducerActionTyp
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { useContext, useEffect, useState } from 'react'
-import { Theme } from '@emotion/react'
+import { useContext, useEffect } from 'react'
 import { ApolloProvider } from '@apollo/client'
 import { getApolloClient } from '@/lib/apolloClient'
 import i18n from '@/i18n'
@@ -21,6 +17,7 @@ import { getCommonConfig } from '@/config'
 import useAccountFunctions from '@/lib/useAccountFunctions'
 import ChatContextProvider from './ChatContextProvider'
 import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
+import Themed from './Themed'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -40,8 +37,6 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const uiContext= useContext(UiContext)
-    const [theme, setTheme] = useState(undefined as Theme | undefined)
-    const defaultDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true })
     const { connectWithToken } = useAccountFunctions(version)
 
     const load = async () => {
@@ -56,6 +51,7 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         dayjs.locale(uiLanguage)
 
         uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
+
         if(token) {
             try {
                 await connectWithToken(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
@@ -67,25 +63,21 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
             appDispatch({ type: AppReducerActionType.Load, payload: undefined })
         }
     }
-    useEffect(() => { 
-        setTheme(createTheme(uiContext.lightMode === undefined ? defaultDark : !uiContext.lightMode)) 
-    }, [defaultDark, uiContext.lightMode])
 
     useEffect(() => {
         load()
     }, [])
 
-    return <LoadedZone loading={uiContext.loading || !theme} error={uiContext.error} containerStyle={{ 
+    return <LoadedZone loading={uiContext.loading} error={uiContext.error} containerStyle={{ 
             height: '100vh', 
             overflow: 'clip', 
             display: 'flex'
         }}>
         <ApolloProvider client={getApolloClient(version, appContext.token)}>
-            { !uiContext.loading && theme && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
-                <ThemeProvider theme={theme!}>
-                    <CssBaseline />
+            { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
+                <Themed>
                     {children}
-                </ThemeProvider>
+                </Themed>
             </LocalizationProvider>}
         </ApolloProvider>
     </LoadedZone>

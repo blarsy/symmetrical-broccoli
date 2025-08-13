@@ -6,7 +6,7 @@ import Refresh from '@mui/icons-material/Refresh'
 import LoadedList from "../scaffold/LoadedList"
 import Clock from '@mui/icons-material/AccessTime'
 import { LoadingButton } from "@mui/lab"
-import dayjs, { Dayjs } from "dayjs"
+import dayjs from "dayjs"
 
 const PAGESIZE = 5
 export const GET_TOKENS_HISTORY = gql`query GetTokensHistory($after: Cursor, $first: Int) {
@@ -58,6 +58,12 @@ const TransactionsHistory = () => {
                 return t('sentTokens')
             case 9:
                 return t('receivedTokens')
+            case 10:
+                return t('bidCreated')
+            case 11:
+                return t('bidCancelled')
+            case 12:
+                return t('bidAccepted')
             default:
                 throw new Error(`Unexpected token transaction type ${tokenHistory.node.tokenTransactionTypeByTokenTransactionTypeId.id}`)
         }
@@ -87,7 +93,7 @@ const TransactionsHistory = () => {
         </IconButton> 
         <LoadedList loading={loadingFromScratch} error={error} items={historyItems}
             containerStyle={{ gap: '0.5rem', padding: 0, margin: 0 }}
-            renderItem={(item: any) => <Stack key={item.node.id} direction="row" 
+            renderItem={(item: any) => <Stack data-testid={`Transaction:${item.node.id}`} key={item.node.id} direction="row" 
                 sx={theme => ({ gap: '1rem', backgroundColor: theme.palette.primary.light, borderRadius: '1rem', 
                 padding: '0.5rem', alignItems: 'center' })}>
                 <Stack alignItems="center" flex="0 0 30%">

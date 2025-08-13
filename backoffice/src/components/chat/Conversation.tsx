@@ -6,8 +6,8 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
-import ConversationHeader from "./ConversationHeader"
-import { ConversationHeaderyData, ConversationState, Message, NewMessage } from "./lib"
+import ConversationHeader from "../resources/ResourceHeader"
+import { ResourceHeaderyData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
@@ -137,7 +137,7 @@ interface Props {
 }
 
 interface ConversationDisplayData { 
-    conversation: ConversationHeaderyData,
+    conversation: ResourceHeaderyData,
     messages: Message[] 
 }
 
@@ -154,7 +154,6 @@ const fromRawConversation = (rawConversation: any, currentAccountId: number, cat
                 id: otherParticipant.accountByAccountId.id,
                 participantId: otherParticipant.id,
                 name: otherParticipant.accountByAccountId.name,
-                willingToContribute: otherParticipant.accountByAccountId.willingToContribute,
                 imagePublicId: otherParticipant.accountByAccountId.imageByAvatarImageId.publicId
             },
             resource: fromServerGraphResource(rawResource, categories)
@@ -211,7 +210,6 @@ const Conversation = (p: Props) => {
                 otherAccount: {
                   id: chatContext.newConversationState.resource.account!.id,
                   name: chatContext.newConversationState.resource.account!.name,
-                  willingToContribute: chatContext.newConversationState.resource.account!.willingToContribute || false,
                   imagePublicId: chatContext.newConversationState.resource.account!.avatarImageUrl,
                   participantId: 0
                 },

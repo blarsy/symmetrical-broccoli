@@ -2,10 +2,13 @@ import { useContext, useState } from "react"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
 import { gql, useMutation } from "@apollo/client"
-import { ConfirmDialog } from "../misc"
+import { ConfirmDialog, ErrorText } from "../misc"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
+import { ErrorMessage, Formik } from "formik"
+import * as yup from "yup"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: Int) {
     sendTokens(
@@ -28,49 +31,61 @@ interface Props {
 
 const TransferTokensDialog = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [sendTokens] = useMutation(SEND_TOKENS)
-    const [amount, setAmount] = useState(p.transferInfo?.defaultAmount || 0)
     const [confirming, setConfirming] = useState(false)
     const [sendingStatus, setSendingStatus] = useState<DataLoadState<undefined>>(initial(false))
 
-    return <>
-        <Dialog open={!!p.transferInfo?.destinatorAccount} onClose={p.onClose}>
-            <DialogTitle>{uiContext.i18n.translator('transferTokensDialogTitle', { destinatorAccount: p.transferInfo?.destinatorAccount })}</DialogTitle>
-            <DialogContent sx={{ display: 'flex' }}>
-                <TextField sx={{ flex: 1 }} value={amount} type="number" required onChange={e => setAmount(Number(e.currentTarget.value))}/>
-            </DialogContent>
-            <DialogContent>
-                <Feedback severity="error" detail={sendingStatus.error?.detail} message={sendingStatus.error?.message}
-                    onClose={() => setSendingStatus(initial(false))} visible={!!sendingStatus.error}/>
-            </DialogContent>
-            <DialogActions>
-                <LoadingButton loading={sendingStatus.loading} disabled={sendingStatus.loading} onClick={ p.onClose }>{uiContext.i18n.translator('cancelButton')}</LoadingButton>
-                <Button disabled={!amount || amount <= 0} onClick={ () => {
-                    setConfirming(true)
-                }}>{uiContext.i18n.translator('okButton')}</Button>
-            </DialogActions>
-        </Dialog>
-        <ConfirmDialog onClose={async response => {
-            if(response) {
+    const t = uiContext.i18n.translator
+
+    return <Formik initialValues={{ amountOfTokens: p.transferInfo?.defaultAmount || 1 }}
+            onSubmit={async values => {
                 setSendingStatus(initial(true))
                 setConfirming(false)
                 try {
-                    const res = await sendTokens({ variables: { amountToSend: amount, targetAccountId: p.transferInfo?.destinatorId } })
+                    const res = await sendTokens({ variables: { amountToSend: values.amountOfTokens, targetAccountId: p.transferInfo?.destinatorId } })
                     if(res.data.sendTokens.integer === 2) {
-                        setSendingStatus(fromError(new Error('Insufficient amount of token on source account'), uiContext.i18n.translator('insufficientTokenAmount')))
+                        setSendingStatus(fromError(new Error('Insufficient amount of token on source account'), t('insufficientTokenAmount')))
                     } else {
                         setSendingStatus(fromData(undefined))
                         p.onClose()
                     }
                 } catch(e) {
-                    setSendingStatus(fromError(e, uiContext.i18n.translator('requestError')))
+                    setSendingStatus(fromError(e, t('requestError')))
                 }
-            } else {
-                setConfirming(false)
-            }
-        }} title={uiContext.i18n.translator('confirmSendTokens', { amount, destinatorAccount: p.transferInfo?.destinatorAccount })}
-        visible={confirming} />
-    </>
+            }} validationSchema={yup.object().shape({
+                amountOfTokens: yup.number().required(t('required_field')).integer(t('mustBeAnInteger'))
+                    .min(1, t('mustBeAValidNumber'))
+                    .max(appContext.account!.amountOfTokens, t('cannotSendMoreThanWhatYouHave', {max: appContext.account!.amountOfTokens})),
+        })}>
+            { ({ handleSubmit, handleChange, handleBlur, values }) =>
+            <>
+                <Dialog open={!!p.transferInfo?.destinatorAccount} onClose={p.onClose}>
+                    <DialogTitle>{t('transferTokensDialogTitle', { destinatorAccount: p.transferInfo?.destinatorAccount })}</DialogTitle>
+                    <DialogContent sx={{ display: 'flex' }}>
+                        <TextField sx={{ flex: 1 }} value={values.amountOfTokens} type="number" onChange={handleChange('amountOfTokens')}
+                            onBlur={handleBlur('amountOfTokens')}/>
+                        <ErrorMessage component={ErrorText} name="amountOfTokens" />
+                        <Feedback severity="error" detail={sendingStatus.error?.detail} message={sendingStatus.error?.message}
+                            onClose={() => setSendingStatus(initial(false))} visible={!!sendingStatus.error}/>
+                    </DialogContent>
+                    <DialogActions>
+                        <LoadingButton loading={sendingStatus.loading} disabled={sendingStatus.loading} onClick={ p.onClose }>{t('cancelButton')}</LoadingButton>
+                        <Button onClick={ () => {
+                            setConfirming(true)
+                        }}>{t('okButton')}</Button>
+                    </DialogActions>
+                </Dialog>
+                <ConfirmDialog onClose={async response => {
+                    if(response) {
+                        await handleSubmit()
+                    } else {
+                        setConfirming(false)
+                    }
+                }} title={t('confirmSendTokens', { amount: values.amountOfTokens, destinatorAccount: p.transferInfo?.destinatorAccount })}
+                visible={confirming} /> 
+            </> }
+    </Formik>
 }
 
 export default TransferTokensDialog

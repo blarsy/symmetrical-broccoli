@@ -7,7 +7,7 @@ import { Chip, Dialog, IconButton, Stack, Tooltip, Typography } from "@mui/mater
 import Hourglass from "@mui/icons-material/HourglassTop"
 import dayjs from "dayjs"
 import Link from "next/link"
-import { AccountAvatar, ResponsiveImage } from "../misc"
+import { AccountAvatar, PriceTag, ResponsiveImage } from "../misc"
 import { urlFromPublicId } from "@/lib/images"
 import DisplayLocation from "../user/DisplayLocation"
 import { UiContext } from "../scaffold/UiContextProvider"
@@ -16,7 +16,10 @@ import { primaryColor } from "@/utils"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { GET_RESOURCE } from "@/lib/apolloClient"
 import GiveIcon from '@mui/icons-material/VolunteerActivism'
-import TransferTokensDialog, { TokenTransferInfo } from "../token/TransferTokensDialog"
+import { AppContext } from "../scaffold/AppContextProvider"
+import CreateBidDialog from "../bids/CreateBidDialog"
+import Feedback from "../scaffold/Feedback"
+import ConnectDialog from "../user/ConnectDialog"
 
 interface Props {
     resourceId: number
@@ -28,8 +31,11 @@ const ViewResource = (p: Props) => {
     const [resource, setResource] = useState<DataLoadState<Resource>>(initial(true))
     const [zoomedImg, setZoomedImg] = useState<string>()
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+    const [bidCreationSucceeded, setBidCreationSucceeded] = useState(false)
+    const [resourceToBidOn, setResourceToBidOn] = useState<Resource>()
     const uiContext = useContext(UiContext)
-    const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
+    const appContext = useContext(AppContext)
+    const [connecting, setConnecting] = useState(false)
 
     const loadResource = async() => {
         try {
@@ -110,18 +116,22 @@ const ViewResource = (p: Props) => {
                             </Stack>
                         </Link>
                         <Stack direction="row">
-                          <Link href={`/webapp/${uiContext.version}/chat/new/${resource.data!.id}`}>
-                            <IconButton color="primary">
+                          { !appContext.account ?
+                            <IconButton color="primary" onClick={() => setConnecting(true)}>
                               <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
                             </IconButton>
-                          </Link>
-                          <IconButton color="primary" onClick={() => {
-                            setTokenTransferInfo({ destinatorAccount: resource.data!.account!.name, 
-                              destinatorId: resource.data!.account!.id
-                            })
+                            : resource.data!.account!.id != appContext.account.id &&
+                            <Link href={`/webapp/${uiContext.version}/chat/new/${resource.data!.id}`}>
+                              <IconButton color="primary">
+                                <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
+                              </IconButton>
+                            </Link>
+                          }
+                          { appContext.account && resource.data!.account!.id != appContext.account.id && resource.data!.canBeExchanged && <IconButton data-testid="BidButton" color="primary" onClick={() => {
+                            setResourceToBidOn(resource.data)
                           }}>
                             <GiveIcon sx={{ fontSize: '2.5rem' }} />
-                          </IconButton>
+                          </IconButton> }
                         </Stack>
                       </Stack>,
                       <Typography key="catLabel" color="primary" variant="body1">{uiContext.i18n.translator('categoriesTitle')}</Typography>,
@@ -148,6 +158,11 @@ const ViewResource = (p: Props) => {
                       { resource.data.canBeGifted && <Chip label={uiContext.i18n.translator('canBeGifted')}/> }
                       { resource.data.canBeExchanged && <Chip label={uiContext.i18n.translator('canBeExchanged')}/> }
                     </Stack>)
+                  if(resource.data.price) {
+                    fields.push(
+                      <Typography key="price" color="primary" variant="body1">{uiContext.i18n.translator('Label')}</Typography>,
+                      <PriceTag key="tag" value={resource.data?.price} />)
+                  }
                   if(resource.data.canBeDelivered || resource.data.canBeTakenAway) {
                     fields.push( <Typography key="delivLabel" color="primary" variant="body1">{uiContext.i18n.translator('deliveryOptionsLabel')}</Typography>,
                     <Stack direction="row" gap="0.5rem" key="deliv">
@@ -160,8 +175,13 @@ const ViewResource = (p: Props) => {
                   }
                   return fields
                 })()}
+                  <Feedback testID="CreateBidSuccess" sx={{ position: 'fixed', bottom: '1rem' }} severity="success" message={uiContext.i18n.translator('bidCreationSuccessMessage')} onClose={() => setBidCreationSucceeded(false)}
+                    visible={bidCreationSucceeded}/>
               </Stack>
-              <TransferTokensDialog transferInfo={tokenTransferInfo} onClose={() => setTokenTransferInfo(undefined)} />
+              {resourceToBidOn && <CreateBidDialog resource={resourceToBidOn} onClose={success => {
+                setResourceToBidOn(undefined)
+                setBidCreationSucceeded(!!success)
+              }} />}
             </Stack>
           )
         }
@@ -173,6 +193,7 @@ const ViewResource = (p: Props) => {
               <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
           </Stack>
       </Dialog>
+      <ConnectDialog onClose={() => setConnecting(false)} version={uiContext.version} visible={connecting} />
     </LoadedZone>
 }
 

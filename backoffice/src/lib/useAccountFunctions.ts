@@ -42,7 +42,7 @@ const AUTHENTICATE_EXTERNAL_AUTH = gql`mutation AuthenticateExternalAuth($token:
     }
 }`
 
-const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
+export const REGISTER_ACCOUNT = gql`mutation RegisterAccount($email: String, $name: String, $password: String, $language: String) {
     registerAccount(
         input: {email: $email, name: $name, password: $password, language: $language}
     ) {

@@ -32,7 +32,7 @@ export const RESOURCES = gql`query MyResources {
         canBeDelivered
         deleted
         suspended
-        subjectiveValue
+        price
         accountByAccountId {
           id
           name
@@ -114,7 +114,7 @@ const ResourceCard = (p: ResourceCardProps) => {
           }} startIcon={<DeleteIcon/>}>{uiContext.i18n.translator('deleteButtonCaption')}</Button>
       </CardActions>
     </Card>
-    { p.isExample && <Typography color="contrastText" 
+    { p.isExample && <Typography color="primary.contrastText" 
       sx={{ backgroundColor: primaryColor, position: 'absolute', top: '3rem', left: '2rem', transform: 'rotate(-13deg)', padding: '0rem 0.5rem' }} 
       variant="overline">
       {uiContext.i18n.translator('ExampleLabel')}
@@ -161,7 +161,7 @@ const Resources = () => {
         </Stack>
         <LoadedList loading={loading} error={error} items={(data && data.myResources && data.myResources.nodes) || []}
             containerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }} 
-            renderNodata={ExampleResources}
+            renderNoData={ExampleResources}
             renderItem={(res: any) => <ResourceCard key={res.id} id={res.id} deleted={res.deleted} title={res.title} 
               expiration={res.expiration} onImageClicked={(uri: string) => setZoomedImg(uri)}
               onDeleteRequested={() => setDeletingResourceId(res.id)}

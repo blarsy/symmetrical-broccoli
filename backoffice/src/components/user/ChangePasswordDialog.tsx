@@ -47,11 +47,11 @@ const ChangePasswordDialog = (p: Props) => {
                         { ({ handleChange, handleBlur, handleSubmit, values }) =>
                             <Form style={{ display: 'flex', flex: 1 }} onSubmit={handleSubmit}>
                                 <Stack alignItems="stretch" gap="1rem" flex="1">
-                                    <TextField type="password" id="currentPassword" name="currentPassword" placeholder={uiContext.i18n.translator('currentPasswordLabel')} onChange={handleChange('currentPassword')} onBlur={handleBlur('currentPassword')}/>
+                                    <TextField type="password" id="currentPassword" name="currentPassword" label={uiContext.i18n.translator('currentPasswordLabel')} onChange={handleChange('currentPassword')} onBlur={handleBlur('currentPassword')}/>
                                     <ErrorMessage component={ErrorText} name="currentPassword" />
-                                    <TextField type="password" id="newPassword" name="newPassword" placeholder={uiContext.i18n.translator('newPasswordLabel')} onChange={handleChange('newPassword')} onBlur={handleBlur('newPassword')}/>
+                                    <TextField type="password" id="newPassword" name="newPassword" label={uiContext.i18n.translator('newPasswordLabel')} onChange={handleChange('newPassword')} onBlur={handleBlur('newPassword')}/>
                                     <ErrorMessage component={ErrorText} name="newPassword" />
-                                    <TextField type="password" id="repeatNewPassword" name="repeatNewPassword" placeholder={uiContext.i18n.translator('repeatNewPasswordLabel')} onChange={handleChange('repeatNewPassword')} onBlur={handleBlur('repeatNewPassword')}/>
+                                    <TextField type="password" id="repeatNewPassword" name="repeatNewPassword" label={uiContext.i18n.translator('repeatNewPasswordLabel')} onChange={handleChange('repeatNewPassword')} onBlur={handleBlur('repeatNewPassword')}/>
                                     <ErrorMessage component={ErrorText} name="repeatNewPassword" />
                                     <Stack>
                                         <Stack direction="row" alignSelf="flex-end">

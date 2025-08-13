@@ -70,7 +70,7 @@ const Search = (p: {version: string}) => {
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', 
                 gap: '1rem', justifyContent: 'center', overflow: 'auto' }}>
-            { suggestedResources.map((res: any, idx)=> <ResourceCard key={idx} version={p.version}
+            { suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx} version={p.version}
               resource={{
                 id: res.id, accountName: res.accountByAccountId.name, description: res.description,
                 title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),

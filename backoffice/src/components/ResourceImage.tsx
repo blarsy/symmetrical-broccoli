@@ -4,6 +4,7 @@ import { makePxSize, screenSizesCoefficients, ResponsiveImage, ResponsivePhotoBo
 interface ResourceImageProps {
     accountName: string
     accountImagePublicId?: string
+    avatarImageUrl?: string
     resourceImagePublicId?: string
     baseWidth: number
 }
@@ -29,7 +30,7 @@ const ResourceImage = (p: ResourceImageProps) => {
         })}>
         <ResponsiveImage baseSize={baseSize} publicId={p.resourceImagePublicId}/>
         <ResponsivePhotoBox baseSize={baseSize} sx={theme => {
-            const delta = baseSize / 3
+            const delta = baseSize / 2
             return { 
                 position: 'absolute',
                 top: makePxSize(delta, 1),
@@ -48,7 +49,7 @@ const ResourceImage = (p: ResourceImageProps) => {
                 }
             }
         }}>
-            <AccountAvatar avatarImagePublicId={p.accountImagePublicId} name={p.accountName} />
+            <AccountAvatar avatarImagePublicId={p.accountImagePublicId} avatarImageUrl={p.avatarImageUrl} name={p.accountName} />
         </ResponsivePhotoBox>
     </Box>
 }

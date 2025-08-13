@@ -93,7 +93,7 @@ const EditLinks = (p: Props) => {
         { currentLinks.map((link, idx) => {
             return <Formik key={idx} initialValues={{...link, ...{ index: idx }}} validationSchema={yup.object().shape({
                 label: yup.string(),
-                url: yup.string().url(uiContext.i18n.translator('mustBeWellFormedURL')).required('required_field')
+                url: yup.string().url(uiContext.i18n.translator('mustBeWellFormedURL')).required(uiContext.i18n.translator('required_field'))
             })} onSubmit={values => {
                 const newLinks = [...currentLinks]
                 newLinks[idx] = values
@@ -106,10 +106,14 @@ const EditLinks = (p: Props) => {
                         [  <LinkIconEdit value={f.values.type} key="link" onChange={newVal => {
                                 f.setFieldValue('type', newVal)
                             }} />,
-                            <TextField key="label" sx={{ flex: 1 }} color="primary" value={f.values.label} onBlur={f.handleBlur('label')} onChange={f.handleChange('label')} />,
-                            <Stack>
-                                <TextField key="url" sx={{ flex: 1 }} color="primary" value={f.values.url} onBlur={f.handleBlur('url')} onChange={f.handleChange('url')} />
-                                <ErrorMessage component={ErrorText} name="url" />
+                            <TextField key="label" sx={{ flex: 1 }} label={uiContext.i18n.translator('linkLabelLabel')}
+                                color="primary" value={f.values.label} onBlur={f.handleBlur('label')} 
+                                onChange={f.handleChange('label')} />,
+                            <Stack key="url">
+                                <TextField sx={{ flex: 1 }} label={uiContext.i18n.translator('linkUrlLabel')}
+                                    color="primary" value={f.values.url} onBlur={f.handleBlur('url')} 
+                                    onChange={f.handleChange('url')} />
+                            <ErrorMessage component={ErrorText} name="url" />
                             </Stack>
                         ] : [ <Box key="link" sx={{ padding: '8px'}}><LinkIcon value={f.values.type} /></Box>,
                             <Typography key="label" sx={{ flex: 1, paddingTop: '16px', paddingBottom: '16px' }} color="primary" noWrap>{f.values.label}</Typography>,
@@ -129,7 +133,7 @@ const EditLinks = (p: Props) => {
                     }}
                     onDelete={() => setLinkToDelete(idx)}
                     saveButtonDisabled={!f.dirty} />
-                    <ConfirmDialog processing={deleteLinkState.loading} title={ uiContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
+                    <ConfirmDialog visible={deleteLinkState.loading} title={ uiContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
                         onClose={ response => {
                             if(response) {
                                 setCurrentLinks(prev => {
