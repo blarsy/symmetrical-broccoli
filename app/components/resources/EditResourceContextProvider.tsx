@@ -5,9 +5,9 @@ import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 
-export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $subjectiveValue: Int) {
+export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
     updateResource(
-      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, subjectiveValue: $subjectiveValue}
+      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price}
     ) {
       integer
     }
@@ -42,7 +42,7 @@ const blankResource: Resource = { id: 0, description: '', title: '', images: [],
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
     canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null, specificLocation: null,
-    subjectiveValue: null
+    price: null
 }
 
 export const EditResourceContext = createContext<EditResourceContextProps>({
@@ -132,7 +132,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     categoryCodes: resource.categories.map(cat => cat.code),
                     imagesPublicIds: resource.images.map(img => img.publicId),
                     specificLocation: resource.specificLocation,
-                    subjectiveValue: resource.subjectiveValue || null
+                    price: resource.price || null
                 }})
                 setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             } else {
@@ -154,7 +154,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     categoryCodes: resource.categories.map(cat => cat.code),
                     imagesPublicIds,
                     specificLocation: resource.specificLocation,
-                    subjectiveValue: resource.subjectiveValue || null
+                    price: resource.price || null
                 }
 
                 await createResource({ variables })

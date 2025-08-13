@@ -37,6 +37,8 @@ web_test.zip
 
 .pnp*
 
+test.txt
+
 /webapi/build
 /build
 /build.zip

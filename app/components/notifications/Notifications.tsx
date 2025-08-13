@@ -90,7 +90,7 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
         paidUntil
         created
         deleted
-        subjectiveValue
+        price
       }
     }
 }`

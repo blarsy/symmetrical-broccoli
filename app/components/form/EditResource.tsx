@@ -34,7 +34,7 @@ export default ({ route, navigation }:RouteProps) => {
     const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
         try {
-            if(values.subjectiveValue != null) values.subjectiveValue = Number(values.subjectiveValue)
+            if(values.price != null) values.price = Number(values.price)
 
             await editResourceContext.actions.save(values)
             setSaveResourcestate(fromData(true))
@@ -62,7 +62,7 @@ export default ({ route, navigation }:RouteProps) => {
             title: yup.string().max(30).required(t('field_required')),
             description: yup.string(),
             expiration: yup.date().nullable().min(new Date(), t('date_mustBeFuture')),
-            subjectiveValue: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber')),
+            price: yup.number().nullable().integer(t('mustBeAnInteger')).min(1, t('mustBeAValidNumber')),
             categories: yup.array().min(1, t('field_required')),
             isProduct: yup.bool().test('natureIsPresent', t('nature_required'), (val, ctx) => {
                 return val || ctx.parent.isService
@@ -118,11 +118,11 @@ export default ({ route, navigation }:RouteProps) => {
                     <ErrorMessage component={ErrorText} name="isProduct" />
                     <Hr />
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TransparentTextInput style={{ flex: 1 }} testID="subjectiveValue" label={<StyledLabel label={t('subjectiveValueLabel')} />} value={values.subjectiveValue?.toString()}
-                            onChangeText={handleChange('subjectiveValue')} onBlur={handleBlur('subjectiveValue')} />
-                        <InfoIcon text={t('subjectiveValueTooltip')} />
+                        <TransparentTextInput style={{ flex: 1 }} testID="price" label={<StyledLabel label={t('Label')} />} value={values.price?.toString()}
+                            onChangeText={handleChange('price')} onBlur={handleBlur('price')} />
+                        <InfoIcon text={t('Tooltip')} />
                     </View>
-                    <ErrorMessage component={ErrorText} name="subjectiveValue" />
+                    <ErrorMessage component={ErrorText} name="price" />
                     <DateTimePickerField testID="expiration" textColor="#000" value={values.expiration} onChange={async d => {
                         await setFieldValue('expiration', d)
                         setTouched({ expiration: true })

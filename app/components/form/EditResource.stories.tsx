@@ -45,7 +45,7 @@ export const EditExisting: Story = {
         id: 1, canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, isProduct: true,
         isService: true, created: new Date(), deleted: null, categories: [], description: 'description de la ressource',
         title: 'Titre de ressource alléchant', images: [], expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
-        subjectiveValue: null, specificLocation: { address: `Rue de l'adresse spécifique, 1, 10000, Gloupgloup`, latitude: 51, longitude: 4 }
+        price: null, specificLocation: { address: `Rue de l'adresse spécifique, 1, 10000, Gloupgloup`, latitude: 51, longitude: 4 }
     }), apolloClientMocksDecorator([{
         query: ACCOUNT_LOCATION,
         variables: { id: 1 },

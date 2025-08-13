@@ -174,10 +174,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </ViewField>
                 <Hr thickness={2}/>
             </View>}
-            {resource.data.subjectiveValue && <>
-                <ViewField title={t('subjectiveValueLabel')}>
+            {resource.data.price && <>
+                <ViewField title={t('Label')}>
                     <View style={{ flexDirection: 'column' }}>
-                        <Text variant="bodyMedium">{`${resource.data.subjectiveValue}€`}</Text>
+                        <Text variant="bodyMedium">{`${resource.data.price}€`}</Text>
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>

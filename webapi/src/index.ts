@@ -15,6 +15,7 @@ import dayjs from "dayjs"
 import googleAuth from "./googleAuth"
 import { Pool } from "pg"
 import appleAuth from "./appleAuth"
+import adminAuth from "./adminAuth"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -60,6 +61,7 @@ const launchPostgraphileWebApi = (config: Config, pool: Pool) => {
 
     googleAuth(app, pool, config.googleAuthAudience, config.googleApiSecret, corsMiddleware)
     appleAuth(app, pool, corsMiddleware)
+    adminAuth(app, pool, corsMiddleware)
 
     app.use(postgraphile(config))
     
@@ -77,7 +79,11 @@ const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Pro
 }
 
 const launchJobWorker = async (pool: Pool, version: string) => {
-    const crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications'
+    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications\n*/10 * * * * handleResourcesAndBidsExpiration'
+
+    if(version === 'v0_9'){
+        crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications'
+    }
 
     const runner = await run({
         pgPool: pool,
@@ -122,6 +128,11 @@ const launchJobWorker = async (pool: Pool, version: string) => {
                 executeJob(async () => {
                     await runAndLog(`SELECT sb.apply_resources_token_transactions()`, pool, 'Running burnTokens routine')
                 }, 'burnTokens')
+            },
+            handleResourcesAndBidsExpiration: async () => {
+                executeJob(async () => {
+                    await runAndLog('SELECT sb.handle_resources_and_bids_expiration()', pool, 'Terminate expired bids, and bids on expired resources')
+                }, 'handleResourcesAndBidsExpiration')
             }
         },
         schema: 'worker'

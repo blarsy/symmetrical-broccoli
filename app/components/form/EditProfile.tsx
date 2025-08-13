@@ -41,8 +41,8 @@ export const UPDATE_ACCOUNT_PUBLIC_INFO = gql`mutation UpdateAccountPublicInfo($
   }
 `
 
-export const GET_ACCOUNT_INFO = gql`query AccountInfoById($id: Int!) {
-    accountById(id: $id) {
+export const GET_ACCOUNT_INFO = gql`query AccountInfoById {
+    me {
       id
       accountsLinksByAccountId {
         nodes {

@@ -35,7 +35,7 @@ export const RESOURCES = gql`query MyResources {
       canBeDelivered
       deleted
       suspended
-      subjectiveValue
+      price
       accountByAccountId {
         id
         name

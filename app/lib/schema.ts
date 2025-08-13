@@ -82,7 +82,7 @@ export interface Resource {
     created: Date,
     deleted: Date | null,
     specificLocation: Location | null,
-    subjectiveValue: number | null
+    price: number | null
 }
 
 export interface ConversationData {
@@ -131,7 +131,7 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         suspended:  rawRes.suspended && new Date(rawRes.suspended),
         paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
-        images, subjectiveValue: rawRes.subjectiveValue
+        images, price: rawRes.price
 } as Resource
 }
 
@@ -159,7 +159,7 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                     images: rawConversation.resourceByResourceId.resourcesImagesByResourceId.nodes.map((img: any) => ({
                         publicId: img.imageByImageId.publicId
                     })),
-                    subjectiveValue: rawConversation.resourceByResourceId.subjectiveValue,
+                    price: rawConversation.resourceByResourceId.price,
                     account: {
                         id: rawConversation.resourceByResourceId.accountByAccountId.id,
                         name: rawConversation.resourceByResourceId.accountByAccountId.name,

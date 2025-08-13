@@ -22,7 +22,7 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
     {
         editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null, specificLocation: null, expiration: new Date(), subjectiveValue: null },
+            isService: false, deleted: null, specificLocation: null, expiration: new Date(), price: null },
         changeCallbacks: [], imagesToAdd: []},
         actions: {
             setResource: () => {},
@@ -174,7 +174,7 @@ export const singleResource = (id?: number, isDeleted: boolean = false, threeIma
         created: new Date(2022, 1, 1),
         deleted: isDeleted ? new Date() : null,
         suspended: null,
-        subjectiveValue: null,
+        price: null,
         paidUntil: null,
         accountByAccountId: {
             email: 'me@me.com',

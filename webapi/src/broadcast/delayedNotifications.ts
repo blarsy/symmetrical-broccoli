@@ -5,6 +5,7 @@ import { TFunction } from "i18next"
 import dayjs from "dayjs"
 import logger from "../logger"
 import { Pool } from "pg"
+import { makeNotificationInfo } from "./common"
 
 const succinctDate = (date: Date, t: TFunction) => {
     const todayMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0)
@@ -40,6 +41,21 @@ interface EmailSummaryData {
 
 interface ChatMessageSummaryData {
     [email: string]: EmailSummaryData
+}
+
+interface AccountNotificationSummaryData {
+    language: string
+    accountId: number
+    notifications: {
+        date: Date
+        id: number
+        title: string
+        summary: string
+    }[]
+}
+
+interface NotificationsSummaryData {
+    [email: string]: AccountNotificationSummaryData
 }
 
 const getAccountChatMessages = async (emailSummaryData: EmailSummaryData): Promise<string> => {
@@ -118,7 +134,7 @@ const getChatMessageSummaryData = async (pool: Pool): Promise<ChatMessageSummary
         INNER JOIN sb.participants author ON author.id = m.participant_id
         INNER JOIN sb.accounts aa ON aa.id = author.account_id
         INNER JOIN sb.resources r ON r.id = c.resource_id
-        INNER JOIN sb.broadcast_prefs bp ON bp.account_id = destinator.account_id AND bp.event_type = 1
+        INNER JOIN sb.broadcast_prefs bp ON bp.account_id = destinator.account_id AND bp.event_type = 1 AND bp.days_between_summaries IS NOT NULL
         WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW())
         AND um.created > NOW() - interval '1 day' * bp.days_between_summaries
         AND ad.email IS NOT NULL`, pool, 'Running delayed notifier')
@@ -254,15 +270,14 @@ const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSumma
 	FROM sb.notifications n
 	INNER JOIN sb.resources r ON n.data::json->'resource_id' IS NOT NULL AND r.id = (n.data::json->>'resource_id')::integer
     INNER JOIN sb.accounts author ON author.id = r.account_id
-    INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id
+    INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
     INNER JOIN sb.accounts notified ON notified.id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
-        n.read IS NULL AND n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
+        n.read IS NULL AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
         author.id <> notified.id AND
-        notified.email IS NOT NULL AND
-		n.read IS NULL
+        notified.email IS NOT NULL
     ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, pool, `Querying new resources to notify`)
 
     const resourcesSummaryData = {} as NewResourcesSummaryData
@@ -282,56 +297,139 @@ const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSumma
     return resourcesSummaryData
 }
 
+const getNotificationsSummaryData = async (pool: Pool): Promise<NotificationsSummaryData> => {
+    const notifications = await runAndLog(`SELECT a.language, a.id as account_id, n.id, n.created, n.data, a.email
+        FROM sb.notifications n
+        INNER JOIN sb.accounts a ON a.id = n.account_id
+        INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 3 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
+        WHERE n.data::json->>'resource_id' IS NULL AND (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
+            n.read IS NULL AND n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
+            a.email IS NOT NULL
+        ORDER BY a.id, n.created DESC`, pool, 'Querying notifications to notify')
+    
+        const notificationsSummaryData: NotificationsSummaryData = {} 
+
+        notifications.rows.forEach(async row => {
+            if(!notificationsSummaryData[row.email]) {
+                notificationsSummaryData[row.email] = {
+                    accountId: row.account_id, language: row.language, notifications: []
+                }
+            }
+
+            const t = await initTranslations(row.language)
+            const notificationInfo = makeNotificationInfo(row.data, t)
+
+            notificationsSummaryData[row.email].notifications.push({
+                date: row.created,
+                id: row.id,
+                title: notificationInfo.title,
+                summary: notificationInfo.summary
+            })
+        })
+
+        return notificationsSummaryData
+}
+
+const getAccountNotifications = async (notificationsSummaryData: AccountNotificationSummaryData): Promise<string> => {
+        const t = await initTranslations(notificationsSummaryData.language)
+    let newNotificationsList = `                                <table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+        <tr>
+            <td style="padding:25px 45px 25px 45px;line-height:22px;text-align:inherit;"
+                height="100%"
+                valign="top"
+                bgcolor="">
+                <div style="text-align: center;"><strong><span style="color:#3E3E3E;"><span style="font-size:16px;">${t('notifications_mail_section_title')}</span></span></strong></div>
+            </td>
+        </tr>
+    </table><table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+        <tr>
+            <th style="font-size:16px; text-align: center;">${t('created_date_column_title')}</th>
+            <th style="font-size:16px; text-align: center;">${t('title_column_title')}</th>
+            <th style="font-size:16px; text-align: center;">${t('summary_column_title')}</th>
+        </tr>`
+    let currentCells = ''
+    notificationsSummaryData.notifications.forEach(notif => {
+        currentCells = currentCells.concat(`<td style="padding:8px 8px 8px 8px;line-height:22px;text-align:inherit;"
+    height="100%"
+    valign="top"
+    bgcolor=""">
+    <div style="text-align: center;"><strong><span style="color:#3E3E3E;"><span style="font-size:16px;">${succinctDate(notif.date, t)}</span></span></strong></div>
+    </td>`)
+        currentCells = currentCells.concat(`<td style="padding:8px 8px 8px 8px;line-height:22px;text-align:inherit;"
+            height="100%"
+            valign="top"
+            bgcolor="">
+            <div style="text-align: center;"><span style="color:#3E3E3E;"><span style="font-size:16px;">${notif.title}</span></span></div>
+        </td>`)
+        currentCells = currentCells.concat(`<td style="padding:8px 8px 8px 8px;line-height:22px;text-align:inherit;"
+            height="100%"
+            valign="top"
+            bgcolor="">
+            <div style="text-align: center;"><span style="color:#3E3E3E;"><span style="font-size:16px;">${notif.summary}</span></span></div>
+        </td>`)
+        newNotificationsList = newNotificationsList.concat(`<tr>`, currentCells, `</tr>`)
+        currentCells = ''
+    })
+
+    return newNotificationsList.concat(`</table>`)
+}
+
+const makePostQuery = (eventType: number, accountId: number) => {
+    return `UPDATE sb.broadcast_prefs
+        SET last_summary_sent = NOW()
+        WHERE event_type = ${eventType} AND account_id = ${accountId}`
+}
+
 export const sendSummaries = async (pool: Pool, version: string): Promise<void> => {
-    const [resourcesSummaryData, chatMessagesSummaryData] = await Promise.all([
+    const postQuerieInfos: { eventType: number, accountId: number }[] = []
+
+    const [resourcesSummaryData, chatMessagesSummaryData, notificationsSummaryData] = await Promise.all([
         getNewResourcesSummaryData(pool),
         getChatMessageSummaryData(pool),
-        
+        getNotificationsSummaryData(pool)
     ])
 
-    logger.info(`Data objects for sending summaries by email:\nresourcesSummaryData: ${JSON.stringify(resourcesSummaryData)}\nchatMessagesSummaryData: ${JSON.stringify(chatMessagesSummaryData)}`)
+    logger.info(`Data objects for sending summaries by email:\nresourcesSummaryData: ${JSON.stringify(resourcesSummaryData)}\nchatMessagesSummaryData: ${JSON.stringify(chatMessagesSummaryData)}\nnotificationsSummaryData: ${JSON.stringify(notificationsSummaryData)}`)
 
+    //create the union of the mails that should be seent either chat messages or resource notifications
     const emails = [] as string[]
-    [...Object.keys(resourcesSummaryData), ...Object.keys(chatMessagesSummaryData)].forEach(mail => {
+    [...Object.keys(resourcesSummaryData), ...Object.keys(chatMessagesSummaryData), ...Object.keys(notificationsSummaryData)].forEach(mail => {
         if(!emails.includes(mail)) emails.push(mail)
     })
 
     emails.forEach(async email => {
-        let resourceSummaryContentPromise, resourceSummaryContent, chatMessagesSummaryContent = '', i18nMailSubject, language = ''
+        let i18nMailSubject = '', language = ''
+        let contentPromises: Promise<string>[] = []
+
         if(resourcesSummaryData[email]) {
-            resourceSummaryContentPromise = getAccountNewResources(resourcesSummaryData[email])
+            contentPromises.push(getAccountNewResources(resourcesSummaryData[email]))
             language = resourcesSummaryData[email].language
+            postQuerieInfos.push({ eventType: 1, accountId: resourcesSummaryData[email].id })
+            i18nMailSubject = 'new_resources_summary_subject'
         }
         if(chatMessagesSummaryData[email]) {
-            chatMessagesSummaryContent = await getAccountChatMessages(chatMessagesSummaryData[email])
+            contentPromises.push(getAccountChatMessages(chatMessagesSummaryData[email]))
             language = chatMessagesSummaryData[email].lang
-        }
-
-        resourceSummaryContent = await resourceSummaryContentPromise
-        
-        const makePostQuery = (eventType: number, accountId: number) => {
-            return `UPDATE sb.broadcast_prefs
-                SET last_summary_sent = NOW()
-                WHERE event_type = ${eventType} AND account_id = ${accountId}`
-        }
-        const postQuerieInfos: { eventType: number, accountId: number }[] = []
-
-        if(resourceSummaryContent && chatMessagesSummaryContent) {
-            i18nMailSubject = 'multiple_new_things_summary_subject'
-            postQuerieInfos.push({ eventType: 1, accountId: chatMessagesSummaryData[email].accountId })
-            postQuerieInfos.push({ eventType: 2, accountId: resourcesSummaryData[email].id })
-        } else if (resourceSummaryContent) {
-            i18nMailSubject = 'new_resources_summary_subject'
-            postQuerieInfos.push({ eventType: 2, accountId: resourcesSummaryData[email].id })
-        } else {
+            postQuerieInfos.push({ eventType: 2, accountId: chatMessagesSummaryData[email].accountId })
             i18nMailSubject = 'chat_messages_summary_subject'
-            postQuerieInfos.push({ eventType: 1, accountId: chatMessagesSummaryData[email].accountId })
         }
+        if(notificationsSummaryData[email]) {
+            contentPromises.push(getAccountNotifications(notificationsSummaryData[email]))
+            language = notificationsSummaryData[email].language
+            postQuerieInfos.push({ eventType: 3, accountId: notificationsSummaryData[email].accountId })
+            i18nMailSubject = 'notifications_summary_subject'
+        }
+
+        if(contentPromises.length > 1 ) {
+            i18nMailSubject = 'multiple_new_things_summary_subject'
+        }
+
+        const contents =  await Promise.all(contentPromises)
 
         postQuerieInfos.forEach(qry => {
             runAndLog(makePostQuery(qry.eventType, qry.accountId), pool, `Setting last summary time.`)
         })
 
-        sendNotificationsSummaryMail(email, i18nMailSubject, [resourceSummaryContent, chatMessagesSummaryContent].join(''), language, version, pool)
+        sendNotificationsSummaryMail(email, i18nMailSubject, contents.join(''), language, version, pool)
     })
 }

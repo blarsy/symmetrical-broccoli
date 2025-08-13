@@ -1,12 +1,13 @@
 import createPostgresSubscriber, { PgParsedNotification, Subscriber } from "pg-listen"
 import logger from "../logger"
 import { Config } from "../config"
-import { handleMessageCreated, handleResourceCreated } from "./event"
+import { handleMessageCreated, handleNotificationCreated, handleResourceCreated } from "./event"
 import { Pool } from "pg"
 
 const dbNotificationConfigs: { channel: string, handler: (notification: PgParsedNotification, config: Config, pool: Pool) => Promise<void> }[] = [
     { channel: 'message_created', handler: handleMessageCreated },
-    { channel: 'resource_created', handler: handleResourceCreated }
+    { channel: 'resource_created', handler: handleResourceCreated },
+    { channel: 'notification_created', handler: handleNotificationCreated }
 ]
 
 export class NotificationsListener {

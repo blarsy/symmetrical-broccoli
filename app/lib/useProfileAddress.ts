@@ -5,7 +5,7 @@ import { fromData, fromError, initial } from "./DataLoadState"
 import { gql, useLazyQuery } from "@apollo/client"
 
 export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
-    accountById(id: $id) {
+    getAccountPublicInfo(id: $id) {
       id
       locationByLocationId {
         address

@@ -12,8 +12,8 @@ import { RouteProps, aboveMdWidth, adaptToWidth, mdScreenWidth } from "@/lib/uti
 import { ScrollView } from "react-native-gesture-handler"
 import { RadioButton, Text } from "react-native-paper"
 
-export const GET_PREFERENCES = gql`query Preferences($id: Int!) {
-    accountById(id: $id) {
+export const GET_PREFERENCES = gql`query Preferences {
+    me {
       id
       broadcastPrefsByAccountId {
         nodes {
