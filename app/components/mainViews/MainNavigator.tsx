@@ -150,7 +150,8 @@ export function Main ({ screens }: Props) {
             colors: {
                 ...DefaultTheme.colors,
                 card: primaryColor
-            }, dark: false
+            }, dark: false,
+            fonts: DefaultTheme.fonts
         }}>
             <View style={{ flex: 1,alignItems: 'stretch', alignSelf: 'stretch', justifyContent: 'center', alignContent: 'stretch' }}>
                 <StackNav.Navigator screenOptions={{ headerShown: false }}>

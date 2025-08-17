@@ -107,10 +107,10 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
             checked={!!appContext.account?.avatarPublicId} 
             onPress={() => navigation.navigate('main')} reward={ADD_LOGO_REWARD}/>
         <OneTimeTask text={t('howToGet_addLocation')} 
-            checked={data && data.accountById?.locationByLocationId?.address} 
+            checked={data && data.getAccountPublicInfo?.locationByLocationId?.address} 
             loading={loading} onPress={() => navigation.navigate('main')} reward={ADD_LOCATION_REWARD}/>
         <OneTimeTask text={t('howToGet_addLink')} 
-            checked={data && data.accountById?.accountsLinksByAccountId?.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0} 
+            checked={data && data.getAccountPublicInfo?.accountsLinksByAccountId?.nodes && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0} 
             loading={loading} onPress={() => navigation.navigate('main')} reward={ADD_LINK_REWARD}/>
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 

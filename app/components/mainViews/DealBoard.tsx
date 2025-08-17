@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react"
-import { Badge } from "react-native-paper"
+import { Badge, Icon } from "react-native-paper"
 import { primaryColor } from "@/components/layout/constants"
 import { View } from "react-native"
 import Search from './Search'
@@ -16,6 +16,7 @@ import Notifications from "../notifications/Notifications"
 import DealNavigator from "../DealNavigator"
 import AppHeader from "../AppHeader"
 import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
+import Bids from "./Bids"
 
 export interface DealBoardProps extends RouteProps {
     tabs?: TabNavigatorProps[]
@@ -37,6 +38,8 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
                     name: 'search', component: Search, options: { title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }
                 }, {
                     name: 'resource', component: Resources, options: { title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }
+                }, {
+                    name: 'bids', component: Bids, options: { tabBarButtonTestID: 'bottomBar:Bids', title: t('bids_label'), tabBarIcon: p => <Icon source="hand-coin" color={p.color} size={32} /> }
                 }, {
                     name: 'chat', component: Chat, options: { tabBarButtonTestID: 'bottomBar:Chat', title: t('chat_label'), tabBarIcon: p => <>
                         <Images.Chat fill={p.color} />

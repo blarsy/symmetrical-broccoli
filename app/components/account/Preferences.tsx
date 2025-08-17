@@ -71,8 +71,8 @@ export default ({ route, navigation }: RouteProps) => {
 
     let pref1: any, pref2: any
     if(data) {
-        pref1 = data.accountById.broadcastPrefsByAccountId.nodes.find((broadcastPref: any) => broadcastPref.eventType === 1)
-        pref2 = data.accountById.broadcastPrefsByAccountId.nodes.find((broadcastPref: any) => broadcastPref.eventType === 2)
+        pref1 = data.me.broadcastPrefsByAccountId.nodes.find((broadcastPref: any) => broadcastPref.eventType === 1)
+        pref2 = data.me.broadcastPrefsByAccountId.nodes.find((broadcastPref: any) => broadcastPref.eventType === 2)
     }
 
     return <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: 'transparent' }} contentContainerStyle={{ alignItems: adaptToWidth<FlexAlignType>('stretch', 'center', 'center') }}>

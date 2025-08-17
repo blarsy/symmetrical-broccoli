@@ -188,7 +188,7 @@ export const AppDispatchContext = createContext((() => {}) as Dispatch<{ type: A
 export const AppAlertDispatchContext = createContext((() => {}) as Dispatch<{type: AppAlertReducerActionType, payload: IAppNotification}>)
 
 interface Props {
-  children: JSX.Element
+  children: React.ReactNode
   initialState?: IAppState
   reducer?: (previousState: IAppState, action: {
       type: AppReducerActionType;
@@ -197,7 +197,7 @@ interface Props {
 }
 
 export function AppContextProvider({ children, initialState, reducer } : Props) {
-    const [appState, dispatch] = useReducer<(previousState: IAppState, action: { type: AppReducerActionType, payload: any }) => IAppState>(reducer || appReducer, initialState || initialAppState)
+    const [appState, dispatch] = useReducer(reducer || appReducer, initialState || initialAppState)
     const [appAlertState, dispatchAlert] = useReducer(alertReducer, {})
 
     return (

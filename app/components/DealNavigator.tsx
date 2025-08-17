@@ -16,6 +16,8 @@ const getViewTitleI18n = (screenName: string): string => {
             return t('chat_label')
         case 'notifications':
             return t('notifications_title')
+        case 'bids':
+            return t('bids_label')
         default:
             return ''
     }

@@ -102,9 +102,9 @@ const Preferences = () => {
         numberOfDaysBetweenSummaries: number | null
     } } => {
         const 
-            rawPref1 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 1),
-            rawPref2 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 2),
-            rawPref3 = data?.accountById?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 3)
+            rawPref1 = data?.getAccountPublicInfo?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 1),
+            rawPref2 = data?.getAccountPublicInfo?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 2),
+            rawPref3 = data?.getAccountPublicInfo?.broadcastPrefsByAccountId?.nodes?.find((pref: any) => pref.eventType === 3)
         return {
             pref1: { numberOfDaysBetweenSummaries : rawPref1 ? rawPref1.daysBetweenSummaries : null },
             pref2: { numberOfDaysBetweenSummaries : rawPref2 ? rawPref2.daysBetweenSummaries : null },

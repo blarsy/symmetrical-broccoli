@@ -456,7 +456,7 @@ const resources = {
             "bidCreated": "Tu as fais une offre",
             "bidCancelled": "Une de tes offres a été effacée, ou refusée",
             "bidAccepted": "Tu as accepté une offre",
-            "bidsButtonCaption": "OFfres",
+            "bidsButtonCaption": "Offres",
             "noBids": "Pas d'offre envoyée pour le moment. Pour faire une offre, trouve d'abord une ressource qui t'intéresse",
             "noReceivedBids": "Pas d'offre reçue pour le moment",
             "myBidsTitle": "Offres envoyées",

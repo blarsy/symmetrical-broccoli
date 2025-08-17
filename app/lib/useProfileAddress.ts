@@ -25,7 +25,7 @@ export default () => {
     const loadLocationAndReset = async () => {
         try {
             const res = await getLocation({ variables: { id: appContext.account!.id }, fetchPolicy: "network-only" })
-            const defaultLocation = parseLocationFromGraph(res.data.accountById.locationByLocationId)
+            const defaultLocation = parseLocationFromGraph(res.data.getAccountPublicInfo.locationByLocationId)
 
             setState(fromData(defaultLocation))
         } catch(e) {

@@ -34,8 +34,8 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
     const appContext = useContext(AppContext)
 
     useEffect(() => {
-        if(data && data.accountById.resourcesByAccountId.nodes) {
-            setAccountResources(data.accountById.resourcesByAccountId.nodes
+        if(data && data.getAccountPublicInfo.resourcesByAccountId.nodes) {
+            setAccountResources(data.getAccountPublicInfo.resourcesByAccountId.nodes
                 .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
                 .map((res:any) => fromServerGraphResource(res, appContext.categories.data!)))
         }
@@ -46,25 +46,25 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
             { data && 
                 <View style={{ gap: 10 }}>
                     <Text variant="titleLarge" style={{ textTransform: 'uppercase', textAlign: 'center', paddingTop: 10 }}>
-                        {data.accountById.name}
+                        {data.getAccountPublicInfo.name}
                     </Text>
-                    { data.accountById.imageByAvatarImageId?.publicId ?
-                        <TouchableOpacity onPress={() => setLogotoZoom(imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId))}
+                    { data.getAccountPublicInfo.imageByAvatarImageId?.publicId ?
+                        <TouchableOpacity onPress={() => setLogotoZoom(imgSourceFromPublicId(data.getAccountPublicInfo.imageByAvatarImageId.publicId))}
                           containerStyle={{ alignItems: 'center' }}>
-                          <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.accountById.imageByAvatarImageId.publicId)} size={adaptToWidth(250, 350, 500)} />
+                          <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.getAccountPublicInfo.imageByAvatarImageId.publicId)} size={adaptToWidth(250, 350, 500)} />
                         </TouchableOpacity>
                         :
                         <View style={{ margin: 15 }}/>
                     }
-                    { ((data.accountById.accountsLinksByAccountId.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0) || data.accountById.locationByLocationId) &&
+                    { ((data.getAccountPublicInfo.accountsLinksByAccountId.nodes && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0) || data.getAccountPublicInfo.locationByLocationId) &&
                     <>
                       <WhiteButton icon={moreInfo ? 'chevron-up' : 'chevron-right'} textColor="#000" style={{ paddingVertical: 15 }}
                         onPress={() => setMoreInfo(!moreInfo)}><Text variant="titleMedium">{moreInfo ? t('lessInfo') : t('moreInfo')}</Text></WhiteButton>
                       { moreInfo && 
                         <View style={{ backgroundColor: lightPrimaryColor, padding: 5, borderRadius: IMAGE_BORDER_RADIUS }}>
-                          { data.accountById.accountsLinksByAccountId.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&
+                          { data.getAccountPublicInfo.accountsLinksByAccountId.nodes && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0 &&
                             <ViewField title={t('links')} titleOnOwnLine>
-                              <LinkList values={ data.accountById.accountsLinksByAccountId.nodes.map((link: any) => ({
+                              <LinkList values={ data.getAccountPublicInfo.accountsLinksByAccountId.nodes.map((link: any) => ({
                                 id: link.id,
                                 label: link.label,
                                 url: link.url,
@@ -72,13 +72,13 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
                               } as Link)) } />
                             </ViewField>
                           }
-                          { data.accountById.locationByLocationId && <ViewField title={t('address_label')} titleOnOwnLine>
+                          { data.getAccountPublicInfo.locationByLocationId && <ViewField title={t('address_label')} titleOnOwnLine>
                               <View style={{ flexDirection: 'column' }}>
-                                  <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{data.accountById.locationByLocationId.address}</Text>
+                                  <Text variant="bodySmall" style={{ paddingVertical: 5 }}>{data.getAccountPublicInfo.locationByLocationId.address}</Text>
                                   <MapView showsUserLocation={false} style={{ height: adaptToWidth(200, 300, 550) }} 
-                                      region={regionFromLocation(parseLocationFromGraph(data.accountById.locationByLocationId)!)}
+                                      region={regionFromLocation(parseLocationFromGraph(data.getAccountPublicInfo.locationByLocationId)!)}
                                       provider={PROVIDER_GOOGLE}>
-                                      <Marker coordinate={parseLocationFromGraph(data.accountById.locationByLocationId)!} />
+                                      <Marker coordinate={parseLocationFromGraph(data.getAccountPublicInfo.locationByLocationId)!} />
                                   </MapView>
                               </View>
                           </ViewField> }

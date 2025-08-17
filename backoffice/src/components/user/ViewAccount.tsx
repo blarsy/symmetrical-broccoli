@@ -80,8 +80,8 @@ const ViewAccount = (p: Props) => {
     useCategories()
 
     useEffect(() => {
-        if(data && data.accountById.resourcesByAccountId.nodes && uiContext.categories.data) {
-            setAccountResources(data.accountById.resourcesByAccountId.nodes
+        if(data && data.getAccountPublicInfo.resourcesByAccountId.nodes && uiContext.categories.data) {
+            setAccountResources(data.getAccountPublicInfo.resourcesByAccountId.nodes
                 .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
                 .map((res:any) => fromServerGraphResource(res, uiContext.categories.data!)))
         }
@@ -92,30 +92,30 @@ const ViewAccount = (p: Props) => {
       }}>
         { data && <>
             <Stack direction="row" gap="1rem" alignItems="center">
-                <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.accountById.name}
-                    avatarImagePublicId={data.accountById.imageByAvatarImageId?.publicId} />
-                <Typography flex="1" color="primary" variant="h1">{data.accountById.name}</Typography>
+                <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.getAccountPublicInfo.name}
+                    avatarImagePublicId={data.getAccountPublicInfo.imageByAvatarImageId?.publicId} />
+                <Typography flex="1" color="primary" variant="h1">{data.getAccountPublicInfo.name}</Typography>
                 <IconButton color="primary" onClick={() => {
-                  setTokenTransferInfo({ destinatorAccount: data.accountById.name, 
-                    destinatorId: data.accountById.id
+                  setTokenTransferInfo({ destinatorAccount: data.getAccountPublicInfo.name, 
+                    destinatorId: data.getAccountPublicInfo.id
                   })
                 }}>
                   <GiveIcon sx={{ fontSize: '3rem' }} />
                 </IconButton>
             </Stack>
-            { data.accountById.accountsLinksByAccountId && data.accountById.accountsLinksByAccountId.nodes.length > 0 &&
+            { data.getAccountPublicInfo.accountsLinksByAccountId && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0 &&
                 <Stack>
                     <Typography variant="caption" color="primary">{uiContext.i18n.translator('linksLabel')}</Typography>
-                    {data.accountById.accountsLinksByAccountId.nodes.map((link: any, idx: number) => <Link key={idx} href={link.url}>{link.label || link.url}</Link>) }
+                    {data.getAccountPublicInfo.accountsLinksByAccountId.nodes.map((link: any, idx: number) => <Link key={idx} href={link.url}>{link.label || link.url}</Link>) }
                 </Stack>
             }
-            { data.accountById.locationByLocationId &&
+            { data.getAccountPublicInfo.locationByLocationId &&
                 <Stack>
                     <Typography variant="caption" color="primary">{uiContext.i18n.translator('accountLocationLabel')}</Typography>
                     <DisplayLocation value={{ 
-                      address: data.accountById.locationByLocationId.address, 
-                      latitude: Number(data.accountById.locationByLocationId.latitude), 
-                      longitude: Number(data.accountById.locationByLocationId.longitude)}}/>
+                      address: data.getAccountPublicInfo.locationByLocationId.address, 
+                      latitude: Number(data.getAccountPublicInfo.locationByLocationId.latitude), 
+                      longitude: Number(data.getAccountPublicInfo.locationByLocationId.longitude)}}/>
                 </Stack>
             }
             <Typography variant="caption" color="primary">{uiContext.i18n.translator('availableResources')}</Typography>

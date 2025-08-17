@@ -71,10 +71,10 @@ function useProfile () {
     useEffect(() => {
         if(publicInfoData) {
             setProfileData(fromData({
-                links: publicInfoData.accountById.accountsLinksByAccountId.nodes.map((raw: any) => ({
+                links: publicInfoData.me.accountsLinksByAccountId.nodes.map((raw: any) => ({
                     id: raw.id, label: raw.label, type: raw.linkTypeByLinkTypeId.id, url: raw.url
                 } as Link)),
-                location: parseLocationFromGraph(publicInfoData.accountById.locationByLocationId),
+                location: parseLocationFromGraph(publicInfoData.me.locationByLocationId),
                 preferences: {
                     chatMessageDaysSummary: 1,
                     newResourcesDaysSummary: 1

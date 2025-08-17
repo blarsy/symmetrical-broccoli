@@ -279,8 +279,8 @@ const useNotifications = (version: string) => {
                     break
                 case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
                     otherNotifs.push(
-                        createOtherNotification(t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { cancelledBy: rawNotification.node.data.resourceAuthor }), 
-                            t('bidExpiredHeadlineDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                        createOtherNotification(t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
+                            t('bidDExpiredDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
                             `/webapp/${version}/bids`, rawNotification)
                         )
                     break

@@ -148,9 +148,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </ViewField>
                 { appState.account && resource.data.account!.id === appState.account!.id && <BareIconButton Image={Images.Modify} size={35} onPress={() => {
                     editResourceContext.actions.setResource(resource.data)
-                    navigation.navigate('resource', {
-                        screen: 'editResource'
-                    })
+                    navigation.navigate('editResource')
                 }}/>}
             </View>
             <Hr thickness={2}/>

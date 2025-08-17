@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { ActivityIndicator, Dimensions, NativeScrollEvent, StyleProp, View, ViewStyle } from "react-native"
 import ListOf from "./ListOf"
 import { StateError } from "@/lib/DataLoadState"
@@ -10,8 +10,8 @@ interface Props<T> {
     loading: boolean,
     error?: StateError,
     data?: T[],
-    displayItem: (item: T, index: number) => JSX.Element
-    noDataLabel?: string | JSX.Element,
+    displayItem: (item: T, index: number) => ReactNode
+    noDataLabel?: string | ReactNode,
     style?: StyleProp<ViewStyle>,
     contentContainerStyle? : StyleProp<ViewStyle>
     testID?: string

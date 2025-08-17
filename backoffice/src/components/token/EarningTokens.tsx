@@ -162,10 +162,10 @@ const EarningTokens = ({ version }: { version: string }) => {
             checked={!!appContext.account?.avatarPublicId} 
             onClick={() => router.push(`/webapp/${version}/profile`)} reward={ADD_LOGO_REWARD}/>
         <OneTimeTask text={t('howToGet_addLocation')} 
-            checked={data && data.accountById?.locationByLocationId?.address} 
+            checked={data && data.me?.locationByLocationId?.address} 
             loading={loading} onClick={() => router.push(`/webapp/${version}/profile`)} reward={ADD_LOCATION_REWARD}/>
         <OneTimeTask text={t('howToGet_addLink')} 
-            checked={data && data.accountById?.accountsLinksByAccountId?.nodes && data.accountById.accountsLinksByAccountId.nodes.length > 0} 
+            checked={data && data.me?.accountsLinksByAccountId?.nodes && data.me.accountsLinksByAccountId.nodes.length > 0} 
             loading={loading} onClick={() => router.push(`/webapp/${version}/profile`)} reward={ADD_LINK_REWARD}/>
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 

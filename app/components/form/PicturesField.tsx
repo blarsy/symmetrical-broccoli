@@ -9,7 +9,7 @@ import { ImageInfo } from "@/lib/schema"
 import { urlFromPublicId } from "@/lib/images"
 import { cropImageCenterVertically, pickImage } from "@/lib/utils"
 import { AppAlertDispatchContext, AppAlertReducerActionType } from "../AppContextProvider"
-import { Camera, CameraCapturedPicture } from "expo-camera"
+import { CameraCapturedPicture, CameraView, useCameraPermissions } from "expo-camera"
 import Slider from '@react-native-community/slider'
 import { error } from "@/lib/logger"
 
@@ -21,14 +21,14 @@ interface CameraButtonProps {
 }
 
 const CameraButton = ({ children, onDone }: CameraButtonProps) => {
-    const [permission, requestPermission] = Camera.useCameraPermissions()
+    const [permission, requestPermission] = useCameraPermissions()
     const [takingPicture, setTakingPicture] = useState(false)
     const [cameraReady, setCameraReady] = useState(false)
     const [processing, setProcessing] = useState(false)
     const [zoom, setZoom] = useState(0)
     const ref = useRef<Camera | null>(null)
 
-    const previewSize = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height)
+    //const previewSize = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height)
     const vertical = Dimensions.get('screen').width < Dimensions.get('screen').height
     
 
@@ -48,7 +48,7 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                 backgroundColor: lightPrimaryColor, alignItems: 'center',
                 flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
                 <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
-                <Camera ref={ref} zoom={zoom} pictureSize="1:1" ratio="1:1"
+                <CameraView ref={ref} zoom={zoom} pictureSize="1:1" ratio="1:1"
                     style={{ flex: 1, alignSelf: 'stretch', justifyContent: processing ? 'space-between' : 'flex-end', 
                         alignItems: 'center', padding: 10, gap: 5 }}
                     onCameraReady={() => setCameraReady(true)}>
@@ -61,7 +61,7 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
                             onValueChange={val => setZoom(val / 100)} minimumValue={0} value={zoom * 100}
                             maximumValue={100} style={{ width: '70%' }} />
                     </View>
-                </Camera>
+                </CameraView>
                 <IconButton style={{ borderRadius: 3 }} disabled={!cameraReady} icon={Images.Camera} onPress={async () => {
                     setProcessing(true)
                     try {

@@ -24,6 +24,7 @@ import LocationEdit from "../account/LocationEdit"
 import OptionSelect from "../OptionSelect"
 import useProfileAddress from "@/lib/useProfileAddress"
 import { primaryColor } from "../layout/constants"
+import EditResource from "../form/EditResource"
 
 const StackNav = createNativeStackNavigator()
 
@@ -179,5 +180,6 @@ export default function Search({ route, navigation }: RouteProps) {
         <StackNav.Screen name="searchResults" component={SearchResults} options={{ headerShown: false }} />
         <StackNav.Screen name="viewResource" key="viewResource" options={{ header: SimpleBackHeader }} component={ViewResource} />
         <StackNav.Screen name="viewAccount" key="viewAccount" options={{ header: SimpleBackHeader }} component={ViewAccount} />
+        <StackNav.Screen name="editResource" key="editResource" options={{ header: SimpleBackHeader }} component={EditResource} />
     </StackNav.Navigator>
 }
