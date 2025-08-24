@@ -37,7 +37,7 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const uiContext= useContext(UiContext)
-    const { connectWithToken } = useAccountFunctions(version)
+    const { connectWithToken, disconnect } = useAccountFunctions(version)
 
     const load = async () => {
         const token = localStorage.getItem('token')
@@ -73,7 +73,7 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
             overflow: 'clip', 
             display: 'flex'
         }}>
-        <ApolloProvider client={getApolloClient(version, appContext.token)}>
+        <ApolloProvider client={getApolloClient(version, appContext.token, disconnect)}>
             { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
                 <Themed>
                     {children}

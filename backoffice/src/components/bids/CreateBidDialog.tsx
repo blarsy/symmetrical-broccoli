@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
 import { useContext, useState } from "react"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { LoadingButton } from "@mui/lab"
@@ -21,7 +21,7 @@ export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursVal
 }`
 
 interface Props {
-    resource: Resource
+    resource?: Resource
     onClose: (sucess?: boolean) => void
 }
 

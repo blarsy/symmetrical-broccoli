@@ -17,7 +17,7 @@ import LocationEdit from "../account/LocationEdit"
 import LoadedZone from "../LoadedZone"
 import ListOf from "../ListOf"
 import EditLinkModal from "../account/EditLinkModal"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { TouchableOpacity } from "../layout/lib"
 import { lightPrimaryColor } from "../layout/constants"
 
 const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {

@@ -5,6 +5,7 @@ import { AppContext, AppDispatchContext, AppReducerActionType } from "@/componen
 import config from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
+import { useRouter } from "next/navigation"
 
 export interface AccountInfo {
     name: string
@@ -97,9 +98,10 @@ const useAccountFunctions = (version: string) => {
     const appDispatch = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
     const { apiUrl } = config(version)
+    const router = useRouter()
 
     const connectWithToken = async (token: string, otherSessionProps: any) => {
-        const client = getApolloClient(version, token)
+        const client = getApolloClient(version, token, disconnect)
         const res = await client.query({ query: GET_SESSION_DATA })
 
         if(!res.data.getSessionDataWeb) {
@@ -158,6 +160,7 @@ const useAccountFunctions = (version: string) => {
         appContext.subscriptions.forEach(s => s.unsubscribe())
         localStorage.removeItem('token')
         appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
+        router.push(`/webapp/${version}`)
     }
 
     const login = async (email: string, password: string) => {

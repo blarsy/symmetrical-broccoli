@@ -79,7 +79,7 @@ const PastConversations = ({ onConversationSelected }: Props) => {
         error={error} noDataLabel={<NoConversationYet />}
         displayItem={(item, idx) => {
           return <ResponsiveListItem testID={`conversation:${idx}:Button`} key={idx} style={{ paddingLeft: 5, paddingRight: item.conversation.hasUnread ? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
-            left={() => <ResourceImageWithCreator size={70} resource={item.conversation.resource} authorInfo={item.withUser} onAccountPress={() => {}}/>}
+            left={() => <ResourceImageWithCreator size={70} resource={item.conversation.resource} authorInfo={item.withUser} />}
             onPress={() => {
               onConversationSelected(item.conversation.resource, item.withUser.id)
             }}

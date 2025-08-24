@@ -5,12 +5,12 @@ import { DatePickerModal } from "react-native-paper-dates"
 import { ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
-import OptionSelect from "../OptionSelect"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { aboveMdWidth, getLanguage, SMALL_IMAGEBUTTON_SIZE } from "@/lib/utils"
 import BareIconButton from "./BareIconButton"
 import Images from "@/Images"
+import { Pressable } from "react-native-gesture-handler"
+import { PressableEvent } from "react-native-gesture-handler/lib/typescript/components/Pressable/PressableProps"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -154,19 +154,22 @@ interface RightAlignedModifyButtonsProps {
 }
 
 export const RightAlignedModifyButtons = (p: RightAlignedModifyButtonsProps) => <View style={{ position: 'absolute', flexDirection: 'row', right: 0, bottom: 5, gap: 3 }}>
-    { !p.editing && <BareIconButton testID={`${p.testID}:Modify`} Image={Images.ModifyInCircle} size={SMALL_IMAGEBUTTON_SIZE} color="#000" 
+    { !p.editing && <BareIconButton testID={`${p.testID}:Modify`} Image={Images.ModifyInCircle} 
+        size={SMALL_IMAGEBUTTON_SIZE} color="#000" 
         onPress={p.onEditRequested}/> }
-    { p.editing && <BareIconButton testID={`${p.testID}:Save`} disabled={p.saveButtonDisabled} Image={Images.Check} size={SMALL_IMAGEBUTTON_SIZE} 
+    { p.editing && <BareIconButton testID={`${p.testID}:Save`} disabled={p.saveButtonDisabled} 
+        Image={Images.Check} size={SMALL_IMAGEBUTTON_SIZE} 
         color={p.saveButtonColor || '#000'} onPress={p.onSave}/> }
-    { ((p.onDelete && !p.editing) || p.editing) && <BareIconButton Image={Images.Remove} size={SMALL_IMAGEBUTTON_SIZE} 
-                                                    color={lightPrimaryColor} 
-                                                    onPress={() => {
-                                                        if(p.editing && p.onCancelEdit) {
-                                                            p.onCancelEdit()
-                                                        } else {
-                                                            p.onDelete!()
-                                                        }
-                                                    }} />}
+    { ((p.onDelete && !p.editing) || p.editing) && <BareIconButton Image={Images.Remove} 
+        size={SMALL_IMAGEBUTTON_SIZE} 
+        color={lightPrimaryColor} 
+        onPress={() => {
+            if(p.editing && p.onCancelEdit) {
+                p.onCancelEdit()
+            } else {
+                p.onDelete!()
+            }
+        }} />}
 </View>
 
 interface DateTimePickerFieldProps {
@@ -178,18 +181,53 @@ interface DateTimePickerFieldProps {
     testID: string
 }
 
+interface TouchableOpacityProps extends PropsWithChildren {
+    testID?: string
+    onPress: (event: PressableEvent) => void
+    style?: StyleProp<ViewStyle>
+}
+
+export const TouchableOpacity = (p: TouchableOpacityProps) => <View style={p.style}>
+    <Pressable onPress={p.onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+        {p.children}
+    </Pressable>
+</View>
+
+interface OptionSelectProps {
+    value: boolean
+    onChange: (newValue: boolean) => void
+    title: string
+    selectedColor?: ColorValue
+    color?: ColorValue
+    testID?: string
+}
+
+export const OptionSelect = ({ value, onChange, title, selectedColor, color, testID }: OptionSelectProps) => {
+    return <TouchableOpacity testID={`${testID}:Button`} onPress={() => onChange(!value)}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5, gap: 5 }}>
+            <Icon testID={`${testID}:Icon`} source={ value ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={value ? selectedColor?.toString() || primaryColor : color?.toString() || '#000'} />
+            <Text variant="bodyMedium" style={{ color: value ? selectedColor?.toString() || primaryColor : color?.toString() || '#000' }}>{title}</Text>
+        </View>
+    </TouchableOpacity>
+}
+
+
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
 
-    return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
+    return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', 
+        alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
         <View>
             <OptionSelect title={t('noDate')} value={!props.value} onChange={() => {
                     props.onChange(undefined)
                 }} />
-            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
+            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', 
+                justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
                 onPress={() => setDateOpen(true)}>
-                <Text variant="bodyMedium">{props.value ? dayjs(props.value).format(t('dateFormat')) : t('setDate')}</Text>
+                <Text variant="bodyMedium">
+                    {props.value ? dayjs(props.value).format(t('dateFormat')) : t('setDate')}
+                </Text>
                 <View style={{ marginRight: 14 }}>
                     <Icon source="chevron-right" size={26} color="#000" />
                 </View>

@@ -178,10 +178,10 @@ const ViewResource = (p: Props) => {
                   <Feedback testID="CreateBidSuccess" sx={{ position: 'fixed', bottom: '1rem' }} severity="success" message={uiContext.i18n.translator('bidCreationSuccessMessage')} onClose={() => setBidCreationSucceeded(false)}
                     visible={bidCreationSucceeded}/>
               </Stack>
-              {resourceToBidOn && <CreateBidDialog resource={resourceToBidOn} onClose={success => {
+              <CreateBidDialog resource={resourceToBidOn} onClose={success => {
                 setResourceToBidOn(undefined)
                 setBidCreationSucceeded(!!success)
-              }} />}
+              }} />
             </Stack>
           )
         }

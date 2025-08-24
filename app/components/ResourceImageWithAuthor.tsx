@@ -8,16 +8,17 @@ interface Props {
     resource: Resource
     authorInfo: AvatarIconAccountInfo
     size?: number
-    onAccountPress: (id: number) => void
+    onPress?: () => void
 }
 
-const ResourceImageWithCreator = ({resource, authorInfo, size, onAccountPress}: Props) => {
+const ResourceImageWithCreator = ({resource, authorInfo, size, onPress}: Props) => {
     const imageSize = (size || 50) / 60 * 50
+
     const containersize = size || 50
     return <View style={{ position: 'relative', width: containersize, height: containersize }}>
-        <ResourceImage size={ imageSize } resource={resource} />
-        <AccountAvatar style={{ position: 'absolute', top: -imageSize / 2, left: imageSize / 2 }} 
-            onPress={onAccountPress} 
+        <ResourceImage size={ imageSize } resource={resource} onPress={onPress}/>
+        <AccountAvatar style={{ position: 'absolute', top: imageSize / 2, left: imageSize / 2 }} 
+            onPress={onPress} 
             account={authorInfo} size={imageSize / 3 * 2} />
     </View>
 }

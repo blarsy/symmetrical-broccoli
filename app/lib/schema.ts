@@ -203,3 +203,31 @@ export const getIconForLink = (type: LinkTypes) => {
             return 'web'
     }
 }
+
+export interface Bid {
+    id: number
+    amountOfTokens: number
+    resource: Resource
+    account: Account
+    created: Date
+    refused?: Date
+    deleted?: Date
+    accepted?: Date
+    validUntil: Date
+}
+
+export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
+    name: rawAccount.name,
+    id: rawAccount.id,
+    email: rawAccount.email,
+    avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId),
+    willingToContribute: rawAccount.willingToContribute
+})
+
+export const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {
+    return {
+        id: bid.id, amountOfTokens: bid.amountOfTokens, created: bid.created, accepted: bid.accepted,
+        refused: bid.refused, deleted: bid.deleted, resource: fromServerGraphResource(bid.resourceByResourceId, categories),
+        account: fromServerGraphAccount(bid.accountByAccountId), validUntil: bid.validUntil
+    }
+}

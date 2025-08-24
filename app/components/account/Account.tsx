@@ -15,10 +15,13 @@ import LinkList from "./LinkList"
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import dayjs from "dayjs"
 import PanZoomImage from "../PanZoomImage"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { TouchableOpacity } from "../layout/lib"
 import { lightPrimaryColor } from "../layout/constants"
 import { WhiteButton } from "../layout/lib"
 import { GraphQlLib } from "@/lib/backendFacade"
+import BareIconButton from "../layout/BareIconButton"
+import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
+import SendTokensDialog from "./SendTokensDialog"
 
 interface Props {
     id: number,
@@ -32,11 +35,13 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
     const [accountResources, setAccountResources] = useState<Resource[]>([])
     const [moreInfo, setMoreInfo] = useState(false)
     const appContext = useContext(AppContext)
+    const { ensureConnected } = useUserConnectionFunctions()
+    const [sendingTokensTo, setSendingTokensTo] = useState<number | undefined>()
 
     useEffect(() => {
-        if(data && data.getAccountPublicInfo.resourcesByAccountId.nodes) {
+        if(data && data.getAccountPublicInfo && data.getAccountPublicInfo.resourcesByAccountId.nodes) {
             setAccountResources(data.getAccountPublicInfo.resourcesByAccountId.nodes
-                .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
+                .filter((res: any) => !res.deleted && (!res.expiration || dayjs(res.expiration).toDate() > new Date()))
                 .map((res:any) => fromServerGraphResource(res, appContext.categories.data!)))
         }
     }, [data])
@@ -45,12 +50,19 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
         <LoadedZone loading={loading} error={error}>
             { data && 
                 <View style={{ gap: 10 }}>
-                    <Text variant="titleLarge" style={{ textTransform: 'uppercase', textAlign: 'center', paddingTop: 10 }}>
-                        {data.getAccountPublicInfo.name}
-                    </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                      <Text variant="titleLarge" style={{ textTransform: 'uppercase', textAlign: 'center', paddingTop: 10 }}>
+                          {data.getAccountPublicInfo.name}
+                      </Text>
+                      { data.getAccountPublicInfo.id != appContext.account?.id && <BareIconButton testID={`SendTokens`} size={35} onPress={() => {
+                          ensureConnected('introduce_yourself', '', () => {
+                              setSendingTokensTo(data.getAccountPublicInfo.id)
+                          })
+                      } } Image="hand-coin" /> }
+                    </View>
                     { data.getAccountPublicInfo.imageByAvatarImageId?.publicId ?
                         <TouchableOpacity onPress={() => setLogotoZoom(imgSourceFromPublicId(data.getAccountPublicInfo.imageByAvatarImageId.publicId))}
-                          containerStyle={{ alignItems: 'center' }}>
+                          style={{ alignItems: 'center' }}>
                           <Avatar.Image style={{ marginVertical: 10 }} source={imgSourceFromPublicId(data.getAccountPublicInfo.imageByAvatarImageId.publicId)} size={adaptToWidth(250, 350, 500)} />
                         </TouchableOpacity>
                         :
@@ -95,10 +107,12 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
                             }
                         }
                     />
+                    <SendTokensDialog toAccount={sendingTokensTo} accountName={data.getAccountPublicInfo.name} 
+                        onDismiss={() => setSendingTokensTo(undefined)} testID="sendTokensDialog" />
                 </View>
             }
+            <PanZoomImage source={logoToZoom} onDismess={() => setLogotoZoom(undefined)} />
         </LoadedZone>
-        <PanZoomImage source={logoToZoom} onDismess={() => setLogotoZoom(undefined)} />
     </ScrollView>
 }
 

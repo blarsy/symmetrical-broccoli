@@ -224,7 +224,7 @@ const resources = {
             "bidReceivedDetails": "About your resource '{{resourceTitle}}'",
             "bidRefusedHeadline1": "Too bad...",
             "bidRefusedHeadline2": "{{refuser}} refused your bid",
-            "bidRefusedDetails": "It was about your resource '{{resourceTitle}}'",
+            "bidRefusedDetails": "It was about the resource '{{resourceTitle}}'",
             "bidAcceptedHeadline1": "Congratulations !",
             "bidAcceptedHeadline2": "{{accepter}} accepted your bid",
             "bidAcceptedDetails": "You get the resource '{{resourceTitle}}'",

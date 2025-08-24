@@ -277,42 +277,90 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     otherNotifs.push(
                          makeNotificationData(rawNotification, t('bidReceivedHeadline1'), t('bidReceivedHeadline2', { sender: rawNotification.node.data.receivedFrom }), 
                             t('bidReceivedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }),
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'R',
+                                        includeInactive: false
+                                    }
+                                })
+                            })
                         )
                     break
                 case 'BID_REFUSED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidRefusedHeadline1'), t('bidRefusedHeadline2', { refuser: rawNotification.node.data.refusedBy }), 
                             t('bidRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'S',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
                         )
                     break
                 case 'BID_ACCEPTED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidAcceptedHeadline1'), t('bidAcceptedHeadline2', { accepter: rawNotification.node.data.acceptedBy }), 
                             t('bidAcceptedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'S',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
                         )
                     break
                 case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'S',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
                         )
                     break
                 case 'BID_CANCELLED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidDeletedHeadline1'), t('bidDeletedHeadline2', { cancelledBy: rawNotification.node.data.cancelledBy }), 
                             t('bidDeletedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'R',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
                         )                    
                     break
                 case 'BID_EXPIRED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            () => {})
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'R',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
                         )
                     break
             }
@@ -355,7 +403,7 @@ const NotificationImage = ({ image } : { image: string | {
     } else if (!image) {
         return <Icon size={70} source="creation" />
     } else {
-        return <ResourceImageWithCreator size={70} resource={image.resource} authorInfo={image.account} onAccountPress={() => {}} />
+        return <ResourceImageWithCreator size={70} resource={image.resource} authorInfo={image.account} />
     }
 }
 

@@ -16,7 +16,7 @@ interface ThemedDialogProps {
     title?: string
     actions?: ReactNode[]
     testID?: string
-    onDismiss: () => void
+    onDismiss?: () => void
     actionZoneStyle?: StyleProp<ViewStyle>
     style?: StyleProp<ViewStyle>
     contentStyle?: StyleProp<ViewStyle>
@@ -27,7 +27,7 @@ export const ThemedDialog = ({ visible, content, title, actions, testID, onDismi
         <Dialog testID={testID} visible={visible} style={{ backgroundColor: lightPrimaryColor, ...(style as object) }} onDismiss={onDismiss}>
             <View style={{ flexDirection: 'row', paddingLeft: 16, paddingRight: 16, justifyContent: 'space-between' }}>
                 <Text variant="titleLarge" style={{ textAlign:'center', flex: 1 }}>{title || ''}</Text>
-                <BareIconButton size={20} Image={Images.Cross} onPress={onDismiss}/>
+                { onDismiss && <BareIconButton size={20} Image={Images.Cross} onPress={onDismiss}/> }
             </View>
             <Dialog.Content style={contentStyle}>
                 {content}
@@ -60,7 +60,7 @@ interface Props {
     question?: string
     content?: ReactNode
     testID?: string
-    onDismiss: () => void
+    onDismiss?: () => void
 }
 
 const ConfirmDialog = ({ visible, onResponse, title, question, content, testID, onDismiss }: Props) => {

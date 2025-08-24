@@ -8,6 +8,7 @@ import Link from "next/link"
 import { ApolloProvider, gql } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
 import Themed from "./Themed"
+import useAccountFunctions from "@/lib/useAccountFunctions"
 
 declare global {
     interface Window {
@@ -22,6 +23,7 @@ interface Props extends PropsWithChildren {
 const AdminLayout = (p : Props) => {
     const [connectionStatus, setConnectionStatus] = useState<DataLoadState<string>>(initial(true))
     const { apiUrl } = config(p.version)
+    const {disconnect} = useAccountFunctions(p.version)
 
     const getChallengeFromServer = async (publicKey: string) => {
         const qry = await fetch(`${apiUrl}/adminchallenge`, { 
@@ -122,7 +124,7 @@ const AdminLayout = (p : Props) => {
                         <Link href={`/webapp/${p.version}/admin/mails`}>Mails</Link>
                     </Button>
                 </Stack>,
-                <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data)}>
+                <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data, disconnect)}>
                     {p.children}
                 </ApolloProvider>
             ]}

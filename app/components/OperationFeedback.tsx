@@ -9,7 +9,7 @@ interface Props {
     successMessage?: string
     onDismissError: () => void
     onDismissSuccess?: () => void
-    testID: string
+    testID?: string
 }
 
 interface ErrorSnackbarProps {

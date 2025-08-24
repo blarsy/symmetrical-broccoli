@@ -3,11 +3,11 @@ import { urlFromPublicId } from "@/lib/images"
 import { initials } from "@/lib/utils"
 import { t } from "i18next"
 import { Avatar } from "react-native-paper"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { StyleProp, ViewStyle } from "react-native"
+import { TouchableOpacity } from "../layout/lib"
 
 interface AccountAvatarProps extends AvatarIconProps {
-    onPress: (accountId: number) => void
+    onPress?: () => void
     style?: StyleProp<ViewStyle>
 }
 
@@ -32,7 +32,7 @@ export const AvatarIcon = ({ account, size }: AvatarIconProps) => {
 }
 
 export default ({ account, size, onPress, style }: AccountAvatarProps) => {
-    return <TouchableOpacity style={style} onPress={() => onPress(account.id)}>
+    return <TouchableOpacity style={style} onPress={() => onPress && onPress()}>
         <AvatarIcon account={account} size={size} />
     </TouchableOpacity>
 }

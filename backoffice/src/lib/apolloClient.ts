@@ -4,6 +4,7 @@ import { setContext } from "@apollo/client/link/context"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
+import { ErrorResponse, onError } from "@apollo/client/link/error"
 
 // const errorsToString = (es: readonly Error[]) => es.map(errorToString).join(', ')
 
@@ -14,7 +15,7 @@ import { createClient } from 'graphql-ws'
 //       ${ae.networkError && `, networkError: ${errorToString(ae.networkError)}`}`
 // }
 
-export const getApolloClient = (version: string, token?: string) => {
+export const getApolloClient = (version: string, token?: string, onSessionExpired? : () => void) => {
     const config = getConfig(version)
     
     let webSocketImpl
@@ -85,14 +86,11 @@ export const getApolloClient = (version: string, token?: string) => {
     return new ApolloClient({
       link: from([
         // traceLink,
-        // onError((e: ErrorResponse) => {
-        //   if(e.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors.some(error => error.message === 'jwt expired' || error.message === 'invalid signature')){
-        //     info({ message: 'Token expired' })
-        //     apolloTokenExpiredHandler.handle()
-        //   } else {
-        //     error({ message: errorStringFromResponse(e) })
-        //   }
-        // }),
+        onError((e: ErrorResponse) => {
+          if(e.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors.some(error => error.message === 'jwt expired' || error.message === 'invalid signature')){
+            onSessionExpired && onSessionExpired()
+          }
+        }),
         authLink,
         wsSplitLink
       ]),

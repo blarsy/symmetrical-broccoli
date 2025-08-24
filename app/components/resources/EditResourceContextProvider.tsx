@@ -71,7 +71,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
         setEditResourceState(value)
     }
 
-    const getResourcWithExpiration = (resource: Resource) => {
+    const getResourceWithExpiration = (resource: Resource) => {
         if(typeof(resource.expiration) === 'string')
             resource.expiration = new Date(resource.expiration as unknown as string)
         
@@ -79,7 +79,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
     }
     
     const setResource = (resource: Resource) => {
-        setState( {...editResourceState, ...{ editedResource: getResourcWithExpiration(resource) } })
+        setState( {...editResourceState, ...{ editedResource: getResourceWithExpiration(resource) } })
     }
 
     const actions: EditResourceActions = {

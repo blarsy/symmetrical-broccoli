@@ -20,6 +20,7 @@ import { EditResourceContext } from "./EditResourceContextProvider"
 import BareIconButton from "../layout/BareIconButton"
 import { Hr } from "../layout/lib"
 import SendTokensDialog from "../account/SendTokensDialog"
+import CreateBidDialog from "../bids/CreateBidDialog"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -82,7 +83,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const [resource, setResource] = useState<{ data: Resource, expirationInfo: { text: string, date: string } } | undefined>()
     const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const { ensureConnected } = useUserConnectionFunctions()
-    const [sendingTokensTo, setSendingTokensTo] = useState<number | undefined>()
+    const [resourceToBidOn, setResourceToBidOn] = useState<Resource | undefined>()
 
     let expiration: { text: string, date: string } | undefined = undefined
     
@@ -131,10 +132,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                         }))
                     })
                 } } Image={Images.Chat} /> }
-                { resource.data.account?.id != appState.account?.id && 
+                { resource.data.account?.id != appState.account?.id && resource.data.canBeExchanged && 
                     <BareIconButton testID={`${baseTestId}:SendTokens`} size={35} onPress={() => {
                         ensureConnected('introduce_yourself', '', () => {
-                            setSendingTokensTo(resource.data.account!.id)
+                            setResourceToBidOn(resource.data)
                         })
                     } } Image="hand-coin" />
                 }
@@ -175,7 +176,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             {resource.data.price && <>
                 <ViewField title={t('Label')}>
                     <View style={{ flexDirection: 'column' }}>
-                        <Text variant="bodyMedium">{`${resource.data.price}€`}</Text>
+                        <Text variant="bodyMedium">{resource.data.price}</Text>
                     </View>
                 </ViewField>
                 <Hr thickness={2}/>
@@ -213,10 +214,9 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 </View>
             </ViewField>
             <PanZoomImage onDismess={() => setFocusedImage(undefined)} source={focusedImage} />
-            <SendTokensDialog toAccount={sendingTokensTo} accountName={resource.data.account!.name} 
-                onDismiss={() => setSendingTokensTo(undefined)} testID="sendTokensDialog" />
         </>}
         </LoadedZone>
+        <CreateBidDialog onDismiss={() => setResourceToBidOn(undefined)} resource={resourceToBidOn}/>
     </ScrollView>
 }
 

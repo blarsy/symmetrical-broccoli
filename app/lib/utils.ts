@@ -14,6 +14,8 @@ import { configureFonts, DefaultTheme } from "react-native-paper"
 import { useFonts } from 'expo-font'
 import { ThemeProp } from "react-native-paper/lib/typescript/types"
 import { info } from "./logger"
+import { color } from "@cloudinary/url-gen/qualifiers/background"
+import { lightPrimaryColor, primaryColor } from "@/components/layout/constants"
 
 export const isValidPassword = (password?: string) => !!password && password.length > 7 && !!password.match(/[A-Z]/) && !!password.match(/[^A-Z]/)
 
@@ -75,6 +77,7 @@ export const getTheme = (): ThemeProp => ({
   } }),
   colors: {
     ...DefaultTheme.colors,
+    secondaryContainer: lightPrimaryColor,
     backdrop: 'rgba(227,94,30,0.3)'
   }
 })
