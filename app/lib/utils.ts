@@ -57,21 +57,21 @@ export const SMALL_IMAGEBUTTON_SIZE = 30
 
 export const getTheme = (): ThemeProp => ({
   fonts: configureFonts({ config: { 
-      bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-      bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-      bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-      titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-      titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
+      bodyLarge: { fontFamily: 'Jost', fontSize: fontSizeLarge, fontWeight: "800", lineHeight: fontSizeLarge * 1.2 },
+      bodyMedium: { fontFamily: 'Jost', fontSize: fontSizeMedium, fontWeight: "800", lineHeight: fontSizeMedium * 1.2 },
+      bodySmall: { fontFamily: 'Jost', fontSize: fontSizeSmall, fontWeight: "800", lineHeight: fontSizeSmall * 1.2},
+      displayLarge: { fontFamily: 'Jost', fontSize: fontSizeLarge, fontWeight: "800", lineHeight: fontSizeLarge * 1.2},
+      displayMedium: { fontFamily: 'Jost', fontSize: fontSizeMedium, fontWeight: "800", lineHeight: fontSizeMedium * 1.2},
+      displaySmall: { fontFamily: 'Jost', fontSize: fontSizeSmall, fontWeight: "800", lineHeight: fontSizeSmall * 1.2},
+      headlineLarge: { fontFamily: 'sugar', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      headlineMedium: { fontFamily: 'sugar', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      headlineSmall: { fontFamily: 'sugar', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      labelLarge: { fontFamily: 'sugar', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      labelMedium: { fontFamily: 'sugar', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      labelSmall: { fontFamily: 'sugar', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      titleLarge: { fontFamily: 'sugar', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      titleMedium: { fontFamily: 'sugar', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      titleSmall: { fontFamily: 'sugar', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
   } }),
   colors: {
     ...DefaultTheme.colors,
@@ -255,8 +255,8 @@ export const userFriendlyTime = (time: Date) => {
 }
 
 export const useCustomFonts = () => useFonts({
-  'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
-  'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
+  'sugar': require('@/assets/fonts/DSMarkerFelt.ttf'),
+  'Jost': require('@/assets/fonts/Jost-VariableFont_wght.ttf')
 })
 
 export const regionFromLocation = (loc : Location) => ({

@@ -121,8 +121,8 @@ const TeamMember = (p: TeamMemberProps) => {
         }
     }}>
         <img src={p.imageUrl} alt={p.firstName}/>
-        <Typography color="#000" lineHeight={22/26} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={26} textTransform="uppercase" textAlign="center">{p.fullName}</Typography>
-        <Typography color="#000" lineHeight={14/18} fontFamily={fonts.sugar.style.fontFamily} fontWeight={400} fontSize={18} textAlign="center">{p.title}</Typography>
+        <Typography color="#000" fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={24} lineHeight={1} textTransform="uppercase" textAlign="center">{p.fullName}</Typography>
+        <Typography color="#000" fontFamily={fonts.sugar.style.fontFamily} fontWeight={400} fontSize={20} textAlign="center">{p.title}</Typography>
     </Stack>
 }
 
@@ -136,7 +136,7 @@ interface SectionTitleProps {
 
 const SectionTitle = (p : SectionTitleProps) => <Stack sx={{ transform: 'rotate(-3.7deg)', marginBottom: '2rem', alignItems: 'center', ...p.sx }}>
     { p.lines.map((line, idx) => <Box key={idx}>
-        { line.map((run, idx) => <Typography key={idx} component="span" color={run.color} lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={48} textTransform="uppercase">{run.text}</Typography> )}
+        { line.map((run, idx) => <Typography key={idx} component="span" color={run.color} lineHeight={1} fontFamily={fonts.title.style.fontFamily} variant="h1">{run.text}</Typography> )}
     </Box> )}
 </Stack>
 
@@ -159,6 +159,8 @@ const ParchmentContainer = ({ children }: { children: ReactNode}) => {
         {children}
     </Stack>
 }
+
+const SMALL_TEXT_SIZE = 18
 
 const Page = () => {
     const dark = useMediaQuery('(prefers-color-scheme: dark)')
@@ -190,24 +192,24 @@ const Page = () => {
                         ]} />
                         <Box sx={{ 
                             padding: '1rem 10%',
-                            fontSize: 18,
+                            fontSize: SMALL_TEXT_SIZE,
                             [theme.breakpoints.down('md')]: {
                                 padding: '2.5rem 1.5rem'
                             },
                             alignItems: 'center'
                         }}>
-                            <Typography component="p" variant="body2" fontSize={18} textAlign="center" color="#fff" >La solidarit&#233;, on y croit dur comme fer.</Typography>
+                            <Typography component="p" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >La solidarit&#233;, on y croit dur comme fer.</Typography>
                             <Box sx={{ textAlign: 'center' }}>
-                                <Typography component="span" variant="body2" fontSize={18} textAlign="center" color="#000" >La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au </Typography>
-                                <Typography component="span" variant="body2" fontSize={18} textAlign="center" color="#fff" >don</Typography>
-                                <Typography component="span" variant="body2" fontSize={18} textAlign="center" color="#000" > ou </Typography>
-                                <Typography component="span" variant="body2" fontSize={18} textAlign="center" color="#fff" >l&#8217;&#233;change.</Typography>
+                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#000" >La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au </Typography>
+                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >don</Typography>
+                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#000" > ou </Typography>
+                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >l&#8217;&#233;change.</Typography>
                             </Box>
                         </Box>
                         <Button variant="outlined" startIcon={<QuestionIcon/>} endIcon={<QAIcon/>} target="_blank"
                             href={link2Url}
                             style={{ color: '#fff', borderColor: '#ccc', alignSelf: 'center', justifyContent: 'center', 
-                            marginTop: '2rem', fontFamily: fonts.title.style.fontFamily, fontSize: '1.7rem', 
+                            marginTop: '2rem', fontFamily: fonts.title.style.fontFamily, fontSize: '1.4rem', 
                             borderRadius: '1rem' }}>Foire aux questions</Button>
                     </Stack>
                     <Box sx={theme => ({
@@ -235,8 +237,8 @@ const Page = () => {
                 </ParchmentContainer>
                 <Stack alignItems="center" justifyContent="center" padding="3rem">
                      <Stack sx={{ padding: '0 0 2rem', alignItems: 'center' }}>
-                        <Typography color="#000" textAlign="center" lineHeight={28/32} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={32} textTransform="uppercase">Disponible sur l&apos;application </Typography>
-                        <Typography color="#000" textAlign="center" lineHeight={18/22} fontFamily={fonts.sugar.style.fontFamily} fontWeight={400} fontSize={24} paddingTop="0.75rem">Téléchargez sur</Typography>
+                        <Typography color="#000" textAlign="center" fontFamily={fonts.title.style.fontFamily} fontSize={28} fontWeight={800} textTransform="uppercase">Disponible sur l&apos;application </Typography>
+                        <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={20} fontWeight={400}>Téléchargez sur</Typography>
                     </Stack>
                     <Stack sx={theme => ({
                         flexDirection: 'column',

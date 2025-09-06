@@ -171,9 +171,9 @@ const AccountsGallery = () => {
 
     return <Stack padding="3rem 0 4rem">
         <Stack sx={{ transform: 'rotate(3.19deg)', alignItems: 'center', marginBottom: '4rem' }}>
-            <Typography color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={48} textTransform="uppercase">Ensemble</Typography>
-            <Typography color="#fff" lineHeight={44/48} fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={48} textTransform="uppercase">On est plus fort:</Typography>
-            <Typography color="#000" lineHeight={24/28} fontFamily={fonts.sugar.style.fontFamily} fontWeight={400} fontSize={28} paddingTop="1rem">Rejoignez-les !</Typography>
+            <Typography color="#fff" fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={36} textTransform="uppercase" lineHeight={1}>Ensemble</Typography>
+            <Typography color="#fff" fontFamily={fonts.title.style.fontFamily} fontWeight={400} fontSize={36} textTransform="uppercase" lineHeight={1}>On est plus fort:</Typography>
+            <Typography color="#000" lineHeight={24/28} fontFamily={fonts.sugar.style.fontFamily} fontWeight={400} fontSize={24} paddingTop="1rem">Rejoignez-les !</Typography>
         </Stack>
         <Stack flexDirection="row" justifyContent="center">
             <Stack sx={{
