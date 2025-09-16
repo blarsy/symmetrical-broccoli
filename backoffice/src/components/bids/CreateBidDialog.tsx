@@ -33,6 +33,8 @@ const CreateBidDialog = (p: Props) => {
 
     const t = uiContext.i18n.translator
 
+    if(!p.resource) return <></>
+
     return <Formik initialValues={{ amountOfTokens: p.resource?.price || 0, hoursValid: 12 }}
         onSubmit={async values => {
             setBidStatus(initial(true))

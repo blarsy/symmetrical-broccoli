@@ -8,6 +8,8 @@
     "jwtType": "sb.jwt_token",
     "logPath": "/app/logs/",
     "mailApiKey": "yoursendgridkey",
+    "mailApiUrl": "https://api.eu.mailgun.net",
+    "mailDomain": "tope-la.com",
     "mailPath": "./mails/",
     "mailTemplatesLocation": "./src/mailing/templates/",
     "noreplyEmail": "noreply@tope-la.com",

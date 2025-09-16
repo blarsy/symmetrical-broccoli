@@ -42,17 +42,18 @@ const StepStone = (p: StepStoneProps) => {
                 fontWeight: 'bolder',
                 textTransform: 'uppercase',
                 [theme.breakpoints.down('lg')]: {
-                    fontSize: 12
+                    fontSize: 24
                 },[theme.breakpoints.down('md')]: {
-                    fontSize: 8
+                    fontSize: 16
                 }
             }}>{p.rightTextTitle}</Typography>
             <Typography color="#000" fontFamily={fonts.sugar.style.fontFamily} lineHeight={1} sx={{
-                fontSize: 24,
+                fontSize: 22,
+                fontWeight: 'bolder',
                 [theme.breakpoints.down('lg')]: {
-                    fontSize: 18
-                },[theme.breakpoints.down('md')]: {
                     fontSize: 12
+                },[theme.breakpoints.down('md')]: {
+                    fontSize: 8
                 }
             }}>{p.rightTextDetail}</Typography>
         </Stack>
