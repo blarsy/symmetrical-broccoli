@@ -1,4 +1,3 @@
-import sgMail from '@sendgrid/mail'
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
 import { recordMail } from './recordMail'
@@ -6,6 +5,8 @@ import getConfig,{ getCommonConfig } from '../config'
 import initTranslations from '../i18n'
 import { runAndLog } from '../db_jobs/utils'
 import { Pool } from 'pg'
+import FormData from "form-data"
+import Mailgun from "mailgun.js"
 
 interface MailData {
     to: string,
@@ -24,15 +25,27 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
         subject,
         text: plainText,
         html: htmlContent
-      }
+    }
 
-    const sendViaSendGrid = async (data: MailData):Promise<void> => {
-        sgMail.setApiKey(config.mailApiKey)
-        sgMail.send(data)
+    const sendViaMailgun = async (mail: MailData) => {
+        const mailgun = new Mailgun(FormData);
+        const mg = mailgun.client({
+            username: "api",
+            key: config.mailApiKey,
+            url: config.mailApiUrl
+        })
+
+        await mg.messages.create(config.mailDomain, {
+            from: mail.from,
+            to: [mail.to],
+            subject: mail.subject,
+            html: mail.html,
+            text: mail.text
+        })
     }
 
     const promises: Promise<void>[] = (config.production && !config.doNotSendMails) ?
-        [sendViaSendGrid(msg)] :
+        [sendViaMailgun(msg)] :
         [recordMail(msg)]
 
     promises.push(persistMail(msg, pool))

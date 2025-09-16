@@ -9,6 +9,8 @@
     "jwtType": "sb.jwt_token",
     "logPath": "./",
     "mailApiKey": "yoursendgridkey",
+    "mailApiUrl": "sandbox27eb27b90be24bf9ad604cc3d08019e6.mailgun.org",
+    "mailDomain": "tope-la.com",
     "mailPath": "./mails/",
     "mailTemplatesLocation": "./src/mailing/templates/",
     "noreplyEmail": "noreply@tope-la.com",

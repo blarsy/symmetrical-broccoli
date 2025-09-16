@@ -47,6 +47,8 @@ export interface RawConfig {
     port: number
     user: string
     mailApiKey: string
+    mailApiUrl: string
+    mailDomain: string
     noreplyEmail: string
     production: boolean
     productName: string
