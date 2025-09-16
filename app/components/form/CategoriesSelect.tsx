@@ -70,7 +70,7 @@ const CategoriesSelect = ({ value, onChange, labelVariant, label, inline, testID
         { appContext.categories.data ? <View>
             <TouchableOpacity testID={ `${testID}:Button` } onPress={openModal}>
                 <View style={{ display: 'flex', flexDirection: 'row' }}>
-                    <TransparentTextInput inlineMode={inline} label={<StyledLabel isMandatory={isMandatory} variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
+                    <TransparentTextInput inlineMode={inline} label={<StyledLabel style={{ fontWeight: '700' }} isMandatory={isMandatory} variant={labelVariant} label={label || t('resourceCategories_label')} />} editable={false} 
                         value={( value.map(cat => cat.name).join(', '))} right={<TextInput.Icon color="#000" onPress={openModal} size={26} icon="chevron-right"/>} 
                         style={{ margin: 0, flex: 1, backgroundColor: 'transparent' }}/>
                 </View>

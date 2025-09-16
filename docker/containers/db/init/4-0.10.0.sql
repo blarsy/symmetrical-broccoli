@@ -26,6 +26,13 @@ GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) T
 
 GRANT EXECUTE ON FUNCTION sb.conversation_messages_by_conversation_id(integer) TO sb;
 
+
+ALTER TABLE IF EXISTS sb.accounts
+    ADD COLUMN knows_about_campaigns boolean NOT NULL DEFAULT false;
+
+ALTER TYPE sb.session_data
+    ADD ATTRIBUTE knows_about_campaigns boolean;
+
 CREATE OR REPLACE FUNCTION sb.get_session_data(
 	)
     RETURNS session_data
@@ -49,7 +56,8 @@ AS $BODY$
 	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until,
 	(SELECT COUNT(*) 
 	 FROM sb.external_auth_tokens eat 
-	 WHERE eat.email = a.email) as number_of_external_auth_providers
+	 WHERE eat.email = a.email) as number_of_external_auth_providers,
+	a.knows_about_campaigns
 
 	FROM sb.accounts a
 	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
@@ -86,7 +94,8 @@ AS $BODY$
 	a.willing_to_contribute, a.amount_of_tokens, a.unlimited_until,
 	(SELECT COUNT(*) 
 	 FROM sb.external_auth_tokens eat 
-	 WHERE eat.email = a.email) as number_of_external_auth_providers
+	 WHERE eat.email = a.email) as number_of_external_auth_providers,
+	a.knows_about_campaigns
 
 	FROM sb.accounts a
 	LEFT JOIN sb.images i ON a.avatar_image_id = i.id
@@ -384,12 +393,12 @@ BEGIN
 end;
 $BODY$;
 
-ALTER FUNCTION sb.delete_bid_internal(integer)
+ALTER FUNCTION sb.delete_bid_internal(integer, integer)
     OWNER TO sb;
 
-REVOKE ALL ON FUNCTION sb.delete_bid_internal(integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION sb.delete_bid_internal(integer, integer) FROM PUBLIC;
 
-GRANT EXECUTE ON FUNCTION sb.delete_bid_internal(integer) TO sb;
+GRANT EXECUTE ON FUNCTION sb.delete_bid_internal(integer, integer) TO sb;
 
 CREATE OR REPLACE FUNCTION sb.delete_bid(
 	bid_id integer)
@@ -1214,7 +1223,8 @@ AS $BODY$
 select a.id, name, '' as email, '' as hash, '' as salt, '' as recovery_code,
 	now() as recovery_code_expiration, now() as created, avatar_image_id, now() as activated,
 	language, 0 as log_level, location_id, false as can_be_showcased, false as willing_to_contribute,
-	0 as amount_of_tokens, now() as unlimited_until, now() as last_suspension_warning
+	0 as amount_of_tokens, now() as unlimited_until, now() as last_suspension_warning, false as knows_about_campaigns
+	
   from sb.accounts a
   where a.id = get_account_public_info.id;
  
@@ -1227,6 +1237,7 @@ GRANT EXECUTE ON FUNCTION sb.get_account_public_info(integer) TO identified_acco
 
 GRANT EXECUTE ON FUNCTION sb.get_account_public_info(integer) TO PUBLIC;
 
+DROP ROLE IF EXISTS admin;
 CREATE ROLE admin WITH
   NOLOGIN
   NOSUPERUSER
@@ -1312,6 +1323,837 @@ REVOKE ALL ON FUNCTION sb.search_mails(character varying) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION sb.search_mails(character varying) TO admin;
 
+INSERT INTO sb.token_transaction_types(
+	id, code)
+	VALUES (13, 'TOKEN_GRANT');
+
+CREATE OR REPLACE FUNCTION sb.grant_tokens(
+	account_ids integer[],
+	grantor integer,
+	amount_of_tokens integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE account_id INTEGER;
+BEGIN
+	INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement, target_account_id)
+	SELECT UNNEST(account_ids), 13, amount_of_tokens, grantor;
+	
+	UPDATE sb.accounts a SET amount_of_tokens = a.amount_of_tokens + grant_tokens.amount_of_tokens
+	WHERE id = ANY(grant_tokens.account_ids);
+	
+	FOR account_id IN SELECT UNNEST(account_ids)
+	LOOP
+		PERFORM sb.create_notification(account_id, json_build_object(
+			'info', 'TOKEN_GRANTED',
+			'amountOfTokens', grant_tokens.amount_of_tokens,
+			'grantorName', (SELECT name FROM sb.accounts WHERE id = grantor)
+		));
+	END LOOP;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.grant_tokens(integer[], integer, integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.grant_tokens(integer[], integer, integer) TO sb;
+
+REVOKE ALL ON FUNCTION sb.grant_tokens(integer[], integer, integer) FROM PUBLIC;
+
+
+INSERT INTO sb.token_transaction_types(
+	id, code)
+	VALUES (14, 'RESOURCE_PRICE_SET');
+
+CREATE OR REPLACE FUNCTION sb.apply_resources_rewards(
+	resource_id integer)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE amount_to_add integer = 0;
+DECLARE att_id integer;
+DECLARE resource_account_id integer;
+BEGIN
+	SELECT account_id FROM sb.resources WHERE id = apply_resources_rewards.resource_id INTO resource_account_id;
+	
+	-- Check account is activated, and resource is not expired, not deleted, and least 1 day old
+	IF EXISTS (SELECT * FROM sb.accounts WHERE id = resource_account_id AND activated IS NOT NULL 
+		AND (unlimited_until IS NULL OR unlimited_until < NOW())) 
+		AND NOT EXISTS(SELECT * FROM sb.resources WHERE id = apply_resources_rewards.resource_id AND (
+			deleted IS NOT NULL OR (expiration IS NOT NULL AND expiration < NOW()) OR created > (NOW() - INTERVAL '1 day')))
+	THEN
+		-- If there has not been any reward for creating the resource, grant it
+		IF NOT EXISTS ( SELECT * 
+						FROM sb.resources_accounts_token_transactions ratt
+						INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 5
+						WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
+			amount_to_add = amount_to_add + 20;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (resource_account_id, 5, 20)
+			RETURNING id INTO att_id;
+			
+			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
+			VALUES (att_id, apply_resources_rewards.resource_id);
+		END IF;
+		
+		-- If a resource image has been added, give the reward
+		IF (SELECT COUNT(*) FROM sb.resources_images ri WHERE ri.resource_id = apply_resources_rewards.resource_id) > 0 
+			AND NOT EXISTS (SELECT * 
+							FROM sb.resources_accounts_token_transactions ratt
+							INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 4
+							WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
+			amount_to_add = amount_to_add + 5;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (resource_account_id, 4, 5)
+			RETURNING id INTO att_id;
+			
+			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
+			VALUES (att_id, apply_resources_rewards.resource_id);
+		END IF;
+
+		-- If a resource price has been set, give the reward
+		IF (SELECT COUNT(*) FROM sb.resources r WHERE r.id = apply_resources_rewards.resource_id AND r.price IS NOT NULL) > 0 
+			AND NOT EXISTS (SELECT * 
+							FROM sb.resources_accounts_token_transactions ratt
+							INNER JOIN sb.accounts_token_transactions att ON ratt.accounts_token_transaction_id = att.id  AND att.token_transaction_type_id = 14
+							WHERE ratt.resource_id = apply_resources_rewards.resource_id ) THEN
+			amount_to_add = amount_to_add + 15;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (resource_account_id, 14, 15)
+			RETURNING id INTO att_id;
+			
+			INSERT INTO sb.resources_accounts_token_transactions (accounts_token_transaction_id, resource_id)
+			VALUES (att_id, apply_resources_rewards.resource_id);
+		END IF;
+
+		IF amount_to_add > 0 THEN
+			UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + amount_to_add
+			WHERE id = resource_account_id;
+		END IF;
+	END IF;
+END;
+$BODY$;
+
+CREATE TABLE IF NOT EXISTS sb.campaigns
+(
+    id SERIAL,
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    description character varying COLLATE pg_catalog."default",
+    airdrop timestamp with time zone NOT NULL,
+    airdrop_amount integer NOT NULL,
+    resource_rewards_multiplier integer NOT NULL,
+    default_resource_categories integer[],
+    beginning timestamp with time zone NOT NULL,
+    ending timestamp with time zone NOT NULL,
+    created timestamp with time zone NOT NULL DEFAULT now(),
+	airdrop_done boolean NOT NULL DEFAULT FALSE,
+	airdrop_imminent_announced boolean NOT NULL DEFAULT FALSE,
+	beginning_announced boolean NOT NULL DEFAULT FALSE,
+    CONSTRAINT campaigns_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS sb.campaigns
+    OWNER to sb;
+
+GRANT SELECT, INSERT, DELETE, UPDATE ON TABLE sb.campaigns TO admin;
+
+GRANT SELECT ON TABLE sb.campaigns TO identified_account;
+
+GRANT ALL ON TABLE sb.campaigns TO sb;
+
+GRANT USAGE ON SEQUENCE sb.campaigns_id_seq TO admin;
+
+CREATE OR REPLACE FUNCTION sb.create_campaign(
+	name character varying,
+	description character varying,
+	airdrop timestamp with time zone,
+	airdrop_amount integer,
+	resource_rewards_multiplier integer,
+	default_resource_categories integer[],
+	beginning timestamp with time zone,
+	ending timestamp with time zone)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id INTEGER;
+BEGIN
+	INSERT INTO sb.campaigns(
+		name, description, airdrop, airdrop_amount, resource_rewards_multiplier, default_resource_categories, beginning, ending)
+	VALUES (create_campaign.name, create_campaign.description, create_campaign.airdrop, create_campaign.airdrop_amount,
+		   create_campaign.resource_rewards_multiplier, create_campaign.default_resource_categories, 
+		   create_campaign.beginning, create_campaign.ending)
+	RETURNING id INTO inserted_id;
+	
+	RETURN inserted_id;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.create_campaign(character varying, character varying, timestamp with time zone, integer, integer, integer[], timestamp with time zone, timestamp with time zone)
+    OWNER TO sb;
+
+CREATE OR REPLACE FUNCTION sb.get_campaigns()
+    RETURNS SETOF campaigns 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT *
+	FROM sb.campaigns
+	WHERE ending + 30 * INTERVAL '1 day' > NOW()
+	ORDER BY created DESC;
+$BODY$;
+
+ALTER FUNCTION sb.get_campaigns()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.get_campaigns() TO admin;
+
+CREATE OR REPLACE FUNCTION sb.get_active_campaign()
+    RETURNS campaigns 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+
+AS $BODY$
+	SELECT *
+	FROM sb.campaigns
+	WHERE ending > NOW()
+	ORDER BY created
+	LIMIT 1;
+$BODY$;
+
+ALTER FUNCTION sb.get_active_campaign()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.get_active_campaign() TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.set_account_knows_about_campaigns()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+BEGIN
+	UPDATE sb.accounts
+	SET knows_about_campaigns = true
+	WHERE id = sb.current_account_id();
+
+	PERFORM pg_notify('graphql:account_changed:' || sb.current_account_id(), json_build_object(
+		'event', 'account_changed',
+		'subject', sb.current_account_id()
+	)::text);
+
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.set_account_knows_about_campaigns()
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.set_account_knows_about_campaigns() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.set_account_knows_about_campaigns() TO sb;
+
+REVOKE ALL ON FUNCTION sb.set_account_knows_about_campaigns() FROM PUBLIC;
+
+CREATE TABLE sb.campaigns_resources
+(
+    id serial NOT NULL,
+    campaign_id integer NOT NULL,
+    resource_id integer NOT NULL,
+    created date NOT NULL DEFAULT now(),
+    PRIMARY KEY (id),
+    CONSTRAINT fk_campaigns_resources_resources FOREIGN KEY (resource_id)
+        REFERENCES sb.resources (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT fk_campaigns_resources_campaigns FOREIGN KEY (campaign_id)
+        REFERENCES sb.campaigns (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE IF EXISTS sb.campaigns_resources
+    OWNER to sb;
+	
+GRANT DELETE, INSERT, SELECT ON TABLE sb.campaigns_resources TO identified_account;
+
+GRANT ALL ON TABLE sb.campaigns_resources TO sb;
+
+GRANT USAGE ON SEQUENCE sb.campaigns_resources_id_seq TO identified_account;
+
+CREATE OR REPLACE FUNCTION sb.get_number_of_active_resources_on_active_campaign()
+    RETURNS INTEGER 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+
+AS $BODY$
+	SELECT COUNT(*)
+	FROM sb.resources r
+	INNER JOIN sb.campaigns_resources cr ON cr.resource_id = r.id
+	INNER JOIN sb.get_active_campaign() c ON c.id = cr.campaign_id
+	WHERE r.account_id = sb.current_account_id()
+		AND (r.expiration is NULL OR r.expiration > NOW())
+		AND r.deleted IS NULL
+		AND r.suspended IS NULL
+	LIMIT 1;
+$BODY$;
+
+GRANT EXECUTE ON FUNCTION sb.get_number_of_active_resources_on_active_campaign() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.get_number_of_active_resources_on_active_campaign() TO sb;
+
+REVOKE ALL ON FUNCTION sb.get_number_of_active_resources_on_active_campaign() FROM PUBLIC;
+
+CREATE OR REPLACE FUNCTION sb.delete_resource(
+	resource_id integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE ids_images_to_delete INTEGER[];
+DECLARE bid record;
+begin
+	--Detect attempt to delete a resource owned by another account
+	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = delete_resource.resource_id AND account_id = sb.current_account_id()) THEN
+		RETURN 0;
+	END IF;
+	
+	DELETE FROM sb.resources WHERE id = delete_resource.resource_id;
+	
+	UPDATE sb.resources r
+	SET deleted = NOW()
+	WHERE r.id = delete_resource.resource_id;
+	
+	FOR bid IN
+	SELECT * FROM sb.bids b
+	WHERE b.resource_id = delete_resource.resource_id
+	AND deleted IS NULL AND accepted IS NULL AND refused IS NULL AND valid_until > NOW()
+	LOOP
+		PERFORM sb.refuse_bid(bid.id);
+		PERFORM sb.create_notification(bid.account_id, json_build_object(
+			'info', 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED',
+			'resourceId', delete_resource.resource_id,
+			'resourceTitle', (SELECT title FROM sb.resources WHERE id = delete_resource.resource_id), 
+			'resourceAuthor', (SELECT name FROM sb.accounts WHERE id = (SELECT account_id FROM sb.resources WHERE id = delete_resource.resource_id))
+		));
+	END LOOP;
+	
+	-- In case a free resource was deleted, run apply_resources_consumption,
+	-- which could un-suspend a suspended resource
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	
+	RETURN 1;
+end;
+$BODY$;
+
+DROP FUNCTION IF EXISTS sb.update_resource(integer, character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location);
+
+CREATE OR REPLACE FUNCTION sb.update_resource(
+	resource_id integer,
+	title character varying,
+	description character varying,
+	expiration timestamp with time zone,
+	price integer,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location,
+	campaign_to_join integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE ids_images_to_delete INTEGER[];
+DECLARE location_id INTEGER = NULL;
+DECLARE location_to_delete_id INTEGER = NULL;
+BEGIN
+	--Detect attempt to update a resource owned by another account
+	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND account_id = sb.current_account_id()) THEN
+		RETURN 0;
+	END IF;
+	
+	--Detect attempt to update a resource already deleted
+	IF EXISTS(SELECT * FROM sb.resources WHERE id = update_resource.resource_id AND deleted IS NOT NULL) THEN
+		RETURN -1;
+	END IF;
+	
+	SELECT specific_location_id INTO location_id
+	FROM sb.resources
+	WHERE id = update_resource.resource_id;
+
+	IF specific_location IS NOT NULL THEN
+		IF location_id IS NULL THEN
+			INSERT INTO sb.locations (address, latitude, longitude)
+			VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+			RETURNING id INTO location_id;
+		ELSE
+			UPDATE sb.locations SET address = specific_location.address, latitude = specific_location.latitude, longitude = specific_location.longitude
+			WHERE id = location_id;
+		END IF;
+	ELSE
+		IF location_id IS NOT NULL THEN
+			SELECT location_id INTO location_to_delete_id;
+		END IF;
+		SELECT null INTO location_id;
+	END IF;
+	
+	IF update_resource.campaign_to_join IS NOT NULL THEN
+		IF (SELECT id FROM sb.campaigns_resources cr WHERE cr.resource_id = update_resource.resource_id AND cr.campaign_id = update_resource.campaign_to_join) IS NULL THEN
+			INSERT INTO sb.campaigns_resources (campaign_id, resource_id)
+			VALUES (update_resource.campaign_to_join, update_resource.resource_id);
+		END IF;
+	ELSE
+		IF (SELECT id FROM sb.campaigns_resources cr WHERE cr.resource_id = update_resource.resource_id AND cr.campaign_id = (SELECT id FROM sb.get_active_campaign())) IS NOT NULL THEN
+			DELETE FROM sb.campaigns_resources cr WHERE cr.campaign_id = (SELECT id FROM sb.get_active_campaign()) AND cr.resource_id = update_resource.resource_id;
+		END IF;
+	END IF;
+
+	UPDATE sb.resources r SET title = update_resource.title, description = update_resource.description, 
+		expiration = update_resource.expiration, is_service = update_resource.is_service, 
+		is_product = update_resource.is_product, can_be_delivered = update_resource.can_be_delivered, 
+		can_be_taken_away = update_resource.can_be_taken_away, can_be_exchanged = update_resource.can_be_exchanged, 
+		can_be_gifted = update_resource.can_be_gifted, specific_location_id = location_id,
+		price = update_resource.price
+	WHERE r.id = update_resource.resource_id;
+	
+	IF location_to_delete_id IS NOT NULL THEN
+		DELETE FROM sb.locations WHERE id = location_to_delete_id;
+	END IF;
+	DELETE FROM sb.resources_resource_categories rrc WHERE rrc.resource_id = update_resource.resource_id;
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT update_resource.resource_id, UNNEST(category_codes);
+	
+	ids_images_to_delete = ARRAY(SELECT image_id FROM sb.resources_images ri
+		WHERE ri.resource_id = update_resource.resource_id);
+	
+	DELETE FROM sb.resources_images ri WHERE ri.resource_id = update_resource.resource_id;
+	DELETE FROM sb.images i WHERE i.id IN (SELECT UNNEST(ids_images_to_delete));
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT update_resource.resource_id, inserted_images.inserted_image_id FROM inserted_images;
+	
+	PERFORM sb.apply_resources_rewards(update_resource.resource_id);
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+
+	RETURN 1;
+END;
+$BODY$;
+
+GRANT EXECUTE ON FUNCTION sb.update_resource(integer, character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location, integer) TO identified_account;
+
+DROP FUNCTION IF EXISTS sb.create_resource(character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location);
+
+CREATE OR REPLACE FUNCTION sb.create_resource(
+	title character varying,
+	description character varying,
+	expiration timestamp with time zone,
+	price integer,
+	is_service boolean,
+	is_product boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	can_be_exchanged boolean,
+	can_be_gifted boolean,
+	images_public_ids character varying[],
+	category_codes integer[],
+	specific_location new_location,
+	campaign_to_join integer)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id INTEGER;
+DECLARE location_id INTEGER = NULL;
+BEGIN
+	-- Prevent creating a resource if the account already has 2 active
+	-- and is not either contributor, or unlimited account
+	IF NOT EXISTS (SELECT *
+		FROM sb.accounts a
+		WHERE id = sb.current_account_id()
+		AND ((
+			(a.unlimited_until IS NOT NULL AND a.unlimited_until > NOW())
+		) OR (
+			(SELECT COUNT(*) FROM sb.resources r WHERE r.account_id = sb.current_account_id()
+			AND (r.expiration is NULL OR r.expiration > NOW())
+			AND r.deleted IS NULL
+			AND r.suspended IS NULL) < (SELECT amount_free_resources FROM sb.system)
+		) OR (
+			a.willing_to_contribute
+		))) THEN
+	
+		RAISE EXCEPTION 'ACCOUNT_CANNOT_CREATE_NON_FREE_RESOURCES';
+	
+	END IF;
+	
+	IF specific_location IS NOT NULL THEN
+		INSERT INTO sb.locations (address, latitude, longitude)
+		VALUES (specific_location.address, specific_location.latitude, specific_location.longitude)
+		RETURNING id INTO location_id;
+	END IF;
+
+	INSERT INTO sb.resources(
+		title, description, expiration, account_id, created, is_service, is_product, 
+		can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, 
+		specific_location_id, paid_until, price)
+	VALUES (create_resource.title, create_resource.description, create_resource.expiration, sb.current_account_id(),
+			NOW(), create_resource.is_service, create_resource.is_product, create_resource.can_be_delivered,
+			create_resource.can_be_taken_away, create_resource.can_be_exchanged, create_resource.can_be_gifted, 
+			location_id, NOW(), create_resource.price)
+	RETURNING id INTO inserted_id;
+	
+	INSERT INTO sb.resources_resource_categories (resource_id, resource_category_code)
+	SELECT inserted_id, UNNEST(category_codes);
+	
+	WITH inserted_images AS (
+		INSERT INTO sb.images (public_id)
+		SELECT UNNEST(images_public_ids)
+		RETURNING id AS inserted_image_id
+	)
+	INSERT INTO sb.resources_images (resource_id, image_id)
+	SELECT inserted_id, inserted_images.inserted_image_id FROM inserted_images;
+		
+	IF create_resource.campaign_to_join IS NOT NULL THEN
+		INSERT INTO sb.campaigns_resources (campaign_id, resource_id)
+		VALUES (create_resource.campaign_to_join, inserted_id);
+	END IF;
+	
+	PERFORM sb.apply_resources_consumption(sb.current_account_id());
+	
+	IF (SELECT activated FROM sb.accounts WHERE id = sb.current_account_id()) IS NOT NULL AND
+		(SELECT suspended FROM sb.resources WHERE id = inserted_id) IS NULL THEN
+		-- Emit notification for push notification handling
+		PERFORM pg_notify('resource_created', json_build_object(
+			'resource_id', inserted_id
+		)::text);
+	END IF;
+	
+	RETURN inserted_id;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.create_resource(character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location, integer)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.create_resource(character varying, character varying, timestamp with time zone, integer, boolean, boolean, boolean, boolean, boolean, boolean, character varying[], integer[], new_location, integer) TO identified_account;
+
+ALTER TABLE IF EXISTS sb.searches
+    ADD COLUMN in_active_campaign boolean;
+
+DROP FUNCTION IF EXISTS sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean);
+
+CREATE OR REPLACE FUNCTION sb.suggested_resources(
+	search_term text,
+	is_product boolean,
+	is_service boolean,
+	can_be_gifted boolean,
+	can_be_exchanged boolean,
+	can_be_delivered boolean,
+	can_be_taken_away boolean,
+	category_codes integer[],
+	reference_location_latitude numeric,
+	reference_location_longitude numeric,
+	distance_to_reference_location numeric,
+	exclude_unlocated boolean,
+	in_active_campaign boolean)
+    RETURNS SETOF resources 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+	INSERT INTO sb.searches (term, is_product, is_service, can_be_gifted, 
+		can_be_exchanged, can_be_delivered, can_be_taken_away, category_codes, 
+		reference_location_latitude, reference_location_longitude, 
+		distance_to_reference_location, account_id, exclude_unlocated, in_active_campaign) 
+	VALUES
+		(suggested_resources.search_term, suggested_resources.is_product, suggested_resources.is_service, 
+		 suggested_resources.can_be_gifted, suggested_resources.can_be_exchanged, 
+		 suggested_resources.can_be_delivered, suggested_resources.can_be_taken_away, 
+		 suggested_resources.category_codes, suggested_resources.reference_location_latitude, 
+		 suggested_resources.reference_location_longitude, suggested_resources.distance_to_reference_location,
+		 sb.current_account_id(), suggested_resources.exclude_unlocated, suggested_resources.in_active_campaign);
+
+	RETURN QUERY
+	SELECT r.*
+	  FROM sb.resources r
+	  LEFT JOIN sb.active_accounts a ON a.id = r.account_id
+	  LEFT JOIN sb.locations l ON l.id = r.specific_location_id
+	  LEFT JOIN sb.campaigns_resources cr ON cr.resource_id = r.id AND cr.campaign_id = (SELECT id FROM sb.get_active_campaign())
+	  WHERE (r.expiration > LOCALTIMESTAMP OR r.expiration IS NULL)
+	  AND r.deleted IS NULL
+	  AND r.suspended IS NULL
+	  AND (ARRAY_LENGTH(category_codes, 1) IS NULL OR EXISTS(
+		  SELECT * 
+		  FROM sb.resources_resource_categories rrc 
+		  WHERE r.id = rrc.resource_id AND rrc.resource_category_code IN (SELECT UNNEST(category_codes))))
+	  AND (r.account_id = sb.current_account_id() OR a.id IS NOT NULL)
+	  AND
+	  (NOT suggested_resources.is_product OR r.is_product)
+	  AND
+	  (NOT suggested_resources.is_service OR r.is_service)
+	  AND
+	  (NOT suggested_resources.can_be_gifted OR r.can_be_gifted)
+	  AND
+	  (NOT suggested_resources.can_be_exchanged OR r.can_be_exchanged)
+	  AND
+	  (NOT suggested_resources.can_be_delivered OR r.can_be_delivered)
+	  AND
+	  (NOT suggested_resources.can_be_taken_away OR r.can_be_taken_away)
+	  AND(
+		 (suggested_resources.reference_location_latitude = 0 AND suggested_resources.reference_location_longitude = 0)
+		 OR 
+		 (r.specific_location_id IS NULL AND NOT suggested_resources.exclude_unlocated)
+		 OR
+		 (select sb.geodistance(suggested_resources.reference_location_latitude, suggested_resources.reference_location_longitude, l.latitude, l.longitude) <= suggested_resources.distance_to_reference_location)
+	  )
+	  AND
+	  (search_term = '' OR 
+		(r.title ILIKE '%' || search_term || '%' OR 
+		 r.description ILIKE '%' || search_term || '%' OR
+		 a.name ILIKE '%' || search_term || '%'))
+	  AND
+	  (NOT suggested_resources.in_active_campaign OR suggested_resources.in_active_campaign IS NULL OR cr.id IS NOT NULL)
+	  ORDER BY created DESC, r.expiration DESC
+	  LIMIT 50;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean, boolean)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean, boolean) TO PUBLIC;
+
+CREATE OR REPLACE FUNCTION sb.delete_old_searches()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+begin
+	DELETE FROM sb.searches
+	WHERE created + interval '1 day' * 30 < NOW();
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.delete_old_searches()
+    OWNER TO sb;
+
+INSERT INTO sb.token_transaction_types(id, code)
+VALUES (16, 'AIRDROP_RECEIVED');
+
+CREATE OR REPLACE FUNCTION sb.apply_campaign_announcements()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE campaign_id INTEGER;
+DECLARE campaign_name character varying;
+DECLARE airdrop timestamp with time zone;
+DECLARE multiplier INTEGER;
+DECLARE airdrop_amount INTEGER;
+DECLARE n RECORD;
+BEGIN
+	SELECT id, oirdrop, airdrop_amount, name, resource_rewards_multiplier
+	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name, block.multiplier
+	FROM sb.get_active_campaign()
+	WHERE (beginning < NOW() AND NOT beginning_announced);
+	
+	IF (block.campaign_id IS NOT NULL) THEN
+		-- Announce beginning
+		FOR n IN
+			INSERT INTO sb.notifications (account_id, data)
+			SELECT
+				id as account_id, 
+				json_build_object('info', 'CAMPAIGN_BEGUN',
+								 'campaignName', block.campaign_name, 
+								 'airdrop', block.airdrop, 
+								 'airdropAmount', block.airdrop_amount,
+								 'multiplier', block.multiplier)
+			FROM sb.active_accounts
+			RETURNING id, account_id
+		LOOP
+			-- Emit notification for graphql/postgraphile's subscription plugin
+			PERFORM pg_notify('graphql:notification_account:' || n.account_id, json_build_object(
+				'event', 'notification_created',
+				'subject', n.id
+			)::text);
+		END LOOP;
+	
+	END IF;
+	
+	SELECT id, oirdrop, airdrop_amount, name, resource_rewards_multiplier
+	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name, block.multiplier
+	FROM sb.get_active_campaign()
+	WHERE (airdrop - interval '1 day' < NOW() AND NOT airdrop_imminent_announced);
+	
+	IF (block.campaign_id IS NOT NULL) THEN
+		-- Announce airdrop soon
+		FOR n IN
+			INSERT INTO sb.notifications (account_id, data)
+			SELECT
+				id as account_id, 
+				json_build_object('info', 'CAMPAIGN_BEGUN',
+								 'campaignName', block.campaign_name, 
+								 'airdrop', block.airdrop, 
+								 'airdropAmount', block.airdrop_amount,
+								 'multiplier', block.multiplier)
+			FROM sb.active_accounts
+			RETURNING id, account_id
+		LOOP
+			-- Emit notification for graphql/postgraphile's subscription plugin
+			PERFORM pg_notify('graphql:notification_account:' || n.account_id, json_build_object(
+				'event', 'notification_created',
+				'subject', n.id
+			)::text);
+		END LOOP;
+	
+	END IF;
+	
+	RETURN 1;
+END;
+$BODY$;
+
+ALTER FUNCTION sb.apply_campaign_announcements()
+    OWNER TO sb;
+
+CREATE OR REPLACE FUNCTION sb.apply_airdrop()
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE campaign_id INTEGER;
+DECLARE campaign_name character varying;
+DECLARE airdrop timestamp with time zone;
+DECLARE airdrop_amount INTEGER;
+DECLARE account_to_airdrop record;
+begin
+	SELECT id, oirdrop, airdrop_amount, name
+	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name 
+	FROM sb.get_active_campaign()
+	WHERE airdrop < NOW() AND NOT airdrop_done;
+	
+	IF (block.campaign_id IS NOT NULL) THEN
+		--Apply airdrop to accounts having at least 2 resources on the campaign
+		FOR account_to_airdrop IN
+		SELECT a.id
+		FROM sb.accounts a
+		INNER JOIN sb.resources r ON a.id = r.account_id AND r.deleted IS NULL AND r.suspended IS NULL AND (expiration IS NULL OR expiration > NOW())
+		INNER JOIN sb.campaigns_resources cr ON cr.resource_id = r.id AND cr.campaign_id = block.campaign_id
+		GROUP BY a.id
+		HAVING COUNT(*) > 1
+		LOOP		
+			UPDATE sb.accounts
+			SET amount_of_tokens = amount_of_tokens + block.airdrop_amount
+			WHERE id = account_to_airdrop.id;
+			
+			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
+			VALUES (sb.current_account_id(), 16, block.airdrop_amount);
+			
+			PERFORM sb.create_notification(account_to_airdrop.id, json_build_object(
+				'info', 'AIRDROP_RECEIVED',
+				'amount', block.airdrop_amount,
+				'campaignName', block.campaign_name
+			));
+
+			PERFORM pg_notify('graphql:account_changed:' || account_to_airdrop.id, json_build_object(
+				'event', 'account_changed',
+				'subject', account_to_airdrop.id
+			)::text);
+		
+		END LOOP;
+		
+		UPDATE sb.campaigns
+		SET airdrop_done = TRUE
+		WHERE id = block.campaign_id;
+
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.apply_airdrop()
+    OWNER TO sb;
+	
+CREATE OR REPLACE FUNCTION sb.request_account_recovery(
+	email character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE code TEXT;
+DECLARE language TEXT;
+begin
+	SELECT array_to_string(array(select substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
+	INTO code;
+	
+	SELECT a.language
+	INTO block.language
+	FROM sb.accounts a
+	WHERE a.email = LOWER(request_account_recovery.email);
+	
+	UPDATE sb.accounts SET recovery_code = code, recovery_code_expiration = NOW() + interval '15 minutes'
+	WHERE accounts.email = LOWER(request_account_recovery.email);
+	
+	IF FOUND THEN
+		PERFORM sb.add_job('mailPasswordRecovery', 
+			json_build_object('email', LOWER(request_account_recovery.email), 'code', code, 'lang', block.language));
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+ALTER FUNCTION sb.request_account_recovery(character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO anonymous;
+
+GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO sb;
 
 DO
 $body$

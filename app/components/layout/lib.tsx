@@ -1,8 +1,8 @@
-import React, { PropsWithChildren, ReactNode, RefObject, useState } from "react"
+import React, { PropsWithChildren, ReactNode, RefObject, useEffect, useState } from "react"
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps, Tooltip } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
+import { Animated, ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
@@ -11,6 +11,7 @@ import BareIconButton from "./BareIconButton"
 import Images from "@/Images"
 import { Pressable } from "react-native-gesture-handler"
 import { PressableEvent } from "react-native-gesture-handler/lib/typescript/components/Pressable/PressableProps"
+import { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {
@@ -203,14 +204,13 @@ interface OptionSelectProps {
 }
 
 export const OptionSelect = ({ value, onChange, title, selectedColor, color, testID }: OptionSelectProps) => {
-    return <TouchableOpacity testID={`${testID}:Button`} onPress={() => onChange(!value)}>
+    return <TouchableOpacity style={{ flexShrink: 1, flexDirection: 'column' }} testID={`${testID}:Button`} onPress={() => onChange(!value)}>
         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5, gap: 5 }}>
             <Icon testID={`${testID}:Icon`} source={ value ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={value ? selectedColor?.toString() || primaryColor : color?.toString() || '#000'} />
-            <Text variant="bodyMedium" style={{ color: value ? selectedColor?.toString() || primaryColor : color?.toString() || '#000' }}>{title}</Text>
+            <Text variant="bodyMedium" style={{ flexShrink: 1, color: value ? selectedColor?.toString() || primaryColor : color?.toString() || '#000' }}>{title}</Text>
         </View>
     </TouchableOpacity>
 }
-
 
 export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     const [dateOpen, setDateOpen] = useState(false)
@@ -218,21 +218,21 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
     return <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', 
         alignItems: 'center', marginTop: 5, paddingVertical: 10  }}>
         <Text variant="labelSmall" style={{ color: props.textColor, marginLeft: 16 }}>{props.label}</Text>
-        <View>
-            <OptionSelect title={t('noDate')} value={!props.value} onChange={() => {
-                    props.onChange(undefined)
-                }} />
-            <TouchableOpacity testID={`${props.testID}:Button`} style={{ flexDirection: 'row', 
-                justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}
-                onPress={() => setDateOpen(true)}>
+        <OptionSelect title={t('noDate')} value={!props.value} onChange={() => {
+                props.onChange(undefined)
+            }} />
+        <TouchableOpacity testID={`${props.testID}:Button`} style={{  }}
+            onPress={() => setDateOpen(true)}>
+            <View style={{ flexDirection: 'row', 
+                justifyContent: 'space-between', alignContent: 'center', alignItems: 'center' }}>
                 <Text variant="bodyMedium">
                     {props.value ? dayjs(props.value).format(t('dateFormat')) : t('setDate')}
                 </Text>
                 <View style={{ marginRight: 14 }}>
                     <Icon source="chevron-right" size={26} color="#000" />
                 </View>
-            </TouchableOpacity>
-        </View>
+            </View>
+        </TouchableOpacity>
         <DatePickerModal
             testID={`${props.testID}:Picker`}
             locale={getLanguage()}
@@ -256,8 +256,30 @@ export const DateTimePickerField = (props: DateTimePickerFieldProps) => {
 export const Hr = ({ color, thickness, margin }: { color?: ColorValue, thickness?: number, margin?: number }) => 
     <View style={{ backgroundColor: color || '#343434', 
         height: thickness || 1, transform: 'scaleY(0.5)', 
-        marginVertical: margin || 5 }}></View>
+        marginVertical: margin || 5, alignSelf: 'stretch' }}></View>
 
 export const InfoIcon = ({ text }: { text: string }) => <Tooltip enterTouchDelay={1} title={text}>
     <Icon source="help-circle" size={20} />
 </Tooltip>
+
+export const AnimatedSwipeHand = () => {
+    const translate = useSharedValue(0)
+    const rotate = useSharedValue(0)
+    const animatedStyles = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: translate.value },
+            { rotate: `${rotate.value}deg` }
+        ],
+    }))
+
+    useEffect(() => {
+        translate.value = withRepeat(withSequence(withTiming(0, { duration: 1500 }), withTiming(10, { duration: 250 }), withTiming(-40, { duration: 200 }), withTiming(0, { duration: 350 })), 4)
+        rotate.value = withRepeat(withSequence(withTiming(0, { duration: 1500 }), withTiming(10, { duration: 250 }), withTiming(-5, { duration: 200 }), withTiming(0, { duration: 350 })), 4)
+    }, [])
+
+    return <Animated.View style={animatedStyles}>
+        <View style={{ position: 'absolute', right: 5, padding: 10, top: -80, backgroundColor: "#aaaa", borderRadius: 30 }}>
+            <Icon color="#000" size={40} source="gesture-swipe-left"/>
+        </View>
+    </Animated.View>
+}

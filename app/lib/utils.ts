@@ -59,21 +59,21 @@ export const SMALL_IMAGEBUTTON_SIZE = 30
 
 export const getTheme = (): ThemeProp => ({
   fonts: configureFonts({ config: { 
-      bodyLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-      bodyMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-      bodySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      displayLarge: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      displayMedium: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      displaySmall: { fontFamily: 'Futura-std-heavy', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      headlineLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      headlineMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      headlineSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      labelLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
-      labelMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
-      labelSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
-      titleLarge: { fontFamily: 'DK-magical-brush', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
-      titleMedium: { fontFamily: 'DK-magical-brush', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
-      titleSmall: { fontFamily: 'DK-magical-brush', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
+      bodyLarge: { fontFamily: 'text', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      bodyMedium: { fontFamily: 'text', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      bodySmall: { fontFamily: 'text', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      displayLarge: { fontFamily: 'text', fontSize: fontSizeLarge, fontWeight: '800', lineHeight: fontSizeLarge * 1.2},
+      displayMedium: { fontFamily: 'text', fontSize: fontSizeMedium, fontWeight: '800', lineHeight: fontSizeMedium * 1.2},
+      displaySmall: { fontFamily: 'text', fontSize: fontSizeSmall, fontWeight: '800', lineHeight: fontSizeSmall * 1.2},
+      headlineLarge: { fontFamily: 'title', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      headlineMedium: { fontFamily: 'title', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      headlineSmall: { fontFamily: 'title', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      labelLarge: { fontFamily: 'title', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2},
+      labelMedium: { fontFamily: 'title', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2},
+      labelSmall: { fontFamily: 'title', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2},
+      titleLarge: { fontFamily: 'title', fontSize: fontSizeLarge, lineHeight: fontSizeLarge * 1.2 },
+      titleMedium: { fontFamily: 'title', fontSize: fontSizeMedium, lineHeight: fontSizeMedium * 1.2 },
+      titleSmall: { fontFamily: 'title', fontSize: fontSizeSmall, lineHeight: fontSizeSmall * 1.2 }
   } }),
   colors: {
     ...DefaultTheme.colors,
@@ -220,6 +220,11 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
     created
     deleted
     price
+    campaignsResourcesByResourceId {
+      nodes {
+        campaignId
+      }
+    }
   }
 }`
 
@@ -258,8 +263,8 @@ export const userFriendlyTime = (time: Date) => {
 }
 
 export const useCustomFonts = () => useFonts({
-  'DK-magical-brush': require('@/assets/fonts/dk-magical-brush.otf'),
-  'Futura-std-heavy': require('@/assets/fonts/futura-std-heavy.otf')
+  'title': require('@/assets/fonts/DSMarkerFelt.ttf'),
+  'text': require('@/assets/fonts/Jost-VariableFont_wght.ttf')
 })
 
 export const regionFromLocation = (loc : Location) => ({

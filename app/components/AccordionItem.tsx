@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { PropsWithChildren, useState } from "react";
 import { View, TouchableOpacity, StyleProp, ViewStyle, ColorValue } from "react-native";
 import { Icon, Text } from "react-native-paper";
@@ -12,7 +12,7 @@ type AccordionItemProps = PropsWithChildren<{
     initialExpanded?: boolean
   }>
   
-export default ({ children, title, style, testID, big, textColor, initialExpanded }: AccordionItemProps): JSX.Element => {
+export default ({ children, title, style, testID, big, textColor, initialExpanded }: AccordionItemProps): ReactNode => {
     const [ expanded, setExpanded ] = useState(initialExpanded)
 
     const body = <View>{ children }</View>
@@ -21,7 +21,7 @@ export default ({ children, title, style, testID, big, textColor, initialExpande
       <View style={{ marginTop: 10, ...(style as object) }}>
         <TouchableOpacity testID={`${testID}:Button`} onPress={ () => setExpanded(!expanded) }>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16 }}>
-                <Text style={{ color: textColor }} variant={big ? 'bodyLarge': 'bodyMedium'}>{ title }</Text>
+                <Text style={{ color: textColor, fontWeight: '700' }} variant={big ? 'bodyLarge': 'bodyMedium'}>{ title }</Text>
                 <Icon color={textColor} source={ expanded ? 'chevron-up' : 'chevron-right' } size={26} />
             </View>
         </TouchableOpacity>

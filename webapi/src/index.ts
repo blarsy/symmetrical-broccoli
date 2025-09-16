@@ -79,7 +79,7 @@ const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Pro
 }
 
 const launchJobWorker = async (pool: Pool, version: string) => {
-    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications\n*/10 * * * * handleResourcesAndBidsExpiration'
+    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications\n*/10 * * * * handleResourcesAndBidsExpiration\n0 1 * * * cleanupOldSearches\n10 * * * * applyAirdrop'
 
     if(version === 'v0_9'){
         crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications'
@@ -133,6 +133,16 @@ const launchJobWorker = async (pool: Pool, version: string) => {
                 executeJob(async () => {
                     await runAndLog('SELECT sb.handle_resources_and_bids_expiration()', pool, 'Terminate expired bids, and bids on expired resources')
                 }, 'handleResourcesAndBidsExpiration')
+            },
+            cleanupOldSearches: async () => {
+                executeJob(async () => {
+                    await runAndLog('SELECT sb.delete_old_searches()', pool, 'Cleanup old searches')
+                }, 'cleanupOldSearches')                
+            },
+            applyAirdrop: async () => {
+                executeJob(async () => {
+                    await runAndLog('SELECT sb.apply_airdrop(); SELECT sb.apply_campaign_announcements()', pool, 'Checking campaign events to apply')
+                }, 'applyAirdrop')
             }
         },
         schema: 'worker'

@@ -64,6 +64,10 @@ const TransactionsHistory = () => {
                 return t('bidCancelled')
             case 12:
                 return t('bidAccepted')
+            case 13:
+                return t('tokensGranted')
+            case 14:
+                return t('priceSetOnResource')
             default:
                 throw new Error(`Unexpected token transaction type ${tokenHistory.node.tokenTransactionTypeByTokenTransactionTypeId.id}`)
         }

@@ -116,7 +116,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                     <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                         <View style={{ flex: 1, alignContent: 'flex-start', justifyContent: 'flex-start' }}>
                             <TouchableOpacity testID={`${baseTestId}:viewButton`} onPress={() => navigation.navigate('viewAccount', { id: resource.data.account?.id })}>
-                                <Text variant="bodyMedium" style={{ textDecorationLine: 'underline', fontFamily: 'Futura-std-heavy', color: primaryColor }}>{resource.data.account?.name}</Text>
+                                <Text variant="bodyMedium" style={{ textDecorationLine: 'underline', color: primaryColor }}>{resource.data.account?.name}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

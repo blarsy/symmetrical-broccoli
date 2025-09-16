@@ -13,6 +13,7 @@ import { userFriendlyTime } from "@/lib/utils"
 import useCategories from "@/lib/useCategories"
 import { makePxSize, ResponsivePhotoBox, screenSizesCoefficients } from "../misc"
 import FiberManualRecord from '@mui/icons-material/FiberManualRecord'
+import dayjs from "dayjs"
 
 interface NotificationData {
     id: number
@@ -296,6 +297,34 @@ const useNotifications = (version: string) => {
                         createOtherNotification(t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
                             `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'TOKEN_GRANTED':
+                    otherNotifs.push(
+                        createOtherNotification(t('tokenGrantedHeadline1'), t('tokenGrantedHeadline2', { grantorName: rawNotification.node.data.grantorName }), 
+                            t('tokenGrantedDetails', { amountOfTokens: rawNotification.node.data.amountOfTokens }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
+                    break
+                case 'AIRDROP_RECEIVED':
+                    otherNotifs.push(
+                        createOtherNotification(t('airdropHeadline1'), t('airdropHeadline2', { campaignName: rawNotification.node.data.campaignName }), 
+                            t('airdropDetails', { amountOfTokens: rawNotification.node.data.amount }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
+                    break
+                case 'CAMPAIGN_BEGUN':
+                    otherNotifs.push(
+                        createOtherNotification(t('campaignBegunHeadline1'), t('campaignBegunHeadline2', { name: rawNotification.node.data.campaignName }), 
+                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
+                        )
+                    break
+                case 'AIRDROP_SOON':
+                    otherNotifs.push(
+                        createOtherNotification(t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop, t('dateTimeFormat')) }), 
+                            t('airdropSoonDetails', { name: rawNotification.node.data.campaignName }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification)
                         )
                     break
             }

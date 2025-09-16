@@ -13,12 +13,16 @@ import { SearchFilterContext } from "../SearchFilterContextProvider"
 import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import useProfileAddress from "@/lib/useProfileAddress"
-import { CheckboxGroup, DateTimePickerField, ErrorText, Hr, InfoIcon, OrangeButton, StyledLabel, SubmitButton, TransparentTextInput } from "../layout/lib"
+import { CheckboxGroup, DateTimePickerField, ErrorText, Hr, InfoIcon, OptionSelect, OrangeButton, StyledLabel, SubmitButton, TransparentTextInput } from "../layout/lib"
 import LocationEdit from "../account/LocationEdit"
 import PicturesField from "./PicturesField"
 import Icons from "@expo/vector-icons/FontAwesome"
 import CategoriesSelect from "./CategoriesSelect"
-import { primaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
+import useActiveCampaign from "@/lib/useActiveCampaign"
+import { IMAGE_BORDER_RADIUS } from "@/lib/images"
+import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
+import BareIconButton from "../layout/BareIconButton"
 
 
 export default ({ route, navigation }:RouteProps) => {
@@ -30,6 +34,8 @@ export default ({ route, navigation }:RouteProps) => {
     const [saveResourceState, setSaveResourcestate] = useState(initial(false, false))
     const { ensureConnected } = useUserConnectionFunctions()
     const { loading: loadingAddress, data: defaultLocation } = useProfileAddress()
+    const { activeCampaign } = useActiveCampaign()
+    const [explainingCampaign, setExplainingCampaign] = useState(false)
 
     const createResource = async (values: Resource) => {
         setSaveResourcestate(beginOperation())
@@ -51,7 +57,8 @@ export default ({ route, navigation }:RouteProps) => {
 
     useEffect(() => {
         if(route.params?.isNew) {
-            editResourceContext.actions.reset(defaultLocation || undefined)
+            console.log('params', route.params)
+            editResourceContext.actions.reset(defaultLocation || undefined, route.params.campaignId)
         }
     },  [defaultLocation])
 
@@ -103,6 +110,12 @@ export default ({ route, navigation }:RouteProps) => {
                     <TransparentTextInput testID="title" label={<StyledLabel isMandatory label={t('title_label')} />} value={values.title}
                         onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
                     <ErrorMessage component={ErrorText} name="title" />
+                    { activeCampaign.data && <View style={{ backgroundColor: lightPrimaryColor, borderRadius: IMAGE_BORDER_RADIUS, padding: 6, flexDirection: 'row', alignItems: 'center' }}>
+                        <OptionSelect title={`${t('resourceConformsToCampaign')} '${activeCampaign.data.name}'`} value={!!editResourceContext.state.campaignToJoin} onChange={() => {
+                            editResourceContext.actions.setCampaignToJoin(editResourceContext.state.campaignToJoin ? undefined : activeCampaign.data!.id)
+                        }} />
+                        <BareIconButton color="#000" Image="help" size={20} onPress={() => setExplainingCampaign(true)} />
+                    </View> }
                     <TransparentTextInput testID="description" label={<StyledLabel label={t('description_label')} />} value={values.description}
                         onChangeText={handleChange('description')} onBlur={handleBlur('description')} multiline={true} />
                     <ErrorMessage component={ErrorText} name="description" />
@@ -179,10 +192,14 @@ export default ({ route, navigation }:RouteProps) => {
                 <SubmitButton testID="submitButton"
                     handleSubmit={handleSubmit} icon={props => <Icons {...props} name="pencil-square" />} 
                     onPress={() => handleSubmit()} 
-                    loading={saveResourceState.loading} Component={OrangeButton} ErrorTextComponent={ErrorText} isValid={formikState.isValid}
-                    submitCount={formikState.submitCount} updating={saveResourceState.loading}>
+                    loading={saveResourceState.loading} Component={OrangeButton} ErrorTextComponent={ErrorText} 
+                    isValid={formikState.isValid} submitCount={formikState.submitCount} 
+                    updating={saveResourceState.loading}>
                     {(editResourceContext.state.editedResource.id) ? t('save_label') : t('create_label')} 
                 </SubmitButton>
+                <CampaignExplanationDialog onDismiss={() =>{
+                    setExplainingCampaign(false)
+                }} campaign={explainingCampaign ? activeCampaign.data! : undefined} />
             </View>
         }}
         </Formik> }

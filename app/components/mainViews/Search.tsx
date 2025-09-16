@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
-import { ActivityIndicator, IconButton, Text, TextInput } from "react-native-paper"
+import { ActivityIndicator, Icon, IconButton, Text, TextInput } from "react-native-paper"
 import { t } from "@/i18n"
-import { View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { MAX_DISTANCE, RouteProps } from "@/lib/utils"
 import { useDebounce } from "usehooks-ts"
 import CategoriesSelect from "../form/CategoriesSelect"
@@ -22,8 +22,9 @@ import FoundResourceCard from "../resources/FoundResourceCard"
 import Slider from "@react-native-community/slider"
 import LocationEdit from "../account/LocationEdit"
 import useProfileAddress from "@/lib/useProfileAddress"
-import { primaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import EditResource from "../form/EditResource"
+import useActiveCampaign from "@/lib/useActiveCampaign"
 
 const StackNav = createNativeStackNavigator()
 
@@ -90,13 +91,16 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
     const searchFilterContext = useContext(SearchFilterContext)
     const { ensureConnected } = useUserConnectionFunctions()
     const { data: defaultAddress, loading: loadingAddress } = useProfileAddress()
+    const { activeCampaign } = useActiveCampaign()
 
     useEffect(() => {
         if(!loadingAddress) {
             searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                 categories: searchFilterContext.filter.categories, 
                 options: searchFilterContext.filter.options,
-                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress! } } })
+                location: { ...searchFilterContext.filter.location, ...{ referenceLocation: defaultAddress! } },
+                inActiveCampaign: searchFilterContext.filter.inActiveCampaign
+            })
         }
     }, [loadingAddress])
 
@@ -112,13 +116,13 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
         <ActivityIndicator color={primaryColor} /> : 
         <ScrollView style={{ flexDirection: 'column', margin: 10, marginBottom: 0 }}>
             <View style={{ flexDirection: 'row' }}>
-                <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} value={searchFilterContext.filter.search} />
+                <SearchBox testID="searchText" onChange={text => searchFilterContext.actions.setSearchFilter({ search: text, categories: searchFilterContext.filter.categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location, inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} value={searchFilterContext.filter.search} />
                 <IconButton style={{ margin: 6, borderRadius: 0 }} size={20} icon={Images.Refresh} onPress={() => {
                     searchFilterContext.actions.requery(appContext.categories.data!)
                 }} />
             </View>
             <CategoriesSelect testID="categories" inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
-                onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location })} />
+                onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location, inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} />
             <Hr />
             <AccordionItem testID="attributesAccordion" title={t('options_title')} style={{ paddingBottom: 10 }}>
                 <View style={{ flexDirection: 'column' }}>
@@ -127,19 +131,22 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions, 
-                            location: searchFilterContext.filter.location })} />
+                            location: searchFilterContext.filter.location, 
+                            inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} />
                     <Hr />
                     <CheckboxGroup testID="transport" title={''} options={{ canBeTakenAway: t('canBeTakenAway_label'), canBeDelivered: t('canBeDelivered_label')}} values={searchFilterContext.filter.options as any}
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions,
-                            location: searchFilterContext.filter.location })} />
+                            location: searchFilterContext.filter.location, 
+                            inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} />
                     <Hr />
                     <CheckboxGroup testID="exchangeType" title={''} options={{ canBeExchanged: t('canBeExchanged_label'), canBeGifted: t('canBeGifted_label') }} values={searchFilterContext.filter.options as any}
                         onChanged={values => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, 
                             categories: searchFilterContext.filter.categories, 
                             options: values as any as SearchOptions,
-                            location: searchFilterContext.filter.location })} />
+                            location: searchFilterContext.filter.location, 
+                            inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} />
                 </View>
             </AccordionItem>
             <Hr />
@@ -150,6 +157,16 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         searchFilterContext.actions.setSearchFilter(newFilter)
                     }} />
             </AccordionItem>
+            { activeCampaign.data && [
+                <Hr key="line" />,
+                <TouchableOpacity key="activeCampaignSwitch" style={{ flexDirection: 'row', paddingTop: 10, 
+                    paddingBottom: 10, justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16, 
+                    alignItems: 'center', backgroundColor: primaryColor, borderRadius: 15 }} 
+                    onPress={() => searchFilterContext.actions.setSearchFilter({...searchFilterContext.filter, ...{ inActiveCampaign: !searchFilterContext.filter.inActiveCampaign } })}>
+                    <Text style={{ fontWeight: '700', color: '#fff' }} variant="bodyMedium">{t(activeCampaign.data.name)}</Text>
+                    <Icon source={ searchFilterContext.filter.inActiveCampaign ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={searchFilterContext.filter.inActiveCampaign ?  lightPrimaryColor : '#fff'} />
+                </TouchableOpacity>
+            ] }
 
             <LoadedList testID="foundResources" style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 

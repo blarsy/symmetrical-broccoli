@@ -12,7 +12,7 @@ interface SimpleBackHeaderProps extends NativeStackHeaderProps {
 
 const SimpleBackHeader = (props: SimpleBackHeaderProps) => <View style={{ flexDirection: 'row', backgroundColor: '#fff' }}>
     <Button testID="BackButton" textColor={primaryColor} icon={p => <Images.Caret fill={p.color} width={p.size} height={p.size} />}
-        onPress={() => props.goBack ? props.goBack() : props.navigation.goBack() }>{t('back_label')}</Button>
+        onPress={() => props.goBack ? props.goBack() : props.navigation.goBack() }>{t('back_label').toUpperCase()}</Button>
 </View>
 
 export default SimpleBackHeader

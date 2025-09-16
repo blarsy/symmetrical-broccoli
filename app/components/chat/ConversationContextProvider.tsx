@@ -1,6 +1,6 @@
 import DataLoadState, { fromError, fromData, initial } from "@/lib/DataLoadState"
 import { gql, useLazyQuery } from "@apollo/client"
-import { createContext, useState } from "react"
+import { createContext, ReactNode, useState } from "react"
 import React from "react"
 import { Category, Resource, fromServerGraphResource } from "@/lib/schema"
 import { IMessage } from "./Chat"
@@ -106,6 +106,11 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
     suspended
     paidUntil
     deleted
+    campaignsResourcesByResourceId {
+      nodes {
+        campaignId
+      }
+    }
   }
 }`
 
@@ -135,7 +140,7 @@ interface ConversationContext {
 }
 
 interface Props {
-    children: JSX.Element
+    children: ReactNode
 }
 
 const blankConversationState: ConversationState = initial(true, {

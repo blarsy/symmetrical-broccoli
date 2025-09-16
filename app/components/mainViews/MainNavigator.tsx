@@ -1,5 +1,5 @@
 import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
-import React, { useContext, useEffect } from 'react'
+import React, { ReactNode, useContext, useEffect } from 'react'
 import { ScrollView, View } from 'react-native'
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
@@ -30,7 +30,7 @@ export const GET_CATEGORIES = gql`query Categories($locale: String) {
 `
 
 const prefix = Linking.createURL('/')
-const getInitialURL = async () => {
+const getInitialURL = async (): Promise<string> => {
     // First, you may want to do the default deep link handling
     // Check if app was opened from a deep link
     const url = await Linking.getInitialURL()
@@ -98,7 +98,7 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
 interface Props {
     screens: {
         name: string, 
-        component: (r: RouteProps) => JSX.Element
+        component: (r: RouteProps) => ReactNode
         options?: NativeStackNavigationOptions
     }[]
 }
@@ -169,7 +169,7 @@ export function Main ({ screens }: Props) {
 }
 
 export default () => <Main screens={[{
-    name: 'main', component: DealBoard
+    name: 'board', component: DealBoard
   }, {
     name: 'profile', component: Profile
 }]} />

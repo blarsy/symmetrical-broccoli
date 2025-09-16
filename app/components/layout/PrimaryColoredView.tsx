@@ -1,9 +1,8 @@
-import React from "react"
-import { primaryColor } from "./constants"
+import React, { ReactNode } from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 
 interface Props {
-    children: JSX.Element,
+    children: ReactNode,
     style?: StyleProp<ViewStyle>
 }
 

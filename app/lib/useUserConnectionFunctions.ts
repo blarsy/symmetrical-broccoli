@@ -10,21 +10,22 @@ import { getApolloClient } from "./apolloClient"
 import { AccountInfo } from "./schema"
 
 export const GET_SESSION_DATA = gql`query GetSessionData {
-    getSessionData {
-      accountId
-      email
-      name
-      avatarPublicId
-      activated
-      logLevel
-      unreadConversations
-      unreadNotifications
-      willingToContribute
-      amountOfTokens
-      unlimitedUntil
-      numberOfExternalAuthProviders
-    }
-  }`
+  getSessionData {
+    accountId
+    email
+    name
+    avatarPublicId
+    activated
+    logLevel
+    unreadConversations
+    unreadNotifications
+    willingToContribute
+    amountOfTokens
+    unlimitedUntil
+    numberOfExternalAuthProviders
+    knowsAboutCampaigns
+  }
+}`
 
 export const SYNC_PUSH_TOKEN = gql`mutation SyncPushToken($token: String) {
     syncPushToken(input: {token: $token}) {
@@ -77,6 +78,7 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     accountChangeReceived {
       account {
         willingToContribute
+        knowsAboutCampaigns
         name
         language
         email
@@ -129,7 +131,8 @@ export default () => {
             willingToContribute: res.data.getSessionData.willingToContribute,
             amountOfTokens: res.data.getSessionData.amountOfTokens,
             unlimitedUntil: res.data.getSessionData.unlimitedUntil || null,
-            lastChangeTimestamp: new Date()
+            lastChangeTimestamp: new Date(),
+            knowsAboutCampaigns: res.data.getSessionData.knowsAboutCampaigns
         }
 
         return { res, account, client }
@@ -172,10 +175,11 @@ export default () => {
                 unreadConversations: [],
                 unreadNotifications: [],
                 unlimitedUntil: payload.data.unlimitedUntil || null,
+                knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns,
                 // Does not change, so just repeat it from previous account value
                 numberOfExternalAuthProviders: account.numberOfExternalAuthProviders
             }
-            
+
             appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
         }})
         

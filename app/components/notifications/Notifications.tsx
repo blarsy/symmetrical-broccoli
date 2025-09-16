@@ -13,6 +13,7 @@ import { AppContext, AppDispatchContext, AppReducerActionType } from "../AppCont
 import ResourceImageWithCreator from "../ResourceImageWithAuthor"
 import { AvatarIconAccountInfo } from "../mainViews/AccountAvatar"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
+import dayjs from "dayjs"
 
 interface NotificationData {
     id: number
@@ -48,51 +49,56 @@ export const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: 
   }`
 
 export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
-    getResources(resourceIds: $resourceIds) {
-      nodes {
-        accountByAccountId {
-            email
-            id
-            name
-            imageByAvatarImageId {
-                publicId
-            }
-        }
-        canBeDelivered
-        canBeExchanged
-        canBeGifted
-        canBeTakenAway
-        description
+  getResources(resourceIds: $resourceIds) {
+    nodes {
+      accountByAccountId {
+        email
         id
-        isProduct
-        isService
-        expiration
-        title
-        resourcesResourceCategoriesByResourceId {
-            nodes {
-                resourceCategoryCode
-            }
+        name
+        imageByAvatarImageId {
+          publicId
         }
-        resourcesImagesByResourceId {
-            nodes {
-                imageByImageId {
-                publicId
-                }
-            }
+      }
+      canBeDelivered
+      canBeExchanged
+      canBeGifted
+      canBeTakenAway
+      description
+      id
+      isProduct
+      isService
+      expiration
+      title
+      resourcesResourceCategoriesByResourceId {
+        nodes {
+          resourceCategoryCode
         }
-        locationBySpecificLocationId {
-            address
-            latitude
-            longitude
-            id
+      }
+      resourcesImagesByResourceId {
+        nodes {
+          imageByImageId {
+            publicId
+          }
         }
-        suspended
-        paidUntil
-        created
-        deleted
-        price
+      }
+      locationBySpecificLocationId {
+        address
+        latitude
+        longitude
+        id
+      }
+      suspended
+      paidUntil
+      created
+      deleted
+      price
+      campaignsResourcesByResourceId {
+        nodes {
+          campaignId
+        }
       }
     }
+  }
 }`
 
 const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: Int) {
@@ -359,6 +365,56 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         initialOfferType: 'R',
                                         includeInactive: true
                                     }
+                                })
+                            })
+                        )
+                    break
+                case 'TOKEN_GRANTED':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('tokenGrantedHeadline1'), t('tokenGrantedHeadline2', { grantorName: rawNotification.node.data.grantorName }), 
+                            t('tokenGrantedDetails', { amountOfTokens: rawNotification.node.data.amountOfTokens }), 
+                            () => {
+                                navigation.navigate('profile', {
+                                    screen: 'tokens',
+                                    params: {
+                                        showHistory: true
+                                    }
+                                })
+                            })
+                        )
+                    break
+                case 'AIRDROP_RECEIVED':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('airdropHeadline1'), t('airdropHHeadline2', { grantorName: rawNotification.node.data.grantorName }), 
+                            t('airdropDetails', { amountOfTokens: rawNotification.node.data.amountOfTokens }), 
+                            () => {
+                                navigation.navigate('profile', {
+                                    screen: 'tokens',
+                                    params: {
+                                        showHistory: true
+                                    }
+                                })
+                            })
+                        )
+                    break
+                case 'CAMPAIGN_BEGUN':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('campaignBegunHeadline1'), t('campaignBegunHeadline2', { name: rawNotification.node.data.campaignName }), 
+                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier }), 
+                            () => {
+                                navigation.navigate('resource', {
+                                    screen: 'resources'
+                                })
+                            })
+                        )
+                    break
+                case 'AIRDROP_SOON':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop, t('dateTimeFormat')) }), 
+                            t('airdropSoonDetails', { name: rawNotification.node.data.campaignName }), 
+                            () => {
+                                navigation.navigate('resource', {
+                                    screen: 'resources'
                                 })
                             })
                         )

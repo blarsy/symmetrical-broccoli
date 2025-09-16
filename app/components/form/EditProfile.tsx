@@ -73,10 +73,11 @@ interface LinksEditProps {
 
 const LinksEdit = ({ links, newLinkRequested, editLinkRequested, deleteLinkRequested, style }: LinksEditProps) => <View style={{ alignItems: 'center', ...(style as object || {})}}>
     <TouchableOpacity testID="addLinkButton" 
-        style={{ alignSelf: 'flex-start', alignItems: 'center', flexDirection: 'row', paddingTop: 7, paddingBottom: 7 }}
         onPress={newLinkRequested}>
-        <Icon source="plus" size={25} color="#fff"/>
-        <Text variant="labelSmall" style={{ color: '#fff', textTransform: 'uppercase', flex: 1, marginLeft: 7 }}>{t('add_buttonLabel')}</Text>
+        <View style={{ alignSelf: 'flex-start', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingTop: 7, paddingBottom: 7 }}>
+            <Icon source="plus" size={25} color="#fff"/>
+            <Text variant="labelSmall" style={{ color: '#fff', textTransform: 'uppercase', marginLeft: 7 }}>{t('add_buttonLabel')}</Text>
+        </View>
     </TouchableOpacity>
     <ListOf testID="LinkList" data={links} noDataLabel={t('no_link')} noDataLabelStyle={{ color: '#fff' }}
         displayItem={(link, idx) => <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' }}>

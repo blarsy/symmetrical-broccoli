@@ -8,7 +8,9 @@ import Link from "next/link"
 import { ApolloProvider, gql } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
 import Themed from "./Themed"
-import useAccountFunctions from "@/lib/useAccountFunctions"
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { useRouter } from "next/navigation"
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 declare global {
     interface Window {
@@ -23,7 +25,7 @@ interface Props extends PropsWithChildren {
 const AdminLayout = (p : Props) => {
     const [connectionStatus, setConnectionStatus] = useState<DataLoadState<string>>(initial(true))
     const { apiUrl } = config(p.version)
-    const {disconnect} = useAccountFunctions(p.version)
+    const router = useRouter()
 
     const getChallengeFromServer = async (publicKey: string) => {
         const qry = await fetch(`${apiUrl}/adminchallenge`, { 
@@ -111,25 +113,33 @@ const AdminLayout = (p : Props) => {
     }, [])
 
     return <Themed>
-        <Container maxWidth="xl" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem'}}>
-            { connectionStatus.loading && <CircularProgress/> }
-            { connectionStatus.error && <Feedback severity="error" message="Error connecting" 
-                detail={connectionStatus.error.detail} onClose={() => setConnectionStatus(initial(false))} /> }
-            { connectionStatus.data && [
-                <Stack direction="row" key="bar" paddingTop="1rem">
-                    <Button>
-                        <Link href={`/webapp/${p.version}/admin/accounts`}>Accounts</Link>
-                    </Button>
-                    <Button>
-                        <Link href={`/webapp/${p.version}/admin/mails`}>Mails</Link>
-                    </Button>
-                </Stack>,
-                <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data, disconnect)}>
-                    {p.children}
-                </ApolloProvider>
-            ]}
-            { !connectionStatus.loading && !connectionStatus.data && <Button onClick={tryConnect}>Connect</Button>}
-        </Container>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
+            <Container maxWidth="xl" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem'}}>
+                { connectionStatus.loading && <CircularProgress/> }
+                { connectionStatus.error && <Feedback severity="error" message="Error connecting" 
+                    detail={connectionStatus.error.detail} onClose={() => setConnectionStatus(initial(false))} /> }
+                { connectionStatus.data && [
+                    <Stack direction="row" key="bar" paddingTop="1rem">
+                        <Button>
+                            <Link href={`/webapp/${p.version}/admin/accounts`}>Accounts</Link>
+                        </Button>
+                        <Button>
+                            <Link href={`/webapp/${p.version}/admin/mails`}>Mails</Link>
+                        </Button>
+                        <Button>
+                            <Link href={`/webapp/${p.version}/admin/campaigns`}>Campaigns</Link>
+                        </Button>
+                    </Stack>,
+                    <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data, () => {
+                        localStorage.removeItem('adminToken')
+                        router.push(`/webapp/${p.version}/admin`)
+                    })}>
+                        {p.children}
+                    </ApolloProvider>
+                ]}
+                { !connectionStatus.loading && !connectionStatus.data && <Button onClick={tryConnect}>Connect</Button>}
+            </Container>
+        </LocalizationProvider>
     </Themed>
 }
 

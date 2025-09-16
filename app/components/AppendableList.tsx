@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { Platform, StyleProp, View, ViewStyle } from "react-native"
 import { t } from "@/i18n"
 import LoadedList from "./LoadedList"
@@ -10,11 +10,11 @@ import Images from "@/Images"
 interface Props<I> {
     state: LoadState | I[]
     dataFromState?: (state: LoadState) => I[]
-    displayItem: (item: I, index: number) => JSX.Element
+    displayItem: (item: I, index: number) => ReactNode
     onAddRequested: () => void
     contentContainerStyle?: StyleProp<ViewStyle>
     onRefreshRequested?: () => void
-    noDataLabel?: string | JSX.Element
+    noDataLabel?: string | ReactNode
     testID?: string
 }
 

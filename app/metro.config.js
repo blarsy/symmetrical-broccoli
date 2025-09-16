@@ -1,5 +1,5 @@
 const path = require('path')
-const {getDefaultConfig} = require('@react-native/metro-config')
+const {getDefaultConfig} = require('expo/metro-config')
 
 /**
  * Metro configuration
@@ -15,7 +15,10 @@ const { generate } = require('@storybook/react-native/scripts/generate')
 
 generate({
   configPath: path.resolve(__dirname, './.storybook'),
+  useJs: true,
 })
+
+config.resolver.unstable_enablePackageExports = false
 
 config.transformer = {
   ...transformer,

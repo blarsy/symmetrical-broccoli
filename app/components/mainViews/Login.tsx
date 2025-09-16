@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { View } from "react-native"
 import React from "react"
 import { t } from 'i18next'
@@ -11,7 +11,7 @@ import { aboveMdWidth, mdScreenWidth } from "@/lib/utils"
 import RegisterExternalAuthForm from "../form/RegisterExternalAuthForm"
 
 interface ConnectProps {
-    children: JSX.Element,
+    children: ReactNode,
     titleI18n: string,
     infoTextI18n?: string
     infoSubtextI18n? : string

@@ -3,13 +3,15 @@ import React, { useContext, useEffect } from "react"
 import { ActivityIndicator, Card, Text } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import Images from "@/Images"
-import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext, AppDispatchContext, AppReducerActionType } from "../AppContextProvider"
+import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext } from "../AppContextProvider"
 import { useNavigation } from "@react-navigation/native"
 import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 import BareIconButton from "../layout/BareIconButton"
 import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/settings"
+import useActiveCampaign from "@/lib/useActiveCampaign"
+import dayjs from "dayjs"
 
 interface OneTimeTaskProps {
     text: string
@@ -82,6 +84,10 @@ export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture 
     }
   }`
 
+const NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN = gql`query GetNumberOfActiveResourcesOnActiveCampaign {
+  getNumberOfActiveResourcesOnActiveCampaign
+}`
+
 const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
     const appContext = useContext(AppContext)
     const appAlertDispatch = useContext(AppAlertDispatchContext)
@@ -89,6 +95,8 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
         navigation = useNavigation()
     const {data, loading, error, refetch} = useQuery(GraphQlLib.queries.GET_ACCOUNT, { variables: { id: appContext.account?.id } })
     const { data: resWithoutPics, loading: resWithoutPicsLoading, error: resWithoutPicsError } = useQuery(GET_RESOURCES_WITHOUT_PIC)
+    const { data: resOnCampaign, loading: resOnCampaignLoading, error: resOnCampaignError } = useQuery(NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN)
+    const { activeCampaign } = useActiveCampaign()
 
     useEffect(() => {
         if(error || resWithoutPicsError) appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: (error || resWithoutPicsError) as Error } })
@@ -97,7 +105,7 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
     useEffect(() => {
         if(appContext.account) refetch()
     }, [appContext.account])
-    
+
     return <Card style={{ backgroundColor: lightPrimaryColor, margin: 10, padding: 10 }}
         contentStyle={{ gap: 15 }}>
         <OneTimeTask text={t('howToGet_switchToContributionMode')} 
@@ -115,11 +123,18 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
-            onPress={() => navigation.navigate('resources')} />
+            onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />
         <PermanentTask text={t('howToGet_addNewResource')} 
             reward={CREATE_RESOURCE_REWARD}
-            onPress={() => navigation.navigate('resources')} />
-
+            onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />
+        { activeCampaign.loading && <ActivityIndicator color={primaryColor} /> }
+        { activeCampaign.data && new Date(activeCampaign.data.airdrop) > new Date() && 
+            <ReccurringTask text={t('howToGet_beElligibleForAirdrop', { date: dayjs(activeCampaign.data.airdrop).format(t('dateTimeFormat')) })}
+                reward={activeCampaign.data.airdropAmount} remainingAmount={2 - resOnCampaign?.getNumberOfActiveResourcesOnActiveCampaign} remainingText={t('resourcesInCampaigntoGo')} 
+                loading={resOnCampaignLoading} onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })}/> }
+        { activeCampaign.data && <PermanentTask key="rewardMultiplier" 
+            reward={CREATE_RESOURCE_REWARD * activeCampaign.data.resourceRewardsMultiplier} 
+            text={t('howToGet_createResourcesOnCampaign')} onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />}
     </ Card>
 }
 export default InfoHowToGet

@@ -1,10 +1,10 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import { StyleProp, View, ViewStyle } from "react-native"
 import { Text } from "react-native-paper"
 
 interface ResourceViewFieldProps {
     title: string
-    children: JSX.Element
+    children: ReactNode
     titleOnOwnLine?: boolean
     style?: StyleProp<ViewStyle>
 }

@@ -1,20 +1,21 @@
-import { SetStateAction, createContext, useState } from "react"
+import { ReactNode, SetStateAction, createContext, useState } from "react"
 import { ImageInfo, Location, Resource } from "@/lib/schema"
 import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 
-export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
-    updateResource(
-      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price}
-    ) {
-      integer
-    }
-  }`
+export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
+  updateResource(
+    input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
+  ) {
+    integer
+  }
+}`
 
 interface EditResourceState {
     editedResource: Resource
+    campaignToJoin?: number
     changeCallbacks: (() => void)[]
     imagesToAdd: ImageInfo[]
 }
@@ -26,7 +27,8 @@ interface EditResourceActions {
     addImage: (img: ImageInfo, resource: Resource) => Promise<void>
     deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
     save: (resource: Resource) => Promise<void>
-    reset: (accountLocation?: Location) => void
+    reset: (accountLocation?: Location, campaignToJoin?: number) => void
+    setCampaignToJoin: (campaignId?: number) => void
 }
 
 export interface EditResourceContextProps {
@@ -35,7 +37,7 @@ export interface EditResourceContextProps {
 }
 
 interface Props {
-    children: JSX.Element
+    children: ReactNode
 }
 
 const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: new Date(),
@@ -58,12 +60,14 @@ export const EditResourceContext = createContext<EditResourceContextProps>({
         addImage: async() => {},
         deleteImage: async() => {},
         save: async() => {},
-        reset: (accountLocation?: Location) => {}
+        reset: (accountLocation?: Location, campaignToJoin?: number) => {},
+        setCampaignToJoin: (campaignId => {})
     }
 })
 
 const EditResourceContextProvider = ({ children }: Props) => {
-    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, imagesToAdd: [], changeCallbacks: [] } as EditResourceState)
+    const [editResourceState, setEditResourceState] = useState({ editedResource: blankResource, 
+        campaignToJoin: undefined, imagesToAdd: [], changeCallbacks: [] } as EditResourceState)
     const [createResource] = useMutation(GraphQlLib.mutations.CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
 
@@ -79,7 +83,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
     }
     
     const setResource = (resource: Resource) => {
-        setState( {...editResourceState, ...{ editedResource: getResourceWithExpiration(resource) } })
+        setState( {...editResourceState, ...{ editedResource: getResourceWithExpiration(resource), campaignToJoin: resource.campaignId } })
     }
 
     const actions: EditResourceActions = {
@@ -95,7 +99,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
         addImage: async (img: ImageInfo, resource: Resource) => {
             if(!img.path) throw new Error('Image has not local path')
 
-            setState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...getResourcWithExpiration(resource), ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
+            setState({ ...editResourceState, ...{ imagesToAdd: [ ...editResourceState.imagesToAdd, img ], editedResource: { ...getResourceWithExpiration(resource), ...{ images: [ ...editResourceState.editedResource.images, img] } } }})
         },
         deleteImage: async (img: ImageInfo, resource: Resource) => {
             let updatedImagesToAdd = editResourceState.imagesToAdd
@@ -106,7 +110,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             } else {
                 updatedImages = updatedImages.filter(curImg => curImg.publicId != img.publicId)
             }
-            setState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...getResourcWithExpiration(resource), ...{ images: updatedImages } } })
+            setState({ ...editResourceState, ...{ imagesToAdd: updatedImagesToAdd }, editedResource: { ...getResourceWithExpiration(resource), ...{ images: updatedImages } } })
         },
         save: async (resource: Resource) => {
             if(editResourceState.editedResource.id) {
@@ -132,7 +136,8 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     categoryCodes: resource.categories.map(cat => cat.code),
                     imagesPublicIds: resource.images.map(img => img.publicId),
                     specificLocation: resource.specificLocation,
-                    price: resource.price || null
+                    price: resource.price || null,
+                    campaignToJoin: editResourceState.campaignToJoin
                 }})
                 setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             } else {
@@ -154,7 +159,8 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     categoryCodes: resource.categories.map(cat => cat.code),
                     imagesPublicIds,
                     specificLocation: resource.specificLocation,
-                    price: resource.price || null
+                    price: resource.price || null,
+                    campaignToJoin: editResourceState.campaignToJoin
                 }
 
                 await createResource({ variables })
@@ -164,11 +170,15 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
             editResourceState.changeCallbacks.forEach(cb => cb())
         },
-        reset: (accountLocation?: Location) => {
+        reset: (accountLocation?: Location, campaignToJoin?: number) => {
             const newResource = { ...blankResource }
             newResource.specificLocation = accountLocation || null
-            const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [] }}
+            
+            const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [], campaignToJoin }}
             setState( newResourceState )
+        },
+        setCampaignToJoin: (campaignToJoin?: number) => {
+            setState(prev => ({ ...prev, ...{ campaignToJoin } }))
         }
     }
 

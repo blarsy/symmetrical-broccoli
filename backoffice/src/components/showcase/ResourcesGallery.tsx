@@ -47,7 +47,7 @@ const ResourcesGallery = () => {
                 flex: '0 1 100%'
             }
         }}>
-            <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} 
+            <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={14}
                 color="#000" borderBottom="2px solid #000"
                 sx={{
                     backgroundColor: lightPrimaryColor

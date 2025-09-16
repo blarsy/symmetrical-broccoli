@@ -21,7 +21,7 @@ const BidsMain = ({ route, navigation }: RouteProps) => {
     useEffect(() => {
         setOfferType((route.params && route.params.initialOfferType) || 'S')
         setIncludeInactive(route.params && route.params.includeInactive)
-    }, [route.params.initialOfferType, route.params.includeInactive])
+    }, [route.params])
 
     return <View style={{ marginTop: 6, marginHorizontal: 6, gap: 6 }}>
         <SegmentedButtons theme={theme} value={offerType} onValueChange={setOfferType}

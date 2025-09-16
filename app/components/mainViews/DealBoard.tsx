@@ -35,18 +35,18 @@ const DealBoard = ({ route, navigation, tabs }: DealBoardProps) => {
                     onSupportScreenRequested={() => setSupportVisible(true )}
                     onTokenCounterPressed={() => navigation.navigate('profile',  { screen: 'tokens'  }) }/>
                 <DealNavigator onTabSelected={setCurrentTabTitle} tabs={tabs || [{
-                    name: 'search', component: Search, options: { title: t('search_label'), tabBarIcon: p => <Images.Search fill={p.color} /> }
+                    name: 'search', component: Search, options: { title: t('search_label').toUpperCase(), tabBarIcon: p => <Images.Search fill={p.color} /> }
                 }, {
-                    name: 'resource', component: Resources, options: { title: t('resource_label'), tabBarIcon: p => <Images.Modify fill={p.color} /> }
+                    name: 'resource', component: Resources, options: { title: t('resource_label').toUpperCase(), tabBarIcon: p => <Images.Modify fill={p.color} /> }
                 }, {
-                    name: 'bids', component: Bids, options: { tabBarButtonTestID: 'bottomBar:Bids', title: t('bids_label'), tabBarIcon: p => <Icon source="hand-coin" color={p.color} size={32} /> }
+                    name: 'bids', component: Bids, options: { tabBarButtonTestID: 'bottomBar:Bids', title: t('bids_label').toUpperCase(), tabBarIcon: p => <Icon source="hand-coin" color={p.color} size={32} /> }
                 }, {
-                    name: 'chat', component: Chat, options: { tabBarButtonTestID: 'bottomBar:Chat', title: t('chat_label'), tabBarIcon: p => <>
+                    name: 'chat', component: Chat, options: { tabBarButtonTestID: 'bottomBar:Chat', title: t('chat_label').toUpperCase(), tabBarIcon: p => <>
                         <Images.Chat fill={p.color} />
                         { appContext.unreadConversations.length != 0 && <Badge testID="chatUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadConversations.length}</Badge>}
                     </> }
                 }, {
-                    name: 'notifications', component: Notifications, options: { tabBarButtonTestID: 'bottomBar:Notifications', title: t('notifications_label'), tabBarIcon: p => <>
+                    name: 'notifications', component: Notifications, options: { tabBarButtonTestID: 'bottomBar:Notifications', title: t('notifications_label').toUpperCase(), tabBarIcon: p => <>
                         <Images.Bell fill={p.color}/>
                         { appContext.unreadNotifications.length != 0 && <Badge testID="notificationUnreads" style={{ position: 'absolute', backgroundColor: primaryColor, top: -8, right: -8 }}>{appContext.unreadNotifications.length}</Badge>}
                     </> }

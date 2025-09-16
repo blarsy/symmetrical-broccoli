@@ -1,9 +1,8 @@
-import { createContext, useState } from "react"
+import { createContext, ReactNode, useState } from "react"
 import { Category, Location, Resource, fromServerGraphResources } from "@/lib/schema"
 import React from "react"
 import { gql, useMutation } from "@apollo/client"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { t } from "@/i18n"
 import { MAX_DISTANCE } from "@/lib/utils"
 
 export interface SearchOptions {
@@ -26,6 +25,7 @@ export interface SearchFilterState {
     categories: Category[]
     options: SearchOptions
     location: LocationSearchOptions
+    inActiveCampaign?: boolean
 }
 
 interface SearchFilterActions {
@@ -40,7 +40,7 @@ interface SearchFilterContext {
 }
 
 interface Props {
-    children: JSX.Element
+    children: ReactNode
 }
 
 const blankSearchFilter: SearchFilterState = { 
@@ -50,9 +50,9 @@ const blankSearchFilter: SearchFilterState = {
   location: { distanceToReferenceLocation: MAX_DISTANCE, excludeUnlocated: false, referenceLocation: null }
 }
 
-export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0") {
+export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0", $inActiveCampaign: Boolean) {
   suggestedResources(
-    input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm}
+    input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm, inActiveCampaign: $inActiveCampaign}
   ) {
     resources {
       accountByAccountId {
@@ -90,6 +90,11 @@ export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: 
       }
       suspended
       paidUntil
+      campaignsResourcesByResourceId {
+        nodes {
+          campaignId
+        }
+      }
     }
   }
 }`
@@ -122,7 +127,8 @@ const SearchFilterContextProvider = ({ children }: Props) => {
                     excludeUnlocated: searchFilterState.location?.excludeUnlocated,
                     referenceLocationLatitude: (searchFilterState.location && searchFilterState.location.referenceLocation) ? searchFilterState.location.referenceLocation.latitude : 0,
                     referenceLocationLongitude: (searchFilterState.location && searchFilterState.location.referenceLocation) ? searchFilterState.location?.referenceLocation.longitude : 0,
-                    distanceToReferenceLocation: searchFilterState.location?.distanceToReferenceLocation
+                    distanceToReferenceLocation: searchFilterState.location?.distanceToReferenceLocation,
+                    inActiveCampaign: searchFilterState.inActiveCampaign
                 }})
 
                 setSearchResults(fromData(fromServerGraphResources(res.data.suggestedResources.resources, categories)))

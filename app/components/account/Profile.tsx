@@ -67,7 +67,7 @@ export const ProfileMain = ({ route, navigation }: RouteProps) => {
                                 await deleteAccount()
                                 await logout()
                                 navigation.reset({ routes: [
-                                    {name: 'main'}
+                                    {name: 'board'}
                                 ], index: 0 })
                                 navigation.goBack()
                                 setDeleting(fromData(null))
@@ -92,19 +92,19 @@ export default function Profile ({ route, navigation }: RouteProps) {
 
     useEffect(() => {
         if(!appContext.account) {
-            navigation.navigate('main')
+            navigation.navigate('board')
         }
     }, [])
 
     const fixedScreens: TabNavigatorProps[] = [
-        { name:'main', options:{ title: t('main_profile_label'), tabBarIcon: p => <Images.Profile height="30" width="30" fill={p.color} /> }, component: ProfileMain },
-        { name:'preferences', options:{ title: t('preferences_profile_label'), tabBarIcon: p => <Images.Preferences height="30" width="30" fill={p.color} /> }, component: Preferences },
+        { name:'main', options:{ title: t('main_profile_label').toUpperCase(), tabBarIcon: p => <Images.Profile height="30" width="30" fill={p.color} /> }, component: ProfileMain },
+        { name:'preferences', options:{ title: t('preferences_profile_label').toUpperCase(), tabBarIcon: p => <Images.Preferences height="30" width="30" fill={p.color} /> }, component: Preferences },
     ]
 
     const actualScreens = appContext.account ? 
         [
             fixedScreens[0],
-            { name:'tokens', options:{ title: t('tokensProfileLabel'), tabBarIcon: (p: any) => <Images.TokensBlack fill={p.color} width={30} height={30} />}, component: TokenSettings }, 
+            { name:'tokens', options:{ title: t('tokensProfileLabel').toUpperCase(), tabBarIcon: (p: any) => <Images.TokensBlack fill={p.color} width={30} height={30} />}, component: TokenSettings }, 
             fixedScreens[1]
         ]
         : 
@@ -112,14 +112,14 @@ export default function Profile ({ route, navigation }: RouteProps) {
 
     return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch'}}>
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
-            <Appbar.BackAction testID="Profile:BackButton" onPress={() => navigation.navigate('main')} />
+            <Appbar.BackAction testID="Profile:BackButton" onPress={() => navigation.navigate('board')} />
             <Appbar.Content titleStyle={{ textTransform: 'uppercase', fontWeight: '400', 
                 fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() }} 
                 title={t('profile_label')}  />
             <Appbar.Action testID="logout" icon="logout" size={getAppBarsTitleFontSize()} color="#000" onPress={ async () => {
                 await logout()
                 navigation.reset({ routes: [
-                    {name: 'main'}
+                    {name: 'board'}
                 ], index: 0 })
             }} />
         </Appbar.Header>

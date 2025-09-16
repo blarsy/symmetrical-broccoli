@@ -12,7 +12,7 @@ import Unlock from '@/assets/img/howitworks/unlock.svg'
 import ConsumeTokens from '@/assets/img/howitworks/consommation jeton.svg'
 import { primaryColor } from "../layout/constants"
 import { SvgProps } from "react-native-svg"
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated"
+import { AnimatedSwipeHand } from "../layout/lib"
 
 const WinToken = () => <View style={{ flexDirection: 'row' }}>
     <Images.Check fill="#4BB543" height={50} width={50} />
@@ -27,28 +27,6 @@ const NumberedImage = ({ numbers, Image, numberSize }: { numbers: number[], Imag
                 <Icon size={actualNumberSize} source={`numeric-${num}-circle`} color={primaryColor} />
             </View>)}
     </View>
-}
-
-const AnimatedSwipeHand = () => {
-    const translate = useSharedValue(0)
-    const rotate = useSharedValue(0)
-    const animatedStyles = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: translate.value },
-            { rotate: `${rotate.value}deg` }
-        ],
-    }))
-
-    useEffect(() => {
-        translate.value = withRepeat(withSequence(withTiming(0, { duration: 1500 }), withTiming(10, { duration: 250 }), withTiming(-40, { duration: 200 }), withTiming(0, { duration: 350 })), 4)
-        rotate.value = withRepeat(withSequence(withTiming(0, { duration: 1500 }), withTiming(10, { duration: 250 }), withTiming(-5, { duration: 200 }), withTiming(0, { duration: 350 })), 4)
-    }, [])
-
-    return <Animated.View style={animatedStyles}>
-        <View style={{ position: 'absolute', right: 5, padding: 10, top: -80, backgroundColor: "#aaaa", borderRadius: 30 }}>
-            <Icon color="#000" size={40} source="gesture-swipe-left"/>
-        </View>
-    </Animated.View>
 }
 
 interface Props {

@@ -51,6 +51,11 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
             }
           }
           id
+          campaignsResourcesByResourceId {
+            nodes {
+              campaignId
+            }
+          }
         }
         accountByAccountId {
           id
