@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom'
-import { render, RenderResult, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import userEvent, { UserEvent } from '@testing-library/user-event'
 import dayjs from "dayjs"
-import { cleanupTestAccounts, createResource, executeQuery, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
+import { checkLastNotificationOnAccount, cleanupTestAccounts, createResource, executeQuery, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
 import BidsPage from "@/app/webapp/[version]/bids/page"
 import ViewResourcePage from "@/app/webapp/[version]/view/[id]/page"
 import NotifsPage from "@/app/webapp/[version]/notifications/page"
@@ -34,17 +34,6 @@ beforeEach(async () => {
 const check1ActiveBidOnResource = async(resourceId: number) => {
     const res = await executeQuery(`SELECT id FROM sb.bids WHERE resource_id = ($1) AND deleted IS NULL AND accepted IS NULL AND refused IS NULL AND valid_until > NOW()`, [resourceId])
     expect(res.rowCount === 1)
-    return res.rows[0].id
-}
-
-const checkLastNotificationOnAccount = async(accountId: number, checkData: (parsed: any) => boolean) => {
-    const res = await executeQuery(`SELECT id, data FROM sb.notifications
-        WHERE account_id = ($1) AND read IS NULL
-        ORDER BY id desc 
-        LIMIT 1`, [accountId])
-
-    expect(checkData(res.rows[0].data)).toBeTruthy()
-
     return res.rows[0].id
 }
 

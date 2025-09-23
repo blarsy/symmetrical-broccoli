@@ -1,7 +1,7 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Stack, TextField, Typography } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 import { LoadingButton } from "@mui/lab"
-import { DatePicker } from '@mui/x-date-pickers'
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import Feedback from "../scaffold/Feedback"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { ErrorMessage, Formik } from "formik"
@@ -26,7 +26,7 @@ interface DatetimeFieldProps {
 
 const DatetimeField = (p: DatetimeFieldProps) => <Stack direction="row" alignItems="flex-start" gap="1rem">
     <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{p.label}</Typography>
-    <DatePicker closeOnSelect defaultValue={dayjs()} disablePast
+    <DateTimePicker closeOnSelect defaultValue={dayjs()} disablePast
         label={p.label} value={dayjs(p.value)} 
         onChange={(e: any) => {
             p.onChange(e?.toDate())

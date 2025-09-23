@@ -638,6 +638,8 @@ begin
 	SET deleted = NOW()
 	WHERE r.id = delete_resource.resource_id;
 	
+	DELETE FROM sb.campaigns_resources WHERE resource_id = delete_resource.resource_id;
+	
 	FOR bid IN
 	SELECT * FROM sb.bids b
 	WHERE b.resource_id = delete_resource.resource_id
@@ -1532,7 +1534,7 @@ CREATE OR REPLACE FUNCTION sb.get_active_campaign()
 AS $BODY$
 	SELECT *
 	FROM sb.campaigns
-	WHERE ending > NOW()
+	WHERE ending > NOW() AND beginning < NOW()
 	ORDER BY created
 	LIMIT 1;
 $BODY$;
@@ -1577,7 +1579,7 @@ CREATE TABLE sb.campaigns_resources
     id serial NOT NULL,
     campaign_id integer NOT NULL,
     resource_id integer NOT NULL,
-    created date NOT NULL DEFAULT now(),
+    created timestamp with time zone NOT NULL DEFAULT now(),
     PRIMARY KEY (id),
     CONSTRAINT fk_campaigns_resources_resources FOREIGN KEY (resource_id)
         REFERENCES sb.resources (id) MATCH SIMPLE
@@ -1638,8 +1640,6 @@ begin
 	IF NOT EXISTS (SELECT * FROM sb.resources WHERE id = delete_resource.resource_id AND account_id = sb.current_account_id()) THEN
 		RETURN 0;
 	END IF;
-	
-	DELETE FROM sb.resources WHERE id = delete_resource.resource_id;
 	
 	UPDATE sb.resources r
 	SET deleted = NOW()
@@ -1991,9 +1991,9 @@ DECLARE multiplier INTEGER;
 DECLARE airdrop_amount INTEGER;
 DECLARE n RECORD;
 BEGIN
-	SELECT id, oirdrop, airdrop_amount, name, resource_rewards_multiplier
+	SELECT id, ac.airdrop, ac.airdrop_amount, name, resource_rewards_multiplier
 	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name, block.multiplier
-	FROM sb.get_active_campaign()
+	FROM sb.get_active_campaign() ac
 	WHERE (beginning < NOW() AND NOT beginning_announced);
 	
 	IF (block.campaign_id IS NOT NULL) THEN
@@ -2016,13 +2016,14 @@ BEGIN
 				'subject', n.id
 			)::text);
 		END LOOP;
-	
+		
+		UPDATE sb.campaigns SET beginning_announced = TRUE WHERE id = (SELECT id FROM sb.get_active_campaign());	
 	END IF;
 	
-	SELECT id, oirdrop, airdrop_amount, name, resource_rewards_multiplier
+	SELECT id, ac.airdrop, ac.airdrop_amount, name, resource_rewards_multiplier
 	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name, block.multiplier
-	FROM sb.get_active_campaign()
-	WHERE (airdrop - interval '1 day' < NOW() AND NOT airdrop_imminent_announced);
+	FROM sb.get_active_campaign() ac
+	WHERE (ac.airdrop - interval '1 day' < NOW() AND NOT airdrop_imminent_announced);
 	
 	IF (block.campaign_id IS NOT NULL) THEN
 		-- Announce airdrop soon
@@ -2030,7 +2031,7 @@ BEGIN
 			INSERT INTO sb.notifications (account_id, data)
 			SELECT
 				id as account_id, 
-				json_build_object('info', 'CAMPAIGN_BEGUN',
+				json_build_object('info', 'AIRDROP_SOON',
 								 'campaignName', block.campaign_name, 
 								 'airdrop', block.airdrop, 
 								 'airdropAmount', block.airdrop_amount,
@@ -2045,6 +2046,7 @@ BEGIN
 			)::text);
 		END LOOP;
 	
+		UPDATE sb.campaigns SET airdrop_imminent_announced = TRUE WHERE id = (SELECT id FROM sb.get_active_campaign());
 	END IF;
 	
 	RETURN 1;
@@ -2067,10 +2069,10 @@ DECLARE airdrop timestamp with time zone;
 DECLARE airdrop_amount INTEGER;
 DECLARE account_to_airdrop record;
 begin
-	SELECT id, oirdrop, airdrop_amount, name
+	SELECT id, ac.airdrop, ac.airdrop_amount, name
 	INTO campaign_id, block.airdrop, block.airdrop_amount, block.campaign_name 
-	FROM sb.get_active_campaign()
-	WHERE airdrop < NOW() AND NOT airdrop_done;
+	FROM sb.get_active_campaign() ac
+	WHERE ac.airdrop < NOW() AND NOT airdrop_done;
 	
 	IF (block.campaign_id IS NOT NULL) THEN
 		--Apply airdrop to accounts having at least 2 resources on the campaign
@@ -2087,7 +2089,7 @@ begin
 			WHERE id = account_to_airdrop.id;
 			
 			INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-			VALUES (sb.current_account_id(), 16, block.airdrop_amount);
+			VALUES (account_to_airdrop.id, 16, block.airdrop_amount);
 			
 			PERFORM sb.create_notification(account_to_airdrop.id, json_build_object(
 				'info', 'AIRDROP_RECEIVED',

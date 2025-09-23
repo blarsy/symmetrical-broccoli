@@ -41,19 +41,13 @@ export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $ca
     }
 }`
 
-export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int], $canBeDelivered: Boolean, 
-    $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, 
-    $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, 
-    $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
+export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
     createResource(
-      input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, 
-        canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, 
-        expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, 
-        title: $title, specificLocation: $specificLocation, price: $price}
+    input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
     ) {
-      integer
+    integer
     }
-  }`
+}`
 
 export const SWITCH_TO_CONTRIBUTION_MODE = gql`mutation SwitchToContributionMode {
     switchToContributionMode(input: {}) {

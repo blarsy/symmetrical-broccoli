@@ -1,4 +1,4 @@
-const version = '0.10.0'
+const version = '0.10.1'
 const versionCode = 153
 
 let appSettings

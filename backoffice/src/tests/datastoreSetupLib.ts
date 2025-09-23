@@ -14,6 +14,14 @@ import { RenderResult } from "@testing-library/react"
 
 const VERSION = 'v0_10'
 
+export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
+  createCampaign(
+    input: {airdrop: $airdrop, defaultResourceCategories: $defaultResourceCategories, description: $description, ending: $ending, beginning: $beginning, name: $name, resourceRewardsMultiplier: $resourceRewardsMultiplier, airdropAmount: $airdropAmount}
+  ) {
+    integer
+  }
+}`
+
 export const getToken = async (email: string, password: string) => {
     const client = getApolloClient(VERSION, '')
     const res = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } } )
@@ -113,11 +121,12 @@ const deleteAccountByToken = async (token: string) => {
 
 export const createResource = async (jwtToken: string, title: string, description: string,
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
-    canBeExchanged: boolean, canBeGifted: boolean, expiration: Date, categoryCodes: number[]): Promise<number> => {
+    canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | undefined, 
+    categoryCodes: number[], campaignToJoin?: number): Promise<number> => {
     const loggedInClient = getApolloClient(VERSION, jwtToken)
     const res = await loggedInClient.mutate({ mutation: CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
-        expiration, isProduct, isService, title
+        expiration, isProduct, isService, title, campaignToJoin
     } })
     return res.data.createResource.integer
 }
@@ -290,4 +299,35 @@ export const setAccountTokens = async (email: string, numberOfTokens: number) =>
     await executeQuery(`update sb.accounts
         set amount_of_tokens = $1
         where email = lower($2)`, [numberOfTokens, email])
+}
+
+export const fromToday = (days: number) =>
+    new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * days)
+
+export const createCampaign = async (name: string, description: string,
+    airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
+    ending: Date): Promise<number> => {
+    await executeQuery(`INSERT INTO sb.campaigns(
+        name, description, airdrop, airdrop_amount, resource_rewards_multiplier, beginning, ending)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
+    const res = await executeQuery('select id from sb.get_active_campaign();')
+    return res.rows[0].id;
+}
+
+export const checkLastNotificationOnAccount = async(accountId: number, checkData: (parsed: any) => boolean) => {
+    const res = await executeQuery(`SELECT id, data FROM sb.notifications
+        WHERE account_id = ($1) AND read IS NULL
+        ORDER BY id desc 
+        LIMIT 1`, [accountId])
+
+    expect(checkData(res.rows[0].data)).toBeTruthy()
+
+    return res.rows[0].id
+}
+
+export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {
+    const result = await executeQuery(`select amount_of_tokens from sb.accounts
+        where email = lower($1)`, [email])
+    
+    expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
 }
