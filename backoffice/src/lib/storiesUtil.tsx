@@ -1,7 +1,7 @@
 import AppContextProvider, { AppStateData } from "@/components/scaffold/AppContextProvider"
 import { getCommonConfig } from "@/config"
 import { DocumentNode } from "@apollo/client"
-import { MockedResponse, MockedProvider } from '@apollo/react-testing'
+import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { APIProvider } from "@vis.gl/react-google-maps"
 import { fromData } from "./DataLoadState"
 import UiContextProvider, { UiStateData } from "@/components/scaffold/UiContextProvider"
@@ -51,7 +51,9 @@ export const appContextDecorator = (initial?: AppStateData) => {
     if(!initial){
         initial = {
             token: '',
-            unreadNotifications: []
+            unreadNotifications: [],
+            loading: false,
+            subscriptions: []
         }
 
     }

@@ -9,7 +9,8 @@ const config: StorybookConfig = {
     "@chromatic-com/storybook",
     "@storybook/addon-interactions",
     "@storybook/addon-mdx-gfm",
-    "@newhighsco/storybook-addon-svgr"
+    "@newhighsco/storybook-addon-svgr",
+    "@storybook/addon-themes"
   ],
 
   framework: {
@@ -17,7 +18,12 @@ const config: StorybookConfig = {
     options: {},
   },
 
-  staticDirs: ["../public"],
+  staticDirs: ["../public",
+    {
+      from: "../src/app", // Path to your font files from the .storybook directory
+      to: "/src/app",     // Path where Storybook should serve them from
+    },
+  ],
 
   docs: {},
 

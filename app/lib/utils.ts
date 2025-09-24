@@ -263,8 +263,8 @@ export const userFriendlyTime = (time: Date) => {
 }
 
 export const useCustomFonts = () => useFonts({
-  'title': require('@/assets/fonts/DSMarkerFelt.ttf'),
-  'text': require('@/assets/fonts/Jost-VariableFont_wght.ttf')
+  'title': require('@/assets/fonts/Bruta-Sans.ttf'),
+  'text': require('@/assets/fonts/renner-book.otf')
 })
 
 export const regionFromLocation = (loc : Location) => ({

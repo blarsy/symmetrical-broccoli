@@ -123,7 +123,7 @@ const ViewAccount = (p: Props) => {
                 <Typography variant="body1" textAlign="center" color="primary">{uiContext.i18n.translator('noResource')}</Typography>
                 :
                 <Stack direction="row" flexWrap="wrap" gap="1rem" justifyContent="center">
-                    { accountResources.map((res, idx) => <ResourceCard 
+                    { accountResources.map((res, idx) => <ResourceCard testId={`ResCard${res.id}`}
                         key={idx} version={p.version} resource={{
                             id: res.id, title: res.title, description: res.description, expiration: res.expiration,
                             images: res.images.map((img) => img.publicId!)

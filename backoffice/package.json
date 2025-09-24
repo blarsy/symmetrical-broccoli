@@ -81,6 +81,7 @@
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-mdx-gfm": "^8.4.7",
     "@storybook/addon-onboarding": "^8.4.7",
+    "@storybook/addon-themes": "^8.2.10",
     "@storybook/blocks": "^8.4.7",
     "@storybook/nextjs": "^8.4.7",
     "@storybook/react": "^8.4.7",
@@ -100,6 +101,7 @@
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "jest-transformer-svg": "^2.1.0",
+    "rxjs": "^7.8.2",
     "storybook": "^8.4.7",
     "ts-node": "^10.9.2"
   }

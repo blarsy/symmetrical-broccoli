@@ -133,7 +133,7 @@ const EditLinks = (p: Props) => {
                     }}
                     onDelete={() => setLinkToDelete(idx)}
                     saveButtonDisabled={!f.dirty} />
-                    <ConfirmDialog visible={deleteLinkState.loading} title={ uiContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
+                    <ConfirmDialog title={ uiContext.i18n.translator('confirmLinkDeletionTitle') } visible={linkToDelete != null}
                         onClose={ response => {
                             if(response) {
                                 setCurrentLinks(prev => {

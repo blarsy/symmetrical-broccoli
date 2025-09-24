@@ -2,9 +2,9 @@ import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
 import { lightPrimaryColor } from "./utils"
 
-const title = localFont({ src: './app/DSMarkerFelt.ttf' })
-const general = localFont({ src: './app/Jost-VariableFont_wght.ttf' })
-const altGeneral = localFont({ src: './app/Jost-VariableFont_wght.ttf', weight: "800" })
+const title = localFont({ src: './app/Bruta-Sans.ttf' })
+const general = localFont({ src: './app/renner-book.otf' })
+const altGeneral = localFont({ src: './app/renner-black.otf', weight: "800" })
 const sugar = localFont({ src: './app/ComicJensFreePro-Regular.ttf' })
 export const fonts = {
   title,
@@ -15,7 +15,7 @@ export const fonts = {
 
 const BIGGEST_TITLE_FONT_SIZE = 2.5
 const TITLE_SIZE_RATIOS = [1, 0.8, 0.65, 0.55, 0.45, 0.4]
-
+console.log('fonts', fonts)
 export default (dark: boolean) => createTheme({
   palette: {
     mode: dark ? 'dark': 'light',
