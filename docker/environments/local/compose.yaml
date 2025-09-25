@@ -16,5 +16,12 @@ services:
     restart: always
     volumes: 
       - "db_data:/var/lib/postgresql/data"
+  # storybook:
+  #   build:
+  #     context: './../../containers/storybook'
+  #     dockerfile: './Dockerfile'
+  #   ports: 
+  #     - "6001:6001"
+  #   restart: always
 volumes: 
   db_data: {}

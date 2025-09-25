@@ -15,7 +15,7 @@ export const fonts = {
 
 const BIGGEST_TITLE_FONT_SIZE = 2.5
 const TITLE_SIZE_RATIOS = [1, 0.8, 0.65, 0.55, 0.45, 0.4]
-console.log('fonts', fonts)
+
 export default (dark: boolean) => createTheme({
   palette: {
     mode: dark ? 'dark': 'light',

@@ -4,7 +4,7 @@ import DataLoadState, { fromData, initial } from './DataLoadState'
 import { AccountInfo, Category, Resource } from './schema'
 import { SearchFilterContext } from '@/components/SearchFilterContextProvider'
 import { PaperProvider, Text } from 'react-native-paper'
-import { MockedProvider, MockedResponse } from "@apollo/react-testing"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { DocumentNode } from 'graphql'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'

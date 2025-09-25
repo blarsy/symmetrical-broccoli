@@ -10,7 +10,7 @@
     "lint": "next lint",
     "test": "jest",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build -o ../docker/containers/storybook/web"
   },
   "dependencies": {
     "@apollo/client": "^3.8.8",

@@ -26,6 +26,7 @@ web-build/
 .env.test
 *.config.json
 /docker/prod/.env
+/docker/containers/storybook/web/*
 *.log
 web.zip
 web_test.zip

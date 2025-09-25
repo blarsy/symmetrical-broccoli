@@ -1598,6 +1598,8 @@ ALTER TABLE IF EXISTS sb.campaigns_resources
 	
 GRANT DELETE, INSERT, SELECT ON TABLE sb.campaigns_resources TO identified_account;
 
+GRANT SELECT ON TABLE sb.campaigns_resources TO public;
+
 GRANT ALL ON TABLE sb.campaigns_resources TO sb;
 
 GRANT USAGE ON SEQUENCE sb.campaigns_resources_id_seq TO identified_account;
@@ -1871,6 +1873,8 @@ GRANT EXECUTE ON FUNCTION sb.create_resource(character varying, character varyin
 ALTER TABLE IF EXISTS sb.searches
     ADD COLUMN in_active_campaign boolean;
 
+CREATE EXTENSION pg_trgm;
+
 DROP FUNCTION IF EXISTS sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean);
 
 CREATE OR REPLACE FUNCTION sb.suggested_resources(
@@ -1941,10 +1945,10 @@ BEGIN
 		 (select sb.geodistance(suggested_resources.reference_location_latitude, suggested_resources.reference_location_longitude, l.latitude, l.longitude) <= suggested_resources.distance_to_reference_location)
 	  )
 	  AND
-	  (search_term = '' OR 
-		(r.title ILIKE '%' || search_term || '%' OR 
-		 r.description ILIKE '%' || search_term || '%' OR
-		 a.name ILIKE '%' || search_term || '%'))
+		  (search_term = '' OR 
+			(r.title % search_term OR 
+			 r.description % search_term OR
+			 a.name % search_term ))
 	  AND
 	  (NOT suggested_resources.in_active_campaign OR suggested_resources.in_active_campaign IS NULL OR cr.id IS NOT NULL)
 	  ORDER BY created DESC, r.expiration DESC
@@ -2156,6 +2160,61 @@ GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO PUBL
 GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO anonymous;
 
 GRANT EXECUTE ON FUNCTION sb.request_account_recovery(character varying) TO sb;
+
+CREATE OR REPLACE FUNCTION sb.get_accounts_to_notify_of_new_resource(
+	resource_id integer)
+    RETURNS integer[]
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE results INTEGER[];
+BEGIN
+	results := ARRAY(
+		SELECT id, score
+		FROM (
+			-- Accounts close to the resource created
+			-- if new resource has a location
+			SELECT a.id,
+				CASE 
+					WHEN sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 5 THEN 10 
+					WHEN sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 10 THEN 5 
+				END as score
+			FROM sb.accounts a
+			INNER JOIN sb.locations l ON a.location_id = l.id
+			CROSS JOIN (
+				SELECT latitude, longitude
+				FROM sb.resources r
+				INNER JOIN sb.locations l ON l.id = r.specific_location_id
+				WHERE r.id = 40
+			) loc
+			WHERE name IS NOT NULL and name <> '' AND location_id IS NOT NULL
+
+			UNION
+			-- Accounts taking part in active campaign
+			-- if a campaign is active
+			SELECT id, 10 as score
+			FROM sb.accounts a
+			WHERE name IS NOT NULL and name <> '' AND EXISTS (
+				SELECT *
+				FROM sb.resources r
+				INNER JOIN sb.campaigns_resources cr ON cr.resource_id = r.id AND cr.campaign_id = (SELECT id FROM sb.get_active_campaign())
+				WHERE account_id = a.id AND deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
+			)
+			UNION
+			-- Accounts having recent searches that match the new resource's title and/or description
+			SELECT account_id, 10 as score from sb.searches
+			WHERE account_id IS NOT NULL AND term IS NOT NULL AND term <> '' AND term % 'Pots'
+			ORDER BY similarity(term, 'Pots') DESC
+			LIMIT 5
+		) matches
+		WHERE id != (SELECT account_id FROM sb.resources WHERE id = resource_id)
+		ORDER BY score DESC
+		LIMIT 5);
+
+	RETURN results;
+end;
+$BODY$;
 
 DO
 $body$

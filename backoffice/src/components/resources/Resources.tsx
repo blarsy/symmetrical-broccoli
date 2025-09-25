@@ -99,7 +99,7 @@ const ResourceCard = (p: ResourceCardProps) => {
       opacity: p.isExample ? '0.6': 'inherit',
       }}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-          <Typography noWrap component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${p.deleted ? `(${uiContext.i18n.translator('deletedLabel')})` : ''} ${p.title}`}</Typography>
+          <Typography component="p" lineHeight="1rem" textAlign="center" variant="overline">{`${p.deleted ? `(${uiContext.i18n.translator('deletedLabel')})` : ''} ${p.title}`}</Typography>
           <ExpirationIndicator value={p.expiration} />
           <PictureGallery sx={{ justifyContent: "center" }}
               images={p.images}
@@ -148,7 +148,6 @@ const Resources = () => {
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
-    const [explainingToken, setExplainingToken] = useState(false)
 
     return <Stack gap="1rem" overflow="auto">
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
