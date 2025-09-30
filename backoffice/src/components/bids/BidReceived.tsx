@@ -12,6 +12,7 @@ import RefuseIcon from '@mui/icons-material/ThumbDown'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import dayjs from "dayjs"
 import { ConfirmDialog, PriceTag } from "../misc"
+import { urlFromPublicId } from "@/lib/images"
 
 export const ACCEPT_BID = gql`mutation AcceptBid($bidId: Int) {
   acceptBid(input: {bidId: $bidId}) {
@@ -53,7 +54,7 @@ const BidReceived = ({ bid, onAction } : Props) => {
             <ResourceHeader data={{
                 id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
                     id: bid.account.id, name: bid.account.name,
-                    participantId: 0, avatarImageUrl: bid.account.avatarImageUrl
+                    participantId: 0, avatarImageUrl: bid.account.avatarImagePublicId && urlFromPublicId(bid.account.avatarImagePublicId)
                 }
             }}/>
             <Stack data-testid={testId} direction="row" gap="0.5rem" alignItems="center">

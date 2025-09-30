@@ -3,7 +3,6 @@ import ClientWrapper from "../scaffold/ClientWrapper"
 import ProximityFilter from "./ProximityFilter"
 
 const meta = {
-    title: 'Search filter, proximity',
     component: ProximityFilter,
     parameters: {
       // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout

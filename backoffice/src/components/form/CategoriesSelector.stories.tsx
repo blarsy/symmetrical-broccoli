@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CategoriesSelector from './CategoriesSelector'
-import { apolloClientMocksDecorator, uiContextDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, clientComponentDecorator } from '@/lib/storiesUtil'
 import { GET_CATEGORIES } from '@/lib/useCategories'
-import { initial } from '@/lib/DataLoadState'
 
 const meta = {
   component: CategoriesSelector,
@@ -12,7 +11,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {},
-  args: {  },
+  args: {},
   decorators: [apolloClientMocksDecorator([
     {
         query: GET_CATEGORIES,
@@ -26,11 +25,7 @@ const meta = {
             }
         }
     }
-  ]), uiContextDecorator({ i18n: { lang: 'fr', translator: val => (val as string) }, 
-    categories: initial(true, []),
-    version: '0_10',
-    loading: false
-  })]
+  ]), clientComponentDecorator()]
 } satisfies Meta<typeof CategoriesSelector>
 
 export default meta

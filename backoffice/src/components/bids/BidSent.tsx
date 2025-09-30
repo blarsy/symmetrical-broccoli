@@ -11,6 +11,7 @@ import { Bid } from "@/lib/schema"
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import DeleteIcon from '@mui/icons-material/Delete'
 import dayjs from "dayjs"
+import { urlFromPublicId } from "@/lib/images"
 
 export const DELETE_BID = gql`mutation DeleteBid($bidId: Int) {
   deleteBid(input: {bidId: $bidId}) {
@@ -40,7 +41,7 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
             <ResourceHeader sx={{ padding: 0 }} data={{
                 id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
                     id: bid.resource.account!.id, name: bid.resource.account!.name,
-                    participantId: 0, avatarImageUrl: bid.resource.account!.avatarImageUrl
+                    participantId: 0, avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
                 }
             }}/>
             <Stack data-testid={`BidSent:${bid.id}`} direction="row" gap="0.5rem" alignItems="center">

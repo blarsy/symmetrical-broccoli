@@ -10,7 +10,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {},
-  decorators: [ clientComponentDecorator, configDayjsDecorator ]
+  decorators: [ clientComponentDecorator(), configDayjsDecorator ]
 } satisfies Meta<typeof Resources>
 
 export default meta

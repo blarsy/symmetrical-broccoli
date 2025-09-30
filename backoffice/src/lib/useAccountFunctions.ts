@@ -100,17 +100,18 @@ const useAccountFunctions = (version: string) => {
     const { apiUrl } = config(version)
     const router = useRouter()
 
-    const connectWithToken = async (token: string, otherSessionProps: any) => {
+    const connectWithToken = async (token: string) => {
         const client = getApolloClient(version, token, disconnect)
         const res = await client.query({ query: GET_SESSION_DATA })
 
         if(!res.data.getSessionDataWeb) {
             localStorage.removeItem('token')
-            appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
+            appDispatch({ type: AppReducerActionType.Login, payload: { 
                 token: '',
                 unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
                 unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
-                account: undefined} })
+                account: undefined
+            }})
         }
 
         const subscriptions = [
@@ -126,7 +127,6 @@ const useAccountFunctions = (version: string) => {
                     willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
                     unlimitedUntil: payload.data.unlimitedUntil || null
                 }
-                
                 appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
             }}),
             client.subscribe({query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
@@ -147,8 +147,7 @@ const useAccountFunctions = (version: string) => {
         }
 
         localStorage.setItem('token', token)
-
-        appDispatch({ type: AppReducerActionType.Login, payload: { ...otherSessionProps, 
+        appDispatch({ type: AppReducerActionType.Login, payload: {
             token,
             unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
             unreadNotifications: res.data.getSessionDataWeb.unreadNotifications,
@@ -166,7 +165,7 @@ const useAccountFunctions = (version: string) => {
     const login = async (email: string, password: string) => {
         const client = getApolloClient(version)
         const tokenRes = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } })
-        return connectWithToken(tokenRes.data.authenticate.jwtToken, {})
+        return connectWithToken(tokenRes.data.authenticate.jwtToken)
     }
 
     const connectGoogleWithAccessCode = async (code: string, onNewAccountNeeded: (name: string, email: string, gauthToken: string) => void) => {
@@ -180,14 +179,14 @@ const useAccountFunctions = (version: string) => {
 
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken, authProvider } })
         
-        return connectWithToken(res.data.registerAccountExternalAuth.jwtToken, {})
+        return connectWithToken(res.data.registerAccountExternalAuth.jwtToken)
     }
 
     const completeExternalAuth = async (email: string, idToken: string, authProvider: AuthProviders) => {
         //Important to use the imperative form of Apollo here (no useQuery, useMutation, ...), otherwise some page prerenders fail during the NextJs build, trying to create an Apollo client prematurely
         const client = getApolloClient(version)
         const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_EXTERNAL_AUTH, variables: { email, token: idToken, authProvider } })
-        return connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken, {})
+        return connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
     }
 
     const connectApple = async (id_token: string, nonce: string, firstName: string, lastName: string, onNewAccountNeeded: (name: string, email: string, token: string) => void) => {
@@ -250,7 +249,7 @@ const useAccountFunctions = (version: string) => {
     const registerAccount = async (email: string, password: string, name: string, language: string) => {
         const client = getApolloClient(version)
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT, variables: { email, password, name, language } })
-        return connectWithToken(res.data.registerAccount.jwtToken, {})
+        return connectWithToken(res.data.registerAccount.jwtToken)
     }
 
     return { login, connectGoogleWithAccessCode, connectApple, completeExternalAuth, connectWithToken, disconnect, 

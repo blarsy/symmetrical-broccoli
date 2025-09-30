@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { TFunction } from "i18next"
 
 interface NotificationInfo {
@@ -65,6 +66,26 @@ export const makeNotificationInfo = (data: any, t: TFunction<"translation", unde
             return {
                 title: t('bidExpired'),
                 summary: t('bidExpiredSummary', { from: data.resourceAuthor, resourceTitle: data.resourceTitle })
+            }
+        case 'TOKEN_GRANTED':
+            return {
+                title: t('tokenGranted'),
+                summary: t('tokenGrantedSummary', { grantorName: data.grantorName, amountOfTokens: data.amountOfTokens })
+            }
+        case 'AIRDROP_RECEIVED':
+            return {
+                title: t('airdropReceived'),
+                summary: t('airdropReceivedSummary', { campaignName: data.campaignName, amountOfTokens: data.amountOfTokens })
+            }
+        case 'CAMPAIGN_BEGUN':
+            return {
+                title: t('campaignBegun', { campaignName: data.campaignName }),
+                summary: t('campaignBegunSummary', { multiplier: data.multiplier, airdropAmount: data.airdropAmount })
+            }
+        case 'AIRDROP_SOON':
+            return {
+                title: t('airdropSoon', { airdropAmount: data.airdropAmount }),
+                summary: t('airdropSoonSummary', { airdrop: dayjs(data.airdrop).format(t('full_date_format')), campaignName: data.campaignName })
             }
         default:
             throw new Error(`Unexpected notification type '${data.info}'`)

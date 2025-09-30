@@ -25,7 +25,9 @@ const ConnectContent = (p: Props) => {
     const uiContext = useContext(UiContext)
 
     if(uiContext.loading || appContext.loading) {
-        return <CircularProgress color="primary" />
+        return <Stack sx={{ flex: 1, alignItems: 'center', paddingTop: '2rem' }}>
+            <CircularProgress color="primary" />
+        </Stack>
     }
 
     if(!appContext.account && !p.allowAnonymous) {

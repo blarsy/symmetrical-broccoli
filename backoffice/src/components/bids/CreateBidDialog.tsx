@@ -11,6 +11,7 @@ import * as yup from "yup"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorText } from "../misc"
 import { AppContext } from "../scaffold/AppContextProvider"
+import { urlFromPublicId } from "@/lib/images"
 
 export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: Int) {
   createBid(
@@ -67,7 +68,7 @@ const CreateBidDialog = (p: Props) => {
                             participantId: 0, // not used in this component's context
                             id: p.resource!.account!.id,
                             name: p.resource!.account!.name,
-                            avatarImageUrl: p.resource!.account!.avatarImageUrl
+                            avatarImageUrl: p.resource!.account!.avatarImagePublicId && urlFromPublicId(p.resource!.account!.avatarImagePublicId)
                         } 
                     }}/>
                 <TextField inputProps={{

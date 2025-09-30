@@ -54,6 +54,14 @@ const resources = {
         "bidCancelledSummary" : "{{from}} cancelled her bid on '{{resourceTitle}}'",
         "bidExpired": "Bid expired",
         "bidExpiredSummary" : "{{from}} did not respond on time to your bid on '{{resourceTitle}}'",
+        "tokenGranted": "You were granted Topes",
+        "tokenGrantedSummary": "{{grantorName}} sent you {{amountOfTokens}} Topes",
+        "airdropReceived": "Well done, you were airdropped !",
+        "airdropReceivedSummary": "You got the airdrop in the campaign '{{campaignName}}': {{amountOfTokens}} Topes were added to your account",
+        "campaignBegun": "Campaign begun: '{{campaignName}}'",
+        "campaignBegunSummary": "Create resources in this campaign to win {{multiplier}} times more rewards + airdrop of {{airdropAmount}} Topes if you have 2 active resources.",
+        "airdropSoon": "Don't miss the {{airdropAmount}} Topes, only 2 resources are needed !",
+        "airdropSoonSummary": "Create 2 resources under the theme '{{campaignName}}' to win the airdrop on the {{airdrop}}."
     }},
     fr: { translation: {
         "recover_account_subject": "Récupération d'accès à ton compte'",
@@ -105,6 +113,14 @@ const resources = {
         "bidCancelledSummary" : "{{from}} a annulé son offre sur '{{resourceTitle}}'",
         "bidExpired": "Offre expirée",
         "bidExpiredSummary" : "{{from}} n'a pas répondu à temps à ton offre sur '{{resourceTitle}}'",
+        "tokenGranted": "Tu as reçu des Topes !",
+        "tokenGrantedSummary": "{{grantorName}} t'a envoyé {{amountOfTokens}} Topes",
+        "airdropReceived": "Bravo, tu as reçu un largage de Topes !",
+        "airdropReceivedSummary": "Tu as gagné le largage de la campagne '{{campaignName}}': {{amountOfTokens}} Topes ont été ajouté à ton compte.",
+        "campaignBegun": "Nouvelle campagne lancée: '{{campaignName}}'",
+        "campaignBegunSummary": "Crée des ressources pour cette campagne et gagne {{multiplier}} fois plus de récompenses en Topes + largage de {{airdropAmount}} Topes si tu as 2 ressources disponibles.",
+        "airdropSoon": "Ne rate pas les {{airdropAmount}} Topes, il suffit de créer 2 ressources !",
+        "airdropSoonSummary": "Crée 2 ressources en rapport avec le thème '{{campaignName}}' pour le {{airdrop}}, et tu gagnes le largage."
     }}
 }
 

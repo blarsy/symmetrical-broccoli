@@ -3,21 +3,30 @@ import { getCommonConfig } from "@/config"
 import { DocumentNode } from "@apollo/client"
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { APIProvider } from "@vis.gl/react-google-maps"
-import { fromData } from "./DataLoadState"
+import { fromData, initial } from "./DataLoadState"
 import UiContextProvider, { UiStateData } from "@/components/scaffold/UiContextProvider"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import '../app/globals.css'
-import ClientWrapper from "@/components/scaffold/ClientWrapper"
+import { Translatable } from "@/components/scaffold/ClientWrapper"
 import { ReactNode } from "react"
+import ChatContextProvider, { ChatStateData } from "@/components/scaffold/ChatContextProvider"
+import { AccountInfo } from "./useAccountFunctions"
+import { GET_CATEGORIES } from "./useCategories"
 const { mapsApiKey } = getCommonConfig()
 
 export interface GraphQlOp {
     query: DocumentNode,
     result: any,
     variables?: Record<string, any>
+}
+
+const defaultAccount: AccountInfo = {
+    id: 123, name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
+    willingToContribute: true, amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
+    unlimitedUntil: null, avatarPublicId: ''
 }
 
 export const makeDbRresource = (title: string, description: string, deleted: Date | null, creatorName: string, imagesPublicIds: string[], expiration: Date | null = null, suspended: Date | null = null) => ({
@@ -96,6 +105,20 @@ export const uiContextDecorator = (initial?: UiStateData) => {
         </UiContextProvider>
 }
 
+export const chatContextDecorator = (initial?: ChatStateData) => {
+    if(!initial) {
+        initial = {
+            conversations: [],
+            unreadConversations: [],
+        }
+    }
+
+    return (Story: React.ElementType) =>
+        <ChatContextProvider initial={initial}>
+            <Story />
+        </ChatContextProvider>
+}
+
 export const appContextDecorator = (initial?: AppStateData) => {
     if(!initial){
         initial = {
@@ -119,8 +142,38 @@ export const configDayjsDecorator = (Story: React.ElementType) => {
     return <Story />
 }
 
-export const clientComponentDecorator = (Story: () => ReactNode) => {
-    return <ClientWrapper version="v0_9">
-        <Story/>
-    </ClientWrapper>
+export const clientComponentDecorator = (initialAppstate?: AppStateData, initialChatState?: ChatStateData, 
+    initialUiState?: UiStateData, ops?: GraphQlOp[]) => {
+    const actualOps: GraphQlOp[] = [{
+        query: GET_CATEGORIES,
+        variables: { locale: 'fr' },
+        result : {
+            allResourceCategories: { 
+                nodes: []
+            }
+        }
+    }]
+    if(ops) {
+        actualOps.push(...ops)
+    }
+
+    return (Story: () => ReactNode) =>  <AppContextProvider initial={initialAppstate || { token: '', unreadNotifications: [], loading: false, subscriptions: []}}>
+        <ChatContextProvider initial={initialChatState || { conversations: [], unreadConversations: [] }}>
+            <UiContextProvider initial={ initialUiState || { loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_10', categories: initial(false) }}>
+                <Translatable version="v0_10">
+                    <MockedProvider mocks={
+                        actualOps.map(op => ({
+                            delay: 2000,
+                            request: { query: op.query, variables: op.variables },
+                            result: { data: op.result }
+                        } as MockedResponse<any, any>))
+                    }>
+                        <Story />
+                    </MockedProvider>
+                </Translatable>
+            </UiContextProvider>
+        </ChatContextProvider>
+    </AppContextProvider>
 }
+
+export const connectedComponent = (ops?: GraphQlOp[]) => clientComponentDecorator({ loading: false, account: defaultAccount, token: 'token', unreadNotifications: [], subscriptions: [] }, undefined, undefined, ops)

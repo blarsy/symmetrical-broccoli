@@ -250,9 +250,9 @@ const resources = {
             "airdropDetails": "{{amountOfTokens}} Topes were added to your account",
             "campaignBegunHeadline1": "New campaign",
             "campaignBegunHeadline2": "{{name}}",
-            "campaignBegunDetails": "Tons of Topes to win: X {{multiplier}} rewards bonus + airdrop {{airdropAmount}}",
+            "campaignBegunDetails": "Tons of Topes to win: X {{multiplier}} rewards bonus + airdrop {{airdropAmount}} TOpes on {{- airdrop}}",
             "airdropSoonHeadline1" : "{{airdropAmount}} Topes will be airdropped soon !",
-            "airdropSoonHeadline2" : "On {{airdrop}}, all participants will win...",
+            "airdropSoonHeadline2" : "On {{- airdrop}}, all participants will win...",
             "airdropSoonDetails" : "Create quickly 2 resources on the theme '{{name}}'!",
             "expiresIn": "Expires ",
             "acceptOfferConfirmDialogTitle": "Important reminder",
@@ -263,7 +263,8 @@ const resources = {
             "inactiveBecauseAccepted": "Accepted on {{- date}}",
             "inactiveBecauseRefused": "Refused on {{- date}}",
             "inactiveBecauseExpired": "Expired at {{- date}}",
-            "inactiveBecauseDeleted": "Cancelled on {{- date}}"
+            "inactiveBecauseDeleted": "Cancelled on {{- date}}",
+            "noNotification": "No notification at this time"
         }
     },
     fr: { 
@@ -514,10 +515,10 @@ const resources = {
             "airdropDetails": "{{amountOfTokens}} Topes ajoutés à ton compte",
             "campaignBegunHeadline1": "Nouvelle campagne",
             "campaignBegunHeadline2": "{{name}}",
-            "campaignBegunDetails": "Pleins de Topes à gagner: récompenses X {{multiplier}} + largage {{airdropAmount}} le {{airdrop}}",
-            "airdropSoonHeadline1" : "Largage de {{airdropAmoçunt}} Topes imminent !",
-            "airdropSoonHeadline2" : "Le {{airdrop}}, tous les participants gagnent...",
-            "airdropSoonDetails" : "Trouve vite 2 ressources sur le thème {{name}} à mettre sur Tope-là !",
+            "campaignBegunDetails": "Pleins de Topes à gagner: récompenses X {{multiplier}} + largage de {{airdropAmount}} Topes le {{- airdrop}}",
+            "airdropSoonHeadline1" : "Largage de {{airdropAmount}} Topes imminent !",
+            "airdropSoonHeadline2" : "Le {{- airdrop}}, tous les participants gagnent...",
+            "airdropSoonDetails" : "Trouve vite 2 ressources sur le thème '{{name}}' à mettre sur Tope-là !",
             "expiresIn": "Expire ",
             "acceptOfferConfirmDialogTitle": "Rappel important",
             "meaningOfAcceptingOffer": "En acceptant l'offre, tu vas immédiatement recevoir les Topes. Ca veut aussi dire que tu t'engages à fournir la ressource selon les conditions mentionnées. C'est le bon moment pour t'assurer des détails logistiques: prendre un rendez-vous pour la livraison ou l'enlèvement, ou la prestation, et si c'est une location, définir le délai avant le retour de la ressource.",
@@ -527,7 +528,8 @@ const resources = {
             "inactiveBecauseAccepted": "Acceptée le {{- date}}",
             "inactiveBecauseRefused": "Refusée le {{- date}}",
             "inactiveBecauseExpired": "Expirée depuis {{- date}}",
-            "inactiveBecauseDeleted": "Annulée le {{- date}}"
+            "inactiveBecauseDeleted": "Annulée le {{- date}}",
+            "noNotification": "Pas de notification pour le moment"
         }
     }
 }

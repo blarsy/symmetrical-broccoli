@@ -1877,7 +1877,7 @@ CREATE EXTENSION pg_trgm;
 
 DROP FUNCTION IF EXISTS sb.suggested_resources(text, boolean, boolean, boolean, boolean, boolean, boolean, integer[], numeric, numeric, numeric, boolean);
 
-CREATE OR REPLACE FUNCTION sb.suggested_resources(
+CREATE OR REPLACE FUNCTION sb.suggested_resources (
 	search_term text,
 	is_product boolean,
 	is_service boolean,
@@ -1946,9 +1946,9 @@ BEGIN
 	  )
 	  AND
 		  (search_term = '' OR 
-			(r.title % search_term OR 
-			 r.description % search_term OR
-			 a.name % search_term ))
+			(CAST(r.title as text) % search_term OR 
+			 CAST(r.description  as text) % search_term OR
+			 CAST( a.name as text) % search_term ))
 	  AND
 	  (NOT suggested_resources.in_active_campaign OR suggested_resources.in_active_campaign IS NULL OR cr.id IS NOT NULL)
 	  ORDER BY created DESC, r.expiration DESC

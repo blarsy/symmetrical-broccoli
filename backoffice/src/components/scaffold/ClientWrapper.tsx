@@ -32,15 +32,11 @@ const getNavigatorLanguage = () => {
 
 const { googleApiKey } = getCommonConfig()
 
-const Translatable = ({ children, version }: PropsWithVersion) => {
-    const uiDispatcher = useContext(UiDispatchContext)
-    const appContext = useContext(AppContext)
-    const appDispatch = useContext(AppDispatchContext)
+export const Translatable = ({ children, version }: PropsWithVersion) => {
     const uiContext= useContext(UiContext)
-    const { connectWithToken, disconnect } = useAccountFunctions(version)
+    const uiDispatcher = useContext(UiDispatchContext)
 
     const load = async () => {
-        const token = localStorage.getItem('token')
         let uiLanguage = localStorage.getItem('lang')
         const lightMode = localStorage.getItem('lightMode')
         if(!uiLanguage) {
@@ -49,19 +45,8 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
         }
         const translator = await i18n(uiLanguage)
         dayjs.locale(uiLanguage)
-
+        
         uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
-
-        if(token) {
-            try {
-                await connectWithToken(token, { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode })
-            } catch(e) {
-                // TODO: handle expired token
-                uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, error: e as Error }})
-            }
-        } else {
-            appDispatch({ type: AppReducerActionType.Load, payload: undefined })
-        }
     }
 
     useEffect(() => {
@@ -73,28 +58,58 @@ const Translatable = ({ children, version }: PropsWithVersion) => {
             overflow: 'clip', 
             display: 'flex'
         }}>
-        <ApolloProvider client={getApolloClient(version, appContext.token, disconnect)}>
-            { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
-                <Themed>
-                    {children}
-                </Themed>
-            </LocalizationProvider>}
-        </ApolloProvider>
+        { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
+            <Themed>
+                {children}
+            </Themed>
+        </LocalizationProvider>}
     </LoadedZone>
 }
 
-export const ClientWrapper = ({ children, version }: PropsWithVersion) => {
-    return <AppContextProvider>
-        <ChatContextProvider>
-            <UiContextProvider>
-                <GoogleOAuthProvider clientId={googleApiKey}>
-                    <Translatable version={version}>
-                        { children }
-                    </Translatable>
-                </GoogleOAuthProvider>
-            </UiContextProvider>
-        </ChatContextProvider>
-    </AppContextProvider>
+export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
+    const appContext = useContext(AppContext)
+    const { connectWithToken, disconnect } = useAccountFunctions(version)
+    const uiDispatcher = useContext(UiDispatchContext)
+    const appDispatch = useContext(AppDispatchContext)
+    const uiContext = useContext(UiContext)
+
+    const load = async () => {
+        const token = localStorage.getItem('token')
+        
+        if(token) {
+            try {
+                await connectWithToken(token)
+            } catch(e) {
+                // TODO: handle expired token
+                uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: uiContext.i18n, version, error: e as Error }})
+                appDispatch({ type: AppReducerActionType.Load, payload: undefined })
+            }
+        } else {
+            appDispatch({ type: AppReducerActionType.Load, payload: undefined })
+        }
+    }
+
+    useEffect(() => {
+        load()
+    }, [])
+
+    return <ApolloProvider client={getApolloClient(version, appContext.token, disconnect)}>
+        { children }
+    </ApolloProvider>
 }
+
+export const ClientWrapper = ({ children, version }: PropsWithVersion) => <AppContextProvider>
+    <ChatContextProvider>
+        <UiContextProvider>
+            <GoogleOAuthProvider clientId={googleApiKey}>
+                <Translatable version={version}>
+                    <ApolloWrapped version={version}>
+                        { children }
+                    </ApolloWrapped>
+                </Translatable>
+            </GoogleOAuthProvider>
+        </UiContextProvider>
+    </ChatContextProvider>
+</AppContextProvider>
 
 export default ClientWrapper

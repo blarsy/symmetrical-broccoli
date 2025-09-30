@@ -12,6 +12,7 @@ import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { urlFromPublicId } from "@/lib/images"
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -210,7 +211,7 @@ const Conversation = (p: Props) => {
                 otherAccount: {
                   id: chatContext.newConversationState.resource.account!.id,
                   name: chatContext.newConversationState.resource.account!.name,
-                  imagePublicId: chatContext.newConversationState.resource.account!.avatarImageUrl,
+                  imagePublicId: chatContext.newConversationState.resource.account!.avatarImagePublicId && urlFromPublicId(chatContext.newConversationState.resource.account!.avatarImagePublicId),
                   participantId: 0
                 },
                 participantId: 0,

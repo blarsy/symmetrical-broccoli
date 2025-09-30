@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import Search, { DEFAULT_SEARCH_PARAMETERS, SUGGEST_RESOURCES } from './Search'
-import { apolloClientMocksDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, clientComponentDecorator } from '@/lib/storiesUtil'
 import ClientWrapper from '../scaffold/ClientWrapper'
 
 const makeResourceData = (id: number, title: string, description: string, accountName: string, avatarPublicId: string,
@@ -32,7 +32,6 @@ const makeResourceData = (id: number, title: string, description: string, accoun
 })
 
 const meta = {
-  title: 'Default view',
   component: Search,
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
@@ -45,9 +44,7 @@ const meta = {
   args: { 
     version: 'v0_9'
    },
-  decorators: [(Story) => <ClientWrapper version="v0_9">
-    <Story/>
-  </ClientWrapper>, apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
+  decorators: [apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
     suggestedResources: {
       resources: [ 
         makeResourceData(1, 'resource title', 'resource description. No avatar. No resource image', 'account 1', '', []),
@@ -58,7 +55,7 @@ const meta = {
         makeResourceData(6, 'resource title with avatar', 'resource description. No avatar. No resource image', 'account 1-5', 'w2nelofqkkbr5w2cedcc', ['sboopci7bbre34jezxu8', 'd96ifkunm53v7biuocaj', 'mbytebtndcp5w3qwax6a', 'nqwlakejznrz3tprsvom']),
       ]
     }
-  } }])]
+  } }]), clientComponentDecorator()]
 } satisfies Meta<typeof Search>
 
 export default meta

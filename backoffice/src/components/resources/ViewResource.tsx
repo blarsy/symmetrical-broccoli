@@ -111,7 +111,7 @@ const ViewResource = (p: Props) => {
                         <Link href={`../account/${resource.data.account!.id}`}>
                             <Stack direction="row" gap="1rem" alignItems="center">
                                 <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={resource.data.account!.name}
-                                  avatarImageUrl={resource.data.account?.avatarImageUrl} />
+                                  avatarImagePublicId={resource.data.account?.avatarImagePublicId} />
                                 <Typography flex="1" color="primary" variant="overline">{resource.data.account?.name}</Typography>
                             </Stack>
                         </Link>

@@ -400,7 +400,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                 case 'CAMPAIGN_BEGUN':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('campaignBegunHeadline1'), t('campaignBegunHeadline2', { name: rawNotification.node.data.campaignName }), 
-                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier }), 
+                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier, airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
                             () => {
                                 navigation.navigate('resource', {
                                     screen: 'resources'
@@ -410,7 +410,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     break
                 case 'AIRDROP_SOON':
                     otherNotifs.push(
-                        makeNotificationData(rawNotification, t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop, t('dateTimeFormat')) }), 
+                        makeNotificationData(rawNotification, t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
                             t('airdropSoonDetails', { name: rawNotification.node.data.campaignName }), 
                             () => {
                                 navigation.navigate('resource', {

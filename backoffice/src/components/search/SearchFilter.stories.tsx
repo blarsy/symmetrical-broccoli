@@ -6,7 +6,6 @@ import { DEFAULT_SEARCH_PARAMETERS } from "./Search"
 import { GET_CATEGORIES } from "@/lib/useCategories"
 
 const meta = {
-    title: 'Search filter',
     component: SearchFilter,
     parameters: {
       // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout

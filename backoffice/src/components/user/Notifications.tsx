@@ -22,7 +22,7 @@ interface NotificationData {
     headline1: string
     headline2: string
     text: string
-    image?: string | { resource: Resource, account: { id: number, name: string, avatarImageUrl?: string} }
+    image?: string | { resource: Resource, account: { id: number, name: string, avatarImagePublicId?: string} }
     onClick: () => void
 }
 
@@ -77,7 +77,7 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
         resourcesImagesByResourceId {
             nodes {
                 imageByImageId {
-                publicId
+                    publicId
                 }
             }
         }
@@ -103,8 +103,6 @@ const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: 
   }`
 
 const NOTIFICATIONS_PAGE_SIZE = 15
-
-
 
 const useNotifications = (version: string) => {
     const appContext = useContext(AppContext)
@@ -149,7 +147,7 @@ const useNotifications = (version: string) => {
         const resources = {} as {
             [resourceId: number]: any
         }
-
+        
         resourcesData.getResources.nodes.forEach((rawRes: any) => resources[rawRes.id] = rawRes)
         
         notificationsAboutResource.forEach((rawNotification: any) => {
@@ -162,7 +160,7 @@ const useNotifications = (version: string) => {
                     headline2: resources[rawNotification.node.data.resource_id].accountByAccountId.name,
                     read: rawNotification.node.read,
                     text: resources[rawNotification.node.data.resource_id].title,
-                    image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImageUrl: resource.account!.avatarImageUrl } },
+                    image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImagePublicId: resource.account!.avatarImagePublicId } },
                     onClick: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
                         router.push(`/webapp/${version}/view/${rawNotification.node.data.resource_id}`)
@@ -316,13 +314,13 @@ const useNotifications = (version: string) => {
                 case 'CAMPAIGN_BEGUN':
                     otherNotifs.push(
                         createOtherNotification(t('campaignBegunHeadline1'), t('campaignBegunHeadline2', { name: rawNotification.node.data.campaignName }), 
-                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier }), 
+                            t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier, airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
                             `/webapp/${version}/profile/tokens`, rawNotification)
                         )
                     break
                 case 'AIRDROP_SOON':
                     otherNotifs.push(
-                        createOtherNotification(t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop, t('dateTimeFormat')) }), 
+                        createOtherNotification(t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
                             t('airdropSoonDetails', { name: rawNotification.node.data.campaignName }), 
                             `/webapp/${version}/profile/tokens`, rawNotification)
                         )
@@ -362,8 +360,9 @@ const useNotifications = (version: string) => {
 const NOTIFICATION_IMAGE_BASE_SIZE = 120
 const NotificationImage = ({ image } : { image: string | {
     resource: Resource;
-    account: { id: number, name: string, avatarImageUrl?: string };
+    account: { id: number, name: string, avatarImagePublicId?: string };
 } | undefined }) => {
+    console.log('image', image)
     if(typeof image === 'string') {
         return <ResponsivePhotoBox baseSize={NOTIFICATION_IMAGE_BASE_SIZE}>
             <img style={{ borderRadius: 10 }} color="primary" src={image} />
@@ -383,7 +382,7 @@ const NotificationImage = ({ image } : { image: string | {
         })} />
     } else {
         return <ResourceImage accountName={image.account.name} 
-            accountImagePublicId={image.account.avatarImageUrl} baseWidth={NOTIFICATION_IMAGE_BASE_SIZE}
+            accountImagePublicId={image.account.avatarImagePublicId} baseWidth={NOTIFICATION_IMAGE_BASE_SIZE}
             resourceImagePublicId={image.resource.images.length > 0 ? image.resource.images[0].publicId : undefined} />
     }
 }
@@ -421,7 +420,8 @@ const Notifications = ({ version }: { version: string }) => {
         }
     }, [data?.data])
 
-    return <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []} 
+    return <LoadedList ref={ref} loading={loading} error={error} items={data?.data || []}
+        renderNoData={() => <Typography color="primary.contrastText" variant="body1">{uiContext.i18n.translator('noNotification')}</Typography>}
         containerStyle={{
             alignItems: 'center',
             overflow: 'auto',

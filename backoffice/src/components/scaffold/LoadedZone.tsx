@@ -1,8 +1,6 @@
-import { Alert, CircularProgress, Stack, SxProps, Theme } from "@mui/material"
+import { CircularProgress, Stack, SxProps, Theme } from "@mui/material"
 import Feedback from "./Feedback"
-import { RefObject, useEffect, useRef } from "react"
-import { p } from "graphql-ws/dist/common-DY-PBNYy"
-
+import { RefObject } from "react"
 export interface StateError extends Error {
     detail?: string
 }
@@ -18,13 +16,11 @@ interface Props {
 }
 
 const isBottom = (el: Element) => {
-    console.log('Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)) <= 30', el.scrollHeight, el.scrollTop, el.clientHeight, Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)))
     return Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)) <= 30
 }
 
 function LoadedZone({ loading, error, children, containerStyle, onBottom, ref, testID }: Props) {
     return <Stack data-testid={testID} ref={ref} sx={containerStyle || { flexDirection: 'column', justifyContent: 'center' }} onScroll={e => {
-        console.log('onBottom', onBottom)
         if(onBottom && isBottom(e.currentTarget)) {
             onBottom()
         } 

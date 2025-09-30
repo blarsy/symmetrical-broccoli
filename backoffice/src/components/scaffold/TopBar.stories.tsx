@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import TopBar from './TopBar'
-import ClientWrapper from './ClientWrapper'
+import { clientComponentDecorator } from '@/lib/storiesUtil'
 
 const meta = {
   component: TopBar,
@@ -10,17 +10,28 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {},
-  args: {  },
-  decorators: [(Story) => <ClientWrapper version="v0_9">
-    <Story/>
-  </ClientWrapper>]
+  args: {  }
 } satisfies Meta<typeof TopBar>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Simple: Story = {
+export const LoggedOut: Story = {
   args: {
-    version: 'v0_9'
-  }
+    version: 'v0_10'
+  },
+  decorators: [clientComponentDecorator() ]
+}
+
+export const LoggedIn: Story = {
+  args: {
+    version: 'v0_10'
+  },
+  decorators: [ clientComponentDecorator({
+    loading: false, token: 'token', account: {
+      amountOfTokens: 20, name: 'Les patines de Christine', id: 234, email: 'mail@mail.com',
+      activated: new Date(new Date().valueOf() - 10000), lastChangeTimestamp: new Date(new Date().valueOf() - 10000),
+      willingToContribute: true, avatarPublicId: '', unlimitedUntil: null
+    }, unreadNotifications: [], subscriptions: []
+  }) ]
 }

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { RESOURCES, ResourcesList } from './ResourcesList'
 
 import React  from 'react'
-import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, makeAppContextProvider, navigationContainerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 
 const buildDecoratorList = (resourcesObj: any, willingToContribute: boolean = false) => [
   paperProviderDecorator, appContextDecorator(false, false, willingToContribute),

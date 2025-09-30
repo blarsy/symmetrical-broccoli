@@ -135,7 +135,7 @@ const Conversations = (p: Props) => {
             numberOfUnreadMessages: 0,
             resourceId: chatContext.newConversationState.resource.id,
             resourceName: chatContext.newConversationState.resource.title,
-            imagePublicId: chatContext.newConversationState.resource.account!.avatarImageUrl,
+            imagePublicId: chatContext.newConversationState.resource.account!.avatarImagePublicId,
             resourceImagePublicId: chatContext.newConversationState.resource.images.length > 0 ?
               chatContext.newConversationState.resource.images[0].publicId:
               undefined

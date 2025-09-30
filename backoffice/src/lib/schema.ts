@@ -34,7 +34,7 @@ export interface Account {
     name: string,
     id: number,
     email: string,
-    avatarImageUrl?: string
+    avatarImagePublicId?: string
     willingToContribute?: boolean
 }
 
@@ -74,7 +74,7 @@ export const fromServerGraphAccount = (rawAccount: any): Account => ({
     name: rawAccount.name,
     id: rawAccount.id,
     email: rawAccount.email,
-    avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId),
+    avatarImagePublicId: rawAccount.imageByAvatarImageId ? rawAccount.imageByAvatarImageId.publicId : '',
     willingToContribute: rawAccount.willingToContribute
 })
 
