@@ -443,7 +443,8 @@ GRANT EXECUTE ON FUNCTION sb.delete_bid(integer) TO identified_account;
 GRANT EXECUTE ON FUNCTION sb.delete_bid(integer) TO sb;
 
 CREATE OR REPLACE FUNCTION sb.refuse_bid(
-	bid_id integer)
+	bid_id integer,
+	notification_type CHARACTER VARYING)
     RETURNS integer
     LANGUAGE 'plpgsql'
     COST 100
@@ -483,7 +484,7 @@ BEGIN
 	WHERE id = existing_bid_resource_id;
 	
 	PERFORM sb.create_notification(existing_bid_account_id, json_build_object(
-		'info', 'BID_REFUSED',
+		'info', COALESCE(notification_type, 'BID_REFUSED'),
 		'resourceId', existing_bid_resource_id,
 		'resourceTitle', (SELECT title FROM sb.resources WHERE id = existing_bid_resource_id), 
 		'refusedBy', (SELECT name FROM sb.accounts WHERE id = resource_account_id)
@@ -494,17 +495,17 @@ BEGIN
 	)::text);
 	
 	RETURN 1;
-end;
+END;
 $BODY$;
 
-ALTER FUNCTION sb.refuse_bid(integer)
+ALTER FUNCTION sb.refuse_bid(integer, CHARACTER VARYING)
     OWNER TO sb;
 
-REVOKE ALL ON FUNCTION sb.refuse_bid(integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION sb.refuse_bid(integer, CHARACTER VARYING) FROM PUBLIC;
 
-GRANT EXECUTE ON FUNCTION sb.refuse_bid(integer) TO identified_account;
+GRANT EXECUTE ON FUNCTION sb.refuse_bid(integer, CHARACTER VARYING) TO identified_account;
 
-GRANT EXECUTE ON FUNCTION sb.refuse_bid(integer) TO sb;
+GRANT EXECUTE ON FUNCTION sb.refuse_bid(integer, CHARACTER VARYING) TO sb;
 
 CREATE OR REPLACE FUNCTION sb.accept_bid(
 	bid_id integer)
@@ -645,13 +646,7 @@ begin
 	WHERE b.resource_id = delete_resource.resource_id
 	AND deleted IS NULL AND accepted IS NULL AND refused IS NULL AND valid_until > NOW()
 	LOOP
-		PERFORM sb.refuse_bid(bid.id);
-		PERFORM sb.create_notification(bid.account_id, json_build_object(
-			'info', 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED',
-			'resourceId', delete_resource.resource_id,
-			'resourceTitle', (SELECT title FROM sb.resources WHERE id = delete_resource.resource_id), 
-			'resourceAuthor', (SELECT name FROM sb.accounts WHERE id = (SELECT account_id FROM sb.resources WHERE id = delete_resource.resource_id))
-		));
+		PERFORM sb.refuse_bid(bid.id, 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED');
 	END LOOP;
 	
 	-- In case a free resource was deleted, run apply_resources_consumption,
@@ -1652,13 +1647,7 @@ begin
 	WHERE b.resource_id = delete_resource.resource_id
 	AND deleted IS NULL AND accepted IS NULL AND refused IS NULL AND valid_until > NOW()
 	LOOP
-		PERFORM sb.refuse_bid(bid.id);
-		PERFORM sb.create_notification(bid.account_id, json_build_object(
-			'info', 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED',
-			'resourceId', delete_resource.resource_id,
-			'resourceTitle', (SELECT title FROM sb.resources WHERE id = delete_resource.resource_id), 
-			'resourceAuthor', (SELECT name FROM sb.accounts WHERE id = (SELECT account_id FROM sb.resources WHERE id = delete_resource.resource_id))
-		));
+		PERFORM sb.refuse_bid(bid.id, 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED');
 	END LOOP;
 	
 	-- In case a free resource was deleted, run apply_resources_consumption,
@@ -1946,9 +1935,9 @@ BEGIN
 	  )
 	  AND
 		  (search_term = '' OR 
-			(CAST(r.title as text) % search_term OR 
-			 CAST(r.description  as text) % search_term OR
-			 CAST( a.name as text) % search_term ))
+			(sb.strict_word_similarity(r.title, search_term) > 0.1 OR 
+			 sb.strict_word_similarity(r.description, search_term) > 0.1 OR
+			 sb.strict_word_similarity(a.name, search_term) > 0.1))
 	  AND
 	  (NOT suggested_resources.in_active_campaign OR suggested_resources.in_active_campaign IS NULL OR cr.id IS NOT NULL)
 	  ORDER BY created DESC, r.expiration DESC
@@ -2203,12 +2192,16 @@ BEGIN
 			)
 			UNION
 			-- Accounts having recent searches that match the new resource's title and/or description
-			SELECT account_id, 10 as score from sb.searches
-			WHERE account_id IS NOT NULL AND term IS NOT NULL AND term <> '' AND term % 'Pots'
+			SELECT s.account_id, 10 as score from sb.searches s
+			INNER JOIN sb.resources r ON r.id = get_accounts_to_notify_of_new_resource.resource_id
+			WHERE s.account_id IS NOT NULL AND s.term IS NOT NULL AND s.term <> '' AND (
+				sb.strict_word_similarity(s.term, r.title) > 0.1 OR
+				sb.strict_word_similarity(s.term, r.description) > 0.1
+			)
 			ORDER BY similarity(term, 'Pots') DESC
 			LIMIT 5
 		) matches
-		WHERE id != (SELECT account_id FROM sb.resources WHERE id = resource_id)
+		WHERE id != (SELECT account_id FROM sb.resources WHERE id = get_accounts_to_notify_of_new_resource.resource_id)
 		ORDER BY score DESC
 		LIMIT 5);
 

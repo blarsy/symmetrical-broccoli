@@ -57,6 +57,11 @@ export const makeNotificationInfo = (data: any, t: TFunction<"translation", unde
                 title: t('bidAutoDeleted'),
                 summary: t('bidAutoDeletedSummary', { from: data.resourceAuthor, resourceTitle: data.resourceTitle })
             }
+        case 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED':
+            return {
+                title: t('bidAutoRefused'),
+                summary: t('bidAutoRefusedSummary', { from: data.refusedBy, resourceTitle: data.resourceTitle })
+            }
         case 'BID_CANCELLED':
             return {
                 title: t('bidCancelled'),

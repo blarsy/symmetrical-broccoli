@@ -324,7 +324,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             })
                         )
                     break
-                case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
+                case 'BID_EXPIRED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
@@ -354,10 +354,25 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             })
                         )                    
                     break
-                case 'BID_EXPIRED':
+                case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
                     otherNotifs.push(
                         makeNotificationData(rawNotification, t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            () => {
+                                navigation.navigate('bids', {
+                                    screen: 'bidsList',
+                                    params: {
+                                        initialOfferType: 'R',
+                                        includeInactive: true
+                                    }
+                                })
+                            })
+                        )
+                    break
+                case 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('bidAutoRefusedHeadline1'), t('bidAutoRefusedHeadline2', { resourceAuthor: rawNotification.node.data.refusedBy }), 
+                            t('bidAutoRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
                             () => {
                                 navigation.navigate('bids', {
                                     screen: 'bidsList',

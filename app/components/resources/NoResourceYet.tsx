@@ -8,25 +8,25 @@ import LoadedList from "../LoadedList"
 
 const exampleResources: Resource[] = [{
     id: 1, 
-    title: t('title_example_resource_available_timeslots'), 
+    title: t('childClothExampleResourceTitle'), 
     description: t('description_example_resource_available_timeslots'), 
-    images: [{ publicId: 'xz5oydf7u5lj2rjkuda1' }],
+    images: [{ publicId: 'uyn4yzdh6iiqzkrd33py' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
     specificLocation: null, price: null
 },{
     id: 2, 
-    title: t('title_example_resource_things_to_rent'), 
-    description: t('description_example_resource_things_to_rent'), 
-    images: [{ publicId: 'jqmyhsmx1led7nhvilp3' }],
+    title: t('mangasResourceTitle'), 
+    description: t('description_example_resource_unused_object'), 
+    images: [{ publicId: 'he265cbgcsaqegbdsxy8' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
     specificLocation: null, price: null
-},{
+}, {
     id: 3, 
-    title: t('title_example_resource_unused_object'), 
-    description: t('description_example_resource_unused_object'), 
-    images: [{ publicId: 'e1cz5k4rxiwpbw9ekidj' }],
+    title: t('title_example_resource_things_to_rent'), 
+    description: t('description_example_resource_things_to_rent'), 
+    images: [{ publicId: 'jqmyhsmx1led7nhvilp3' }],
     canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, categories: [],
     created: new Date(), isProduct: true, isService: true, deleted: null,
     specificLocation: null, price: null

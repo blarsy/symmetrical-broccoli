@@ -150,7 +150,7 @@ const ReceivedBidCard = ({ bid, navigation, onBidHandled }: ReceivedBidCardProps
         <ConfirmDialog title={t('confirmingRefusalDialogTitle')} visible={!!confirmingRefusal}
           onResponse={async confirmed => {
             if(confirmed) {
-              await refuseBid({ variables: { bidId: bid.id } })
+              await refuseBid({ variables: { bidId: bid.id, notificationType: null } })
               onBidHandled()
             }
             setConfirmingRefusal(false)
