@@ -20,8 +20,8 @@ export const ACCEPT_BID = gql`mutation AcceptBid($bidId: Int) {
   }
 }`
 
-export const REFUSE_BID = gql`mutation RefuseBid($bidId: Int) {
-  refuseBid(input: {bidId: $bidId}) {
+export const REFUSE_BID = gql`mutation RefuseBid($bidId: Int, $notificationType: String) {
+  refuseBid(input: {bidId: $bidId, notificationType: $notificationType}) {
     integer
   }
 }`
@@ -73,7 +73,7 @@ const BidReceived = ({ bid, onAction } : Props) => {
               setConfirmingAcceptation(true)
             }}>{uiContext.i18n.translator('acceptBidButton')}</LoadingButton>}
             { !inactiveMessage && <LoadingButton data-testid={`${testId}:RefuseButton`} loading={refusing} endIcon={<RefuseIcon />} onClick={async () => {
-              await refuseBid({ variables: { bidId: bid.id } })
+              await refuseBid({ variables: { bidId: bid.id, notificationType: null } })
               onAction(false)
             }}>{uiContext.i18n.translator('RefuseBidButton')}</LoadingButton>}
         </CardActions>

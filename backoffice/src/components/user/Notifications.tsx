@@ -276,7 +276,7 @@ const useNotifications = (version: string) => {
                             `/webapp/${version}/bids`, rawNotification)
                         )
                     break
-                case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
+                case 'BID_EXPIRED':
                     otherNotifs.push(
                         createOtherNotification(t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
@@ -290,10 +290,17 @@ const useNotifications = (version: string) => {
                             `/webapp/${version}/bids`, rawNotification)
                         )                    
                     break
-                case 'BID_EXPIRED':
+                case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
                     otherNotifs.push(
                         createOtherNotification(t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
+                            `/webapp/${version}/bids`, rawNotification)
+                        )
+                    break
+                case 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED':
+                    otherNotifs.push(
+                        createOtherNotification(t('bidAutoRefusedHeadline1'), t('bidAutoRefusedHeadline2', { resourceAuthor: rawNotification.node.data.refusedBy }), 
+                            t('bidAutoRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
                             `/webapp/${version}/bids`, rawNotification)
                         )
                     break

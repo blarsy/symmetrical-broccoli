@@ -37,7 +37,6 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
 
     return <Card>
         <CardContent sx={{ paddingBottom: 0 }}>
-            <PriceTag value={bid.amountOfTokens} label={uiContext.i18n.translator('yourBidAmountOfTokenLabel')} />
             <ResourceHeader sx={{ padding: 0 }} data={{
                 id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
                     id: bid.resource.account!.id, name: bid.resource.account!.name,

@@ -18,8 +18,8 @@ const ResourceAttributesFilter = (p: Props) => {
         <Typography variant="h4" textAlign="center" color="primary">{uiContext.i18n.translator('filtersTitle')}</Typography>
         <OptionLine labels={{
             title: t('natureOptionsLabel'),
-            canBeTakenAway: 'canBeTakenAway',
-            canBeDelivered: 'canBeDelivered'
+            isProduct: 'isProduct',
+            isService: 'isService'
         }} values={{ 'isProduct': p.searchParameters.isProduct, isService: p.searchParameters.isService }} onChange={ p.onChange }/>
         <OptionLine labels={{ 
             title: t('exchangeTypeOptionsLabel'),
