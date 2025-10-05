@@ -146,5 +146,10 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
     created
     deleted
     price
+    campaignsResourcesByResourceId {
+      nodes {
+        campaignId
+      }
+    }
   }
 }`

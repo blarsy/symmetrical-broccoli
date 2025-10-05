@@ -126,7 +126,7 @@ const ExplainToken = (p: Props) => {
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('weNeedToGrow')}</Typography>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('chickenOrEgg')}</Typography>
                 <Stack sx={theme => ({ 
-                    margin: 'auto', width: '500px',
+                    margin: 'auto', width: '450px',
                     [theme.breakpoints.down('md')]: {
                         width: '300px'
                     },

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import Roadmap from './Roadmap'
-import ClientWrapper from '../scaffold/ClientWrapper'
+import { clientComponentDecorator } from '@/lib/storiesUtil'
 
 const meta = {
   component: Roadmap,
@@ -12,9 +12,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {},
   args: {  },
-  decorators: [(Story) => <ClientWrapper version="v0_9">
-      <Story/>
-  </ClientWrapper>]
+  decorators: [clientComponentDecorator(), ]
 } satisfies Meta<typeof Roadmap>
 
 export default meta

@@ -1,4 +1,4 @@
-import { alpha, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material"
+import { alpha, Checkbox, FormControlLabel, FormGroup, IconButton, Stack, TextField, Typography, useTheme } from "@mui/material"
 import { ErrorMessage, Form, Formik } from "formik"
 import { useContext, useState } from "react"
 import * as yup from 'yup'
@@ -21,24 +21,18 @@ import EditImage from "./EditImage"
 import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
 import ExplainToken from "../token/ExplainToken"
+import useActiveCampaign from "@/lib/useActiveCampaign"
 
 interface Props {
     value?: Resource
 }
 
-export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], 
-    $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, 
-    $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], 
-    $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int) {
-    updateResource(
-      input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, 
-        canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, 
-        description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, 
-        isProduct: $isProduct, isService: $isService, title: $title, 
-        specificLocation: $specificLocation, price: $price}
-    ) {
-      integer
-    }
+export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
+  updateResource(
+    input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
+  ) {
+    integer
+  }
 }`
 
 export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
@@ -84,6 +78,8 @@ const EditResource = (p: Props) => {
     const [updateResource] = useMutation(UPDATE_RESOURCE)
     const [switchToContributionMode] = useMutation(SWITCH_TO_CONTRIBUTION_MODE)
     const [explainingToken, setExplainingToken] = useState(false)
+    const { activeCampaign } = useActiveCampaign()
+    const theme = useTheme()
 
     const trySave = async (value: Resource) => {
         setSaveState(beginOperation())
@@ -92,13 +88,15 @@ const EditResource = (p: Props) => {
                 canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
-                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null } })
+                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null,
+                campaignToJoin: value.campaignId } })
         } else {
             await createResource({ variables: { canBeDelivered: value.canBeDelivered, canBeExchanged: value.canBeExchanged, 
                 canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
-                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null } })
+                specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null,
+                campaignToJoin: value.campaignId } })
         } 
         setSaveState(fromData(undefined))
     }
@@ -145,8 +143,7 @@ const EditResource = (p: Props) => {
                 return !ctx.parent.canBeTakenAway || !!val
             })
         })}>
-            { f => {
-                return <Form onSubmit={f.handleSubmit}>
+            { f => <Form onSubmit={f.handleSubmit}>
                     <Stack>
                         <Stack gap="1rem" flex="1" paddingBottom="6rem">
                             <Typography variant="body1" color="primary">{uiContext.i18n.translator('imagesLabel')}</Typography>
@@ -172,6 +169,11 @@ const EditResource = (p: Props) => {
                                 label={uiContext.i18n.translator('Label')}
                                 onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
                             <ErrorMessage component={ErrorText} name="price" />
+                            { activeCampaign.data && <FormGroup sx={{ padding: '1rem', borderRadius: '1rem', backgroundColor: theme.palette.secondary.light }}>
+                                <FormControlLabel color={theme.palette.primary.contrastText} control={
+                                    <Checkbox color="info" checked={!!f.values.campaignId} onChange={() => f.setFieldValue('campaignId', f.values.campaignId ? undefined : activeCampaign.data?.id)} onBlur={f.handleBlur('campaignId')} />} 
+                                    label={`${uiContext.i18n.translator('resourceConformsToCampaign')}: '${activeCampaign.data.name}'`} />
+                            </FormGroup> }
                             <OptionLine sx={{ margin: 0 }} labels={{ 
                                 title: uiContext.i18n.translator('natureOptionsLabel'), 
                                 isProduct: 'isProduct',
@@ -181,14 +183,14 @@ const EditResource = (p: Props) => {
                                     Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
                                 }}/>
                             <ErrorMessage component={ErrorText} name="isProduct" />
-                            <Stack direction="row" alignItems="flex-start" gap="1rem">
+                            <Stack direction="row" alignItems="center" gap="1rem">
                                 <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
                                 <FormControlLabel sx={{ 
                                     flex: 1,
                                     '& .MuiFormControlLabel-label': {
                                         color: 'primary.main'
                                     }
-                                }} 
+                                }}
                                 control={<Checkbox size="small" sx={{ padding: '0 0.25rem' }} checked={f.values.expiration === null} onChange={e => {
                                     if(f.values.expiration === null) {
                                         f.setFieldValue('expiration', dayjs().add(1, 'week'))
@@ -203,9 +205,9 @@ const EditResource = (p: Props) => {
                                     }} />
                             </Stack>
                             <ErrorMessage component={ErrorText} name="expiration" />
-                            <Stack direction="row" justifyContent="space-between" gap="2rem">
+                            <Stack direction="row" justifyContent="space-between" gap="2rem" alignItems="center">
                                 <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('categoriesLabel')}</Typography>
-                                <Typography variant="body1" sx={{ flex: 1 }} color="primary">{f.values.categories.map(cat => cat.name).join(', ')}</Typography>
+                                <Typography variant="body1" sx={{ flex: 1, cursor: 'pointer' }} color="primary" onClick={() => setEditedCategories(f.values.categories)}>{f.values.categories.map(cat => cat.name).join(', ')}</Typography>
                                 <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
                             </Stack>
                             <ErrorMessage component={ErrorText} name="categories" />
@@ -256,8 +258,7 @@ const EditResource = (p: Props) => {
                             setEditedCategories(undefined)
                         }} />
                     
-                </Form>
-            }}
+                </Form>}
         </Formik> }
         <ExplainToken visible={explainingToken} pureExplain onClose={() => router.push('.')} />
     </LoadedZone>

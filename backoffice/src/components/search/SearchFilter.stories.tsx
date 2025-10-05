@@ -1,7 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react/*"
 import SearchFilter from "./SearchFilter"
-import ClientWrapper from "../scaffold/ClientWrapper"
-import { apolloClientMocksDecorator } from "@/lib/storiesUtil"
+import { apolloClientMocksDecorator, clientComponentDecorator } from "@/lib/storiesUtil"
 import { DEFAULT_SEARCH_PARAMETERS } from "./Search"
 import { GET_CATEGORIES } from "@/lib/useCategories"
 
@@ -27,9 +26,7 @@ const meta = {
                 ]
             }
         }
-    }]), (Story) => <ClientWrapper version="v0_9">
-    <Story/>
-  </ClientWrapper>]
+    }]), clientComponentDecorator(), ]
   } satisfies Meta<typeof SearchFilter>
   
   export default meta

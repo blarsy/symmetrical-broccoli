@@ -1,7 +1,9 @@
 import { Button, Card, CardActions, CardContent, Dialog, IconButton, Typography } from '@mui/material'
-import { Stack } from '@mui/system'
+import { Stack, useTheme } from '@mui/material'
 import { useContext, useState } from 'react'
 import PlusIcon from '@mui/icons-material/Add'
+import CampaignIcon from '@mui/icons-material/Campaign'
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import EditIcon from '@mui/icons-material/Edit'
@@ -15,6 +17,8 @@ import { UiContext } from '../scaffold/UiContextProvider'
 import LoadedList from '../scaffold/LoadedList'
 import { primaryColor } from '@/utils'
 import dayjs from 'dayjs'
+import useActiveCampaign from '@/lib/useActiveCampaign'
+import ExplainCampaign from '../user/ExplainCampaign'
 
 export const RESOURCES = gql`query MyResources {
     myResources {
@@ -148,10 +152,25 @@ const Resources = () => {
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
     const [deleteResource] = useMutation(DELETE_RESOURCE)
+    const { activeCampaign } = useActiveCampaign()
+    const [explainingCampaign, setExplainingCampaign] = useState(false)
 
     return <Stack gap="1rem" overflow="auto">
+        { activeCampaign.data && <Stack direction="row" justifyContent="center" alignItems="center" gap="0.25rem">
+            <Button variant="contained" startIcon={<PlusIcon/>} endIcon={<CampaignIcon fontSize="large"/>} >
+              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0`, query: 'campaign=1' }}>
+                <Stack>
+                  <Typography variant="subtitle1">{activeCampaign.data.name}</Typography>
+                  <Typography variant="body1">{`${uiContext.i18n.translator('rewards')} X ${activeCampaign.data.resourceRewardsMultiplier}`}</Typography>
+                </Stack>
+              </Link>
+            </Button>
+            <IconButton color="primary" onClick={() => setExplainingCampaign(true)}>
+                <QuestionMarkIcon/>
+            </IconButton>
+        </Stack>}
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
-            <Button variant="contained" startIcon={<PlusIcon/>}>
+            <Button variant="outlined" startIcon={<PlusIcon/>}>
               <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
             </Button>
             <IconButton color="primary" onClick={() => refetch()}>
@@ -171,6 +190,7 @@ const Resources = () => {
                 <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
             </Stack>
         </Dialog>
+        <ExplainCampaign visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
         <ConfirmDialog visible={!!deletingResourceId} onClose={async res => {
           if(res) {
             await deleteResource({ variables: { resourceId: deletingResourceId }})

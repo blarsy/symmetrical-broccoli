@@ -59,9 +59,7 @@ export const Translatable = ({ children, version }: PropsWithVersion) => {
             display: 'flex'
         }}>
         { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>
-            <Themed>
-                {children}
-            </Themed>
+            {children}
         </LocalizationProvider>}
     </LoadedZone>
 }
@@ -102,11 +100,13 @@ export const ClientWrapper = ({ children, version }: PropsWithVersion) => <AppCo
     <ChatContextProvider>
         <UiContextProvider>
             <GoogleOAuthProvider clientId={googleApiKey}>
-                <Translatable version={version}>
-                    <ApolloWrapped version={version}>
-                        { children }
-                    </ApolloWrapped>
-                </Translatable>
+                <Themed>
+                    <Translatable version={version}>
+                        <ApolloWrapped version={version}>
+                            { children }
+                        </ApolloWrapped>
+                    </Translatable>
+                </Themed>
             </GoogleOAuthProvider>
         </UiContextProvider>
     </ChatContextProvider>

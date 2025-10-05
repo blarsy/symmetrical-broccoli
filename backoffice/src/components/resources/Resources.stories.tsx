@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Resources, { RESOURCES } from './Resources'
-import { apolloClientMocksDecorator, configDayjsDecorator, clientComponentDecorator, makeDbRresource } from '@/lib/storiesUtil'
+import { apolloClientMocksDecorator, configDayjsDecorator, clientComponentDecorator, makeDbRresource, defaultCampaign } from '@/lib/storiesUtil'
+import { GET_ACTIVE_CAMPAIGN } from '@/lib/useActiveCampaign'
 
 const meta = {
   component: Resources,
@@ -19,17 +20,16 @@ type Story = StoryObj<typeof meta>
 export const Empty: Story = {
   args: {
     onChange: console.log,
-    style: { width: 400 }
   },
   decorators: [apolloClientMocksDecorator([
-    { query: RESOURCES, result: { myResources: { nodes: [] } }, variables: {} }
+    { query: RESOURCES, result: { myResources: { nodes: [] } }, variables: {} },
+    { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null}, variables: {} }
   ])]
 }
 
 export const Initialized: Story = {
   args: {
     onChange: console.log,
-    style: { width: 400 }
   },
   decorators: [apolloClientMocksDecorator([
     { query: RESOURCES, result: { myResources: { nodes: [
@@ -50,6 +50,35 @@ export const Initialized: Story = {
             null, 'Les patines de Christine', 
             [], null, new Date(new Date().valueOf() - 100000)),
         
-        ] } }, variables: {} }
+        ] } }, variables: {} },
+    { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null}, variables: {} }
+  ])]
+}
+
+export const WithActiveCampaign: Story = {
+  args: {
+    onChange: console.log,
+  },
+  decorators: [apolloClientMocksDecorator([
+    { query: RESOURCES, result: { myResources: { nodes: [
+        makeDbRresource('Resource active avec images', 
+            'Une très longue description. Pour tester comment un champ gère correctement une chaîne de caractère de grande longueur, rien de tel que de lui en donner une interminable.', 
+            null, 'Les patines de Christine', 
+            ["q5owgl7lz6x7vmai9ctz", "ltnozwdpaqyazpkk0out", "uojh5axy7ggnenhypj9f", "sboopci7bbre34jezxu8"]),
+        makeDbRresource('Resource active sans image, expire demain', 
+            'description courte',
+            null , 'Les patines de Christine', 
+            [], new Date(new Date().valueOf() + 1000 * 60 * 60 * 24)),
+        makeDbRresource('Resource supprimée, 1 image', 
+            'description courte', 
+            new Date(new Date().valueOf() - 100000), 'Les patines de Christine', 
+            ["itqjuvh6gntgzk7mjmwu"]),
+        makeDbRresource('Resource suspendue', 
+            'description courte', 
+            null, 'Les patines de Christine', 
+            [], null, new Date(new Date().valueOf() - 100000)),
+        
+        ] } }, variables: {} },
+    { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: defaultCampaign}, variables: {} }
   ])]
 }

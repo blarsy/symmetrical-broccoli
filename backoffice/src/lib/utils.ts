@@ -1,11 +1,12 @@
 import dayjs from "dayjs"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { PropsWithChildren } from "react"
 
 export const usePagePath = () => {
     const path = usePathname()
     const segments = path!.split('/')
-    return { version: segments[2], param: segments[4], rest: segments.slice(3) }
+    const params = useSearchParams()
+    return { version: segments[2], param: segments[4], rest: segments.slice(3), query: params }
 }
 
 export interface PropsWithVersion extends PropsWithChildren {

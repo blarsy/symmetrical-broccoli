@@ -267,7 +267,21 @@ const resources = {
             "inactiveBecauseRefused": "Refused on {{- date}}",
             "inactiveBecauseExpired": "Expired at {{- date}}",
             "inactiveBecauseDeleted": "Cancelled on {{- date}}",
-            "noNotification": "No notification at this time"
+            "noNotification": "No notification at this time",
+            "resourceConformsToCampaign": "This resource belongs to the theme of the current campaign",
+            "rewards": "Rewards",
+            "createResourcesInCampaignExplanation": "Create resources within the theme of this campaign, and win {{multiplier}} times more Topes !",
+            "thatsNotAll": "And that's not all ...",
+            "airdropTitle": "Campaign airdrop",
+            "create2ResourcesOnCampaign": "Have 2 active resources on the campaign on",
+            "youReceive": "... then you receive ...",
+            "ensureAirdropEligibility": "Ensure you meet all conditions at any time via the 'contribution' section of your profile",
+            "campaignSummaryTitle": "In summary",
+            "campaignAllowYouto": "With Tope-là campaigns, you",
+            "getPlentyOfTokens": "Win plenty of Topes",
+            "seeManyResources": "... that you use to find many interesting ressources",
+            "atTheRightMoment": "... at a time you need them",
+            "forFree": "... all this for free !",
         }
     },
     fr: { 
@@ -535,7 +549,21 @@ const resources = {
             "inactiveBecauseRefused": "Refusée le {{- date}}",
             "inactiveBecauseExpired": "Expirée depuis {{- date}}",
             "inactiveBecauseDeleted": "Annulée le {{- date}}",
-            "noNotification": "Pas de notification pour le moment"
+            "noNotification": "Pas de notification pour le moment",
+            "resourceConformsToCampaign": "Cette ressource est conforme au thème de la campagne en cours",
+            "rewards": "Récompenses",
+            "createResourcesInCampaignExplanation": "Crée des ressources dans le thème de cette campagne, et gagne {{multiplier}} fois plus de Topes !",
+            "thatsNotAll": "Et ce n'est pas tout ...",
+            "airdropTitle": "Largage de campagne",
+            "create2ResourcesOnCampaign": "Crée 2 ressources sur cette campagne pour le",
+            "youReceive": "... et reçois ...",
+            "ensureAirdropEligibility": "Tu peux t'assure que tu remplis les conditions via l'onglet 'Contribution' de ton profil",
+            "campaignSummaryTitle": "En résumé",
+            "campaignAllowYouto": "Grâce aux campagnes Tope-là, tu peux",
+            "getPlentyOfTokens": "Gagner pleins de Topes",
+            "seeManyResources": "... que tu peux échanger contre pleins de ressources intéressantes",
+            "atTheRightMoment": "... au moment où tu en as besoin",
+            "forFree": "... eet tout ça gratuitement !",
         }
     }
 }

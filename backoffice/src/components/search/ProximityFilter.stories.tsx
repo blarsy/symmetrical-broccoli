@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react/*"
-import ClientWrapper from "../scaffold/ClientWrapper"
 import ProximityFilter from "./ProximityFilter"
+import { clientComponentDecorator } from "@/lib/storiesUtil"
 
 const meta = {
     component: ProximityFilter,
@@ -13,9 +13,7 @@ const meta = {
 
     },
     args: {  },
-    decorators: [ (Story) => <ClientWrapper version="">
-        <Story/>
-    </ClientWrapper>]
+    decorators: [clientComponentDecorator(), ]
   } satisfies Meta<typeof ProximityFilter>
   
   export default meta

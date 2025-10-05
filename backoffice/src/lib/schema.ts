@@ -49,25 +49,26 @@ export interface Category {
 }
 
 export interface Resource {
-    id: number,
-    images: ImageInfo[],
-    title: string,
-    description: string,
-    expiration?: Date,
-    account?: Account,
-    categories: Category[],
-    isService: boolean,
-    isProduct: boolean,
-    canBeTakenAway: boolean,
-    canBeDelivered: boolean,
-    canBeGifted: boolean,
-    canBeExchanged: boolean,
-    suspended?: Date,
-    paidUntil?: Date,
-    created: Date,
-    deleted: Date | null,
-    specificLocation: Location | null,
+    id: number
+    images: ImageInfo[]
+    title: string
+    description: string
+    expiration?: Date
+    account?: Account
+    categories: Category[]
+    isService: boolean
+    isProduct: boolean
+    canBeTakenAway: boolean
+    canBeDelivered: boolean
+    canBeGifted: boolean
+    canBeExchanged: boolean
+    suspended?: Date
+    paidUntil?: Date
+    created: Date
+    deleted: Date | null
+    specificLocation: Location | null
     price: number | null
+    campaignId?: number
 }
 
 export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
@@ -96,7 +97,8 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         suspended:  rawRes.suspended && new Date(rawRes.suspended),
         paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
-        images, price: rawRes.price
+        images, price: rawRes.price,
+        campaignId: rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId
 } as Resource
 }
 

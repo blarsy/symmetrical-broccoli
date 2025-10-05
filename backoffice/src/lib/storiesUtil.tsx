@@ -26,7 +26,7 @@ export interface GraphQlOp {
 const defaultAccount: AccountInfo = {
     id: 123, name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
     willingToContribute: true, amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
-    unlimitedUntil: null, avatarPublicId: ''
+    unlimitedUntil: null, avatarPublicId: '', knowsAboutCampaigns: false
 }
 
 export const makeDbRresource = (title: string, description: string, deleted: Date | null, creatorName: string, imagesPublicIds: string[], expiration: Date | null = null, suspended: Date | null = null) => ({
@@ -177,3 +177,16 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 }
 
 export const connectedComponent = (ops?: GraphQlOp[]) => clientComponentDecorator({ loading: false, account: defaultAccount, token: 'token', unreadNotifications: [], subscriptions: [] }, undefined, undefined, ops)
+
+export const defaultCampaign = {
+    airdrop: new Date(new Date().valueOf() + 10000),
+    airdropAmount: 5000,
+    beginning: new Date(),
+    created: new Date(),
+    defaultResourceCategories: [],
+    description: 'Ici, un texte engageant qui explique le thème de la campagne.',
+    ending: new Date(new Date().valueOf() + 100000),
+    id: 1,
+    name: 'Vive la rentrée !',
+    resourceRewardsMultiplier: 5
+}

@@ -20,12 +20,12 @@ export const ACCOUNT_LOCATION = gql`query AccountLocation {
 export default () => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
-    const [getLocation] = useLazyQuery(ACCOUNT_LOCATION)
+    const [getLocation] = useLazyQuery(ACCOUNT_LOCATION, {  fetchPolicy: "network-only" })
     const [state, setState] = useState(initial(true, null as Location | null))
 
     const loadLocationAndReset = async () => {
         try {
-            const res = await getLocation({ fetchPolicy: "network-only" })
+            const res = await getLocation()
             const defaultLocation = parseLocationFromGraph(res.data.me.locationByLocationId)
 
             setState(fromData(defaultLocation))

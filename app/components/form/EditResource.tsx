@@ -57,7 +57,6 @@ export default ({ route, navigation }:RouteProps) => {
 
     useEffect(() => {
         if(route.params?.isNew) {
-            console.log('params', route.params)
             editResourceContext.actions.reset(defaultLocation || undefined, route.params.campaignId)
         }
     },  [defaultLocation])

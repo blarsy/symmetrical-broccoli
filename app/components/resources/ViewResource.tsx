@@ -19,7 +19,6 @@ import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import { EditResourceContext } from "./EditResourceContextProvider"
 import BareIconButton from "../layout/BareIconButton"
 import { Hr } from "../layout/lib"
-import SendTokensDialog from "../account/SendTokensDialog"
 import CreateBidDialog from "../bids/CreateBidDialog"
 
 interface ImgMetadata { 

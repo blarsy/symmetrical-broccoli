@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { useContext, useEffect, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
-import { Link, Stack, Typography } from "@mui/material"
+import { Divider, Link, Stack, Typography } from "@mui/material"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import DataLoadState, { fromData } from "@/lib/DataLoadState"
@@ -369,7 +369,6 @@ const NotificationImage = ({ image } : { image: string | {
     resource: Resource;
     account: { id: number, name: string, avatarImagePublicId?: string };
 } | undefined }) => {
-    console.log('image', image)
     if(typeof image === 'string') {
         return <ResponsivePhotoBox baseSize={NOTIFICATION_IMAGE_BASE_SIZE}>
             <img style={{ borderRadius: 10 }} color="primary" src={image} />
@@ -438,29 +437,32 @@ const Notifications = ({ version }: { version: string }) => {
         }}
         renderItem={(notif: NotificationData) => {
             const fontWeight = notif.read ? 'initial': 'bolder'
-            return <Stack data-testid={`Notification:${notif.id}`} key={notif.id} direction="row" gap="1rem" sx={theme => ({ 
-                    cursor: 'pointer' ,
-                    width: makePxSize(900),
-                    [theme.breakpoints.down('lg')]: {
-                        width: makePxSize(900, 0.8),
-                    },
-                    [theme.breakpoints.down('md')]: {
-                        width: makePxSize(900, 0.5),
-                    },
-                    [theme.breakpoints.down('sm')]: {
-                        width: '100%',
-                    }
-                })}>
-                <NotificationImage image={notif.image} />
-                <Link flex="1" onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
-                    <Typography variant="body1" fontWeight={fontWeight}>{notif.headline1}</Typography>
-                    <Typography variant="body1" fontWeight={fontWeight}>{notif.headline2}</Typography>
-                    <Typography variant="body1" fontWeight={fontWeight}>{notif.text}</Typography>
-                </Link>
-                <Stack alignItems="flex-end">
-                    <Typography variant="body1" flex="0 0 20%" color="primary" fontWeight={fontWeight}>{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
-                    { !notif.read && <FiberManualRecord color="primary" /> }
+            return <Stack>
+                <Stack data-testid={`Notification:${notif.id}`} key={notif.id} direction="row" gap="1rem" sx={theme => ({ 
+                        cursor: 'pointer' ,
+                        width: makePxSize(900),
+                        [theme.breakpoints.down('lg')]: {
+                            width: makePxSize(900, 0.8),
+                        },
+                        [theme.breakpoints.down('md')]: {
+                            width: makePxSize(900, 0.5),
+                        },
+                        [theme.breakpoints.down('sm')]: {
+                            width: '100%',
+                        }
+                    })}>
+                    <NotificationImage image={notif.image} />
+                    <Link flex="1" onClick={notif.onClick} sx={{ textDecorationLine: 'none' }}>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline1}</Typography>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.headline2}</Typography>
+                        <Typography variant="body1" fontWeight={fontWeight}>{notif.text}</Typography>
+                    </Link>
+                    <Stack alignItems="flex-end">
+                        <Typography variant="body1" flex="0 0 20%" color="primary" fontWeight={fontWeight}>{userFriendlyTime(notif.created, uiContext.i18n.translator('shortDateFormat'))}</Typography>
+                        { !notif.read && <FiberManualRecord color="primary" /> }
+                    </Stack>
                 </Stack>
+                <Divider sx={{ marginTop: '0.25rem', marginBottom: '0.25rem' }}/>
             </Stack>
     }} />
 }

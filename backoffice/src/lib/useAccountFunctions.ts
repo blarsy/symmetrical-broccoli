@@ -17,6 +17,7 @@ export interface AccountInfo {
     amountOfTokens: number
     lastChangeTimestamp: Date
     unlimitedUntil: Date | null
+    knowsAboutCampaigns: boolean
 }
 
 export const GET_SESSION_DATA = gql`query GetSessionData {
@@ -81,6 +82,7 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     accountChangeReceived {
       account {
         willingToContribute
+        knowsAboutCampaigns
         name
         language
         email
@@ -125,7 +127,8 @@ const useAccountFunctions = (version: string) => {
                     id: payload.data.accountChangeReceived.account.id,
                     name: payload.data.accountChangeReceived.account.name,
                     willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
-                    unlimitedUntil: payload.data.unlimitedUntil || null
+                    unlimitedUntil: payload.data.unlimitedUntil || null,
+                    knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns
                 }
                 appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
             }}),
@@ -143,7 +146,8 @@ const useAccountFunctions = (version: string) => {
             willingToContribute: res.data.getSessionDataWeb.willingToContribute,
             amountOfTokens: res.data.getSessionDataWeb.amountOfTokens,
             unlimitedUntil: res.data.getSessionDataWeb.unlimitedUntil || null,
-            lastChangeTimestamp: new Date()
+            lastChangeTimestamp: new Date(),
+            knowsAboutCampaigns: res.data.getSessionDataWeb.knowsAboutCampaigns
         }
 
         localStorage.setItem('token', token)

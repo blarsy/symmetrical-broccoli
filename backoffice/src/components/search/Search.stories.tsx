@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import Search, { DEFAULT_SEARCH_PARAMETERS, SUGGEST_RESOURCES } from './Search'
 import { apolloClientMocksDecorator, clientComponentDecorator } from '@/lib/storiesUtil'
-import ClientWrapper from '../scaffold/ClientWrapper'
 
 const makeResourceData = (id: number, title: string, description: string, accountName: string, avatarPublicId: string,
     resourceImagesPublicIds: string[]

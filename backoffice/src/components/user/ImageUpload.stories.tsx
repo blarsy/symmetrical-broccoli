@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import ImageUpload from './ImageUpload'
-import ClientWrapper from '../scaffold/ClientWrapper'
+import { clientComponentDecorator } from '@/lib/storiesUtil'
 
 const meta = {
   component: ImageUpload,
@@ -11,9 +11,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {},
   args: {  },
-  decorators: [(Story) => <ClientWrapper version="v0_9">
-      <Story/>
-    </ClientWrapper>]
+  decorators: [clientComponentDecorator(), ]
 } satisfies Meta<typeof ImageUpload>
 
 export default meta
