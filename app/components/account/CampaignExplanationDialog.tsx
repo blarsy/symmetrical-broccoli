@@ -18,11 +18,12 @@ const SET_KNOWS_ABOUT_CAMPAIGNS = gql`mutation SetKnowsAboutCampaigns {
   }
 }`
 
-export const PriceTag = ({ value, label }: { value: number, label?: string }) => {
+export const PriceTag = ({ value, label, big }: { value: number, label?: string, big?: boolean }) => {
+    const iconSize = big ? 60 : 30
     return <View style={{ flexDirection: 'row', gap: '0.5rem', alignItems: 'center' }}>
-        { label && <Text style={{ color: primaryColor }} variant="bodyMedium">{label} </Text> }
-        <Text style={{ color: primaryColor }} variant="bodyMedium">{value} </Text>
-        <Images.Tokens style={{ width: 30, height: 30 }}/>
+        { label && <Text style={{ color: primaryColor, fontSize: big ? 30 : undefined }} variant={big ? 'headlineLarge' : 'bodyMedium'}>{label} </Text> }
+        <Text style={{ color: primaryColor, fontSize: big ? 30 : undefined }} variant={big ? 'headlineLarge' : 'bodyMedium'}>{value} </Text>
+        <Images.Tokens style={{ width: iconSize, height: iconSize }}/>
     </View>
 }
 
@@ -66,24 +67,24 @@ const CampaignExplanationDialog = (p: Props) => {
                                 </View>
                                 <Text variant="bodyLarge">{p.campaign.description}</Text>
                                 <Hr color="#000" />
-                                <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
+                                <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation')}</Text>
+                                <Text variant="headlineLarge">{t('rewardsMultiplied', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
                                 <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
                             </View>
                             <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
                                 <Text variant="headlineLarge">{t('airdropTitle')}</Text>
+                                <View style={{ flexDirection: 'row', gap: '8', alignItems: 'center' }}>
+                                    <PriceTag big value={p.campaign.airdropAmount} label=""/>
+                                    <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30 }}>{t('win')}</Text>
+                                </View>
                                 <Text variant="bodyMedium">{t('create2ResourcesOnCampaign')}</Text>
                                 <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
-                                <Text variant="bodyMedium">{t('youReceive')}</Text>
-                                <PriceTag value={p.campaign.airdropAmount} label=""/>
                                 <Text variant="bodyMedium">{t('ensureAirdropEligibility')}</Text>
                             </View>
                             <View style={childStyle}>
                                 <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('campaignSummaryTitle')}</Text>
                                 <Text variant="bodyMedium">{t('campaignAllowYouto')}</Text>
-                                <DottedString labelI18n="getPlentyOfTokens" />
-                                <DottedString labelI18n="seeManyResources" />
-                                <DottedString labelI18n="atTheRightMoment" />
-                                <DottedString labelI18n="forFree" />
+                                <Text variant="bodyMedium">{t('forFree')}</Text>
                                 <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={p.onDismiss}>{t('ok_caption')}</OrangeButton>
                             </View>
                         </SwiperFlatList> }

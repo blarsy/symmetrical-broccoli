@@ -1,6 +1,6 @@
 "use client"
 import AdminLayout from "@/components/scaffold/AdminLayout"
-import { usePagePath } from "@/lib/utils"
+import { usePagePath } from "@/lib/usePagePath"
 import { Typography } from "@mui/material"
 
 const Page = () => {

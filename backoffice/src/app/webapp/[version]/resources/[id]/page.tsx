@@ -2,7 +2,7 @@
 import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import LoadedZone from "@/components/scaffold/LoadedZone"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
-import { usePagePath } from "@/lib/utils"
+import { usePagePath } from "@/lib/usePagePath"
 import { useLazyQuery } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
 import { fromServerGraphResource, Resource } from "@/lib/schema"

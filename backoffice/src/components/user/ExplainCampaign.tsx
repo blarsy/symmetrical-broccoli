@@ -81,33 +81,25 @@ const ExplainCampaign = (p: Props) => {
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{activeCampaign.data.description}</Typography>
                     <Divider sx={{ alignSelf: 'stretch' }}/>
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">
-                        {uiContext.i18n.translator('createResourcesInCampaignExplanation', { multiplier: activeCampaign.data.resourceRewardsMultiplier })}
+                        {uiContext.i18n.translator('createResourcesInCampaignExplanation')}
+                    </Typography>
+                    <Typography variant="h5" textAlign="center" color="primary.contrastText">
+                        {uiContext.i18n.translator('rewardsMultiplied', { multiplier: activeCampaign.data.resourceRewardsMultiplier })}
                     </Typography>
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('thatsNotAll')}</Typography>
                 </Slide>
                 <Slide title={uiContext.i18n.translator("airdropTitle")} sx={{ gap: '1rem', alignItems: 'center' }}>
-                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('create2ResourcesOnCampaign')}</Typography>
+                    <Stack direction="row" alignItems="center" gap={1}>
+                        <PriceTag big value={activeCampaign.data.airdropAmount}/>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }} color="primary">{uiContext.i18n.translator('win')}</Typography>
+                    </Stack>
+                    <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('create2ResourcesOnCampaign')}</Typography>
                     <Typography variant="subtitle1" color="primary.contrastText">{dayjs(activeCampaign.data.airdrop).format(uiContext.i18n.translator('dateTimeFormat'))}</Typography>
-                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('youReceive')}</Typography>
-                    <PriceTag value={activeCampaign.data.airdropAmount} label=""/>
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('ensureAirdropEligibility')}</Typography>
                 </Slide>
                 <Slide title={uiContext.i18n.translator("campaignSummaryTitle")} sx={{ gap: '1rem' }}>
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
-                    <ul>
-                        <li>
-                            <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('getPlentyOfTokens')}</Typography>
-                        </li>
-                        <li>
-                            <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('seeManyResources')}</Typography>
-                        </li>
-                        <li>
-                            <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('atTheRightMoment')}</Typography>
-                        </li>
-                        <li>
-                            <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
-                        </li>
-                    </ul>
+                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
                     <Divider/>
                     <LoadingButton loading={settingCampaignBit} onClick={() => setAccountKnowsAboutCampaigns()}>{uiContext.i18n.translator('okButton')}</LoadingButton>
                 </Slide>

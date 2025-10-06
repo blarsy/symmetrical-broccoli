@@ -164,10 +164,10 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
     return avatar
 }
 
-export const PriceTag = ({ value, label }: { value: number, label?: string }) => {
+export const PriceTag = ({ value, label, big }: { value: number, label?: string, big?: boolean }) => {
     return <Stack direction="row" gap="0.5rem" alignItems="center">
         { label && <Typography color="primary" variant="body1">{label} </Typography> }
-        <Typography color="primary" variant="h6">{value} </Typography>
-        <Tokens style={{ width: '2rem', height: '2rem' }}/>
+        <Typography color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value} </Typography>
+        <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>
     </Stack>
 }

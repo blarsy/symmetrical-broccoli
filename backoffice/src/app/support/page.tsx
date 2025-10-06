@@ -1,7 +1,8 @@
 "use client"
 import ClientLayout from "@/components/scaffold/ClientLayout"
-import { usePagePath } from "@/lib/utils"
+import { usePagePath } from "@/lib/usePagePath"
 import { Box, Typography } from "@mui/material"
+import { Suspense } from "react"
 
 const Support = () => {
     const { version } = usePagePath()
@@ -25,4 +26,6 @@ const Support = () => {
     </ClientLayout>
 }
 
-export default Support
+export default () => <Suspense>
+    <Support />
+</Suspense>

@@ -1,7 +1,7 @@
 "use client"
 import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import Notifications from "@/components/user/Notifications"
-import { usePagePath } from "@/lib/utils"
+import { usePagePath } from "@/lib/usePagePath"
 
 const Page = () => {
     const { version } = usePagePath()
