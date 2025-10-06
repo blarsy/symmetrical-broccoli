@@ -179,13 +179,13 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 export const connectedComponent = (ops?: GraphQlOp[]) => clientComponentDecorator({ loading: false, account: defaultAccount, token: 'token', unreadNotifications: [], subscriptions: [] }, undefined, undefined, ops)
 
 export const defaultCampaign = {
-    airdrop: new Date(new Date().valueOf() + 10000),
+    airdrop: new Date(new Date().valueOf() + 10000000),
     airdropAmount: 5000,
     beginning: new Date(),
     created: new Date(),
     defaultResourceCategories: [],
     description: 'Ici, un texte engageant qui explique le thème de la campagne.',
-    ending: new Date(new Date().valueOf() + 100000),
+    ending: new Date(new Date().valueOf() + 100000000),
     id: 1,
     name: 'Vive la rentrée !',
     resourceRewardsMultiplier: 5

@@ -16,6 +16,7 @@ const GET_ACTIVE_CAMPAIGN = gql`query GetActiveCampaign {
     id
     name
     resourceRewardsMultiplier
+    airdropDone
   }
 }`
 
@@ -29,6 +30,7 @@ export interface Campaign {
     ending: Date
     defaultResourceCategories: number[]
     resourceRewardsMultiplier: number
+    airdropDone: boolean
 }
 
 function useActiveCampaign () {
@@ -43,7 +45,8 @@ function useActiveCampaign () {
                 name: res.data.getActiveCampaign.name, description: res.data.getActiveCampaign.description, airdrop: res.data.getActiveCampaign.airdrop,
                 airdropAmount: res.data.getActiveCampaign.airdropAmount, resourceRewardsMultiplier: res.data.getActiveCampaign.resourceRewardsMultiplier,
                 beginning: res.data.getActiveCampaign.beginning, ending: res.data.getActiveCampaign.ending, 
-                defaultResourceCategories: res.data.getActiveCampaign.defaultResourceCategories
+                defaultResourceCategories: res.data.getActiveCampaign.defaultResourceCategories,
+                airdropDone: res.data.getActiveCampaign.airdropDone
              }))
         } catch(e) {
             setActiveCampaign(fromError(e, t('requestError')))

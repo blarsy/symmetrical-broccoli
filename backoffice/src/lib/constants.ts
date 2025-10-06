@@ -6,4 +6,4 @@ export const ADD_LOGO_REWARD = 20
 export const ADD_LOCATION_REWARD = 20
 export const ADD_LINK_REWARD = 20
 export const ADD_RESOURCE_PICTURE_REWARD = 5
-export const CREATE_RESOURCE_REWARD = 5
+export const CREATE_RESOURCE_REWARD = 20

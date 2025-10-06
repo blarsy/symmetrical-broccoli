@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client"
 import { useContext, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { Button, Stack, Typography } from "@mui/material"

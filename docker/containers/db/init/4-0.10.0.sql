@@ -1593,6 +1593,7 @@ ALTER TABLE IF EXISTS sb.campaigns_resources
 	
 GRANT DELETE, INSERT, SELECT ON TABLE sb.campaigns_resources TO identified_account;
 
+GRANT SELECT ON TABLE sb.campaigns TO public;
 GRANT SELECT ON TABLE sb.campaigns_resources TO public;
 
 GRANT ALL ON TABLE sb.campaigns_resources TO sb;
