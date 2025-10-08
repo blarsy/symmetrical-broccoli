@@ -2161,49 +2161,57 @@ AS $BODY$
 DECLARE results INTEGER[];
 BEGIN
 	results := ARRAY(
-		SELECT id, score
+		SELECT id
 		FROM (
 			-- Accounts close to the resource created
 			-- if new resource has a location
 			SELECT a.id,
 				CASE 
 					WHEN sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 5 THEN 10 
-					WHEN sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 10 THEN 5 
+					WHEN sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 15 THEN 5 
 				END as score
 			FROM sb.accounts a
 			INNER JOIN sb.locations l ON a.location_id = l.id
 			CROSS JOIN (
-				SELECT latitude, longitude
+				SELECT l.id, latitude, longitude
 				FROM sb.resources r
 				INNER JOIN sb.locations l ON l.id = r.specific_location_id
-				WHERE r.id = 40
+				WHERE r.id = get_accounts_to_notify_of_new_resource.resource_id
 			) loc
-			WHERE name IS NOT NULL and name <> '' AND location_id IS NOT NULL
-
-			UNION
+			WHERE name IS NOT NULL and name <> '' AND loc.id IS NOT NULL AND a.location_id IS NOT NULL AND 
+				sb.geodistance(loc.latitude, loc.longitude, l.latitude, l.longitude) < 15
+			UNION ALL
 			-- Accounts taking part in active campaign
 			-- if a campaign is active
-			SELECT id, 10 as score
+			SELECT a.id, 10 as score
 			FROM sb.accounts a
-			WHERE name IS NOT NULL and name <> '' AND EXISTS (
+			CROSS JOIN sb.get_active_campaign()
+			INNER JOIN sb.campaigns_resources cr_new ON cr_new.resource_id = get_accounts_to_notify_of_new_resource.resource_id
+			WHERE a.name IS NOT NULL and a.name <> '' AND EXISTS (
 				SELECT *
 				FROM sb.resources r
 				INNER JOIN sb.campaigns_resources cr ON cr.resource_id = r.id AND cr.campaign_id = (SELECT id FROM sb.get_active_campaign())
 				WHERE account_id = a.id AND deleted IS NULL AND (expiration IS NULL OR expiration > NOW())
 			)
-			UNION
+			
+			UNION ALL
 			-- Accounts having recent searches that match the new resource's title and/or description
-			SELECT s.account_id, 10 as score from sb.searches s
-			INNER JOIN sb.resources r ON r.id = get_accounts_to_notify_of_new_resource.resource_id
-			WHERE s.account_id IS NOT NULL AND s.term IS NOT NULL AND s.term <> '' AND (
-				sb.strict_word_similarity(s.term, r.title) > 0.1 OR
-				sb.strict_word_similarity(s.term, r.description) > 0.1
-			)
-			ORDER BY similarity(term, 'Pots') DESC
-			LIMIT 5
+			SELECT account_id, 10 FROM (
+				SELECT s.account_id, 10 as score from sb.searches s
+				INNER JOIN sb.accounts a ON a.id = s.account_id AND a.name <> '' -- filter out deleted accounts
+				INNER JOIN sb.resources r ON r.id = get_accounts_to_notify_of_new_resource.resource_id
+				WHERE s.account_id IS NOT NULL AND s.term IS NOT NULL AND s.term <> '' AND (
+					sb.strict_word_similarity(s.term, r.title) > 0.1 OR
+					sb.strict_word_similarity(s.term, r.description) > 0.1
+				)
+				ORDER BY GREATEST(sb.strict_word_similarity(s.term, r.title), sb.strict_word_similarity(s.term, r.description) ) DESC
+				LIMIT 5
+			) m
 		) matches
 		WHERE id != (SELECT account_id FROM sb.resources WHERE id = get_accounts_to_notify_of_new_resource.resource_id)
-		ORDER BY score DESC
+		GROUP BY(id)
+		HAVING SUM(score) > 10
+		ORDER BY SUM(score) DESC
 		LIMIT 5);
 
 	RETURN results;

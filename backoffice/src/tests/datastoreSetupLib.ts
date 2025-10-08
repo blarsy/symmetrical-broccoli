@@ -11,6 +11,9 @@ import { DELETE_RESOURCE } from "@/components/resources/Resources"
 import { waitFor } from "@testing-library/dom"
 import { UserEvent } from "@testing-library/user-event"
 import { RenderResult } from "@testing-library/react"
+import { UPDATE_ACCOUNT_PUBLIC_INFO } from "@/lib/useProfile"
+import { Location } from '@/lib/schema'
+import { SUGGEST_RESOURCES } from "@/components/search/Search"
 
 const VERSION = 'v0_10'
 
@@ -119,14 +122,30 @@ const deleteAccountByToken = async (token: string) => {
     return await loggedInClient.mutate({ mutation: DELETE_ACCOUNT })
 }
 
+export const setAccountLocation = async (account: TestAccount, location: Location) => {
+    const loggedInClient = getApolloClient(VERSION, account.data.token)
+    loggedInClient.mutate({ mutation: UPDATE_ACCOUNT_PUBLIC_INFO, variables: { links: [], location } })
+}
+
+export const makeSearch = async (account: TestAccount, term: string) => {
+    const loggedInClient = getApolloClient(VERSION, account.data.token)
+    return loggedInClient.mutate({ mutation: SUGGEST_RESOURCES, variables: { 
+        canBeDelivered: false, canBeExchanged: false, canBeGifted: false, 
+        canBeTakenAway: false, categoryCodes: [], distanceToReferenceLocation: 50,
+        excludeUnlocated: false, isProduct:false, 
+        isService: false, referenceLocationLatitude: 0,
+        referenceLocationLongitude: 0, searchTerm: term
+    } })
+}
+
 export const createResource = async (jwtToken: string, title: string, description: string,
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
     canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | undefined, 
-    categoryCodes: number[], campaignToJoin?: number): Promise<number> => {
+    categoryCodes: number[], campaignToJoin?: number, specificLocation?: Location): Promise<number> => {
     const loggedInClient = getApolloClient(VERSION, jwtToken)
     const res = await loggedInClient.mutate({ mutation: CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
-        expiration, isProduct, isService, title, campaignToJoin
+        expiration, isProduct, isService, title, campaignToJoin, specificLocation
     } })
     return res.data.createResource.integer
 }
@@ -330,4 +349,11 @@ export const checkAccountTokens = async (email: string, expectedAmountOfTokens: 
         where email = lower($1)`, [email])
     
     expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
+}
+
+export const removeActiveCampaign = async () => {
+    await executeQuery(`
+        delete from sb.campaigns_resources where campaign_id = (select id from sb.get_active_campaign());
+        delete from sb.campaigns where id = (select id from sb.get_active_campaign());
+    `)
 }

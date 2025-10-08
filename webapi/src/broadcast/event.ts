@@ -129,9 +129,11 @@ export const handleNotificationCreated = async (notification: PgParsedNotificati
             `Gather notification data for push notification ${notification.payload.notification_id}`, 
             [notification.payload.notification_id])
 
-        if(notifRecord.rowCount != 1) throw new Error(`Unexpected number of records ${notifRecord.rowCount} when querying for notification with id ${notification.payload.notification_id}. There is probably no push notification token for this account`)
-        console.log('ts[notifRecord.rows[0].language]', notifRecord.rows[0].language, ts[notifRecord.rows[0].language], ts)
-
+        if(notifRecord.rowCount != 1) {
+            //console.log(`Skipping push notification: Unexpected number of records ${notifRecord.rowCount} when querying for notification with id ${notification.payload.notification_id}. There is no push notification token for this account`)
+            return
+        }
+        
         const notifToPush = createPushNotificationFromNotifInfo(notifRecord.rows[0].token,
             notifRecord.rows[0].data, config.pushNotificationsUrlPrefix, ts[notifRecord.rows[0].language] )
 

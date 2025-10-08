@@ -1,6 +1,4 @@
-import { render, waitFor } from "@testing-library/react"
-import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, executeQuery, fromToday, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
-import NotificationsPage from "@/app/webapp/[version]/notifications/page"
+import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, executeQuery, fromToday, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
 
 let accounts : TestAccount[]
 let account1: TestAccount, account2: TestAccount, account3: TestAccount
@@ -58,9 +56,6 @@ test('campaign airdrop is distributed', async () => {
 })
 
 afterEach(async () => {
-    await executeQuery(`
-        delete from sb.campaigns_resources where campaign_id = (select id from sb.get_active_campaign());
-        delete from sb.campaigns where id = (select id from sb.get_active_campaign());
-    `)
+    await removeActiveCampaign()
     return cleanupTestAccounts(accounts)
 })
