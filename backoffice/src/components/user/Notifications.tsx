@@ -437,8 +437,8 @@ const Notifications = ({ version }: { version: string }) => {
         }}
         renderItem={(notif: NotificationData) => {
             const fontWeight = notif.read ? 'initial': 'bolder'
-            return <Stack>
-                <Stack data-testid={`Notification:${notif.id}`} key={notif.id} direction="row" gap="1rem" sx={theme => ({ 
+            return <Stack key={notif.id}>
+                <Stack data-testid={`Notification:${notif.id}`} direction="row" gap="1rem" sx={theme => ({ 
                         cursor: 'pointer' ,
                         width: makePxSize(900),
                         [theme.breakpoints.down('lg')]: {

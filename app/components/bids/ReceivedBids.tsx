@@ -13,10 +13,10 @@ import dayjs from "dayjs"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import ResourceAuthorHeader from "../resources/ResourceAuthorHeader"
-import TokenTag from "../tokens/TokenTag"
 import { IconButton, Text } from "react-native-paper"
 import OperationFeedback from "../OperationFeedback"
 import ConfirmDialog from "../ConfirmDialog"
+import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
 
 const PAGE_SIZE = 10
 
@@ -122,9 +122,10 @@ const ReceivedBidCard = ({ bid, navigation, onBidHandled }: ReceivedBidCardProps
                 navigation.navigate('viewResource', { resourceId: bid.resource.id })
             }} />
         </View>
-        <TokenTag amountOfTokens={bid.amountOfTokens} labelI18n="receivedBidLabel" />
-        { bid.resource.price && <TokenTag textVariant="bodyMedium" iconSize={25} 
-            amountOfTokens={bid.resource.price} labelI18n="resourcePriceLabel" /> }
+        <View style={{ alignItems: 'center' }}>
+          <PriceTag value={bid.amountOfTokens} label={t('receivedBidLabel')} size={PriceTagSizeEnum.normal}/>
+          { bid.resource.price && <PriceTag value={bid.resource.price} label={t('resourcePriceLabel')} /> }
+        </View>
         { inactiveDescription ?
             <Text variant="labelSmall">{inactiveDescription}</Text>
         :

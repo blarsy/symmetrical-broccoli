@@ -13,6 +13,7 @@ import ConsumeTokens from '@/assets/img/howitworks/consommation jeton.svg'
 import { primaryColor } from "../layout/constants"
 import { SvgProps } from "react-native-svg"
 import { AnimatedSwipeHand } from "../layout/lib"
+import PriceTag, { PriceTagSizeEnum } from "./PriceTag"
 
 const WinToken = () => <View style={{ flexDirection: 'row' }}>
     <Images.Check fill="#4BB543" height={50} width={50} />
@@ -78,7 +79,7 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                 </View>
             </View>
             <View style={ { ...childStyle, ...{ alignItems: 'flex-start' } }}>
-                <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('howItWorksStep4Title')}</Text>
+                <Text variant="headlineLarge">{t('howItWorksStep4Title')}</Text>
                 <Text variant="bodyLarge" style={{ alignSelf: 'center' }}>{t('earnTokens')}</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 20, marginTop: 50, alignItems: 'center' }}>
                     <WinToken />
@@ -106,10 +107,9 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                 <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
                     <Text variant="bodyLarge">{t('youAlreadyHave')}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5, marginBottom: 50 }}>
-                    <Text variant="bodyLarge"> {appContext.account?.amountOfTokens}</Text>
-                    <Images.Tokens style={{ width: 30, height: 30 }}/>
-                    <Text variant="bodyLarge">{t('tokenName')}</Text>
+                <View style={{ alignSelf: 'center', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5, marginBottom: 50 }}>
+                    <PriceTag value={appContext.account!.amountOfTokens} size={PriceTagSizeEnum.big} />
+                    <Text style={{ color: primaryColor, fontSize: 30 }} variant="headlineLarge">{t('tokenName')}</Text>
                 </View>
             </View>}
         </SwiperFlatList>

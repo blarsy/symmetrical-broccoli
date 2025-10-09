@@ -3,29 +3,20 @@ import { Dimensions, StyleProp, View, ViewStyle } from "react-native"
 import { ThemedDialog } from "../ConfirmDialog"
 import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
 import { gql, useMutation } from "@apollo/client"
-import { Icon, Text } from "react-native-paper"
+import { Icon, Text, Tooltip } from "react-native-paper"
 import { t } from "@/i18n"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import dayjs from "dayjs"
 import { primaryColor } from "../layout/constants"
-import Images from "@/Images"
 import { Campaign } from "@/lib/useActiveCampaign"
+import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
 
 const SET_KNOWS_ABOUT_CAMPAIGNS = gql`mutation SetKnowsAboutCampaigns {
   setAccountKnowsAboutCampaigns(input: {}) {
     integer
   }
 }`
-
-export const PriceTag = ({ value, label, big }: { value: number, label?: string, big?: boolean }) => {
-    const iconSize = big ? 60 : 30
-    return <View style={{ flexDirection: 'row', gap: '0.5rem', alignItems: 'center' }}>
-        { label && <Text style={{ color: primaryColor, fontSize: big ? 30 : undefined }} variant={big ? 'headlineLarge' : 'bodyMedium'}>{label} </Text> }
-        <Text style={{ color: primaryColor, fontSize: big ? 30 : undefined }} variant={big ? 'headlineLarge' : 'bodyMedium'}>{value} </Text>
-        <Images.Tokens style={{ width: iconSize, height: iconSize }}/>
-    </View>
-}
 
 interface Props {
     campaign?: Campaign
@@ -42,10 +33,6 @@ const CampaignExplanationDialog = (p: Props) => {
     const subViewHeight = height - 80
     const [setKnowsAboutCampaigns] = useMutation(SET_KNOWS_ABOUT_CAMPAIGNS)
     const [swipedToEnd, setSwipedToEnd] = useState(false)
-    const DottedString = ({ labelI18n }: { labelI18n: string }) => <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Icon source="circle" size={10}/>
-        <Text variant="bodyMedium">{t(labelI18n)}</Text>
-    </View>
 
     return <ThemedDialog testID={p.testID} onDismiss={p.onDismiss} visible={!!p.campaign} 
         style={{
@@ -56,38 +43,38 @@ const CampaignExplanationDialog = (p: Props) => {
         content={
             <>
                 <GestureHandlerRootView>
-                        { p.campaign && <SwiperFlatList onEndReached={async() => {
-                            setSwipedToEnd(true)
-                            await setKnowsAboutCampaigns()
-                        }}>
-                            <View style={childStyle}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                    <Icon size={30} source="bullhorn"/>
-                                    <Text variant="headlineLarge">{p.campaign.name}</Text>
-                                </View>
-                                <Text variant="bodyLarge">{p.campaign.description}</Text>
-                                <Hr color="#000" />
-                                <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation')}</Text>
-                                <Text variant="headlineLarge">{t('rewardsMultiplied', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
-                                <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
+                    { p.campaign && <SwiperFlatList onEndReached={async() => {
+                        setSwipedToEnd(true)
+                        await setKnowsAboutCampaigns()
+                    }}>
+                        <View style={childStyle}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
+                                <Icon size={30} source="bullhorn"/>
+                                <Text variant="headlineLarge">{p.campaign.name}</Text>
                             </View>
-                            <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
-                                <Text variant="headlineLarge">{t('airdropTitle')}</Text>
-                                <View style={{ flexDirection: 'row', gap: '8', alignItems: 'center' }}>
-                                    <PriceTag big value={p.campaign.airdropAmount} label=""/>
-                                    <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30 }}>{t('win')}</Text>
-                                </View>
-                                <Text variant="bodyMedium">{t('create2ResourcesOnCampaign')}</Text>
-                                <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
-                                <Text variant="bodyMedium">{t('ensureAirdropEligibility')}</Text>
+                            <Text variant="bodyLarge">{p.campaign.description}</Text>
+                            <Hr color="#000" />
+                            <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation')}</Text>
+                            <Text variant="headlineLarge">{t('rewardsMultiplied', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
+                            <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
+                        </View>
+                        <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
+                            <Text variant="headlineLarge">{t('airdropTitle')}</Text>
+                            <View style={{ flexDirection: 'row', gap: '8', alignItems: 'center' }}>
+                                <PriceTag size={PriceTagSizeEnum.big} value={p.campaign.airdropAmount} label=""/>
+                                <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30 }}>{t('win')}</Text>
                             </View>
-                            <View style={childStyle}>
-                                <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('campaignSummaryTitle')}</Text>
-                                <Text variant="bodyMedium">{t('campaignAllowYouto')}</Text>
-                                <Text variant="bodyMedium">{t('forFree')}</Text>
-                                <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={p.onDismiss}>{t('ok_caption')}</OrangeButton>
-                            </View>
-                        </SwiperFlatList> }
+                            <Text variant="bodyLarge">{t('create2ResourcesOnCampaign')}</Text>
+                            <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
+                            <Text variant="bodyLarge">{t('ensureAirdropEligibility')}</Text>
+                        </View>
+                        <View style={childStyle}>
+                            <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('campaignSummaryTitle')}</Text>
+                            <Text variant="bodyLarge">{t('campaignAllowYouto')}</Text>
+                            <Text variant="bodyLarge">{t('forFree')}</Text>
+                            <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={p.onDismiss}>{t('ok_caption')}</OrangeButton>
+                        </View>
+                    </SwiperFlatList> }
                 </GestureHandlerRootView>
                 { !swipedToEnd && <AnimatedSwipeHand/> }
             </>

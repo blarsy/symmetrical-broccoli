@@ -3,7 +3,7 @@ import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import EmptyImage from '@/app/img/PHOTOS.svg'
-import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Typography, useTheme } from "@mui/material"
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
 import { PropsWithChildren } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import Tokens from '@/app/img/TOKENS.svg'
@@ -165,9 +165,11 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
 }
 
 export const PriceTag = ({ value, label, big }: { value: number, label?: string, big?: boolean }) => {
-    return <Stack direction="row" gap="0.5rem" alignItems="center">
-        { label && <Typography color="primary" variant="body1">{label} </Typography> }
-        <Typography color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value} </Typography>
-        <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>
-    </Stack>
+    return <Tooltip title={`${value} Topes = ${value / 100} Euro`}>
+        <Stack direction="row" gap="0.5rem" alignItems="center">
+            { label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{label} </Typography> }
+            <Typography color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value} </Typography>
+            <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>
+        </Stack>
+    </Tooltip>
 }

@@ -14,12 +14,12 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {},
   args: {  },
-  decorators: [clientComponentDecorator(), (Story) => {
+  decorators: [clientComponentDecorator(), (Story, context) => {
     const [showing, setShowing] = useState(false)
 
     return <>
         <Button onClick={() => setShowing(true)}>Montrer</Button>
-        <Story args={{ visible: showing, onClose: () => setShowing(false) }}/>
+        <Story args={{ ...context.args, visible: showing, onClose: () => setShowing(false) }}/>
     </>
   }]
 } satisfies Meta<typeof ExplainToken>

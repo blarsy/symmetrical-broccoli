@@ -1,5 +1,4 @@
 import { urlFromPublicId } from "./images"
-import { Campaign } from "./useActiveCampaign"
 
 export interface Account {
     name: string,
@@ -135,7 +134,7 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
-        campaignId: rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId
+        campaignId: (rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId) || undefined
 } as Resource
 }
 

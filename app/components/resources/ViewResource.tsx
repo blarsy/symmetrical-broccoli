@@ -20,6 +20,7 @@ import { EditResourceContext } from "./EditResourceContextProvider"
 import BareIconButton from "../layout/BareIconButton"
 import { Hr } from "../layout/lib"
 import CreateBidDialog from "../bids/CreateBidDialog"
+import PriceTag from "../tokens/PriceTag"
 
 interface ImgMetadata { 
     source: ImageSourcePropType
@@ -174,9 +175,10 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             </View>}
             {resource.data.price && <>
                 <ViewField title={t('Label')}>
-                    <View style={{ flexDirection: 'column' }}>
+                    {/* <View style={{ flexDirection: 'column' }}>
                         <Text variant="bodyMedium">{resource.data.price}</Text>
-                    </View>
+                    </View> */}
+                    <PriceTag value={resource.data.price}/>
                 </ViewField>
                 <Hr thickness={2}/>
             </>}

@@ -16,8 +16,8 @@ import Images from "@/Images"
 import dayjs from "dayjs"
 import { OptionSelect } from "../layout/lib"
 import OperationFeedback from "../OperationFeedback"
-import TokenTag from "../tokens/TokenTag"
 import ConfirmDialog from "../ConfirmDialog"
+import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
 
 const PAGE_SIZE = 10
 
@@ -117,9 +117,10 @@ const SentBidCard = ({ bid, navigation, onBidHandled }: SentBidCardProps) => {
                 navigation.navigate('viewResource', { resourceId: bid.resource.id })
             }} />
         </View>
-        <TokenTag amountOfTokens={bid.amountOfTokens} labelI18n="sentBidLabel" />
-        { bid.resource.price && <TokenTag textVariant="bodyMedium" iconSize={25} 
-            amountOfTokens={bid.resource.price} labelI18n="resourcePriceLabel" /> }
+        <View style={{ alignItems: 'center' }}>
+          <PriceTag size={PriceTagSizeEnum.normal} value={bid.amountOfTokens} label={t('sentBidLabel')}/>
+          { bid.resource.price && <PriceTag value={bid.resource.price} label={t('resourcePriceLabel')}/> }
+        </View>
         { inactiveDescription ?
             <Text variant="labelSmall">{inactiveDescription}</Text>
         :

@@ -107,7 +107,7 @@ const ExplainToken = (p: Props) => {
     const sm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
     const md = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
     const numberOfSlides = (appContext.account?.willingToContribute || p.pureExplain) ? 4 : 5
-
+    
     let ratio = 1
     if(sm) {
         ratio = 1/2

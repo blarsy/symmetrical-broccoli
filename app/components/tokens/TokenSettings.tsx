@@ -20,7 +20,8 @@ const TokenSettings = ({ route, navigation }: RouteProps) => {
             <Text testID="AmountOfTokens" variant="headlineLarge" style={{ color: '#fff' }}>{appContext.account?.amountOfTokens}</Text>
             <Text variant="headlineLarge" style={{ color: '#fff' }}>{t('tokenName')}</Text>
         </View>
-        <Text style={{ color: '#fff', paddingLeft: 16, marginTop: 10, marginBottom: 10 }} variant="bodyLarge">{t('howItWorksTitle')}</Text>
+        <Text variant="bodyMedium" style={{ color: '#fff', alignSelf: 'center' }}>{`${appContext.account?.amountOfTokens} Topes = ${appContext.account!.amountOfTokens / 100} Euro`}</Text>
+        <Text style={{ color: '#fff', paddingLeft: 16, marginTop: 30, marginBottom: 10 }} variant="bodyLarge">{t('howItWorksTitle')}</Text>
         <InfoHowItWorks />
         <AccordionItem initialExpanded={route.params?.showHistory} style={{ marginBottom: 20 }} textColor="#fff" big testID="HistoryAccordion" title={t('tokenHistoryAccordionTitle')}>
             <History />

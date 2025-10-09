@@ -18,6 +18,7 @@ import { OverridableComponent } from "@mui/material/OverridableComponent"
 import MenuIcon from '@mui/icons-material/Menu'
 import Tokens from '@/app/img/TOKENS.svg'
 import { useRouter } from "next/navigation"
+import { PriceTag } from "../misc"
 
 interface LinkMenuProps {
     url: string
@@ -145,12 +146,7 @@ const TopBar = ({ version }: Props) => {
             }
         })}>
             { appContext.account &&  <Link style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
-                <Stack direction="row" alignItems="center" sx={{
-                    cursor: 'pointer'
-                }}>
-                    <Typography data-testid="TokenCounter" variant="caption" color="primary"> { appContext.account.amountOfTokens }</Typography>
-                    <Tokens style={{ width: '2rem', height: '2rem' }}/>
-                </Stack>
+                <PriceTag value={appContext.account.amountOfTokens} big/>
             </Link> }
             <Stack direction="row" alignItems="center">
                 <DarkModeIcon color="primary" />
