@@ -42,6 +42,7 @@ export default () => {
         }
     }, [])
 
+    //console.log('useProfileAddress state', state)
     return state
 }
 

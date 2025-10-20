@@ -4,7 +4,6 @@ import React from "react"
 import { checkActivationEmailSent, checkAccountData, checkLinksOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
 import { AppContextProvider } from "@/components/AppContextProvider"
-import '@testing-library/react-native/extend-expect'
 import { waitForThenPress } from "./lib"
 import { ProfileMain } from "@/components/account/Profile"
 
@@ -44,7 +43,7 @@ test('edit account data: name', async () => {
 test('edit account data: email', async () => {
     const newEmail = `new${account.info.email}`
     render(<AppContextProvider>
-        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
+        <Start splashScreenMinimumDuration={0} overrideVersionChecker={() => true} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
             <ProfileMain />
         </Start>
     </AppContextProvider>)
@@ -57,9 +56,7 @@ test('edit account data: email', async () => {
     fireEvent.changeText(screen.getByTestId('email:Input'), newEmail)
 
     waitForThenPress('email:InlineButtons:Save', screen)
-    //fireEvent.press(screen.getByTestId('save'))
 
-    //await waitFor(() => expect(screen.getByTestId('editProfileFeedback:Success')).toBeOnTheScreen())
     await waitFor(() => expect(screen.getByTestId('emailChangingBanner')).toBeVisible())
 
     await checkAccountData (account.info.email, account.info.name)

@@ -4,7 +4,6 @@ import { AppWithSingleScreen, createResourceThroughUI } from "./lib"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import Resources from "@/components/mainViews/Resources"
 import { checkAccountWillingToContribute } from "./datastoreCheck"
-import '@testing-library/react-native/extend-expect'
 import { daysFromNow } from "@/lib/utils"
 
 let account: TestAccount, res1Id: number, resName: string

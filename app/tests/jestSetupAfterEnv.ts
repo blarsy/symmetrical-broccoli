@@ -1,3 +1,3 @@
-import { setUpTests } from "react-native-reanimated/src/reanimated2/jestUtils"
+import { setUpTests } from "react-native-reanimated/src/jestUtils"
 
 setUpTests()

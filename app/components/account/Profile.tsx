@@ -4,7 +4,7 @@ import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer
 import { ActivityIndicator, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
 import { RouteProps, adaptToWidth, getAppBarsTitleFontSize, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
-import { Appbar, Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
+import { Appbar, BottomNavigation, Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
 import ChangePassword from "../form/ChangePassword"
 import { initial, beginOperation, fromData, fromError } from "@/lib/DataLoadState"
 import { ErrorSnackbar } from "../OperationFeedback"
@@ -12,14 +12,15 @@ import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { AppAlertDispatchContext, AppAlertReducerActionType, AppContext } from "../AppContextProvider"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import Preferences from "./Preferences"
-import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation'
 import { GraphQlLib } from "@/lib/backendFacade"
 import { useMutation } from "@apollo/client"
 import Images from "@/Images"
 import TokenSettings from "../tokens/TokenSettings"
 import { TabNavigatorProps } from "@/lib/TabNavigatorProps"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { BaseRoute } from "react-native-paper/lib/typescript/components/BottomNavigation/BottomNavigation"
 
-const Tab = createMaterialBottomTabNavigator()
+const Tab = createBottomTabNavigator()
 
 export const ProfileMain = ({ route, navigation }: RouteProps) => {
     const appContext = useContext(AppContext)
@@ -89,6 +90,7 @@ export const ProfileMain = ({ route, navigation }: RouteProps) => {
 export default function Profile ({ route, navigation }: RouteProps) {
     const appContext = useContext(AppContext)
     const { logout } = useUserConnectionFunctions()
+    const [index, setIndex] = useState(0)
 
     useEffect(() => {
         if(!appContext.account) {
@@ -110,6 +112,10 @@ export default function Profile ({ route, navigation }: RouteProps) {
         : 
         fixedScreens
 
+    const routes = actualScreens.map(tb => ({
+        key: tb.name, name: tb.name, title: tb.options?.title, focusedIcon: tb.options?.tabBarIcon,
+    } as BaseRoute))
+
     return <PrimaryColoredContainer style={{ flex: 1, alignItems: 'stretch'}}>
         <Appbar.Header mode="center-aligned" style={{ backgroundColor: primaryColor }}>
             <Appbar.BackAction testID="Profile:BackButton" onPress={() => navigation.navigate('board')} />
@@ -123,10 +129,17 @@ export default function Profile ({ route, navigation }: RouteProps) {
                 ], index: 0 })
             }} />
         </Appbar.Header>
-        <Tab.Navigator barStyle={{ backgroundColor: lightPrimaryColor }} 
-            theme={{ colors: { secondaryContainer: lightPrimaryColor, background: 'transparent' }}}
-            activeColor={ primaryColor } inactiveColor="#000" style={{ backgroundColor: 'transparent' }} >
-            { actualScreens.map((screen, idx) => <Tab.Screen key={idx} name={screen.name} options={screen.options} component={screen.component} />) }
+        <Tab.Navigator 
+            screenOptions={() => ({ headerShown: false, sceneStyle: { backgroundColor: 'transparent' } })} 
+            tabBar={({ navigation, state, descriptors, insets }) => 
+                <BottomNavigation.Bar
+                    activeColor={ primaryColor } inactiveColor="#000" 
+                    navigationState={{ index, routes }} style={{ backgroundColor: lightPrimaryColor }}
+                    onTabPress={ptp => {
+                        setIndex(actualScreens.findIndex(t => t.name === ptp.route.key))
+                        navigation.navigate(ptp.route.key)
+                    }} />} >
+            { actualScreens.map(t => <Tab.Screen key={t.name} name={t.name} component={t.component} options={t.options} />) }
         </Tab.Navigator>
     </PrimaryColoredContainer>
 }

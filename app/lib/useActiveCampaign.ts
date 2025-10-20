@@ -57,6 +57,8 @@ function useActiveCampaign () {
         load()
     }, [])
 
+    //console.log('useActiveCampaign', {load, activeCampaign})
+
     return { load, activeCampaign }
 }
 

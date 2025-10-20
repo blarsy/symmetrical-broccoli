@@ -1,8 +1,7 @@
 import RegisterForm from '@/components/form/RegisterForm'
 import { getApolloClient } from '@/lib/apolloClient'
 import { ApolloProvider } from '@apollo/client'
-import { render, fireEvent, waitFor, screen } from '@testing-library/react-native'
-import '@testing-library/react-native/extend-expect'
+import { render, fireEvent, waitFor } from '@testing-library/react-native'
 import React from 'react'
 import { Provider } from 'react-native-paper'
 import { authenticate, deleteAccount, getTestNum, simulateActivation,  } from './datastoreSetupLib'
@@ -20,7 +19,7 @@ import 'dayjs/locale/fr'
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-jest.useFakeTimers()
+jest.useRealTimers()
 
 const testNum = getTestNum()
 const email = `me${testNum}@me.com`, password= 'Password1!'
@@ -57,34 +56,39 @@ test('register new user, then log in and out', async () => {
     simulateActivation(activationCode)
     
     await checkAccountActivated(email)
+    console.log('activation success')
 
-    render(<AppContextProvider>
-        <Start splashScreenMinimumDuration={0}>
+    const main = render(<AppContextProvider>
+        <Start splashScreenMinimumDuration={0} overrideVersionChecker={() => true}>
             <MainNavigator />
         </Start>
     </AppContextProvider>)
 
-    await waitFor(() => expect(screen.getByTestId('openLoginScreen')).toBeOnTheScreen())
+    await waitFor(() => expect(main.getByTestId('Start')).toBeOnTheScreen())
+    await waitFor(() => expect(main.getByTestId('openLoginScreen')).toBeOnTheScreen())
+    console.log('Login screen opened')
 
-    fireEvent.press(screen.getByTestId('openLoginScreen'))
+    fireEvent.press(main.getByTestId('openLoginScreen'))
 
-    await waitFor(() => expect(screen.getByTestId('email')).toBeOnTheScreen())
-    fireEvent.changeText(screen.getByTestId('email'), email)
-    fireEvent.changeText(screen.getByTestId('password'), password)
+    await waitFor(() => expect(main.getByTestId('email')).toBeOnTheScreen())
+    fireEvent.changeText(main.getByTestId('email'), email)
+    fireEvent.changeText(main.getByTestId('password'), password)
     
-    fireEvent.press(screen.getByTestId('login'))
-
-    await waitFor(() => expect(screen.getByTestId('openProfile')).toBeOnTheScreen())
-
-    fireEvent.press(screen.getByTestId('openProfile'))
-
-    await waitFor(() => expect(screen.getByTestId('logout')).toBeOnTheScreen())
-    await checkBadgeNumeric('notificationUnreads', screen)
-
-    fireEvent.press(screen.getByTestId('logout'))
+    fireEvent.press(main.getByTestId('login'))
     
-    await waitFor(() => expect(screen.getByTestId('openLoginScreen')).toBeOnTheScreen())
+    await waitFor(() => expect(main.getByTestId('openProfile')).toBeOnTheScreen())
+    console.log('Login on screen success')
+    await checkBadgeNumeric('notificationUnreads', main)
+
+    fireEvent.press(main.getByTestId('openProfile'))
+
+    await waitFor(() => expect(main.getByTestId('logout')).toBeOnTheScreen())
+
+    fireEvent.press(main.getByTestId('logout'))
     
+    await waitFor(() => expect(main.getByTestId('openLoginScreen')).toBeOnTheScreen())
+    console.log('Logout on screen success')
+
     const notif = await checkLastNotificationExists(email)
     const token = await authenticate(email, password)
     

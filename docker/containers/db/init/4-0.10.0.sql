@@ -1936,9 +1936,9 @@ BEGIN
 	  )
 	  AND
 		  (search_term = '' OR 
-			(sb.strict_word_similarity(r.title, search_term) > 0.1 OR 
-			 sb.strict_word_similarity(r.description, search_term) > 0.1 OR
-			 sb.strict_word_similarity(a.name, search_term) > 0.1))
+			(sb.strict_word_similarity(r.title, search_term) > 0.25 OR 
+			 sb.strict_word_similarity(r.description, search_term) > 0.25 OR
+			 sb.strict_word_similarity(a.name, search_term) > 0.8))
 	  AND
 	  (NOT suggested_resources.in_active_campaign OR suggested_resources.in_active_campaign IS NULL OR cr.id IS NOT NULL)
 	  ORDER BY created DESC, r.expiration DESC
@@ -2201,8 +2201,8 @@ BEGIN
 				INNER JOIN sb.accounts a ON a.id = s.account_id AND a.name <> '' -- filter out deleted accounts
 				INNER JOIN sb.resources r ON r.id = get_accounts_to_notify_of_new_resource.resource_id
 				WHERE s.account_id IS NOT NULL AND s.term IS NOT NULL AND s.term <> '' AND (
-					sb.strict_word_similarity(s.term, r.title) > 0.1 OR
-					sb.strict_word_similarity(s.term, r.description) > 0.1
+					sb.strict_word_similarity(s.term, r.title) > 0.25 OR
+					sb.strict_word_similarity(s.term, r.description) > 0.25
 				)
 				ORDER BY GREATEST(sb.strict_word_similarity(s.term, r.title), sb.strict_word_similarity(s.term, r.description) ) DESC
 				LIMIT 5

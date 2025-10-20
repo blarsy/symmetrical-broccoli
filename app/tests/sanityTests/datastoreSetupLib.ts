@@ -1,14 +1,30 @@
 import { getApolloClient } from "@/lib/apolloClient"
 import { GraphQlLib } from "@/lib/backendFacade"
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client"
+import { ApolloClient, gql, HttpLink, InMemoryCache } from "@apollo/client"
 import dayjs from "dayjs"
 import config from "./config"
 import { executeQuery } from "./lib"
+import { UPDATE_ACCOUNT_PUBLIC_INFO } from "@/components/form/EditProfile"
+import { Link, Location } from "@/lib/schema"
+import { SUGGEST_RESOURCES } from "@/components/SearchFilterContextProvider"
 
 export const getToken = async (email: string, password: string) => {
     const client = getApolloClient('')
     const res = await client.mutate({ mutation: GraphQlLib.mutations.AUTHENTICATE, variables: { email, password } } )
     return res.data.authenticate.jwtToken as string
+}
+
+export const fromToday = (days: number) =>
+    new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * days)
+
+export const createCampaign = async (name: string, description: string,
+    airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
+    ending: Date): Promise<number> => {
+    await executeQuery(`INSERT INTO sb.campaigns(
+        name, description, airdrop, airdrop_amount, resource_rewards_multiplier, beginning, ending)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
+    const res = await executeQuery('select id from sb.get_active_campaign();')
+    return res.rows[0].id;
 }
 
 const confirmAccount = async (email: string) => {
@@ -40,6 +56,34 @@ export const createAndLogIn = async (email: string, name: string, password: stri
     }
 }
 
+export const setAccountAddress = async (token: string, location: Location, links: Link[] = []) => {
+    const client = getApolloClient(token)
+    const res = await client.mutate({ mutation: UPDATE_ACCOUNT_PUBLIC_INFO, variables: {
+        location, 
+        links: links.map(link => ({ label: link.label, url: link.url, linkTypeId: link.type })) 
+    } })
+    return res.data.updateAccountPublicInfo.integer === 1
+}
+
+export const searchResourcesOnTerm = async (token: string, term: string) => {
+    const client = getApolloClient(token)
+    await client.mutate({ mutation: SUGGEST_RESOURCES, variables: {
+        categoryCodes: [1],
+        searchTerm: term,
+        isProduct: false,
+        isService: false,
+        canBeTakenAway: false,
+        canBeDelivered: false,
+        canBeExchanged: false,
+        canBeGifted: false,
+        excludeUnlocated: false,
+        referenceLocationLatitude: 0,
+        referenceLocationLongitude: 0,
+        distanceToReferenceLocation: null,
+        inActiveCampaign: false
+    }})
+}
+
 export const authenticate = async (email: string, password: string) => {
     const client = getApolloClient('')
     try {
@@ -59,7 +103,7 @@ export const deleteAccount = async (email: string, password: string) => {
         if(jwtToken) {
             return await deleteAccountByToken(jwtToken)
         }
-        throw new Error(``)
+        throw new Error(`No JWT token found for account '${email}', cannot delete`)
     } catch(e) {
         console.debug('Error while trying to delete account', e)
     }
@@ -72,11 +116,12 @@ const deleteAccountByToken = async (token: string) => {
 
 export const createResource = async (jwtToken: string, title: string, description: string,
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
-    canBeExchanged: boolean, canBeGifted: boolean, expiration: Date, categoryCodes: number[]): Promise<number> => {
+    canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | null, categoryCodes: number[], 
+    location: Location | null = null, campaignToJoin: number | null = null): Promise<number> => {
     const loggedInClient = getApolloClient(jwtToken)
     const res = await loggedInClient.mutate({ mutation: GraphQlLib.mutations.CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
-        expiration, isProduct, isService, title
+        expiration, isProduct, isService, title, price: null, campaignToJoin, specificLocation: location
     } })
     return res.data.createResource.integer
 }
@@ -144,7 +189,7 @@ const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
 }`
 
 export const simulateActivation = async (activationCode: string) => {
-    await new ApolloClient({ uri: config.graphQlUrl, cache: new InMemoryCache() })
+    await new ApolloClient({link: new HttpLink({ uri: config.graphQlUrl }), cache: new InMemoryCache()})
         .mutate({ mutation: ACTIVATE, variables: { activationCode } })
 }
 
@@ -210,29 +255,33 @@ interface SearchableResources {
     resourceIds: [number, number, number, number, number, number, number];
 }
 
+export const searchableResourceTitles = [
+    `Pots weck`,`Carte Pokemon 151`,`Siège de bureau porsche`,`Jante 5x112 Monaco`
+]
+export const searchableAccountNames = [`Artisan intéressant`, `Patissier à domicile`]
+
 export const setupSearchableResources = async (testNum: string): Promise<SearchableResources> => {
     const password = 'Password1!'
-    const name1 = `me${testNum}-1`, name2 = `me${testNum}-2`
     const dateInFuture = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 4)
 
     const accounts = await Promise.all([ 
-        createAndLogIn(`${name1}@me.com`, name1, password, true),
-        createAndLogIn(`${name2}@me.com`, name2, password, true)
+        createAndLogIn(`me${testNum}-1@me.com`, searchableAccountNames[0], password, true, true),
+        createAndLogIn(`me${testNum}-2@me.com`, searchableAccountNames[1], password, true, true)
     ])
 
     const accountNames = [
-        {name: name1, data: accounts[0]},
-        {name: name2, data: accounts[1]},
+        {name: searchableAccountNames[0], data: accounts[0]},
+        {name: searchableAccountNames[1], data: accounts[1]},
     ]
 
     const resourceIds = await Promise.all([
-        createResource(accounts[0].token, `${name1}-1`, 'desc', true, false, true, false, true, false, new Date(), [10]),
-        createResource(accounts[0].token, `${name1}-2`, 'desc', true, false, true, false, true, false, dateInFuture, [10]),
-        createResource(accounts[0].token, `${name1}-3`, 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
-        createResource(accounts[1].token, `${name2}-1`, 'desc', false, true, false, true, false, false, new Date(), [2]),
-        createResource(accounts[1].token, `${name2}-2`, 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
-        createResource(accounts[1].token, `${name2}-3`, 'desc', true, true, true, true, true, true, dateInFuture, [10]),
-        createResource(accounts[1].token, `${name1}-suspended`, 'desc', true, false, true, false, true, false, dateInFuture, [10]),
+        createResource(accounts[0].token, `${searchableAccountNames[0]}-1`, 'desc', true, false, true, false, true, false, new Date(), [10]),
+        createResource(accounts[0].token, searchableResourceTitles[0], 'desc', true, false, true, false, true, false, dateInFuture, [10]),
+        createResource(accounts[0].token, searchableResourceTitles[1], 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
+        createResource(accounts[1].token, `${searchableAccountNames[1]}-1`, 'desc', false, true, false, true, false, false, new Date(), [2]),
+        createResource(accounts[1].token, searchableResourceTitles[2], 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
+        createResource(accounts[1].token, searchableResourceTitles[3], 'desc', true, true, true, true, true, true, dateInFuture, [10]),
+        createResource(accounts[1].token, `suspended res`, 'desc', true, false, true, false, true, false, dateInFuture, [10]),
     ])
     await setResourceData(resourceIds[6], { suspended: new Date() })
 
@@ -249,4 +298,11 @@ export const setAccountTokens = async (email: string, numberOfTokens: number) =>
     await executeQuery(`update sb.accounts
         set amount_of_tokens = $1
         where email = lower($2)`, [numberOfTokens, email])
+}
+
+export const removeActiveCampaign = async () => {
+    await executeQuery(`
+        delete from sb.campaigns_resources where campaign_id = (select id from sb.get_active_campaign());
+        delete from sb.campaigns where id = (select id from sb.get_active_campaign());
+    `)
 }

@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react-nativ
 import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
 import { AppWithSingleScreen } from "./lib"
 import React from "react"
-import '@testing-library/react-native/extend-expect'
 import { checkAccountWillingToContribute } from "./datastoreCheck"
 import Resources from "@/components/mainViews/Resources"
 

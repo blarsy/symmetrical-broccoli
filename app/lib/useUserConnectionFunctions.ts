@@ -218,10 +218,10 @@ export default () => {
             onConnected()
         } else {
             appDispatch({ type: AppReducerActionType.SetConnectingStatus, payload: { message, subMessage, onConnected: (token: string) => {
-            if(token) {
-                onConnected()
-            }
-        } } })
+                if(token) {
+                    onConnected()
+                }
+            } } })
         }
     }
 

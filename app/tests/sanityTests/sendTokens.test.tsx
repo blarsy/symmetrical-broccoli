@@ -1,8 +1,7 @@
 import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { AppWithScreens } from "./lib"
+import { AppWithScreens, waitForThenPress } from "./lib"
 import { SearchResults } from "@/components/mainViews/Search"
-import '@testing-library/react-native/extend-expect'
 import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
 import ViewResource from "@/components/resources/ViewResource"
 import ViewAccount from "@/components/mainViews/ViewAccount"
@@ -46,9 +45,11 @@ test('Send Topes', async () => {
     
     fireEvent.press(screen.getByTestId(`FoundResource:${res1Id}:ViewResourceButton`))
 
-    await waitFor(() => expect(screen.getByTestId('viewResource:SendTokens')).toBeOnTheScreen())
+    await waitForThenPress('viewResource:viewButton', screen)
+    //await waitFor(() => expect(screen.getByTestId('viewResource:viewButton')).toBeOnTheScreen())
 
-    fireEvent.press(screen.getByTestId('viewResource:SendTokens'))
+    await waitForThenPress('SendTokens', screen)
+    //fireEvent.press(screen.getByTestId('viewResource:SendTokens'))
 
     await waitFor(() => expect(screen.getByTestId('sendTokensDialog:AmountToSend')).toBeOnTheScreen())
 

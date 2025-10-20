@@ -24,7 +24,6 @@ import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
 import BareIconButton from "../layout/BareIconButton"
 
-
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)

@@ -1,11 +1,21 @@
 import { TextEncoder, TextDecoder } from 'util'
 import 'react-native-gesture-handler/jestSetup'
+import { enableScreens } from 'react-native-screens'
+
+enableScreens(false)
 
 Object.assign(global, { TextDecoder, TextEncoder })
 
-jest.mock('expo-linking'), () => {
-  createURL: jest.fn().mockReturnValue('coucou gamin')
-}
+jest.mock('expo-linking', () => {
+
+  return {
+    createURL: jest.fn().mockReturnValue('http://coucou.com/gamin'),
+    getInitialURL: jest.fn().mockReturnValue('url'),
+    addEventListener: jest.fn().mockReturnValue({
+      remove: () => {}
+    })
+  }
+})
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
@@ -23,6 +33,46 @@ jest.mock('react-native-reanimated', () => {
 })
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper')
+jest.mock('react-native/src/private/animated/NativeAnimatedHelper')
+
+jest.mock('@os-team/i18next-react-native-language-detector', () => ({
+  type: 'languageDetector',
+  async: true,
+  detect: (cb: (lang: string) => void) => cb('en'),
+  init: jest.fn(),
+  cacheUserLanguage: jest.fn(),
+}))
+
+jest.mock('react-native-maps', () => {
+  const React = require('react')
+  const { View } = require('react-native')
+  const MockMapView = (props: any) => React.createElement(View, props, props.children)
+  const MockMarker = (props: any) => React.createElement(View, props, props.children)
+  return {
+    __esModule: true,
+    default: MockMapView,
+    Marker: MockMarker,
+    PROVIDER_GOOGLE: 'google',
+  }
+})
+
+jest.mock('react-native-paper/react-navigation', () => {
+  return {
+    createMaterialBottomTabNavigator: () => {
+      const React = require('react')
+      return {
+        Navigator: (props: any) => React.createElement('View', props),
+        Screen: (props: any) => React.createElement('View', props),
+      }
+    },
+  }
+})
+
+jest.mock('expo-notifications', () => ({
+  addNotificationResponseReceivedListener: jest.fn(),
+  getLastNotificationResponseAsync: jest.fn(),
+  setNotificationHandler: jest.fn(),
+  
+}))
 
 jest.setTimeout(40000)

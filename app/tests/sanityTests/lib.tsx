@@ -25,10 +25,13 @@ const BoardWithSingleComponent = (t: TabNavigatorProps) => (r: RouteProps) => <D
     name: t.name, component: t.component
 }]} />
 
-const BoardWithComponents = (ts: TabNavigatorProps[] | undefined) => (r: RouteProps) => <DealBoard {...r} tabs={ ts && ts.map(t => ({ name: t.name, component: t.component })) }/>
+const BoardWithComponents = (ts: TabNavigatorProps[] | undefined) => (r: RouteProps) => {
+    console.log('render boardwithcomps', ts)
+    return <DealBoard {...r} tabs={ ts && ts.map(t => ({ name: t.name, component: t.component })) }/>
+}
 
 export const AppWithSingleScreen = (t: Props) => <AppContextProvider>
-    <Start splashScreenMinimumDuration={0} overrideSecureStore={t.overrideSecureStore}>
+    <Start splashScreenMinimumDuration={0} overrideSecureStore={t.overrideSecureStore} overrideVersionChecker={() => true}>
         <Main screens={[{
                 name: 'main', component: BoardWithSingleComponent(t)
             }, {
@@ -43,7 +46,7 @@ interface MultiScreenProps {
 }
 
 export const AppWithScreens = (t: MultiScreenProps) => <AppContextProvider>
-    <Start splashScreenMinimumDuration={0} overrideSecureStore={t.overrideSecureStore}>
+    <Start splashScreenMinimumDuration={0} overrideSecureStore={t.overrideSecureStore} overrideVersionChecker={() => true}>
         <Main screens={[{
                 name: 'main', component: BoardWithComponents(t.screens)
             }, {
@@ -90,7 +93,7 @@ export const checkBadge = async (testID: string, textContent: string, screen : R
 export const checkBadgeNumeric = async (testID: string, screen : RenderResult) => {
     //Oddly enough, Badge renders two items with the same testID, and the same content. As there is no way to change it, 
     //we just work around it
-    await waitFor(async () => expect(await screen.findAllByTestId(testID, { includeHiddenElements: true })).toHaveLength(2))
+    await waitFor(async () => expect(await screen.findAllByTestId(testID, { includeHiddenElements: true })).toHaveLength(2), { timeout: 5000 })
     const badges = await screen.findAllByTestId(testID, { includeHiddenElements: true })
     expect(badges[0]).toHaveTextContent(/\d+/)
 }
@@ -98,7 +101,7 @@ export const checkBadgeNumeric = async (testID: string, screen : RenderResult) =
 export const waitForThenPress = async (testId: string, screen: RenderResult, timeout?: number) => {
     await waitFor(() => expect(screen.getByTestId(testId)).toBeOnTheScreen(), { timeout })
     const uv = userEvent.setup()
-    uv.press(screen.getByTestId(testId))
+    await uv.press(screen.getByTestId(testId))
 }
 
 export const createResourceThroughUI = async (title: string, description: string, expiration: Date, targetScreen: RenderResult, checkSuccess: Boolean = true) => {

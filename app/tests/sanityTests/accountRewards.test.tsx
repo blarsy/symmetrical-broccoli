@@ -2,8 +2,7 @@ import { render, waitFor, screen } from "@testing-library/react-native"
 import React from "react"
 import { TestAccount, makeTestAccounts, cleanupTestAccounts } from "./datastoreSetupLib"
 import { AppWithScreens, waitForThenPress } from "./lib"
-import { checkAccountAddress, checkAccountData, checkAccountLogo } from "./datastoreCheck"
-import '@testing-library/react-native/extend-expect'
+import { checkAccountAddress, checkAccountLogo } from "./datastoreCheck"
 import { DEFAUT_LOCATION } from "@/lib/utils"
 import ResourcesList from "@/components/resources/ResourcesList"
 import { ImageResult } from "expo-image-manipulator"
@@ -52,8 +51,12 @@ test('Setting account address gives reward', async () => {
 
     await waitForThenPress('Profile:BackButton', screen)
 
-    await waitFor(() => expect(screen.getByTestId('TokenCounter:AmountOfTokens')).toHaveTextContent('X50'))
-    
+    //Apparently, react-native-screens is used by react-navigation v6+. Issue, it optimizes navigating 
+    // back and forth navigator-managed screens by switching their visibility (aria-hidden attribute), instead
+    // of unmounting / mounting the pages. In this test, it simply never 
+    const tokenCounter = await screen.findByTestId('TokenCounter:AmountOfTokens', { includeHiddenElements: true })
+    expect(tokenCounter).toHaveTextContent('X50')
+
     expect(checkAccountAddress('Dummy address', DEFAUT_LOCATION.latitude, DEFAUT_LOCATION.longitude, testAccount.data.id)).toBeTruthy()
 })
 
@@ -61,7 +64,7 @@ test('Setting account logo gives reward', async () => {
     render(<AppWithScreens screens={[{ component: ResourcesList, name: 'resourceList' }]}
         overrideSecureStore={{ get: async () => testAccount.data.token, set: async () => {}, remove: async () => {} }} />)
     
-    await waitForThenPress('openProfile', screen,5000)
+    await waitForThenPress('openProfile', screen)
 
     await waitForThenPress('setImageButton', screen)
 
@@ -69,7 +72,11 @@ test('Setting account logo gives reward', async () => {
 
     await waitForThenPress('Profile:BackButton', screen)
 
-    await waitFor(() => expect(screen.getByTestId('TokenCounter:AmountOfTokens')).toHaveTextContent('X50'))
+    //Apparently, react-native-screens is used by react-navigation v6+. Issue, it optimizes navigating 
+    // back and forth navigator-managed screens by switching their visibility (aria-hidden attribute), instead
+    // of unmounting / mounting the pages. In this test, it simply never 
+    const tokenCounter = await screen.findByTestId('TokenCounter:AmountOfTokens', { includeHiddenElements: true })
+    expect(tokenCounter).toHaveTextContent('X50')
     
     expect(checkAccountLogo('dummy_public_id', testAccount.data.id)).toBeTruthy()
 })

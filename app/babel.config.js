@@ -13,6 +13,8 @@ module.exports = function(api) {
           },
         },
       ],
+      '@babel/plugin-proposal-optional-chaining',
+      '@babel/plugin-proposal-nullish-coalescing-operator',
       // warning: the following plugin has to come last
       'react-native-reanimated/plugin'
     ]

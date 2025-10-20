@@ -437,7 +437,7 @@ const resources = {
       "bidDeletedHeadline2": "{{cancelledBy}} a retiré son offre",
       "bidDeletedDetails": "Elle concernait ta ressource '{{resourceTitle}}'",
       "bidExpiredHeadline1": "Offre expirée",
-      "bidExpiredHeadline2": "Ton affre à {{resourceAuthor}} a expiré sans avoir eu de réponse",
+      "bidExpiredHeadline2": "Ton offre à {{resourceAuthor}} a expiré sans avoir eu de réponse",
       "bidDExpiredDetails": "Elle concernait la ressource '{{resourceTitle}}'",
       "bidExpiredWithResourceHeadline1": "Offre expirée",
       "bidExpiredWithResourceHeadline2": "Ton offre à {{resourceAuthor}} a été annulée automatiquement.",

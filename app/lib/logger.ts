@@ -43,7 +43,7 @@ const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: Int, $data: S
   `
 
 let globalLogger: {
-    [x: string]: (...args: unknown[]) => void;
+    [x: string]: (...args: any[]) => void;
 }
 
 export const setOrResetGlobalLogger = async (levelCode?: number) => {
@@ -63,7 +63,7 @@ export const setOrResetGlobalLogger = async (levelCode?: number) => {
     const severity = levelCode ? levelFromLevelCode(levelCode.valueOf()) : ( diagnostic ? 'debug': 'error' )
 
     globalLogger = logger.createLogger({ transport: (p) => {
-        const logData = p.rawMsg[0] as ClientLogMessage
+        const logData = (p.rawMsg as ClientLogMessage[])[0] as ClientLogMessage
         const data = logData.device ? `${logData.message}\nDevice ${logData.device}` : logData.message
         
         client.mutate({ mutation: CREATE_CLIENT_LOG, variables: {

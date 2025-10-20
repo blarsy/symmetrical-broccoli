@@ -4,7 +4,6 @@ import { AppWithScreens } from "./lib"
 import React from "react"
 import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
 import ResourcesList from "@/components/resources/ResourcesList"
-import '@testing-library/react-native/extend-expect'
 import EditResource from "@/components/form/EditResource"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from "dayjs"

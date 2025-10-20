@@ -147,14 +147,21 @@ export const checkLastNotificationExists = async (email: string): Promise<any> =
 }
 
 export const checkANotificationExists = async (email: string, validateData: (data: any) => boolean) => {
+    let retValue: boolean = false
     const result = await executeQuery(`select n.data from sb.notifications n
             inner join sb.accounts a on a.id = n.account_id
             where a.email = lower($1)
+            order by n.created desc
             limit 1`, [email])
 
-    if(result.rowCount === 0) return false
+    if(result.rowCount === 0) {
+        retValue = false
+    } else {
+        retValue = result.rows.some(row => validateData(row.data))
+    }
 
-    return result.rows.some(row => validateData(row.data))
+    //console.log('retValue', retValue)
+    return retValue
 }
 
 export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {

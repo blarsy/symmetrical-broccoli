@@ -1,4 +1,3 @@
-import '@testing-library/react-native/extend-expect'
 import { render, waitFor, fireEvent } from "@testing-library/react-native"
 import React from "react"
 import { cleanupTestAccounts, createResource, makeTestAccounts, TestAccount } from "./datastoreSetupLib"

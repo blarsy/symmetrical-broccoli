@@ -1,5 +1,4 @@
 import { cleanupTestAccounts, createResourceLowLevel, makeTestAccounts, setAccountTokens, TestAccount } from "./datastoreSetupLib"
-import '@testing-library/react-native/extend-expect'
 import dayjs from "dayjs"
 import { checkHasNotifications } from "./datastoreCheck"
 import { executeQuery } from "./lib"

@@ -175,9 +175,6 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             </View>}
             {resource.data.price && <>
                 <ViewField title={t('Label')}>
-                    {/* <View style={{ flexDirection: 'column' }}>
-                        <Text variant="bodyMedium">{resource.data.price}</Text>
-                    </View> */}
                     <PriceTag value={resource.data.price}/>
                 </ViewField>
                 <Hr thickness={2}/>

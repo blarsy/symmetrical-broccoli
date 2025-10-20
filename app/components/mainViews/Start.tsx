@@ -19,12 +19,11 @@ export const GET_MINIMUM_CLIENT_VERSION = gql`query GetMinimumClientVersion {
 const useVersionCheck = (versionChecker: (serverVersion: string) => boolean) => {
     const appAlertDispatch = useContext(AppAlertDispatchContext)
     const [getMinimumClientVersion] = useLazyQuery(GET_MINIMUM_CLIENT_VERSION)
-    const [busy, setBusy] = useState(false)
+    const [busy, setBusy] = useState(true)
     const [outdated, setOutdated] = useState(false)
 
     const checkVersion = async (): Promise<void> => {
         try {
-            setBusy(true)
             const minimumClientVersionData = await getMinimumClientVersion()
             if(minimumClientVersionData.error) throw minimumClientVersionData.error
             if(!versionChecker(minimumClientVersionData.data.getMinimumClientVersion)) {
@@ -78,7 +77,7 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     }, [])
 
     if(startingUp || !fontsLoaded || checkingVersion) {
-        return <Splash />
+        return <Splash testID="Splash" />
     }
 
     if(outdated) {
@@ -86,7 +85,7 @@ export const StartApolloWrapped = ({ overrideSecureStore, overrideVersionChecker
     }
 
     if(fontsLoaded) {
-        return <GestureHandlerRootView style={{ flex: 1 }}>
+        return <GestureHandlerRootView testID="Start" style={{ flex: 1 }}>
             { children }
             <ErrorSnackbar testID="startupError" error={appAlertContext.error} 
                 message={appAlertContext.error ? appAlertContext.message || t('requestError') : undefined} 

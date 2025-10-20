@@ -1,5 +1,4 @@
 import { applyResourceRewards, cleanupTestAccounts, createResourceLowLevel, createResourceLowLevelWithAnImage, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
-import '@testing-library/react-native/extend-expect'
 import dayjs from "dayjs"
 import { checkAccountTokens } from "./datastoreCheck"
 

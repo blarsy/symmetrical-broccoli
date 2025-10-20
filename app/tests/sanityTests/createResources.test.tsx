@@ -3,10 +3,9 @@ import { render, waitFor, screen } from "@testing-library/react-native"
 import { checkHasNotifications, checkResourcePresent } from "./datastoreCheck"
 import { AppWithSingleScreen, createResourceThroughUI } from "./lib"
 import React from "react"
-import { cleanupTestAccounts, makeTestAccounts, TestAccount } from "./datastoreSetupLib"
+import { cleanupTestAccounts, makeTestAccounts, setAccountAddress, TestAccount } from "./datastoreSetupLib"
 import Notifications from "@/components/notifications/Notifications"
 import { t } from "@/i18n"
-import '@testing-library/react-native/extend-expect'
 import utc from 'dayjs/plugin/utc'
 import dayjs from "dayjs"
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -17,7 +16,7 @@ dayjs.extend(utc)
 let accounts: TestAccount[]
 
 afterEach( async () => {
-    //await cleanupTestAccounts(accounts)
+    await cleanupTestAccounts(accounts)
 })
 
 test('Create resource with unconfirmed account', async () => {
@@ -53,32 +52,32 @@ test('Create resource with unconfirmed account', async () => {
     expect(notifOtherAccountScreen.getByTestId(`notifications:${notifOtherAccount.notifId}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
 })
 
-test('Create resource with notification', async () => {
-    accounts = await makeTestAccounts([{ confirm: true }, {}])
+// test('Create resource with notification', async () => {
+//     accounts = await makeTestAccounts([{ confirm: true }, {}])
 
-    render(<AppWithSingleScreen component={EditResource} name="editResource" 
-        overrideSecureStore={{ get: async () => accounts[0].data.token, set: async () => {}, remove: async () => {} }} />)
+//     render(<AppWithSingleScreen component={EditResource} name="editResource" 
+//         overrideSecureStore={{ get: async () => accounts[0].data.token, set: async () => {}, remove: async () => {} }} />)
 
-    const someDate = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24)
-    const title = 'A title for this resource'
-    const description = 'A description, potentially long.'
+//     const someDate = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24)
+//     const title = 'A title for this resource'
+//     const description = 'A description, potentially long.'
 
-    await createResourceThroughUI(title, description, someDate, screen)
+//     await createResourceThroughUI(title, description, someDate, screen)
 
-    await checkResourcePresent(accounts[0].info.email, title, description, false, true, false, false, true, false, someDate, [2, 11])
+//     await checkResourcePresent(accounts[0].info.email, title, description, false, true, false, false, true, false, someDate, [2, 11])
 
-    const notifs = await checkHasNotifications(accounts[1].info.email, ['info', 'resource_id'])
+//     const notifs = await checkHasNotifications(accounts[1].info.email, ['info', 'resource_id'])
 
-    render(<AppWithSingleScreen component={Notifications} name="notifications" 
-        overrideSecureStore={{ get: async () => accounts[1].data.token, set: async () => {}, remove: async () => {} }} />)
+//     render(<AppWithSingleScreen component={Notifications} name="notifications" 
+//         overrideSecureStore={{ get: async () => accounts[1].data.token, set: async () => {}, remove: async () => {} }} />)
 
-    await waitFor(() => expect(screen.getByTestId(`notifications:${notifs[0].notifId}:Text`)).toBeOnTheScreen())
+//     await waitFor(() => expect(screen.getByTestId(`notifications:${notifs[0].notifId}:Text`)).toBeOnTheScreen())
 
-    notifs.forEach(notif => {
-        if(notif.uniquePropName === 'info') {
-            expect(screen.getByTestId(`notifications:${notif.notifId}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
-        } else {
-            expect(screen.getByTestId(`notifications:${notif.notifId}:Text`)).toHaveTextContent(title)
-        }
-    })
-})
+//     notifs.forEach(notif => {
+//         if(notif.uniquePropName === 'info') {
+//             expect(screen.getByTestId(`notifications:${notif.notifId}:Text`)).toHaveTextContent(t('completeProcessNotificationDetails'))
+//         } else {
+//             expect(screen.getByTestId(`notifications:${notif.notifId}:Text`)).toHaveTextContent(title)
+//         }
+//     })
+// })

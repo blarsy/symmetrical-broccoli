@@ -189,7 +189,7 @@ interface TouchableOpacityProps extends PropsWithChildren {
 }
 
 export const TouchableOpacity = (p: TouchableOpacityProps) => <View style={p.style}>
-    <Pressable onPress={p.onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+    <Pressable testID={p.testID} onPress={p.onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
         {p.children}
     </Pressable>
 </View>

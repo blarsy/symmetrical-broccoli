@@ -3,7 +3,6 @@ import { cleanupTestAccounts, createResource, createResourceLowLevel, makeTestAc
 import { AppWithSingleScreen, createResourceThroughUI, executeQuery, waitForThenPress } from "./lib"
 import React from "react"
 import Resources from "@/components/mainViews/Resources"
-import '@testing-library/react-native/extend-expect'
 import { daysFromNow } from "@/lib/utils"
 
 let res1Id: number, account: TestAccount, resName: string
