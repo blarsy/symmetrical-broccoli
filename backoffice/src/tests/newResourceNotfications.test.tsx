@@ -79,5 +79,5 @@ test('New resource gets notified to accounts having searched on the ne resource 
 })
 
 afterEach(async () => {
-    cleanupTestAccounts(accounts)
+    return cleanupTestAccounts(accounts)
 })

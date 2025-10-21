@@ -3,15 +3,14 @@ import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts
 let accounts : TestAccount[]
 let account1: TestAccount, account2: TestAccount, account3: TestAccount
 
-const mockUsePathname = jest.fn(() => '/webapp/v0_10/notifications')
-
 jest.mock('next/navigation', () => ({
   usePathname() {
-    return mockUsePathname()
+    return '/webapp/v0_10/notifications'
   },
   useRouter() {
     return {}
-  }
+  },
+  useSearchParams() { return null }
 }))
 
 beforeEach(async () => {

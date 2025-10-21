@@ -164,11 +164,11 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
     return avatar
 }
 
-export const PriceTag = ({ value, label, big }: { value: number, label?: string, big?: boolean }) => {
+export const PriceTag = ({ value, label, big, testID }: { value: number, label?: string, big?: boolean, testID?: string }) => {
     return <Tooltip title={`${value} Topes = ${value / 100} Euro`}>
-        <Stack direction="row" gap="0.5rem" alignItems="center">
-            { label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{label} </Typography> }
-            <Typography color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value} </Typography>
+        <Stack direction="row" gap="1rem" alignItems="center">
+            { label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{label}</Typography> }
+            <Typography data-testid={testID} color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value}</Typography>
             <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>
         </Stack>
     </Tooltip>

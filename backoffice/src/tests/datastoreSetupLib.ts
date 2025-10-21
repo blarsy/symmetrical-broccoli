@@ -326,10 +326,9 @@ export const fromToday = (days: number) =>
 export const createCampaign = async (name: string, description: string,
     airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
     ending: Date): Promise<number> => {
-    await executeQuery(`INSERT INTO sb.campaigns(
+    const res = await executeQuery(`INSERT INTO sb.campaigns(
         name, description, airdrop, airdrop_amount, resource_rewards_multiplier, beginning, ending)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
-    const res = await executeQuery('select id from sb.get_active_campaign();')
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
     return res.rows[0].id;
 }
 

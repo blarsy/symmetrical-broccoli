@@ -146,7 +146,7 @@ const TopBar = ({ version }: Props) => {
             }
         })}>
             { appContext.account &&  <Link style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
-                <PriceTag value={appContext.account.amountOfTokens} big/>
+                <PriceTag testID="TokenCounter" value={appContext.account.amountOfTokens} big/>
             </Link> }
             <Stack direction="row" alignItems="center">
                 <DarkModeIcon color="primary" />

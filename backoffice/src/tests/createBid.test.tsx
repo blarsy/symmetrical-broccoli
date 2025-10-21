@@ -20,7 +20,8 @@ jest.mock('next/navigation', () => ({
   },
   useRouter() {
     return {}
-  }
+  },
+  useSearchParams() { return null }
 }))
 
 beforeEach(async () => {
