@@ -109,6 +109,66 @@ REVOKE ALL ON FUNCTION sb.get_session_data_web() FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION sb.get_session_data_web() TO identified_account;
 
+
+DO
+$do$
+BEGIN
+   IF EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE  rolname = 'admin') THEN
+
+      RAISE NOTICE 'Role "admin" already exists. Skipping.';
+   ELSE
+      BEGIN   -- nested block
+         CREATE ROLE admin WITH
+			NOLOGIN
+			NOSUPERUSER
+			INHERIT
+			NOCREATEDB
+			NOCREATEROLE
+			NOREPLICATION;
+      EXCEPTION
+         WHEN duplicate_object THEN
+            RAISE NOTICE 'Role "admin" was just created by a concurrent transaction. Skipping.';
+      END;
+   END IF;
+END
+$do$;
+
+CREATE OR REPLACE VIEW sb.active_accounts
+ AS
+ SELECT accounts.id,
+    accounts.name,
+    accounts.email,
+    accounts.hash,
+    accounts.salt,
+    accounts.recovery_code,
+    accounts.recovery_code_expiration,
+    accounts.created,
+    accounts.avatar_image_id,
+    accounts.activated,
+    accounts.language,
+    accounts.log_level,
+    accounts.location_id,
+    accounts.can_be_showcased,
+    accounts.willing_to_contribute,
+    accounts.amount_of_tokens,
+    accounts.unlimited_until,
+    accounts.last_suspension_warning,
+	accounts.knows_about_campaigns
+   FROM accounts
+  WHERE accounts.activated IS NOT NULL AND accounts.name::text <> ''::text AND accounts.name IS NOT NULL;
+
+ALTER TABLE sb.active_accounts
+    OWNER TO sb;
+COMMENT ON VIEW sb.active_accounts
+    IS '@omit all';
+
+GRANT SELECT ON TABLE sb.active_accounts TO admin;
+GRANT SELECT ON TABLE sb.active_accounts TO anonymous;
+GRANT SELECT ON TABLE sb.active_accounts TO identified_account;
+GRANT ALL ON TABLE sb.active_accounts TO sb;
+
 REVOKE ALL ON FUNCTION sb.conversation_messages(integer, integer) FROM PUBLIC;
 
 CREATE OR REPLACE FUNCTION sb.get_conversation_for_resource(
@@ -1233,15 +1293,6 @@ ALTER FUNCTION sb.get_account_public_info(integer)
 GRANT EXECUTE ON FUNCTION sb.get_account_public_info(integer) TO identified_account;
 
 GRANT EXECUTE ON FUNCTION sb.get_account_public_info(integer) TO PUBLIC;
-
-DROP ROLE IF EXISTS admin;
-CREATE ROLE admin WITH
-  NOLOGIN
-  NOSUPERUSER
-  INHERIT
-  NOCREATEDB
-  NOCREATEROLE
-  NOREPLICATION;
   
 GRANT USAGE ON SCHEMA sb TO admin;
 GRANT SELECT ON TABLE sb.notifications TO admin;

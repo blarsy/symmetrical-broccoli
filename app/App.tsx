@@ -13,8 +13,6 @@ import './lib/logger'
 import { error } from './lib/logger'
 import { AppContextProvider } from './components/AppContextProvider'
 import MainNavigator from './components/mainViews/MainNavigator'
-import ErrorBoundary, { FallbackComponentProps } from 'react-native-error-boundary'
-import { Text } from 'react-native-paper'
 
 if(typeof ErrorUtils != 'undefined') {
   // ErrorUtils is not defined on web

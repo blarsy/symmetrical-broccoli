@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material"
 import localFont from "next/font/local"
 import { lightPrimaryColor } from "./utils"
 
-const title = localFont({ src: './app/Bruta-Sans.ttf' })
+const title = localFont({ src: './app/LTMakeup-Regular.otf' })
 const general = localFont({ src: './app/renner-book.otf' })
 const altGeneral = localFont({ src: './app/renner-black.otf', weight: "800" })
 const sugar = localFont({ src: './app/ComicJensFreePro-Regular.ttf' })
