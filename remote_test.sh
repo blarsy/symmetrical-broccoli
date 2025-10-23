@@ -16,6 +16,7 @@ cp -r website ./../docker/containers/website/website
 
 cd /home/symbro_test/docker/environments/test
 
+# !! DONT COPY THIS LINE ON THE PROD SCRIPT !!
 # this is not added to the production deployment script, because should the database container not be running when this script runs, it would be wiped out, volumes included
 docker system prune -f
 
