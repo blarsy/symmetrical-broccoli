@@ -14,6 +14,8 @@ import ResourceImageWithCreator from "../ResourceImageWithAuthor"
 import { AvatarIconAccountInfo } from "../mainViews/AccountAvatar"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import dayjs from "dayjs"
+import { SvgProps } from "react-native-svg"
+import Images from "@/Images"
 
 interface NotificationData {
     id: number
@@ -22,7 +24,7 @@ interface NotificationData {
     headline1: string
     headline2: string
     text: string
-    image?: string | { resource: Resource, account: AvatarIconAccountInfo }
+    image?: string | { resource: Resource, account: AvatarIconAccountInfo } | React.FC<SvgProps>
     onPress: () => void
 }
 
@@ -177,7 +179,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
     }
 
     const makeNotificationData = (rawNotification: any, headline1: string, headline2: string, 
-        text: string, navigate: () => void
+        text: string, navigate: () => void, image: string | React.FC<SvgProps> | { resource: Resource, account: AvatarIconAccountInfo }
     ): NotificationData => ({
         id: rawNotification.node.id,
         created: rawNotification.node.created, 
@@ -185,7 +187,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
         headline2,
         read: rawNotification.node.read,
         text,
-        image: undefined,
+        image,
         onPress: async () => {
             setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
             navigate()
@@ -221,7 +223,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                         () => {
                             navigation.navigate('profile')
                         }
-                    ))
+                    , Images.Hey))
                     break
                 case 'SOME_RESOURCES_SUSPENDED':
                     otherNotifs.push(makeNotificationData(rawNotification, t('resourcesSuspendedNotificationHeadline'),
@@ -231,7 +233,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 screen: 'resources'
                             })
                         }
-                     ))
+                    , Images.Suspended))
                     break
                 case 'WARNING_LOW_TOKEN_AMOUNT':
                     otherNotifs.push(makeNotificationData(rawNotification, t('lowAmountOfTokenNotificationHeadline'),
@@ -241,7 +243,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 screen: 'tokens'
                             })
                         }
-                    ))
+                    , Images.Broke))
                     break
                 case 'TOKENS_RECEIVED':
                     otherNotifs.push(makeNotificationData(rawNotification, t('tokensReceivedHeadline1'),
@@ -254,7 +256,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 }
                             })
                         }
-                    ))
+                    , Images.MoneyIn))
                     break
                 case 'TOKENS_SENT':
                     otherNotifs.push(makeNotificationData(rawNotification, t('tokensSentHeadline1'),
@@ -267,7 +269,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 }
                             })
                         }
-                    ))
+                    , Images.GiftSent))
                     break
                 case 'WELCOME_TOKEN_USER':
                     otherNotifs.push(makeNotificationData(rawNotification, t('welcomeTokenUserHeadline1'),
@@ -277,7 +279,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 screen: 'tokens'
                             })
                         }
-                    ))
+                    , Images.Thanks))
                     break
                 case 'BID_RECEIVED':
                     otherNotifs.push(
@@ -291,7 +293,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: false
                                     }
                                 })
-                            })
+                            }, Images.BidReceived)
                         )
                     break
                 case 'BID_REFUSED':
@@ -306,7 +308,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.Denied)
                         )
                     break
                 case 'BID_ACCEPTED':
@@ -321,7 +323,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.PrizeWon)
                         )
                     break
                 case 'BID_EXPIRED':
@@ -336,7 +338,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.Gone)
                         )
                     break
                 case 'BID_CANCELLED':
@@ -351,7 +353,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.TimeUp)
                         )                    
                     break
                 case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
@@ -366,7 +368,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.TimeUp)
                         )
                     break
                 case 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED':
@@ -381,7 +383,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         includeInactive: true
                                     }
                                 })
-                            })
+                            }, Images.Denied)
                         )
                     break
                 case 'TOKEN_GRANTED':
@@ -395,7 +397,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         showHistory: true
                                     }
                                 })
-                            })
+                            }, Images.GotGift)
                         )
                     break
                 case 'AIRDROP_RECEIVED':
@@ -409,7 +411,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                         showHistory: true
                                     }
                                 })
-                            })
+                            }, Images.ThumbUp)
                         )
                     break
                 case 'CAMPAIGN_BEGUN':
@@ -420,7 +422,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 navigation.navigate('resource', {
                                     screen: 'resources'
                                 })
-                            })
+                            }, Images.Campaign)
                         )
                     break
                 case 'AIRDROP_SOON':
@@ -431,7 +433,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                                 navigation.navigate('resource', {
                                     screen: 'resources'
                                 })
-                            })
+                            }, Images.Airdrop)
                         )
                     break
             }
@@ -466,15 +468,26 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
 }
 
 const NotificationImage = ({ image } : { image: string | {
-    resource: Resource;
-    account: AvatarIconAccountInfo;
-} | undefined }) => {
+    resource: Resource,
+    account: AvatarIconAccountInfo
+} | React.FC<SvgProps> | undefined }) => {
     if(typeof image === 'string') {
         return <Image style={{ width: 70, height: 70, borderRadius: 10 }} source={{ uri: image }} />
-    } else if (!image) {
-        return <Icon size={70} source="creation" />
     } else {
-        return <ResourceImageWithCreator size={70} resource={image.resource} authorInfo={image.account} />
+        const Svg = image as React.FC<SvgProps>
+        const resourceImage = image as {
+            resource: Resource,
+            account: AvatarIconAccountInfo
+        }
+        if(Svg.name) {
+            return <View style={{ width: 70, height: 70, borderRadius: 10 }}>
+                <Svg/>
+            </View>
+        } else if(resourceImage) {
+            return <ResourceImageWithCreator size={70} resource={resourceImage.resource} authorInfo={resourceImage.account} />
+        } else {
+            return <Icon size={70} source="creation" />
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import EditProfile from "@/components/form/EditProfile"
 import PrimaryColoredContainer from "@/components/layout/PrimaryColoredContainer"
-import { ActivityIndicator, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
+import { ActivityIndicator, Dimensions, DimensionValue, FlexAlignType, ScrollView, View } from "react-native"
 import { RouteProps, adaptToWidth, getAppBarsTitleFontSize, mdScreenWidth } from "@/lib/utils"
 import { t } from "@/i18n"
 import { Appbar, BottomNavigation, Button, Dialog, Icon, IconButton, Portal, Switch, Text } from "react-native-paper"
@@ -133,6 +133,7 @@ export default function Profile ({ route, navigation }: RouteProps) {
             screenOptions={() => ({ headerShown: false, sceneStyle: { backgroundColor: 'transparent' } })} 
             tabBar={({ navigation, state, descriptors, insets }) => 
                 <BottomNavigation.Bar
+                    safeAreaInsets={insets}
                     activeColor={ primaryColor } inactiveColor="#000" 
                     navigationState={{ index, routes }} style={{ backgroundColor: lightPrimaryColor }}
                     onTabPress={ptp => {

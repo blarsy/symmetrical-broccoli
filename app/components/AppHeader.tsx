@@ -58,7 +58,7 @@ const AppHeader = ({ currentTabTitle, onProfileScreenRequested, onSupportScreenR
         size={getBaseHeaderButtonSize() * 0.8} color="#000" onPress={onSupportScreenRequested} />
     const barContent = <Appbar.Content key="content" title={currentTabTitle} 
         titleStyle={{ fontWeight: '400', textTransform: 'uppercase', textAlign: 'center', 
-            fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() }} />
+            fontSize: getAppBarsTitleFontSize(), lineHeight: getAppBarsTitleFontSize() + 4}} />
     const profileAction = <Appbar.Action key="profile" testID={appContext.account ? 'openProfile': 'openLoginScreen'} 
         style={{ backgroundColor: appContext.account?.avatarPublicId ? 'transparent' : '#fff', 
             height: getProfileButtonSize(), width: getProfileButtonSize() }} 

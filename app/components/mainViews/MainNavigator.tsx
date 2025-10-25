@@ -1,6 +1,6 @@
 import {DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native'
 import React, { PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
-import { ScrollView, View } from 'react-native'
+import { Dimensions, ScrollView, View } from 'react-native'
 import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { lightPrimaryColor, primaryColor } from '@/components/layout/constants'
 import { Portal, Snackbar, Text } from 'react-native-paper'
@@ -10,13 +10,15 @@ import * as Linking from 'expo-linking'
 import { gql, useLazyQuery } from '@apollo/client'
 import { EventSubscription, addNotificationResponseReceivedListener, getLastNotificationResponseAsync } from 'expo-notifications'
 import NewChatMessages from '../chat/NewChatMessages'
-import { debug } from '@/lib/logger'
+import { debug, error } from '@/lib/logger'
 import { fromData, fromError } from '@/lib/DataLoadState'
 import { AppContext, AppDispatchContext, AppReducerActionType } from '../AppContextProvider'
 import ConnectionDialog from '../ConnectionDialog'
 import DealBoard from './DealBoard'
 import Profile from '../account/Profile'
 import ErrorBoundary, { FallbackComponentProps } from 'react-native-error-boundary'
+import { t } from '@/i18n'
+import AccordionItem from '../AccordionItem'
 
 const StackNav = createNativeStackNavigator()
 
@@ -96,11 +98,19 @@ const ChatMessagesNotificationArea = ({ onClose, newMessage }: ChatMessagesNotif
     </Portal>
 }
 
-const GeneralError = (p: FallbackComponentProps) => <View>
-  <Text variant='headlineLarge'>Oops</Text>
-  <Text variant='bodyMedium'>An problematic error has occured</Text>
-  <Text variant='bodySmall'>{p.error.message}</Text>
-  <Text variant='bodySmall'>{p.error.stack}</Text>
+const GeneralError = (p: FallbackComponentProps) => <View style={{ padding: 20, backgroundColor: lightPrimaryColor, 
+    margin: 10, borderRadius: 15, gap: 20, display: 'flex', alignItems: 'center',
+    maxHeight: Dimensions.get('window').height - 30 }}>
+    <Text variant='headlineLarge'>{t('oops')}</Text>
+    <Text variant='bodyMedium'>{t('errorOccured')}</Text>
+    <Text variant='bodyMedium'>{t('errorReportSent')}</Text>
+    <ScrollView>
+        <AccordionItem title={t('errorTechDetailsLabel')} style={{ flexGrow: 0 }}>
+                <Text>{p.error.name}</Text>
+                <Text>{p.error.message}</Text>
+                <Text>{p.error.stack}</Text>
+        </AccordionItem>
+    </ScrollView>
 </View>
 
 interface Props {
@@ -114,7 +124,9 @@ interface Props {
 export function Main ({ screens }: Props) {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
-    return <ErrorBoundary FallbackComponent={GeneralError}>
+    return <ErrorBoundary FallbackComponent={GeneralError} onError={(err, stackTrace) => {
+        error({ message: `${err.message} - ${stackTrace}`, accountId: appContext.account?.id,}, true)
+    }}>
         <AppContextLoaded>
             <NavigationContainer linking={{
                 prefixes: [prefix],

@@ -344,7 +344,11 @@ const resources = {
       "campaignSummaryTitle": "In summary",
       "campaignAllowYouto": "With Tope-là campaigns, you get plenty of Topes and swap them against great resources.",
       "forFree": "And it's free !",
-      "resourceConformsToCampaign": "This resource belongs to the theme of the current campaign"
+      "resourceConformsToCampaign": "This resource belongs to the theme of the current campaign",
+      "oops": "Oops ...",
+      "errorOccured": "An unexpected error occured. Better restart the app.",
+      "errorReportSent": "An error report has been sent, but just to be safe, you may certainly tell us that something is wrong. Restart the app, tap on the '?' and follow the instructions.",
+      "errorTechDetailsLabel": "Détails techniques"
    }
   },
   fr: {
@@ -683,7 +687,11 @@ const resources = {
       "campaignSummaryTitle": "En résumé",
       "campaignAllowYouto": "Grâce aux campagnes Tope-là, fais le plein de Topes et échange-les contre des ressources intéressantes.",
       "forFree": "En plus c'est gratuit !",
-      "resourceConformsToCampaign": "Cette ressource est conforme au thème de la campagne en cours"
+      "resourceConformsToCampaign": "Cette ressource est conforme au thème de la campagne en cours",
+      "oops": "Aïe ...",
+      "errorOccured": "Une erreur inattendue a eu lieu. Mieux vaut redémarrer l'app.",
+      "errorReportSent": "Un rapport d'erreur a été envoyé, mais pur être sûr, tu peux certainement nous signaler que quelque chose ne marche pas. Redémarre l'app, appuye sur '?', et suis les instructions.",
+      "errorTechDetailsLabel": "Détails techniques"
     }
   }
 }

@@ -68,15 +68,14 @@ export default ({ resource, editRequested, deleteRequested, isExample, style, te
         <Text variant="titleMedium" numberOfLines={2} style={{ flex: 1, textAlign: 'center' }}>{resource.title}</Text>
         { isExample && <Text variant="headlineSmall" 
              style={{ position: 'absolute', backgroundColor: primaryColor, color: '#fff', 
-                 transform: [{ rotate: '15deg' }], paddingVertical: 5, paddingHorizontal: 30,
-                 right: -10, top: 10 }}>{t('example')}</Text>}
-        { resource.suspended && <View style={{ position: 'absolute', flexDirection: 'row', 
-            transform: [{ rotate: '-10deg' }], right: 'auto', top: 70,
-            backgroundColor: primaryColor, gap: 30,
-            paddingVertical: 5, paddingHorizontal: 30 }}>
+                 transform: [{ rotate: '-15deg' }], paddingVertical: 5, paddingHorizontal: 30,
+                 left: 10, top: 10 }}>{t('example')}</Text>}
+        { resource.suspended && <TouchableOpacity onPress={() => setSuspensionExplanation(true)} style={{ position: 'absolute', 
+                transform: [{ rotate: '-10deg' }], right: 'auto', top: 70,
+                backgroundColor: primaryColor, gap: 30,
+                paddingVertical: 5, paddingHorizontal: 30 }}>
             <Text variant="headlineSmall" style={{ color: '#fff' }}>{t('suspended')}</Text>
-            <BareIconButton color="#fff" Image="help" size={15} onPress={() => setSuspensionExplanation(true)} />
-        </View>}
+        </TouchableOpacity>}
         <InfoDialog onDismiss={() => setSuspensionExplanation(false)} visible={ suspensionExplanation }
             title={t('suspensionExplanationDialogTitle')} buttonCaptionI18n="ok_caption" 
             content={<InfoSuspension navigation={navigation} />} />

@@ -1,6 +1,6 @@
 import { t } from "@/i18n"
 import { RouteProps } from "@/lib/utils"
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { View } from "react-native"
 import { SegmentedButtons, Text, useTheme } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
@@ -10,10 +10,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import SimpleBackHeader from "../layout/SimpleBackHeader"
 import ViewResource from "../resources/ViewResource"
 import ViewAccount from "./ViewAccount"
+import { AppContext } from "../AppContextProvider"
 
 const StackNav = createNativeStackNavigator()
 
 const BidsMain = ({ route, navigation }: RouteProps) => {
+    const appState = useContext(AppContext)
     const [offerType, setOfferType] = useState('S')
     const [includeInactive, setIncludeInactive] = useState(false)
     const theme = useTheme()
@@ -23,7 +25,7 @@ const BidsMain = ({ route, navigation }: RouteProps) => {
         setIncludeInactive(route.params && route.params.includeInactive)
     }, [route.params])
 
-    return <View style={{ marginTop: 6, marginHorizontal: 6, gap: 6 }}>
+    return appState.account ? <View style={{ marginTop: 6, marginHorizontal: 6, gap: 6 }}>
         <SegmentedButtons theme={theme} value={offerType} onValueChange={setOfferType}
             buttons={[
                 { label: t('sentOffersLabel'), value: 'S', checkedColor: primaryColor },
@@ -34,7 +36,8 @@ const BidsMain = ({ route, navigation }: RouteProps) => {
         :
             <ReceivedBids navigation={navigation} initialIncludeInactive={includeInactive} />
         }
-    </View>
+    </View> :
+    <Text variant="labelLarge" style={{ textAlign: 'center', padding: 10 }}>{t('PleaseConnectLabel')}</Text>
 }
 
 const Bids = () => <StackNav.Navigator screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>

@@ -2,9 +2,10 @@ import React, { ReactNode, useState } from 'react'
 import { lightPrimaryColor, primaryColor } from "./layout/constants"
 import { t } from '@/i18n'
 import { TabNavigatorProps } from '@/lib/TabNavigatorProps'
-import { BottomNavigation, Icon } from 'react-native-paper'
+import { BottomNavigation, Text } from 'react-native-paper'
 import { BaseRoute } from 'react-native-paper/lib/typescript/components/BottomNavigation/BottomNavigation'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { Dimensions } from 'react-native'
 
 const getViewTitleI18n = (screenName: string): string => {
     switch(screenName) {
@@ -38,6 +39,11 @@ const DealNavigator = (p: DealNavigatorProps) => {
 
     return <Tab.Navigator screenOptions={() => ({ headerShown: false })} tabBar={({ navigation, state, descriptors, insets }) => 
         <BottomNavigation.Bar
+            safeAreaInsets={insets}
+            renderLabel={Dimensions.get('window').width < 400 ? 
+                p => <Text variant="labelSmall" style={{ color: p.color, textAlign: 'center' }}>{p.route.title}</Text>
+                : 
+                undefined}
             activeColor={ primaryColor } inactiveColor="#000" 
             navigationState={{ index, routes }} style={{ backgroundColor: lightPrimaryColor }}
             onTabPress={ptp => {

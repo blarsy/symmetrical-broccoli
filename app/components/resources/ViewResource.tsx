@@ -214,7 +214,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
             <PanZoomImage onDismess={() => setFocusedImage(undefined)} source={focusedImage} />
         </>}
         </LoadedZone>
-        <CreateBidDialog onDismiss={() => setResourceToBidOn(undefined)} resource={resourceToBidOn}/>
+        { appState.account && <CreateBidDialog onDismiss={() => setResourceToBidOn(undefined)} resource={resourceToBidOn}/> }
     </ScrollView>
 }
 
