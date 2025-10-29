@@ -43,8 +43,8 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
         }
     }
     useEffect(() => {
-        if(categories.data && !error && !loading && activeCampaign.data) loadResource()
-    }, [categories.data, address, loading, error, activeCampaign.data])
+        if(categories.data && !error && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
+    }, [categories.data, address, loading, error, activeCampaign])
 
     return <LoadedZone loading={resource.loading || loading} error={resource.error || error} containerStyle={{ overflow: 'auto', paddingLeft: '2rem', paddingRight: '2rem' }}>
         <EditResource value={resource.data}/>

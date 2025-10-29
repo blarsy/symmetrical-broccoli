@@ -58,10 +58,10 @@ export default ({ resource, editRequested, deleteRequested, isExample, style, te
     return <View style={{ borderRadius: IMAGE_BORDER_RADIUS, flexBasis: size, 
         backgroundColor: (resource.deleted || (resource.expiration && resource.expiration < new Date())) ? deletedGrayColor : lightPrimaryColor, padding: 10, 
         justifyContent: 'space-between', gap: 5, opacity: isExample ? 0.7 : 1, ...(style as object)}}>
-            <TopBar resource={resource} onDeleteRequested={e => {
-                    e.stopPropagation()
-                    !isExample && deleteRequested(resource.id)
-                }} />
+        <TopBar resource={resource} onDeleteRequested={e => {
+                e.stopPropagation()
+                !isExample && deleteRequested(resource.id)
+            }} />
         <TouchableOpacity testID={`${testID}:EditButton`} onPress={() => !isExample && editRequested() }>
             <FlexResourceImage resource={resource} />
         </TouchableOpacity>

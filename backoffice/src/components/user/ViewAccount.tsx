@@ -1,3 +1,4 @@
+"use client"
 import { IconButton, Link, Stack, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
 import { gql, useQuery } from "@apollo/client"
@@ -11,69 +12,15 @@ import TransferTokensDialog, { TokenTransferInfo } from "../token/TransferTokens
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import dayjs from "dayjs"
 import useCategories from "@/lib/useCategories"
+import { GET_ACCOUNT_PUBLIC_INFO } from "@/lib/apolloClient"
 
 interface Props {
     accountId: number
     version: string
 }
 
-const GET_ACCOUNT = gql`query Account($id: Int!) {
-    getAccountPublicInfo(id: $id) {
-      email
-      name
-      id
-      resourcesByAccountId(orderBy: CREATED_DESC) {
-        nodes {
-          id
-          canBeGifted
-          canBeExchanged
-          title
-          description
-          deleted
-          expiration
-          suspended
-          paidUntil
-          resourcesImagesByResourceId {
-            nodes {
-              imageByImageId {
-                publicId
-              }
-            }
-          }
-          resourcesResourceCategoriesByResourceId {
-            nodes {
-              resourceCategoryCode
-            }
-          }
-          accountByAccountId {
-            id
-          }
-        }
-      }
-      imageByAvatarImageId {
-        publicId
-      }
-      accountsLinksByAccountId {
-        nodes {
-          id
-          url
-          label
-          linkTypeByLinkTypeId {
-            id
-          }
-        }
-      }
-      locationByLocationId {
-        address
-        id
-        longitude
-        latitude
-      }
-    }
-  }`
-
 const ViewAccount = (p: Props) => {
-    const { data, loading, error } = useQuery(GET_ACCOUNT, { variables: { id: p.accountId } })
+    const { data, loading, error } = useQuery(GET_ACCOUNT_PUBLIC_INFO, { variables: { id: p.accountId } })
     const uiContext = useContext(UiContext)
     const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
     const [accountResources, setAccountResources] = useState<Resource[]>([])

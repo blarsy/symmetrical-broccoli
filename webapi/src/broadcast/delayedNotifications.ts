@@ -274,6 +274,7 @@ const getNewResourcesSummaryData = async (pool: Pool): Promise<NewResourcesSumma
     INNER JOIN sb.accounts notified ON notified.id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
         n.read IS NULL AND
+        n.created > NOW() + interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
         author.id <> notified.id AND
@@ -304,6 +305,7 @@ const getNotificationsSummaryData = async (pool: Pool): Promise<NotificationsSum
         INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 3 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
         WHERE n.data::json->>'resource_id' IS NULL AND (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
             n.read IS NULL AND n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
+            n.created > NOW() + interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
             a.email IS NOT NULL
         ORDER BY a.id, n.created DESC`, pool, 'Querying notifications to notify')
     
@@ -377,11 +379,11 @@ const getAccountNotifications = async (notificationsSummaryData: AccountNotifica
 const makePostQuery = (eventType: number, accountId: number) => {
     return `UPDATE sb.broadcast_prefs
         SET last_summary_sent = NOW()
-        WHERE event_type = ${eventType} AND account_id = ${accountId}`
+        WHERE event_type = ${eventType} AND account_id = ${accountId};`
 }
 
 export const sendSummaries = async (pool: Pool, version: string): Promise<void> => {
-    const postQuerieInfos: { eventType: number, accountId: number }[] = []
+    const postQuerieInfos: { eventType: number, accountId: number, email: string }[] = []
 
     const [resourcesSummaryData, chatMessagesSummaryData, notificationsSummaryData] = await Promise.all([
         getNewResourcesSummaryData(pool),
@@ -401,22 +403,22 @@ export const sendSummaries = async (pool: Pool, version: string): Promise<void> 
         let i18nMailSubject = '', language = ''
         let contentPromises: Promise<string>[] = []
 
-        if(resourcesSummaryData[email]) {
-            contentPromises.push(getAccountNewResources(resourcesSummaryData[email]))
-            language = resourcesSummaryData[email].language
-            postQuerieInfos.push({ eventType: 1, accountId: resourcesSummaryData[email].id })
-            i18nMailSubject = 'new_resources_summary_subject'
-        }
         if(chatMessagesSummaryData[email]) {
             contentPromises.push(getAccountChatMessages(chatMessagesSummaryData[email]))
             language = chatMessagesSummaryData[email].lang
-            postQuerieInfos.push({ eventType: 2, accountId: chatMessagesSummaryData[email].accountId })
+            postQuerieInfos.push({ eventType: 1, email, accountId: chatMessagesSummaryData[email].accountId })
             i18nMailSubject = 'chat_messages_summary_subject'
+        }
+        if(resourcesSummaryData[email]) {
+            contentPromises.push(getAccountNewResources(resourcesSummaryData[email]))
+            language = resourcesSummaryData[email].language
+            postQuerieInfos.push({ eventType: 2, email, accountId: resourcesSummaryData[email].id })
+            i18nMailSubject = 'new_resources_summary_subject'
         }
         if(notificationsSummaryData[email]) {
             contentPromises.push(getAccountNotifications(notificationsSummaryData[email]))
             language = notificationsSummaryData[email].language
-            postQuerieInfos.push({ eventType: 3, accountId: notificationsSummaryData[email].accountId })
+            postQuerieInfos.push({ eventType: 3, email, accountId: notificationsSummaryData[email].accountId })
             i18nMailSubject = 'notifications_summary_subject'
         }
 
@@ -426,10 +428,10 @@ export const sendSummaries = async (pool: Pool, version: string): Promise<void> 
 
         const contents =  await Promise.all(contentPromises)
 
-        postQuerieInfos.forEach(qry => {
-            runAndLog(makePostQuery(qry.eventType, qry.accountId), pool, `Setting last summary time.`)
+        await sendNotificationsSummaryMail(email, i18nMailSubject, contents.join(''), language, version, pool, async email => {
+            await runAndLog(
+                postQuerieInfos.filter(qry => qry.email === email).map(qry => makePostQuery(qry.eventType, qry.accountId)).join('\n'), 
+                pool, `Setting last summary time for account.`)
         })
-
-        sendNotificationsSummaryMail(email, i18nMailSubject, contents.join(''), language, version, pool)
     })
 }

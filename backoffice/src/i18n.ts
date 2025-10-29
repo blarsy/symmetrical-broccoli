@@ -1,4 +1,4 @@
-import i18n from 'i18next'
+import i18n, { TFunction } from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 
 const resources = {
@@ -120,6 +120,9 @@ const resources = {
             "noConversationYet": "No converstation yet ...",
             "noResourceYet": "What resources will you create here ?",
             "ExampleLabel": "Example",
+            "SuspendedLabel": "Suspended",
+            "suspensionExplanationDialogTitle": "Suspended resource ?",
+            "whySuspended": "When you run out of Topes, some of your resources may be \'suspended\', thus not shown to other accounts. Earn some Topes in order to restore your resources !",
             "childClothExampleResourceTitle": "Children clothes",
             "mangasResourceTitle": "Mangas",
             "equipmentForRentResourceTitle": "Equipment to lend",
@@ -284,6 +287,7 @@ const resources = {
             "campaignSummaryTitle": "In summary",
             "campaignAllowYouto": "With Tope-là campaigns, you get plenty of Topes and swap them against great resources.",
             "forFree": "And it's free !",
+            "isOnTopeLa": " is on Tope-là"
         }
     },
     fr: { 
@@ -404,6 +408,9 @@ const resources = {
             "noConversationYet": "Aucune conversation encore ...",
             "noResourceYet": "Quelles ressources vas-tu créer ici ?",
             "ExampleLabel": "Exemple",
+            "SuspendedLabel": "Suspendu",
+            "suspensionExplanationDialogTitle": "Une ressource suspendue ?",
+            "whySuspended": "Quand tu n'as plus assez de Topes pour afficher toutes tes ressources actives, Tope-là les \'suspend\'. Récupère des Topes pour les rétablir !",
             "childClothExampleResourceTitle": "Vêtements enfants",
             "mangasResourceTitle": "Mangas",
             "equipmentForRentResourceTitle": "Equipement à prêter",
@@ -568,9 +575,23 @@ const resources = {
             "campaignSummaryTitle": "En résumé",
             "campaignAllowYouto": "Grâce aux campagnes Tope-là, fais le plein de Topes et échange-les contre des ressources intéressantes.",
             "forFree": "En plus c'est gratuit !",
+            "isOnTopeLa": " est sur Tope-là"
         }
     }
 }
+
+const translationFunctions = {} as { [lng: string]: TFunction<"translation", undefined> }
+let root = undefined as TFunction<"translation", undefined> | undefined
+export const initTranslations = async (lng: string) => {
+    if(!root) {
+        root = await i18n.init({ resources })
+    }
+    if(!translationFunctions[lng]){
+        translationFunctions[lng] = i18n.getFixedT(lng)
+    }
+    return translationFunctions[lng]
+}
+
 export default (lang?: string) => {
     if(!lang) {
         return i18n

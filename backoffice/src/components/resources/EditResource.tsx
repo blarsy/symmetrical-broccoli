@@ -103,6 +103,8 @@ const EditResource = (p: Props) => {
 
     const [saveState, setSaveState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
+    console.log('loading', profileAddress, categories)
+
     return <LoadedZone loading={profileAddress.loading || categories.loading} error={profileAddress.error}>
         { categories.data && <Formik initialValues={p.value || blankResource} onSubmit={async values => {
             try {

@@ -130,7 +130,7 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
         htmlContent, version, pool)
 }
 
-export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string, version: string, pool: Pool) => {
+export const sendNotificationsSummaryMail = async (email: string, headingI18nCode: string, content: string, lang: string, version: string, pool: Pool, postSendTask: (email: string) => Promise<void>) => {
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
 
@@ -155,6 +155,8 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
     const htmlContent = template(data)
 
     await sendNoReplyMail(email, heading, t('no_plaintext_content'), htmlContent, version, pool )
+
+    return postSendTask(email)
 }
 
 const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, pool: Pool): Promise<void> => {
