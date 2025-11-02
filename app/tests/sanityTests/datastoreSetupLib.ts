@@ -129,7 +129,8 @@ export const createResource = async (jwtToken: string, title: string, descriptio
 interface ResourceRawData {
     title: string, description?: string, expiration: Date, accountId: number, created?: Date, 
     isService?: boolean, isProduct?: boolean, canBeDelivered?: boolean, canBeTakenAway?: boolean, 
-    canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date, suspended?: Date, paidUntil?: Date
+    canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date, suspended?: Date, paidUntil?: Date,
+    campaignIdToJoin?: number
 }
 
 export const createResourceLowLevel = async (res: ResourceRawData): Promise<number> => {
@@ -141,6 +142,11 @@ export const createResourceLowLevel = async (res: ResourceRawData): Promise<numb
             res.canBeExchanged || false, res.canBeGifted || false, res.deleted || null, res.suspended || null, 
             res.paidUntil || null
         ])
+    
+    if(res.campaignIdToJoin) {
+        await executeQuery('INSERT INTO sb.campaigns_resources (campaign_id, resource_id) VALUES ($1, $2)', [res.campaignIdToJoin, result.rows[0].id])
+    }
+
     return result.rows[0].id
 }
 

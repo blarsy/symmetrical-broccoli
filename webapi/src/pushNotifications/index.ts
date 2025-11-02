@@ -1,7 +1,7 @@
 import { Pool } from "pg"
 import { Config } from "../config"
 import { runAndLog } from "../db_jobs/utils"
-import logger from "../logger"
+import { loggers } from "../logger"
 
 export interface PushNotification {
     to: string,
@@ -11,7 +11,7 @@ export interface PushNotification {
 }
 
 export async function sendPushNotification(messages: PushNotification[], config: Config, pool: Pool) {
-    logger.info(`Push notifications ${JSON.stringify(messages)}.`)
+    loggers[config.version].info(`Push notifications ${JSON.stringify(messages)}.`)
 
     if(!config.versions[config.version].doNotSendPushNotifs) {
       await fetch('https://exp.host/--/api/v2/push/send', {
@@ -25,5 +25,5 @@ export async function sendPushNotification(messages: PushNotification[], config:
       })
     }
 
-    return runAndLog(`INSERT INTO sb.push_notifications(messages) VALUES (($1))`, pool, 'Persisting sending push message(s).', [JSON.stringify(messages)])
+    return runAndLog(`INSERT INTO sb.push_notifications(messages) VALUES (($1))`, pool, 'Persisting sending push message(s).', config.version, [JSON.stringify(messages)])
 }

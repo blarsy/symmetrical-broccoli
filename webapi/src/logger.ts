@@ -1,22 +1,26 @@
 import { createLogger, format, transports } from "winston"
-import { getCommonConfig } from "./config"
+import { Config, getConnectionString } from "./config"
+import { PostgresTransport } from '@innova2/winston-pg'
 
-const logger: {
+interface Logger {
     initialized: boolean
-    error: (message: string, err: any) => void
-    info: (message: string) => void
+    error: (message: string, error: any) => void
     warn: (message: string) => void
-} = {
-    initialized: false,
-    error: () => { throw new Error('Logger still uninitialized, please first call "init"') },
-    warn: () => { throw new Error('Logger still uninitialized, please first call "init"') },
-    info: () => { throw new Error('Logger still uninitialized, please first call "init"') }
+    info: (message: string) => void
 }
 
-export const init = async () => {
-    const config = await getCommonConfig()
+export const loggers: {[version:string] :Logger} = {}
+
+export const init = async (config: Config) => {
+    const logger: Logger = {
+        initialized: false,
+        error: () => { throw new Error('Logger still uninitialized, please first call "init"') },
+        warn: () => { throw new Error('Logger still uninitialized, please first call "init"') },
+        info: () => { throw new Error('Logger still uninitialized, please first call "init"') }
+    }
+
     if(!logger.initialized) {
-        const winstonLogger = createLogger({
+        const fallbackLogger = createLogger({
             level: 'info',
             format: format.combine(
                 format.timestamp(),
@@ -24,9 +28,26 @@ export const init = async () => {
             ),
             transports: [
                 new transports.File({ filename: config.logPath + 'error.log', level: 'error', maxsize: 5000000, maxFiles: 3 }),
-                new transports.File({ filename: config.logPath + 'combined.log', maxsize: 5000000, maxFiles: 3 }),
             ],
         })
+        const winstonLogger = createLogger({
+            level: 'info',
+            format: format.combine(
+                format.timestamp(),
+                format.json()
+            ),
+            transports: [
+                new PostgresTransport({
+                    connectionString: getConnectionString(config),
+                    maxPool: 10,
+                    level: 'info',
+                    tableName: 'server_logs',
+                    schema: 'sb'
+                })
+            ]
+        })
+        winstonLogger.on('error', err => fallbackLogger.error(err.toString()))
+
         logger.error =  (message: string, error: any) => {
             const content = `${message} ${parseError(error)}`
             if(!config.production) console.log(content)
@@ -43,10 +64,11 @@ export const init = async () => {
         }
         logger.initialized = true
     }
+
+    loggers[config.version] = logger
+    return logger
 }
 
 const parseError = (e: any) => {
     return `name: ${e.name}\nmessage: ${e.message}\nstack: ${e.stack}`
 }
-
-export default logger

@@ -129,6 +129,9 @@ const AdminLayout = (p : Props) => {
                         <Button>
                             <Link href={`/webapp/${p.version}/admin/campaigns`}>Campaigns</Link>
                         </Button>
+                        <Button>
+                            <Link href={`/webapp/${p.version}/admin/logs`}>Logs</Link>
+                        </Button>
                     </Stack>,
                     <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data, () => {
                         localStorage.removeItem('adminToken')

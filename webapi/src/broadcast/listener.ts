@@ -1,8 +1,8 @@
 import createPostgresSubscriber, { PgParsedNotification, Subscriber } from "pg-listen"
-import logger from "../logger"
 import { Config } from "../config"
 import { handleMessageCreated, handleNotificationCreated, handleResourceCreated } from "./event"
 import { Pool } from "pg"
+import { loggers } from "../logger"
 
 const dbNotificationConfigs: { channel: string, handler: (notification: PgParsedNotification, config: Config, pool: Pool) => Promise<void> }[] = [
     { channel: 'message_created', handler: handleMessageCreated },
@@ -36,6 +36,7 @@ export class NotificationsListener {
     }
 
     async onNotification(notification: PgParsedNotification) {
+        const logger = loggers[this.config.version]
         try {
             const targetConfig = dbNotificationConfigs.find(cfg => cfg.channel === notification.channel)
             if(!targetConfig){

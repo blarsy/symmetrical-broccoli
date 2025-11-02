@@ -1,17 +1,17 @@
 import { json } from "express"
 import {Express} from "express-serve-static-core"
 import appleSigninAuth from 'apple-signin-auth'
-import logger from "./logger"
 import { runAndLog } from "./db_jobs/utils"
 import { Pool } from "pg"
 import { CorsRequest } from "cors"
 import { createHash } from 'node:crypto'
+import { loggers } from "./logger"
 
 export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res: {
     statusCode?: number | undefined;
     setHeader(key: string, value: string): any;
     end(): any;
-}, next: (err?: any) => any) => void) => {
+}, next: (err?: any) => any) => void, version: string) => {
     app.use(json())
     
     app.post(`/appleauth`, corsMiddleware, async (req, res) => {
@@ -25,7 +25,7 @@ export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res
                 })
 
                 const qryRes = await runAndLog(`SELECT sb.update_external_auth_status ($1, $2, $3)`, 
-                    pool, 'Checking apple authentication status', 
+                    pool, 'Checking apple authentication status', version,
                     [appleIdTokenClaims.email, req.body.id_token, 1])
 
                 if(qryRes.rows.length != 1 || !qryRes.rows[0].update_external_auth_status || ![1, 2].includes(qryRes.rows[0].update_external_auth_status)) {
@@ -39,7 +39,7 @@ export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res
                 }
                 res.send({ idToken: req.body.id_token })
             } catch (e) {
-                logger.error('Error checking id_token / nonce when connecting with Apple', e)
+                loggers[version].error('Error checking id_token / nonce when connecting with Apple', e)
                 res.status(500).send({ error: 'Verification failed' })
             }
         } else {

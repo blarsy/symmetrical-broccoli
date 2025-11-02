@@ -2,11 +2,12 @@ import { postgraphile, PostGraphileOptions, makePluginHook } from "postgraphile"
 import { Config, createPool } from './config'
 import SubscriptionPlugin from './SubscriptionPlugin'
 import PgPubsub from "@graphile/pg-pubsub"
-import logger from './logger'
+import { loggers } from "./logger"
 
 const pluginHook = makePluginHook([PgPubsub])
 
 export default (config: Config) => {
+    const logger = loggers[config.version]
     const pool = createPool(config, 'postgraphile')
     
     const pgConfig: PostGraphileOptions = config.production ? {

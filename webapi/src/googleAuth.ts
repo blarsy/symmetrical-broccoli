@@ -1,16 +1,16 @@
 import { json } from "express"
 import {Express} from "express-serve-static-core"
 import { OAuth2Client } from "google-auth-library"
-import logger from "./logger"
 import { runAndLog } from "./db_jobs/utils"
 import { Pool } from "pg"
 import { CorsRequest } from "cors"
+import { loggers } from "./logger"
 
 export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiSecret: string, corsMiddleware: (req: CorsRequest, res: {
     statusCode?: number | undefined;
     setHeader(key: string, value: string): any;
     end(): any;
-}, next: (err?: any) => any) => void) => {
+}, next: (err?: any) => any) => void, version: string) => {
     const client = new OAuth2Client( googleAuthAudience, googleApiSecret, 'postmessage' )
 
     app.use(json())
@@ -41,7 +41,7 @@ export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiS
             const email = payload.email
 
             const qryRes = await runAndLog(`SELECT sb.update_external_auth_status ($1, $2, $3)`, 
-                pool, 'Checking Google authentication status', 
+                pool, 'Checking Google authentication status', version, 
                 [email, idToken, 0])
 
             if(qryRes.rows.length != 1 || !qryRes.rows[0].update_external_auth_status || ![1, 2].includes(qryRes.rows[0].update_external_auth_status)) {
@@ -55,7 +55,7 @@ export default (app: Express, pool: Pool, googleAuthAudience: string, googleApiS
             }
             res.send({ idToken })
         } catch (e) {
-            logger.error('Error authenticating with Google', e)
+            loggers[version].error('Error authenticating with Google', e)
             res.status(500).send({ error: 'SERVER_ERROR' })
         }
     })

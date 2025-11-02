@@ -1,12 +1,12 @@
 import { PgParsedNotification } from "pg-listen"
 import { Config } from "../config"
 import { PushNotification, sendPushNotification } from "../pushNotifications"
-import logger from "../logger"
 import initTranslations from '../i18n'
 import { TFunction } from "i18next"
 import { runAndLog } from "../db_jobs/utils"
 import { Pool } from "pg"
 import { makeNotificationInfo } from "./common"
+import { loggers } from "../logger"
 
 interface NewMessageNotificationPayload {
     messageId: number
@@ -47,22 +47,23 @@ export const handleMessageCreated = async (notification: PgParsedNotification, c
             url: `${config.pushNotificationsUrlPrefix}conversation?resourceId=${messageNotif.resourceId}&otherAccountId=${messageNotif.otherAccountId}&otherAccountName=${encodeURIComponent(messageNotif.otherAccountName)}`
         }} ], config, pool)
     } catch(e) {
-        logger.error(`Error while sending push notification to Expo.`, e)
+        loggers[config.version].error(`Error while sending push notification to Expo.`, e)
     }
 }
 
 export const handleResourceCreated = async (notification: PgParsedNotification, config: Config, pool: Pool) => {
+    const logger = loggers[config.version]
     try {
         //Find all accounts that can be suggested the new resource
         const cmdResult = await runAndLog(`SELECT sb.get_accounts_to_notify_of_new_resource(${notification.payload.resource_id});`,
-            pool, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`)
+            pool, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`, config.version)
     
         const accountsToNotify = cmdResult.rows[0][Object.getOwnPropertyNames(cmdResult.rows[0])[0]]
 
         if(accountsToNotify.length > 0) {
             //Create a resource notification for all such accounts
             await runAndLog(`SELECT sb.create_new_resource_notifications($1, $2);`, pool, 
-                `Creating notifications for new resource ${JSON.stringify(notification.payload)}, accounts ${accountsToNotify}`,
+                `Creating notifications for new resource ${JSON.stringify(notification.payload)}, accounts ${accountsToNotify}`, config.version,
                 [notification.payload.resource_id, accountsToNotify]
             )
         
@@ -73,7 +74,7 @@ export const handleResourceCreated = async (notification: PgParsedNotification, 
                 INNER JOIN sb.accounts destinator ON destinator.id = apt.account_id
                 LEFT JOIN sb.broadcast_prefs bp ON bp.account_id = apt.account_id AND event_type = 2 AND days_between_summaries IS NOT NULL
                 WHERE bp.id IS NULL
-                AND apt.account_id = ANY($2)`, pool, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`,
+                AND apt.account_id = ANY($2)`, pool, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`, config.version,
                 [notification.payload.resource_id,accountsToNotify]
             )
         
@@ -116,6 +117,7 @@ const createPushNotificationFromNotifInfo = (token: string, data: object, urlPre
 }
 
 export const handleNotificationCreated = async (notification: PgParsedNotification, config: Config, pool: Pool) => {
+    const logger = loggers[config.version]
     try {
         const ts: {[ lang: string ]: TFunction<"translation", undefined>} = {}
         const languages: string[] = ['fr', 'en']
@@ -126,11 +128,10 @@ export const handleNotificationCreated = async (notification: PgParsedNotificati
             INNER JOIN sb.accounts a ON a.id = n.account_id
             INNER JOIN sb.accounts_push_tokens apt ON apt.account_id = n.account_id
             WHERE n.id = ($1)`, pool, 
-            `Gather notification data for push notification ${notification.payload.notification_id}`, 
+            `Gather notification data for push notification ${notification.payload.notification_id}`, config.version, 
             [notification.payload.notification_id])
 
         if(notifRecord.rowCount != 1) {
-            //console.log(`Skipping push notification: Unexpected number of records ${notifRecord.rowCount} when querying for notification with id ${notification.payload.notification_id}. There is no push notification token for this account`)
             return
         }
         

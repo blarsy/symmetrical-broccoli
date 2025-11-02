@@ -24,7 +24,7 @@ import QuestionIcon from "@mui/icons-material/QuestionMark"
 import QAIcon from "@mui/icons-material/QuestionAnswer"
 import { ApolloProvider } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
-import { getCommonConfig } from "@/config"
+import config, { getCommonConfig } from "@/config"
 import { keyframes, SxProps } from '@mui/system'
 import ResourcesGallery from "@/components/showcase/ResourcesGallery"
 import { ReactNode } from "react"
@@ -168,10 +168,6 @@ const Page = () => {
     return <ApolloProvider client={getApolloClient(mainVersion)}>
         <ThemeProvider theme={theme}>
             <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <Stack flexDirection="row" justifyContent="flex-end" padding="1rem 1rem 0 0" gap="1rem">
-                    <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={33}/></Link>
-                    <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo alt="Logo Instagram" height={33}/></Link>
-                </Stack>
                 <Stack alignItems="center" marginBottom="50px">
                     <Logo alt="Logo Tope-la" height={323}/>
                 </Stack>
@@ -235,10 +231,7 @@ const Page = () => {
                     </Stack>
                 </ParchmentContainer>
                 <Stack alignItems="center" justifyContent="center" padding="3rem">
-                     <Stack sx={{ padding: '0 0 2rem', alignItems: 'center' }}>
-                        <Typography color="#000" textAlign="center" fontFamily={fonts.title.style.fontFamily} fontSize={28} fontWeight={800} textTransform="uppercase">Disponible sur l&apos;application </Typography>
-                        <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="0.75rem">Téléchargez sur</Typography>
-                    </Stack>
+                    <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Télécharge sur</Typography>
                     <Stack sx={theme => ({
                         flexDirection: 'column',
                         gap: '1rem',
@@ -250,6 +243,17 @@ const Page = () => {
                         <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
                         <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
                     </Stack>
+                    <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Version web</Typography>
+                    <Link target="_blank" href={`webapp/${mainVersion}`} style={{ color: '#000', fontSize: '1.7rem', fontFamily: fonts.general.style.fontFamily, fontWeight: 900 }}>
+                        <Box sx={{ backgroundImage: `url('/FOND-180.svg')`, height: 80, display: 'flex', alignItems: 'center', padding: '0 2rem' }}>
+                            Connexion
+                        </Box>
+                    </Link>
+                    <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Suis-nous</Typography>
+                    <Box display="flex" flexDirection="row" gap="1.5rem">
+                        <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={60}/></Link>
+                        <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo alt="Logo Instagram" height={60}/></Link>
+                    </Box>
                 </Stack>
                 <Stack alignItems="center" justifyContent="center" gap="1rem" direction="column" padding="3rem">
                     <SectionTitle lines={[

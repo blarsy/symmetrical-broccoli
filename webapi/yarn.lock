@@ -189,6 +189,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@innova2/winston-pg@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@innova2/winston-pg@npm:1.4.0"
+  dependencies:
+    "@types/pg": ^8.6.6
+    logform: ^2.2.0
+    pg: ^8.7.3
+    sql-ts: ^5.2.3
+    winston-transport: ^4.4.2
+  peerDependencies:
+    winston: ^3
+  checksum: 99a254d110fabe38488ec851d5df78865595741b8343f469f3f8c4ebec73b619bfe0cb10691ae714551e259322bdf836a95ba4bbfacd986b2c756c3d845cb7fb
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -486,6 +501,17 @@ __metadata:
     pg-protocol: "*"
     pg-types: ^4.0.1
   checksum: 50c4a803484610388eed64b1339aab55f6f6493be6798fe560105a216e517a1ec23d4a7792ae2f963f3848b19d5071297d5dbed75f7457f4caa6790b9537c681
+  languageName: node
+  linkType: hard
+
+"@types/pg@npm:^8.6.6":
+  version: 8.15.6
+  resolution: "@types/pg@npm:8.15.6"
+  dependencies:
+    "@types/node": "*"
+    pg-protocol: "*"
+    pg-types: ^2.2.0
+  checksum: 35a8fe848552be8f3f5d4d8428edf525bc48c96607992ef068edf2ed5c64bb015132b46a3f7f5524a911a055c76f103ac3407f2a9b9330a11d1174cbbafdb20e
   languageName: node
   linkType: hard
 
@@ -2905,14 +2931,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:>=4 <5":
+"lodash@npm:>=4 <5, lodash@npm:^4.17.20":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
   languageName: node
   linkType: hard
 
-"logform@npm:^2.7.0":
+"logform@npm:^2.2.0, logform@npm:^2.7.0":
   version: 2.7.0
   resolution: "logform@npm:2.7.0"
   dependencies:
@@ -3509,10 +3535,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pg-cloudflare@npm:^1.2.7":
+  version: 1.2.7
+  resolution: "pg-cloudflare@npm:1.2.7"
+  checksum: 8e66fa9aaf3be9da7570d294c6170ead48ae9187e670dcc4219eb381fb598a12823d90c20f301d76d70e49840dbec8c7eb5aa2af0d2698c0325b634c86bbcd18
+  languageName: node
+  linkType: hard
+
 "pg-connection-string@npm:^2.0.0, pg-connection-string@npm:^2.7.0":
   version: 2.7.0
   resolution: "pg-connection-string@npm:2.7.0"
   checksum: 68015a8874b7ca5dad456445e4114af3d2602bac2fdb8069315ecad0ff9660ec93259b9af7186606529ac4f6f72a06831e6f20897a689b16cc7fda7ca0e247fd
+  languageName: node
+  linkType: hard
+
+"pg-connection-string@npm:^2.9.1":
+  version: 2.9.1
+  resolution: "pg-connection-string@npm:2.9.1"
+  checksum: 23e63951f866ea400b227976be596963c5e68b84dc161df0aa3e36fe2dc281f405e5121d71ba9d2f27973e25a46dbb219056fd91080505bcadc9ae98c9663cf3
   languageName: node
   linkType: hard
 
@@ -3550,6 +3590,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pg-pool@npm:^3.10.1":
+  version: 3.10.1
+  resolution: "pg-pool@npm:3.10.1"
+  peerDependencies:
+    pg: ">=8.0"
+  checksum: 98135a7384be40886bba7100b9ce1a74671ff3877390f68e6db6d50ea56a7f524f7e44e01c02d61efeda97d9dc22d6115d0c66aa7f3cf5b8e892424862d0111a
+  languageName: node
+  linkType: hard
+
 "pg-pool@npm:^3.7.1":
   version: 3.7.1
   resolution: "pg-pool@npm:3.7.1"
@@ -3563,6 +3612,13 @@ __metadata:
   version: 1.7.1
   resolution: "pg-protocol@npm:1.7.1"
   checksum: 88df68e8c09727311bbd0cc4344ac168962578aed3377d9dc0e2a5175ce4dfc6aa6d8c402de3a231a3aeda24f3e085d442ca47ad7c52f803e1abcdc98ddcbc7e
+  languageName: node
+  linkType: hard
+
+"pg-protocol@npm:^1.10.3":
+  version: 1.10.3
+  resolution: "pg-protocol@npm:1.10.3"
+  checksum: 2d8c3b2747526706d37fdf35fc6e87c4a170cf8deb89fac65c562df26b4e0f42b76d62c6d1dbd096725e9a081a8725796f27af874c9e72753499c794472faad7
   languageName: node
   linkType: hard
 
@@ -3580,7 +3636,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-types@npm:^2.1.0":
+"pg-types@npm:2.2.0, pg-types@npm:^2.1.0, pg-types@npm:^2.2.0":
   version: 2.2.0
   resolution: "pg-types@npm:2.2.0"
   dependencies:
@@ -3630,7 +3686,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pgpass@npm:1.x":
+"pg@npm:^8.7.3":
+  version: 8.16.3
+  resolution: "pg@npm:8.16.3"
+  dependencies:
+    pg-cloudflare: ^1.2.7
+    pg-connection-string: ^2.9.1
+    pg-pool: ^3.10.1
+    pg-protocol: ^1.10.3
+    pg-types: 2.2.0
+    pgpass: 1.0.5
+  peerDependencies:
+    pg-native: ">=3.0.1"
+  dependenciesMeta:
+    pg-cloudflare:
+      optional: true
+  peerDependenciesMeta:
+    pg-native:
+      optional: true
+  checksum: ebc98c9480a11f8de74fffd205c2c161f14fc7cd8e19b152b38c7464d7202f59ad52fb1facb3a25319c343118c2fff44f7f46302415e730485878ceccf24241a
+  languageName: node
+  linkType: hard
+
+"pgpass@npm:1.0.5, pgpass@npm:1.x":
   version: 1.0.5
   resolution: "pgpass@npm:1.0.5"
   dependencies:
@@ -4189,6 +4267,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sliced@npm:~1.0.x":
+  version: 1.0.1
+  resolution: "sliced@npm:1.0.1"
+  checksum: 84528d23279985ead75809eeec5d601b0fb6bc28348c6627f4feb40747533a1e36a75e8bc60f9079528079b21c434890b397e8fc5c24a649165cc0bbe90b4d70
+  languageName: node
+  linkType: hard
+
 "smart-buffer@npm:^4.2.0":
   version: 4.2.0
   resolution: "smart-buffer@npm:4.2.0"
@@ -4235,6 +4320,17 @@ __metadata:
   version: 1.1.3
   resolution: "sprintf-js@npm:1.1.3"
   checksum: a3fdac7b49643875b70864a9d9b469d87a40dfeaf5d34d9d0c5b1cda5fd7d065531fcb43c76357d62254c57184a7b151954156563a4d6a747015cfb41021cad0
+  languageName: node
+  linkType: hard
+
+"sql-ts@npm:^5.2.3":
+  version: 5.4.0
+  resolution: "sql-ts@npm:5.4.0"
+  dependencies:
+    lodash: ^4.17.20
+    sliced: ~1.0.x
+    tslib: ~2.0.1
+  checksum: f9306e7920193941e1f4be6778bed00b48f32b08c381270f7c98d670fc5da91e98414aaa8d2f245da4e778afd3b54ea7bf513488cab2b292f03f5a328cf7d471
   languageName: node
   linkType: hard
 
@@ -4499,6 +4595,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:~2.0.1":
+  version: 2.0.3
+  resolution: "tslib@npm:2.0.3"
+  checksum: 00fcdd1f9995c9f8eb6a4a1ad03f55bc95946321b7f55434182dddac259d4e095fedf78a84f73b6e32dd3f881d9281f09cb583123d3159ed4bdac9ad7393ef8b
+  languageName: node
+  linkType: hard
+
 "tsutils@npm:^3.21.0":
   version: 3.21.0
   resolution: "tsutils@npm:3.21.0"
@@ -4549,6 +4652,7 @@ __metadata:
   dependencies:
     "@googleapis/drive": ^8.14.0
     "@graphile/pg-pubsub": ^4.13.0
+    "@innova2/winston-pg": ^1.4.0
     "@types/cors": ^2.8.17
     "@types/express": ^4.17.21
     "@types/node": ^20.10.6
@@ -4766,7 +4870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston-transport@npm:^4.9.0":
+"winston-transport@npm:^4.4.2, winston-transport@npm:^4.9.0":
   version: 4.9.0
   resolution: "winston-transport@npm:4.9.0"
   dependencies:

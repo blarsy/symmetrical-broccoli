@@ -1,9 +1,9 @@
 import { Pool } from "pg"
-import logger from "../logger"
+import { loggers } from "../logger"
 
-export const runAndLog  = async (statement: string, pool: Pool, description: string, paramValues: any[] = []) => {
+export const runAndLog  = async (statement: string, pool: Pool, description: string, version: string, paramValues: any[] = []) => {
     const client = await pool.connect()
-    logger.info(`${description}: ${statement}`)
+    loggers[version].info(`${description}: ${statement}`)
     try {
         return await client.query(statement, paramValues)
     } finally {

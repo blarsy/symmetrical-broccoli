@@ -48,7 +48,7 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
         [sendViaMailgun(msg)] :
         [recordMail(msg)]
 
-    promises.push(persistMail(msg, pool))
+    promises.push(persistMail(msg, pool, version))
 
     await Promise.all(promises)
 }
@@ -159,11 +159,11 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
     return postSendTask(email)
 }
 
-const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, pool: Pool): Promise<void> => {
+const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, pool: Pool, version: string): Promise<void> => {
     runAndLog(`INSERT INTO sb.mails(
         account_id, email, sent_from, subject, text_content, html_content)
         VALUES ((SELECT id FROM sb.accounts WHERE email = '${msg.to}' ), '${msg.to}', '${msg.from}', 
-        $1, $2, $3);`, pool, 'Persisting mail', [
+        $1, $2, $3);`, pool, 'Persisting mail', version, [
             msg.subject, msg.text, msg.html
         ])
 }
