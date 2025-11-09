@@ -11,6 +11,7 @@ import dayjs from "dayjs"
 import { primaryColor } from "../layout/constants"
 import { Campaign } from "@/lib/useActiveCampaign"
 import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
+import Images from "@/Images"
 
 const SET_KNOWS_ABOUT_CAMPAIGNS = gql`mutation SetKnowsAboutCampaigns {
   setAccountKnowsAboutCampaigns(input: {}) {
@@ -48,9 +49,11 @@ const CampaignExplanationDialog = (p: Props) => {
                         await setKnowsAboutCampaigns()
                     }}>
                         <View style={childStyle}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center' }}>
-                                <Icon size={30} source="bullhorn"/>
-                                <Text variant="headlineLarge">{p.campaign.name}</Text>
+                            <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
+                                <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{p.campaign.name}</Text>
+                                <View style={{ width: 120, height: 120, borderRadius: 10 }}>
+                                    <Images.Campaign height="100%" width="100%" />
+                                </View>
                             </View>
                             <Text variant="bodyLarge">{p.campaign.description}</Text>
                             <Hr color="#000" />
@@ -59,17 +62,27 @@ const CampaignExplanationDialog = (p: Props) => {
                             <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
                         </View>
                         <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
-                            <Text variant="headlineLarge">{t('airdropTitle')}</Text>
+                            <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
+                                <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{t('airdropTitle')}</Text>
+                                <View style={{ width: 120, height: 120, borderRadius: 10 }}>
+                                    <Images.Airdrop height="100%" width="100%" />
+                                </View>
+                            </View>
                             <View style={{ flexDirection: 'row', gap: '8', alignItems: 'center' }}>
                                 <PriceTag size={PriceTagSizeEnum.big} value={p.campaign.airdropAmount} label=""/>
-                                <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30 }}>{t('win')}</Text>
+                                <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30, lineHeight: 30 }}>{t('win')}</Text>
                             </View>
                             <Text variant="bodyLarge">{t('create2ResourcesOnCampaign')}</Text>
                             <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
                             <Text variant="bodyLarge">{t('ensureAirdropEligibility')}</Text>
                         </View>
                         <View style={childStyle}>
-                            <Text variant="headlineLarge" style={{ alignSelf: 'center' }}>{t('campaignSummaryTitle')}</Text>
+                            <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
+                                <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{t('campaignSummaryTitle')}</Text>
+                                <View style={{ width: 120, height: 120, borderRadius: 10 }}>
+                                    <Images.MoneyIn height="100%" width="100%" />
+                                </View>
+                            </View>
                             <Text variant="bodyLarge">{t('campaignAllowYouto')}</Text>
                             <Text variant="bodyLarge">{t('forFree')}</Text>
                             <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={p.onDismiss}>{t('ok_caption')}</OrangeButton>

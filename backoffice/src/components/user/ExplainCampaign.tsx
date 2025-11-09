@@ -3,7 +3,9 @@ import React, { PropsWithChildren, useContext, useState } from 'react'
 import 'keen-slider/keen-slider.min.css'
 import { useKeenSlider } from 'keen-slider/react'
 import { UiContext } from "../scaffold/UiContextProvider"
-import BurnhornIcon from '@mui/icons-material/Campaign'
+import Campaign from "@/app/img/campaign.svg"
+import Airdrop from "@/app/img/airdrop.svg"
+import MoneyIn from "@/app/img/money-in.svg"
 import Arrow from '@/app/img/fleche.svg'
 import Close from '@/app/img/CROSS.svg'
 import { gql, useMutation } from "@apollo/client"
@@ -39,7 +41,7 @@ const Slide = (p: SlideProps) => <Stack className="keen-slider__slide">
             padding: '0.25rem'
         }
     })}>
-        <Typography color="primary" variant="h2">{p.title}</Typography>
+        <Typography color="primary" variant="h2" textAlign="center" sx={{ textTransform: 'uppercase' }}>{p.title}</Typography>
         <Stack sx={p.sx}>
             { p.children }
         </Stack>
@@ -77,7 +79,7 @@ const ExplainCampaign = (p: Props) => {
         <LoadedZone loading={activeCampaign.loading} error={activeCampaign.error}>
             { activeCampaign.data && <Stack direction="row" ref={sliderRef} className="keen-slider">
                 <Slide title={activeCampaign.data?.name} sx={{ gap: '1rem', alignItems: 'center' }}>
-                    <BurnhornIcon fontSize="large" />
+                    <Campaign />
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{activeCampaign.data.description}</Typography>
                     <Divider sx={{ alignSelf: 'stretch' }}/>
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">
@@ -89,6 +91,7 @@ const ExplainCampaign = (p: Props) => {
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('thatsNotAll')}</Typography>
                 </Slide>
                 <Slide title={uiContext.i18n.translator("airdropTitle")} sx={{ gap: '1rem', alignItems: 'center' }}>
+                    <Airdrop />
                     <Stack direction="row" alignItems="center" gap={1}>
                         <PriceTag big value={activeCampaign.data.airdropAmount}/>
                         <Typography variant="body1" sx={{ fontWeight: 'bold' }} color="primary">{uiContext.i18n.translator('win')}</Typography>
@@ -98,10 +101,16 @@ const ExplainCampaign = (p: Props) => {
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('ensureAirdropEligibility')}</Typography>
                 </Slide>
                 <Slide title={uiContext.i18n.translator("campaignSummaryTitle")} sx={{ gap: '1rem' }}>
+                    <Stack alignItems="center">
+                        <MoneyIn />
+                    </Stack>
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
                     <Divider/>
-                    <LoadingButton loading={settingCampaignBit} onClick={() => setAccountKnowsAboutCampaigns()}>{uiContext.i18n.translator('okButton')}</LoadingButton>
+                    <LoadingButton loading={settingCampaignBit} onClick={() => {
+                        setAccountKnowsAboutCampaigns()
+                        p.onClose()
+                    }}>{uiContext.i18n.translator('okButton')}</LoadingButton>
                 </Slide>
             </Stack> }
         </LoadedZone>

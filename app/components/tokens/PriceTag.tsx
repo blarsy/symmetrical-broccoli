@@ -33,8 +33,8 @@ const PriceTag = ({ value, label, size }: { value: number, label?: string, size?
     
     return <Tooltip title={`${value} Topes = ${value / 100} Euro`} enterTouchDelay={1}>
         <View style={{ flexDirection: 'row', gap: '0.5rem', alignItems: 'center' }}>
-            { label && <Text style={{ color: primaryColor, fontSize }} variant={variant}>{label} </Text> }
-            <Text style={{ color: primaryColor, fontSize }} variant={variant}>{value} </Text>
+            { label && <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{label} </Text> }
+            <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{value} </Text>
             <Images.Tokens style={{ width: iconSize, height: iconSize }}/>
         </View>
     </Tooltip>

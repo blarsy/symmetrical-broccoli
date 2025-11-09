@@ -1,5 +1,5 @@
-const version = '0.10.3'
-const versionCode = 155
+const version = '0.10.4'
+const versionCode = 156
 
 let appSettings
 if(process.env.TARGET_ENV) {
@@ -39,6 +39,9 @@ module.exports = {
       "**/*"
     ],
     "ios": {
+      "entitlements": {
+        "com.apple.developer.applesignin": ["Default"]
+      },
       "usesAppleSignIn": true,
       "infoPlist": {
         "LSMinimumSystemVersion": "12.0",

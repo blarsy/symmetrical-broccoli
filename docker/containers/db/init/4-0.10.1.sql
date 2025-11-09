@@ -125,6 +125,29 @@ REVOKE ALL ON FUNCTION sb.search_server_logs(character varying) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION sb.search_server_logs(character varying) TO admin;
 
+CREATE OR REPLACE FUNCTION sb.search_client_logs(
+	search_term character varying)
+    RETURNS SETOF client_logs
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+AS $BODY$
+
+SELECT *
+FROM sb.client_logs m
+WHERE cast(account_id as text) ILIKE '%' || search_term || '%' OR activity_id ILIKE '%' || search_term || '%' OR data ILIKE '%' || search_term || '%' OR cast(level as text) ILIKE '%' || search_term || '%'
+ORDER BY created DESC;
+
+$BODY$;
+
+ALTER FUNCTION sb.search_client_logs(character varying)
+    OWNER TO sb;
+
+REVOKE ALL ON FUNCTION sb.search_client_logs(character varying) FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.search_client_logs(character varying) TO admin;
+
 DO
 $body$
 BEGIN
