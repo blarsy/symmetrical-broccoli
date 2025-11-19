@@ -260,6 +260,7 @@ const resources = {
       "bidAccepted": "You accepted an offer",
       "tokensGranted": "You were granted some Topes",
       "priceSetOnResource": "You set a price on your resource",
+      "airdropReceived": "You got an airdrop",
       "loadMore": "Load older",
       "mustBeAnInteger": "Must be an integer",
       "Label": "Price in Topes",
@@ -348,7 +349,9 @@ const resources = {
       "oops": "Oops ...",
       "errorOccured": "An unexpected error occured. Better restart the app.",
       "errorReportSent": "An error report has been sent, but just to be safe, you may certainly tell us that something is wrong. Restart the app, tap on the '?' and follow the instructions.",
-      "errorTechDetailsLabel": "Détails techniques"
+      "errorTechDetailsLabel": "Détails techniques",
+      "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
+      "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away."
    }
   },
   fr: {
@@ -603,6 +606,7 @@ const resources = {
       "bidAccepted": "Tu as accepté une offre",
       "tokensGranted": "On t'a alloué des Topes",
       "priceSetOnResource": "Tu as mis un prix à ta ressource",
+      "airdropReceived": "Tu as gagné le largage",
       "loadMore": "Plus ancien",
       "mustBeAnInteger": "Doit être un nombre entier",
       "Label": "Prix en Topes",
@@ -691,7 +695,9 @@ const resources = {
       "oops": "Aïe ...",
       "errorOccured": "Une erreur inattendue a eu lieu. Mieux vaut redémarrer l'app.",
       "errorReportSent": "Un rapport d'erreur a été envoyé, mais pur être sûr, tu peux certainement nous signaler que quelque chose ne marche pas. Redémarre l'app, appuye sur '?', et suis les instructions.",
-      "errorTechDetailsLabel": "Détails techniques"
+      "errorTechDetailsLabel": "Détails techniques",
+      "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
+      "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés."
     }
   }
 }

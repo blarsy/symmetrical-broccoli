@@ -114,7 +114,7 @@ const ResourceCard = (p: ResourceCardProps) => {
       </CardContent>
       <CardActions sx={{ justifyContent: 'space-around' }}>
           <Button startIcon={<EditIcon/>}>
-            <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${p.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link>
+            { p.isExample ? uiContext.i18n.translator('modifyButtonCaption') : <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${p.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link> }
           </Button>
           <Button onClick={() => {
             p.onDeleteRequested && p.onDeleteRequested()

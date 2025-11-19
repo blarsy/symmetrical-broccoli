@@ -208,13 +208,13 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
                         <LocationEdit testID="accountAddress" orangeBackground location={profileData.location} 
                             onDeleteRequested={async () => {
                                 await updateAccountPublicInfo({ variables: { 
-                                    links: profileData.links, 
+                                    links: profileData.links.map(l =>({ label: l.label, linkTypeId: l.type, url: l.url })), 
                                     location: null 
                                 }})
                                 setProfileData(prev => ({ links: prev?.links, location: null } as ProfileData))
                             }} onLocationChanged={newLocation => {
                                 updateAccountPublicInfo({ variables: { 
-                                    links: profileData.links, 
+                                    links: profileData.links.map(l =>({ label: l.label, linkTypeId: l.type, url: l.url })), 
                                     location: newLocation 
                                 }})
                                 setProfileData(prev => ({ links: prev?.links, location: newLocation } as ProfileData))

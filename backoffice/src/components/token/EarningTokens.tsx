@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import dayjs from "dayjs"
 import ExplainToken from "./ExplainToken"
+import Divider from '@mui/material/Divider'
 
 interface OneTimeTaskProps {
     text: string
@@ -113,13 +114,12 @@ const AirdropTask = (p: AirdropTaskProps) => {
                 { p.numberOfResources >= 2 && <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText, fontStyle: 'italic' })}>{`${p.numberOfResources} ${t('resourcesInCampaign')}`}</Typography> }
             </ Stack>,
             <Stack direction="row" key="action" alignItems="center">
-                { p.numberOfResources >= 2 && <Stack key="check" position="relative">
-                    <AlarmIcon color="success" sx={{ fontSize: 50 }} />
-                    <Smiley color="warning" sx={{ fontSize: 30, position: 'absolute', right: -10, bottom: -10 }} />
-                </Stack>}
                 <Typography variant="body1" sx={theme => ({ color: theme.palette.primary.contrastText })}>+ {p.reward}</Typography>
                 <IconButton onClick={p.onClick}>
-                    <ArrowForward />
+                { p.numberOfResources >= 2 ? <Stack key="check" position="relative">
+                    <AlarmIcon color="success" sx={{ fontSize: 24 }} />
+                    <Smiley color="warning" sx={{ fontSize: 30 * (24/50), position: 'absolute', right: -5, bottom: -5 }} />
+                </Stack> : <ArrowForward /> }
                 </IconButton>
             </ Stack>
         ]
@@ -180,31 +180,35 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
         if(appContext.account) refetch()
     }, [appContext.account])
 
-    return <LoadedZone loading={loading || resWithoutPicsLoading} error={error || resWithoutPicsError}>
+    return <LoadedZone loading={loading || resWithoutPicsLoading} containerStyle={{ gap: '0.25rem' }} error={error || resWithoutPicsError}>
         <OneTimeTask text={t('howToGet_switchToContributionMode')} 
             checked={!!appContext.account?.willingToContribute} 
             onClick={() => {
                 setExplainingToken(true)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={SWITCH_TO_CONTRIBUTION_MODE_REWARD}/>
+        <Divider />
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
             onClick={() => {
                 router.push(`/webapp/${version}/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LOGO_REWARD}/>
+        <Divider />
         <OneTimeTask text={t('howToGet_addLocation')} 
             checked={data && data.me?.locationByLocationId?.address} 
             loading={loading} onClick={() => {
                 router.push(`/webapp/${version}/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LOCATION_REWARD}/>
+        <Divider />
         <OneTimeTask text={t('howToGet_addLink')} 
             checked={data && data.me?.accountsLinksByAccountId?.nodes && data.me.accountsLinksByAccountId.nodes.length > 0} 
             loading={loading} onClick={() => {
                 router.push(`/webapp/${version}/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LINK_REWARD}/>
+        <Divider />
         <ReccurringTask text={t('howToGet_addPictureToResource')} zeroRemainingMeansDone={false}
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
@@ -212,26 +216,30 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
                 router.push(`/webapp/${version}/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />
+        <Divider />
         <PermanentTask text={t('howToGet_addNewResource')} 
             reward={CREATE_RESOURCE_REWARD}
             onClick={() => {
                 router.push(`/webapp/${version}/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />
+        <Divider />
         { activeCampaign.loading && <CircularProgress color="primary" /> }
         { activeCampaign.data && !activeCampaign.data.airdropDone && 
-            <AirdropTask airdrop={activeCampaign.data.airdrop} loading={resOnCampaignLoading} reward={activeCampaign.data.airdropAmount}
+            [<AirdropTask key="airdropTask" airdrop={activeCampaign.data.airdrop} loading={resOnCampaignLoading} reward={activeCampaign.data.airdropAmount}
                 numberOfResources={resOnCampaign?.getNumberOfActiveResourcesOnActiveCampaign}
                 onClick={() => {
                     router.push(`/webapp/${version}/resources`)
                     onSomeTaskClicked && onSomeTaskClicked()
-                }} />}
-        { activeCampaign.data && <PermanentTask key="rewardMultiplier" 
+                }} />,
+            <Divider key="airdropTaskHR" />]}
+        { activeCampaign.data && [<PermanentTask key="rewardMultiplier" 
             reward={CREATE_RESOURCE_REWARD * activeCampaign.data.resourceRewardsMultiplier} 
             text={t('howToGet_createResourcesOnCampaign')} onClick={() => {
                 router.push(`/webapp/${version}/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
-            }} />}
+            }} />,
+             <Divider key="rewardMultiplierHr" />]}
         <ExplainToken visible={explainingToken} onClose={() => setExplainingToken(false)} />
     </LoadedZone>
 }

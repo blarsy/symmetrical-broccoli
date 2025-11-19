@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material"
 import { useContext, useState } from "react"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { LoadingButton } from "@mui/lab"
@@ -71,13 +71,13 @@ const CreateBidDialog = (p: Props) => {
                             avatarImageUrl: p.resource!.account!.avatarImagePublicId && urlFromPublicId(p.resource!.account!.avatarImagePublicId)
                         } 
                     }}/>
-                <TextField inputProps={{
+                <TextField helperText={t('explainTokensForBids2')} inputProps={{
                     'data-testid': 'AmountOfTokenField'
                 }} label={t('amountOfTokenLabel')}  sx={{ flex: 1 }} value={values.amountOfTokens} 
                     type="number" required onChange={handleChange('amountOfTokens')} 
                     onBlur={handleBlur('amountOfTokens')}/>
                 <ErrorMessage component={ErrorText} name="amountOfTokens" />
-                <TextField label={t('hoursValidLabel')} sx={{ flex: 1 }} value={values.hoursValid} 
+                <TextField helperText={t('explainTokensForBids1')} label={t('hoursValidLabel')} sx={{ flex: 1 }} value={values.hoursValid} 
                     type="number" required onChange={handleChange('hoursValid')} onBlur={handleBlur('hoursValid')}/>
                 <ErrorMessage component={ErrorText} name="hoursValid" />
                 <Feedback severity="error" detail={bidStatus.error?.detail} message={bidStatus.error?.message}

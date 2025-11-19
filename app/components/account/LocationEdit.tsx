@@ -43,7 +43,7 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
                 <View style={{ flexDirection: 'row', gap: 3}}>
                     <BareIconButton size={SMALL_IMAGEBUTTON_SIZE} color="#000" Image={Images.ModifyInCircle}
                         onPress={() => { setEditedLocation(currentLocation || DEFAUT_LOCATION)}} />
-                    <BareIconButton size={SMALL_IMAGEBUTTON_SIZE} color={orangeBackground ? lightPrimaryColor : primaryColor} Image={Images.Remove}
+                    <BareIconButton testID={`${testID}:DeleteButton`} size={SMALL_IMAGEBUTTON_SIZE} color={orangeBackground ? lightPrimaryColor : primaryColor} Image={Images.Remove}
                         onPress={() => { setDeleteRequested(true)}} />
                 </View>
             </View>
@@ -64,7 +64,7 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
             }
             setEditedLocation(undefined)
         }}/>
-        <ConfirmDialog question={t('confirmation_unlink_account_location')} title={t('Confirmation_DialogTitle')}
+        <ConfirmDialog testID={`${testID}:ConfirmDeleteDialog`} question={t('confirmation_unlink_account_location')} title={t('Confirmation_DialogTitle')}
             visible={deleteRequested} onResponse={async confirmed => {
                 if(confirmed) {
                     onDeleteRequested()

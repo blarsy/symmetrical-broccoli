@@ -31,6 +31,7 @@ const MessageComposer = (p: Props) => {
     const uiContext = useContext(UiContext)
 
     const sendMessage = async (message: string, imagePublicId?: string) => {
+        if(!message && !imagePublicId) return
         setSendMessageStatus(initial(true))
         try {
             const res = await createMessage({ variables: { 
@@ -50,7 +51,7 @@ const MessageComposer = (p: Props) => {
         <IconButton sx={{ width: '3rem', height: '3rem' }} onClick={() => {
             setPickingImage(true)
         }}><ImageIcon fill={theme.palette.primary.main} /></IconButton>
-        <TextField size="small" sx={{ flex: 1 }} onChange={e => setDraftMessage(e.currentTarget.value)} value={draftMessage} />
+        <TextField multiline size="small" sx={{ flex: 1 }} onChange={e => setDraftMessage(e.currentTarget.value)} value={draftMessage} />
         <IconButton onClick={async () => {
             sendMessage(draftMessage)
         }}>

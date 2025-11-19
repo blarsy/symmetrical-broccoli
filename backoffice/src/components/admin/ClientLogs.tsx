@@ -1,4 +1,4 @@
-import { InputAdornment, Stack, TextField } from "@mui/material"
+import { InputAdornment, Stack, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import SearchIcon from '@mui/icons-material/Search'
 import { useDebounce } from "use-debounce"
@@ -55,13 +55,13 @@ const ClientLogs = () => {
           ),
         }}/>
         <LoadedZone loading={loading} error={error}>
-            { data && <DataGrid paginationMode="server" paginationModel={paginationModel} rowCount={data.searchClientLogs.totalCount} columns={[
+            { data && <DataGrid paginationMode="server" rowHeight={100} paginationModel={paginationModel} rowCount={data.searchClientLogs.totalCount} columns={[
                 { field: 'id', headerName: 'Id'},
                 { field: 'accountId', headerName: 'Account Id'},
                 { field: 'level', headerName: 'Level'},
-                { field: 'created', headerName: 'Timestamp'},
+                { field: 'created', headerName: 'Timestamp', width: 200},
                 { field: 'activityId', headerName: 'Activity Id'},
-                { field: 'data', headerName: 'Data'}
+                { field: 'data', headerName: 'Data', width: 500, renderCell: p => (<Typography sx={{ whiteSpace: 'break-spaces' }}>{p.value}</Typography>)}
             ]}
             rows={data.searchClientLogs.edges.map((sa: any, idx: number) => ({ ...sa.node, ...{ id: idx }}))}
             onPaginationModelChange={(model, details) => {

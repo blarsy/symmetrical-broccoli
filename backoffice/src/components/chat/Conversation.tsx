@@ -6,13 +6,14 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
-import ConversationHeader from "../resources/ResourceHeader"
+import ResourceHeader from "../resources/ResourceHeader"
 import { ResourceHeaderyData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { urlFromPublicId } from "@/lib/images"
+import { useRouter } from "next/navigation"
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -174,6 +175,7 @@ const Conversation = (p: Props) => {
     const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
     const [currentMessages, setCurrentMessages] = useState<Message[]>()
     const [conversationHasNewMessages, setConversationHasNewMessages] = useState(false)
+    const router = useRouter()
 
     const loadConversation = async (id: number) => {
         setConversationData(initial(true))
@@ -237,7 +239,10 @@ const Conversation = (p: Props) => {
         { chatContext.currentConversationId || chatContext.newConversationState ?
             <LoadedZone loading={conversationData?.loading} error={conversationData?.error} containerStyle={{ maxHeight: '100%', flex: '1' }}>
                 { conversationData.data && [
-                    <ConversationHeader key="header" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }} data={conversationData.data!.conversation}  />,
+                    <ResourceHeader key="header" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }} 
+                      data={conversationData.data!.conversation} 
+                      onAccountClicked={() => router.push(`/webapp/${uiContext.version}/account/${conversationData.data!.conversation.otherAccount!.id}`)}
+                      onResourceClicked={() => router.push(`/webapp/${uiContext.version}/view/${conversationData.data!.conversation.resource!.id}`)} />,
                     <ConversationMessages hasNew={conversationHasNewMessages} key="messages" data={currentMessages!} 
                       onBottom={() => setConversationHasNewMessages(false)}/>,
                     <MessageComposer key="composer" conversation={conversationData.data.conversation} 

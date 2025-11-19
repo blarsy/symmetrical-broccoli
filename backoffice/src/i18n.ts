@@ -215,6 +215,7 @@ const resources = {
             "bidAccepted": "You accepted an offer",
             "tokensGranted": "You were granted Topes",
             "priceSetOnResource": "You set a price on your resource",
+            "airdropReceived": "You got an airdrop",
             "bidsButtonCaption": "Bids",
             "noBids": "No bid sent at this time. To create a bid, first find a resource you are interested in.",
             "noReceivedBids": "No bid received at this time",
@@ -287,7 +288,9 @@ const resources = {
             "campaignSummaryTitle": "In summary",
             "campaignAllowYouto": "With Tope-là campaigns, you get plenty of Topes and swap them against great resources.",
             "forFree": "And it's free !",
-            "isOnTopeLa": " is on Tope-là"
+            "isOnTopeLa": " is on Tope-là",
+            "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
+            "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away."
         }
     },
     fr: { 
@@ -503,6 +506,7 @@ const resources = {
             "bidAccepted": "Tu as accepté une offre",
             "tokensGranted": "On t'a alloué des Topes",
             "priceSetOnResource": "Tu as mis un prix à ta ressource",
+            "airdropReceived": "Tu as gagné le largage",
             "bidsButtonCaption": "Offres",
             "noBids": "Pas d'offre envoyée pour le moment. Pour faire une offre, trouve d'abord une ressource qui t'intéresse",
             "noReceivedBids": "Pas d'offre reçue pour le moment",
@@ -575,7 +579,9 @@ const resources = {
             "campaignSummaryTitle": "En résumé",
             "campaignAllowYouto": "Grâce aux campagnes Tope-là, fais le plein de Topes et échange-les contre des ressources intéressantes.",
             "forFree": "En plus c'est gratuit !",
-            "isOnTopeLa": " est sur Tope-là"
+            "isOnTopeLa": " est sur Tope-là",
+            "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
+            "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés."
         }
     }
 }

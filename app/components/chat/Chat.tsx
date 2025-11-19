@@ -147,11 +147,11 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
                             <View style={{ flexDirection: 'column', backgroundColor: fromOther ? lightPrimaryColor : primaryColor, padding: 15,
                                 borderRadius: 15, margin: 5, alignItems: fromOther ? 'flex-start': 'flex-end'
                             }}>
-                            { msg.image && <TouchableOpacity onPress={() => setFocusedImage(imgSourceFromPublicId(msg.image!))}>
-                                <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(msg.image)} />
-                            </TouchableOpacity> }
-                            <Text variant="displayMedium" testID={`${testID}:Messages:${index}`}>{msg.text}</Text>
-                            <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
+                                { msg.image && <TouchableOpacity onPress={() => setFocusedImage(imgSourceFromPublicId(msg.image!))}>
+                                    <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(msg.image)} />
+                                </TouchableOpacity> }
+                                <Text variant="displayMedium" testID={`${testID}:Messages:${index}`}>{msg.text}</Text>
+                                <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
                             </View>
                         </View>}) }
             </ScrollView>

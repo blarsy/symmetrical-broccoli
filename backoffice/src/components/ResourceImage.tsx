@@ -7,6 +7,8 @@ interface ResourceImageProps {
     avatarImageUrl?: string
     resourceImagePublicId?: string
     baseWidth: number
+    onResourceClicked?: () => void
+    onAccountClicked?: () => void
 }
 
 const ResourceImage = (p: ResourceImageProps) => {
@@ -28,7 +30,7 @@ const ResourceImage = (p: ResourceImageProps) => {
                 height: makePxSize(p.baseWidth, screenSizesCoefficients[2]),
             }
         })}>
-        <ResponsiveImage baseSize={baseSize} publicId={p.resourceImagePublicId}/>
+        <ResponsiveImage baseSize={baseSize} publicId={p.resourceImagePublicId} onClick={p.onResourceClicked}/>
         <ResponsivePhotoBox baseSize={baseSize} sx={theme => {
             const delta = baseSize / 2
             return { 
@@ -49,7 +51,7 @@ const ResourceImage = (p: ResourceImageProps) => {
                 }
             }
         }}>
-            <AccountAvatar avatarImagePublicId={p.accountImagePublicId} avatarImageUrl={p.avatarImageUrl} name={p.accountName} />
+            <AccountAvatar avatarImagePublicId={p.accountImagePublicId} avatarImageUrl={p.avatarImageUrl} name={p.accountName} onClick={p.onAccountClicked} />
         </ResponsivePhotoBox>
     </Box>
 }

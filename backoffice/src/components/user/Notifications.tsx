@@ -418,10 +418,9 @@ const NotificationImage = ({ image } : { image: string | {
                 accountImagePublicId={image.account.avatarImagePublicId} baseWidth={NOTIFICATION_IMAGE_BASE_SIZE}
                 resourceImagePublicId={image.resource.images.length > 0 ? image.resource.images[0].publicId : undefined} />
         } else {
-            console.log('image', image)
-            return <Box sx={svgNotificationSizeSx}>
+            return <Stack sx={svgNotificationSizeSx} justifyContent="center">
                 {image() }
-            </Box>
+            </Stack>
         }
     }
 }

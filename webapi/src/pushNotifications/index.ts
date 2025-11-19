@@ -21,7 +21,7 @@ export async function sendPushNotification(messages: PushNotification[], config:
           'Accept-encoding': 'gzip, deflate',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(messages),
+        body: JSON.stringify(messages.map(m => ({ ...m, priority: 'high' }))),
       })
     }
 

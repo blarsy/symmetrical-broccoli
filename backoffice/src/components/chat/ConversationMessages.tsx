@@ -53,22 +53,23 @@ const ConversationMessages = ((p: Props) => {
                 p.onBottom()
             }
         }}>
-        <Stack position="relative">
+        <Stack position="relative" gap="0.1rem">
             {p.data.map((msg, idx) => {
                 const isMessageFromMe = msg.user.id === appContext.account!.id
                 return <Stack key={idx}>
                     <Stack direction="row" justifyContent={isMessageFromMe ? 'flex-end' : 'flex-start'}>
                         <Tooltip title={friendlyTime(msg.createdAt)} placement="left-end">
-                            <Typography variant="body2" 
-                                maxWidth="65%"
+                            <Stack maxWidth="65%"
                                 sx={{ backgroundColor: isMessageFromMe ? primaryColor : lightPrimaryColor }}
                                 borderRadius="1rem"
                                 color={isMessageFromMe ? '#fff' : '#000'}
                                 textAlign={isMessageFromMe ? 'right': 'left'} 
-                                alignSelf={isMessageFromMe ? 'flex-end': 'flex-start'}
-                                padding="0.5rem">
-                                {msg.text}
-                            </Typography>
+                                alignSelf={isMessageFromMe ? 'flex-end': 'flex-start'} padding="0.5rem" >
+                                {msg.text.split('\n').map(t => <Typography variant="body2" 
+                                    padding="0">
+                                    {t}
+                                </Typography>)}
+                            </Stack>
                         </Tooltip>
                     </Stack>
                 </Stack>

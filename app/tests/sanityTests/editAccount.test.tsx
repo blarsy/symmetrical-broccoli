@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { cleanupTestAccounts, makeTestAccounts, simulateActivation, TestAccount } from "./datastoreSetupLib"
+import { cleanupTestAccounts, makeTestAccounts, setAccountAddress, simulateActivation, TestAccount } from "./datastoreSetupLib"
 import React from "react"
 import { checkActivationEmailSent, checkAccountData, checkLinksOnAccount } from "./datastoreCheck"
 import Start from "@/components/mainViews/Start"
@@ -119,4 +119,22 @@ test('edit account data: links', async () => {
     await checkLinksOnAccount(account.info.email, [
         { label: labelLink1Bis, url: urlLink1Bis, type: typeLink1Bis }, 
         { label: labelLink2, url: urlLink2, type: typeLink2 }])
+})
+
+test('delete address from account with links and address', async () => {
+    const labelLink1 = '1',
+        urlLink1 = 'http://l1.f',
+        typeLink1= 2
+
+    await setAccountAddress(account.data.token, { address: 'rue du pipi', latitude: 3, longitude: 50 }, [ { id: 123, label: labelLink1, type: typeLink1, url: urlLink1 } ])
+
+    render(<AppContextProvider>
+        <Start splashScreenMinimumDuration={0} overrideSecureStore={{ get: async () => account.data.token, set: async () => {}, remove: async () => {} }}>
+            <ProfileMain />
+        </Start>
+    </AppContextProvider>)
+
+    await waitForThenPress('accountAddress:DeleteButton', screen)
+    await waitForThenPress('accountAddress:ConfirmDeleteDialog:YesButton', screen)
+    await waitFor(() => expect(screen.getByTestId('accountAddress:setAddress')).toBeVisible())
 })

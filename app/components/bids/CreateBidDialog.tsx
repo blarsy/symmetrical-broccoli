@@ -1,4 +1,4 @@
-import { Modal, Portal, Text } from "react-native-paper"
+import { HelperText, Modal, Portal, Text } from "react-native-paper"
 import { lightPrimaryColor } from "../layout/constants"
 import React, { useContext } from "react"
 import { t } from "@/i18n"
@@ -46,9 +46,11 @@ const CreateBidDialog = (p: Props) => {
                     <TransparentTextInput testID={`${p.testID}:amountToBid`} label={<StyledLabel label={t('amountToBidLabel')} />} value={f.values.amountToBid?.toString()}
                         onChangeText={f.handleChange('amountToBid')} onBlur={f.handleBlur('amountToBid')} />
                     <ErrorMessage component={ErrorText} name="amountToBid" />
+                    <Text variant="bodyMedium">{t('explainTokensForBids2')}</Text>
                     <TransparentTextInput testID={`${p.testID}:HoursValid`} label={<StyledLabel label={t('hoursValidLabel')} />} value={f.values.hoursValid?.toString()}
                         onChangeText={f.handleChange('hoursValid')} onBlur={f.handleBlur('hoursValid')} />
                     <ErrorMessage component={ErrorText} name="hoursValid" />
+                    <Text variant="bodyMedium">{t('explainTokensForBids1')}</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10}}>
                         <OrangeButton onPress={p.onDismiss}>{t('close_buttonCaption')}</OrangeButton>
                         <OrangeButton loading={creating} testID={ `${p.testID}:ConfirmButton` } onPress={() => {

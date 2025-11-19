@@ -102,14 +102,13 @@ const AirdropTask = (p: AirdropTaskProps) => {
                 { p.numberOfResources >= 2 && <Text variant="bodySmall" style={{ fontStyle: 'italic' }}>{`${p.numberOfResources} ${t('resourcesInCampaign')}`}</Text> }
             </ View>,
             <View key="action" style={{ flexDirection: 'row', alignItems: 'center' }}>
-                { p.numberOfResources >= 2 && <View key="check" style={{ flexDirection: 'row', position: 'relative' }}>
-                    <Icon source="alarm" color="#4BB543" size={50} />
-                    <View style= {{ position: 'absolute', right: -10, bottom: -10 }}>
-                        <Icon source="emoticon-happy-outline" color={primaryColor} size={30}/>
-                    </View>
-                </View>}
                 <Text variant="headlineMedium" style={{ minWidth: 35 }}>+ {p.reward}</Text>
-                <BareIconButton Image="arrow-right-bold" size={35} style={{ margin: 0, backgroundColor: '#fff', borderRadius: 17, borderWidth: 2, borderColor: '#000' }} onPress={p.onPress} />
+                { p.numberOfResources >= 2 ? <View key="check" style={{ flexDirection: 'row', position: 'relative' }}>
+                    <Icon source="alarm" color="#4BB543" size={35} />
+                    <View style= {{ position: 'absolute', right: -10, bottom: -10 }}>
+                        <Icon source="emoticon-happy-outline" color={primaryColor} size={30 * (35/50)}/>
+                    </View>
+                </View> : <BareIconButton Image="arrow-right-bold" size={35} style={{ margin: 0, backgroundColor: '#fff', borderRadius: 17, borderWidth: 2, borderColor: '#000' }} onPress={p.onPress} /> }
             </ View>
         ]
     }

@@ -6,6 +6,8 @@ import { Stack, Theme, Typography } from "@mui/material"
 interface Props {
     data: ResourceHeaderyData
     sx?: SxProps<Theme>
+    onResourceClicked?: () => void
+    onAccountClicked?: () => void
 }
 
 const ResourceHeader = (p: Props) => {
@@ -15,7 +17,8 @@ const ResourceHeader = (p: Props) => {
         }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
         <ResourceImage accountName={p.data.otherAccount.name} baseWidth={120}
             accountImagePublicId={p.data.otherAccount.imagePublicId} resourceImagePublicId={resourceImagePublicId} 
-            avatarImageUrl={p.data.otherAccount.avatarImageUrl} />
+            avatarImageUrl={p.data.otherAccount.avatarImageUrl} onResourceClicked={p.onResourceClicked} 
+            onAccountClicked={p.onAccountClicked} />
         <Stack>
             <Typography variant="overline" color="primary">{p.data.otherAccount.name}</Typography>
             <Typography variant="caption" color="primary">{p.data.resource?.title}</Typography>

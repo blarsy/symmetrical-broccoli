@@ -43,6 +43,7 @@ const Conversation = ({ route }: RouteProps) => {
     }, [route.params, appContext.categories.data])
 
     const onSend = useCallback(async (newMessage: string, imagePublicId?: string) => {
+        if(!newMessage && !imagePublicId) return
         try {
 
           await createMessage({ variables: { 
