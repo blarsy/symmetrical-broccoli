@@ -1,9 +1,13 @@
 import { gql, useMutation } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Stack } from "@mui/material"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
 import ResourceCard from "../resources/ResourceCard"
+import { DEFAULT_LOCATION } from "@/lib/constants"
+import { UiContext } from "../scaffold/UiContextProvider"
+import { AppContext } from "../scaffold/AppContextProvider"
+import useProfile from "@/lib/useProfile"
 
 export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0", $inActiveCampaign: Boolean) {
   suggestedResources(
@@ -42,11 +46,29 @@ export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: 
 
 export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: false, canBeExchanged: false, 
   canBeGifted: false, canBeTakenAway: false, isProduct: false, isService: false, categoryCodes: [], 
-  excludeUnlocated: false, distanceToReferenceLocation: 50, searchTerm: '', referenceLocation: null }
+  excludeUnlocated: false, distanceToReferenceLocation: 50, searchTerm: '', referenceLocation: DEFAULT_LOCATION,
+  inCurrentCampaign: false }
 
 const Search = (p: {version: string}) => {
+    const appContext = useContext(AppContext)
+    const { profileData } = useProfile()
     const [ suggestResources, { loading, error }] = useMutation(SUGGEST_RESOURCES)
     const [suggestedResources, setSuggestedResources] = useState<any[]>([])
+    const [initialSearchParams, setInitialSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS)
+    const [loadingProfile, setLoadingProfile] = useState(true)
+
+    useEffect(() => {
+      if(!appContext.account) {
+        setLoadingProfile(false)
+        return
+      }
+      if(!profileData.loading) {
+        if(profileData.data?.location) {
+          setInitialSearchParams({ ...DEFAULT_SEARCH_PARAMETERS, ...{ referenceLocation: profileData.data.location } })
+        }
+        setLoadingProfile(false)
+      }
+    }, [profileData.data])
 
     const loadResources = async (searchParameters: SearchParameters) => {
       const res = await suggestResources({ variables: { 
@@ -56,15 +78,17 @@ const Search = (p: {version: string}) => {
           excludeUnlocated: searchParameters.excludeUnlocated, isProduct: searchParameters.isProduct, 
           isService: searchParameters.isService, referenceLocationLatitude: searchParameters.referenceLocation?.latitude,
           referenceLocationLongitude: searchParameters.referenceLocation?.longitude, 
-          searchTerm: searchParameters.searchTerm
+          searchTerm: searchParameters.searchTerm, inActiveCampaign: searchParameters.inCurrentCampaign
        } })
       setSuggestedResources(res.data.suggestedResources.resources)
     }
 
     return <Stack sx={{ paddingTop: '2rem', gap: '2rem', overflow: 'auto' }}>
-        <SearchFilter value={DEFAULT_SEARCH_PARAMETERS} onParamsChanged={async searchParams => {
-            loadResources(searchParams)
-        }} />
+        <LoadedZone loading={ loadingProfile } error={ profileData.error }>
+          { !loadingProfile && <SearchFilter value={initialSearchParams} onParamsChanged={async searchParams => {
+              loadResources(searchParams)
+          }} />}
+        </LoadedZone>
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', 
                 gap: '1rem', justifyContent: 'center', overflow: 'auto' }}>

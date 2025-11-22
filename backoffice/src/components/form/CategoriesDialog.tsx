@@ -2,7 +2,6 @@ import { Category } from "@/lib/schema"
 import { useContext, useState } from "react"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material"
 import CategoriesSelector from "./CategoriesSelector"
-import useCategories from "@/lib/useCategories"
 import { UiContext } from "../scaffold/UiContextProvider"
 
 interface Props {
@@ -14,7 +13,6 @@ interface Props {
 const CategoriesDialog = (p: Props) => {
     const uiContext = useContext(UiContext)
     const [currentCategories, setCurrentCategories] = useState<Category[]>(p.value)
-    const categories = useCategories()
 
     return <Dialog maxWidth="xl" open={p.visible} onClose={() => p.onClose()}>
         <DialogTitle>{uiContext.i18n.translator('selectCategoriesDialogTitle')}</DialogTitle>
@@ -22,7 +20,7 @@ const CategoriesDialog = (p: Props) => {
             <CategoriesSelector values={p.value.map(c => c.code)} 
                 onSelectionChanged={e => {
                     setCurrentCategories(
-                        e.map(catCode => categories.data!.find(cat => cat.code === catCode)!)
+                        e.map(catCode => uiContext.categories.data!.find(cat => cat.code === catCode)!)
                     )
                 }} />
         </DialogContent>

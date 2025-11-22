@@ -1,10 +1,12 @@
-import { Checkbox, FormControlLabel, IconButton, Slider, Stack, SxProps, Theme, Typography } from "@mui/material"
+import { Checkbox, FormControlLabel, Icon, IconButton, Slider, Stack, SxProps, Theme, Tooltip, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import EditIcon from '@mui/icons-material/EditOutlined'
 import { Location } from '@/lib/schema'
 import SetLocationDialog from "./SetLocationDialog"
 import NoLocation from "./NoLocation"
 import { UiContext } from "../scaffold/UiContextProvider"
+import LocationSetIcon from '@mui/icons-material/LocationOn'
+import LocationNotSetIcon from '@mui/icons-material/LocationOff'
 
 interface ProximitySettingsProps {
     address: string
@@ -23,24 +25,31 @@ interface ProximityParameters {
 const Settings = (p: ProximitySettingsProps) => {
     const uiContext = useContext(UiContext)
 
-    return <Stack>
-        <Typography variant="body1" color="primary">{`${p.distance} ${uiContext.i18n.translator('distanceTo')}`}</Typography>
-        <Stack direction="row" alignItems="center" gap="1rem">
+    return <Stack direction="row" gap="1rem">
+        <Stack direction="row" alignItems="center">
             <Typography variant="body1" color="primary">{p.address}</Typography>
             <IconButton onClick={p.onSetNewLocationRequest}>
                 <EditIcon color="primary"/>
             </IconButton>
         </Stack>
-        <Slider color="primary" min={1} max={50} value={p.distance} onChange={(e, val) => p.onChange(val as number, p.excludeUnlocated) } />
-        <FormControlLabel control={<Checkbox checked={!p.excludeUnlocated} onChange={e => {
-            p.onChange(p.distance, !p.excludeUnlocated)
-        }} />} label={uiContext.i18n.translator('includeUnlocatedResourcesLabel')} sx={{
-            '& .MuiFormControlLabel-label': {
-                color: 'primary.main'
-            }
-        }}/>
+        <Stack minWidth="8rem" alignItems="center">
+            <Typography variant="body1" color="primary">{`${p.distance} ${uiContext.i18n.translator('distanceTo')}`}</Typography>
+            <Slider color="primary" min={1} max={50} value={p.distance} onChange={(_e, val) => p.onChange(val as number, p.excludeUnlocated) } />
+        </Stack>
+        <Tooltip title={uiContext.i18n.translator('onlyLocatedResourcesLabel')}>
+            <FormControlLabel control={<Checkbox sx={{ padding: '0 0 0 1rem' }} checked={p.excludeUnlocated} onChange={e => {
+                p.onChange(p.distance, !p.excludeUnlocated)
+            }} />} label={p.excludeUnlocated ? <LocationSetIcon/> : <LocationNotSetIcon />} sx={{
+                '& .MuiFormControlLabel-label': {
+                    color: 'primary.main',
+                    display: 'flex'
+                }
+            }}/>
+        </Tooltip>
     </Stack>
 }
+
+
 
 interface Props {
     value: ProximityParameters
@@ -58,7 +67,7 @@ const ProximityFilter = (p: Props) => {
     }, [currentParameters])
 
     return <Stack sx={p.sx} alignItems="center">
-        <Typography variant="h4" textAlign="center" color="primary">{uiContext.i18n.translator('proximityTitle')}</Typography>
+        <Typography variant="body1" color="primary">{uiContext.i18n.translator('proximityTitle')}</Typography>
         { currentParameters.referenceLocation ? <Settings 
             address={ currentParameters.referenceLocation!.address } 
             distance={currentParameters.distanceToReferenceLocation} 

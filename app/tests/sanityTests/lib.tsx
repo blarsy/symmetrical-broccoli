@@ -26,7 +26,6 @@ const BoardWithSingleComponent = (t: TabNavigatorProps) => (r: RouteProps) => <D
 }]} />
 
 const BoardWithComponents = (ts: TabNavigatorProps[] | undefined) => (r: RouteProps) => {
-    console.log('render boardwithcomps', ts)
     return <DealBoard {...r} tabs={ ts && ts.map(t => ({ name: t.name, component: t.component })) }/>
 }
 

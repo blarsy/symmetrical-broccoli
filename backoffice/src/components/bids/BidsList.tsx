@@ -6,7 +6,6 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import { Checkbox, FormControlLabel, FormGroup, Stack, Typography } from "@mui/material"
 import { makePxSize } from "../misc"
 import { Bid, Category, fromServerGraphAccount, fromServerGraphResource } from "@/lib/schema"
-import useCategories from "@/lib/useCategories"
 import { LoadingButton } from "@mui/lab"
 import BidSent from "./BidSent"
 import BidReceived from "./BidReceived"
@@ -120,7 +119,6 @@ const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {
 
 const BidsList = () => {
     const uiContext = useContext(UiContext)
-    const categories = useCategories()
     const [myBids, setMyBids] = useState<DataLoadState<Bid[]>>()
     const [myReceivedBids, setMyReceivedBids] = useState<DataLoadState<Bid[]>>()
     const [loadingMoreBids, setLoadingMoreBids] = useState(false)
@@ -134,7 +132,7 @@ const BidsList = () => {
       setMyBids(initial(true))
       try {
           const res = await getMyBids({ variables: { first: PAGESIZE, includeInactive }})
-          setMyBids(fromData(res.data.myBids.edges.map((d: any) => bidFromServerGraph(d.node, categories.data!))))
+          setMyBids(fromData(res.data.myBids.edges.map((d: any) => bidFromServerGraph(d.node, uiContext.categories.data!))))
       } catch(e) {
           setMyBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
@@ -144,7 +142,7 @@ const BidsList = () => {
       setMyReceivedBids(initial(true))
       try {
           const res = await getMyReceivedBids({ variables: { first: PAGESIZE, includeInactive }})
-          setMyReceivedBids(fromData(res.data.myReceivedBids.edges.map((d: any) => bidFromServerGraph(d.node, categories.data!))))
+          setMyReceivedBids(fromData(res.data.myReceivedBids.edges.map((d: any) => bidFromServerGraph(d.node, uiContext.categories.data!))))
       } catch(e) {
           setMyReceivedBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
@@ -158,10 +156,10 @@ const BidsList = () => {
     }
 
     useEffect(() => {
-      if(categories.data) {
+      if(uiContext.categories.data) {
         loadFromScratch()
       }
-    }, [categories])
+    }, [uiContext.categories])
 
     useEffect(() => {
       loadSentBids(!onlyActiveSentOption)
@@ -211,7 +209,7 @@ const BidsList = () => {
               setLoadingMoreReceivedBids(true)
               try {
                 const res = await refetchMyReceivedBids({ first: PAGESIZE, after: getMyReceivedBidsData.myReceivedBids.pageInfo.endCursor })
-                setMyReceivedBids(prev => fromData([...prev?.data!, ...res.data.myReceivedBids.edges.map((rawBid: any) => bidFromServerGraph(rawBid.node, categories.data!))]))
+                setMyReceivedBids(prev => fromData([...prev?.data!, ...res.data.myReceivedBids.edges.map((rawBid: any) => bidFromServerGraph(rawBid.node, uiContext.categories.data!))]))
               } finally {
                 setLoadingMoreReceivedBids(false)
               }
@@ -240,7 +238,7 @@ const BidsList = () => {
               setLoadingMoreBids(true)
               try {
                 const res = await refetchMyBids({ first: PAGESIZE, after: getMyBidsData.myBids.pageInfo.endCursor })
-                setMyBids(prev => fromData([...prev?.data!, ...res.data.myBids.edges.map((rawBid: any) => bidFromServerGraph(rawBid.node, categories.data!))]))
+                setMyBids(prev => fromData([...prev?.data!, ...res.data.myBids.edges.map((rawBid: any) => bidFromServerGraph(rawBid.node, uiContext.categories.data!))]))
               } finally {
                 setLoadingMoreBids(false)
               }

@@ -6,7 +6,6 @@ import { usePagePath } from "@/lib/usePagePath"
 import { useLazyQuery } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
-import useCategories from "@/lib/useCategories"
 import EditResource from "@/components/resources/EditResource"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
 import { GET_RESOURCE } from "@/lib/apolloClient"
@@ -18,19 +17,18 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
     const [resource, setResource] = useState<DataLoadState<Resource | undefined>>(initial(true, undefined))
     const appContext = useContext(AppContext)
     const [getResource] = useLazyQuery(GET_RESOURCE)
-    const categories = useCategories()
     const uiContext = useContext(UiContext)
     const { data: address, loading, error } = useProfileAddress()
     const { activeCampaign } = useActiveCampaign()
 
     const loadResource = async () => {
         try {
-            if(p.resourceId != 0 && categories.data) {
+            if(p.resourceId != 0 && uiContext.categories.data) {
                 const rawRes = await getResource({ variables: { id: Number(p.resourceId) } })
                 if(rawRes.data.resourceById.accountByAccountId.id != appContext.account!.id) {
                     throw new Error('This resource cannot be edited')
                 }
-                setResource(fromData(fromServerGraphResource(rawRes.data.resourceById, categories.data)))
+                setResource(fromData(fromServerGraphResource(rawRes.data.resourceById, uiContext.categories.data)))
             } else {
                 setResource(fromData({
                     specificLocation: address || null, isService: false, isProduct: false, canBeDelivered: false, canBeExchanged: false,
@@ -43,8 +41,8 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
         }
     }
     useEffect(() => {
-        if(categories.data && !error && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
-    }, [categories.data, address, loading, error, activeCampaign])
+        if(uiContext.categories.data && !error && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
+    }, [uiContext.categories.data, address, loading, error, activeCampaign])
 
     return <LoadedZone loading={resource.loading || loading} error={resource.error || error} containerStyle={{ overflow: 'auto', paddingLeft: '2rem', paddingRight: '2rem' }}>
         <EditResource value={resource.data}/>

@@ -30,8 +30,8 @@ const resources = {
             "proximityTitle": "Proximity",
             "noLocationSet": "No location defined",
             "setLocationDialogTitle": "Set location",
-            "includeUnlocatedResourcesLabel": "Include resource with no location defined",
-            "distanceTo": " km from",
+            "onlyLocatedResourcesLabel": "Only resources with location defined",
+            "distanceTo": " km",
             "okButton": "Ok",
             "cancelButton": "Cancel",
             "searchButtonCaption": "Search",
@@ -290,7 +290,8 @@ const resources = {
             "forFree": "And it's free !",
             "isOnTopeLa": " is on Tope-là",
             "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
-            "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away."
+            "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away.",
+            "inCurrentCampaign": "Active campaign `{{name}}`"
         }
     },
     fr: { 
@@ -316,13 +317,13 @@ const resources = {
             "onSite": "A l'adresse donnée",
             "placeToBeAgreed": "Lieu à convenir",
             "canBeDelivered": "Livraison",
-            "categoriesTitle": "Categories",
+            "categoriesTitle": "Catégories",
             "filtersTitle": "Filtres",
             "proximityTitle": "Proximité",
             "noLocationSet": "Aucune location définie",
             "setLocationDialogTitle": "Définir une location",
-            "includeUnlocatedResourcesLabel": "Inclure les resources sans location définie",
-            "distanceTo": " km de ",
+            "onlyLocatedResourcesLabel": "Uniquement les ressources avec location définie",
+            "distanceTo": " km",
             "okButton": "Ok",
             "cancelButton": "Annuler",
             "searchButtonCaption": "Recherche",
@@ -581,7 +582,8 @@ const resources = {
             "forFree": "En plus c'est gratuit !",
             "isOnTopeLa": " est sur Tope-là",
             "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
-            "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés."
+            "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés.",
+            "inCurrentCampaign": "Campagne en cours `{{name}}`"
         }
     }
 }

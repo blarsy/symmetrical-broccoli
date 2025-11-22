@@ -1,6 +1,7 @@
 import dayjs from "dayjs"
-import { checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, fromToday, makeSearch, makeTestAccounts, removeActiveCampaign, setAccountLocation, TestAccount } from "./datastoreSetupLib"
+import { checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, makeSearch, makeTestAccounts, removeActiveCampaign, setAccountLocation, TestAccount } from "./datastoreSetupLib"
 import { waitFor } from "@testing-library/dom"
+import { fromToday } from "@/utils"
 
 let accounts: TestAccount[]
 

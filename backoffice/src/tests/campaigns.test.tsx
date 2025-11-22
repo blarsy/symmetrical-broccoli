@@ -1,6 +1,7 @@
 import { render, waitFor } from "@testing-library/react"
-import { checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, executeQuery, fromToday, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
+import { checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, executeQuery, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
 import NotificationsPage from "@/app/webapp/[version]/notifications/page"
+import { fromToday } from "@/utils"
 
 let account : TestAccount
 let campaignId: number
@@ -25,7 +26,6 @@ beforeEach(async () => {
 
 test('campaign beginning is announced', async () => {
     await executeQuery('SELECT sb.apply_campaign_announcements()')
-    console.log('campaignId', campaignId)
     //check that nothing happened on the campaign
     const matches = await executeQuery(`SELECT count(*) as count FROM sb.campaigns WHERE airdrop_done = false AND airdrop_imminent_announced = false AND beginning_announced = false AND id = $1`, [campaignId])
     expect(matches.rowCount).toEqual(1)

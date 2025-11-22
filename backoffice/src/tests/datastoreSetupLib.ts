@@ -320,9 +320,6 @@ export const setAccountTokens = async (email: string, numberOfTokens: number) =>
         where email = lower($2)`, [numberOfTokens, email])
 }
 
-export const fromToday = (days: number) =>
-    new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * days)
-
 export const createCampaign = async (name: string, description: string,
     airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
     ending: Date): Promise<number> => {

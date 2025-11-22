@@ -1,4 +1,5 @@
-import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, executeQuery, fromToday, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
+import { fromToday } from "@/utils"
+import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, executeQuery, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
 
 let accounts : TestAccount[]
 let account1: TestAccount, account2: TestAccount, account3: TestAccount

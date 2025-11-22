@@ -26,7 +26,6 @@ test('Search on resource text (account name)', async () => {
     await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
 
     fireEvent.changeText(screen.getByTestId('searchText'), `${searchableData.accounts[0].name}`)
-    console.log('searching on ', `${searchableData.accounts[0].name}`)
 
     await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`))
         .toHaveTextContent(searchableResourceTitles[0]), { timeout: 5000 })
@@ -40,7 +39,6 @@ test('Search on resource text (account name)', async () => {
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[3]}:Title`)).not.toBeOnTheScreen()
 
     fireEvent.changeText(screen.getByTestId('searchText'), `${searchableData.accounts[1].name}`)
-    console.log('searching on ', `${searchableData.accounts[1].name}`)
 
     await waitFor(() => expect(screen.getByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`))
         .toHaveTextContent(searchableResourceTitles[2]))

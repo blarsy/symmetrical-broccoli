@@ -1,9 +1,11 @@
 import { createContext, Dispatch, Key, useReducer } from "react"
 import { Category } from "@/lib/schema"
 import DataLoadState, { initial } from "@/lib/DataLoadState"
+import LoadedZone from "./LoadedZone"
 
 export interface UiStateData {
   loading: boolean
+  loadingLookupData: boolean
   error?: Error
   version: string
   i18n: {
@@ -16,6 +18,7 @@ export interface UiStateData {
 
 const blankUiContext = { 
     loading: true,
+    loadingLookupData: true,
     categories: initial<Category[]>(false, undefined),
     version: '',
     i18n: {
@@ -40,8 +43,8 @@ const uiReducer = (previousState: UiStateData, action: { type: UiReducerActionTy
       case UiReducerActionType.SwitchLightMode:
         newState = { lightMode: !previousState.lightMode }
         break
-      case UiReducerActionType.SetCategoriesState:
-        newState = { categories: action.payload }
+      case UiReducerActionType.SetCategoriesState: 
+        newState = { categories: action.payload, loadingLookupData: !action.payload.data }
         break
       default:
         throw new Error(`Unexpected reducer action type ${action.type}`)

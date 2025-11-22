@@ -5,7 +5,6 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
-import useCategories from "@/lib/useCategories"
 import ResourceHeader from "../resources/ResourceHeader"
 import { ResourceHeaderyData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
@@ -170,7 +169,6 @@ const Conversation = (p: Props) => {
     const chatContext = useContext(ChatContext)
     const chatDispatch = useContext(ChatDispatchContext)
     const [getConversation] = useLazyQuery(CONVERSATION_MESSAGES)
-    const categories = useCategories()
     const [conversationData, setConversationData] = useState<ConversationState>(initial(false))
     const [setParticipantRead] = useMutation(SET_PARTICIPANT_READ)
     const [currentMessages, setCurrentMessages] = useState<Message[]>()
@@ -181,7 +179,7 @@ const Conversation = (p: Props) => {
         setConversationData(initial(true))
         try {
             const res = await getConversation({ variables: { id, first: 50 } })
-            const conversationData = fromRawConversation(res.data, appContext.account!.id, categories.data!)
+            const conversationData = fromRawConversation(res.data, appContext.account!.id, uiContext.categories.data!)
             setConversationData(fromData(conversationData))
             setCurrentMessages(conversationData.messages)
             setParticipantRead({ variables: {

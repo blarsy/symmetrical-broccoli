@@ -6,8 +6,8 @@ import AppContextProvider, { AppContext, AppDispatchContext, AppReducerActionTyp
 import relativeTime from 'dayjs/plugin/relativeTime'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useContext, useEffect } from 'react'
-import { ApolloProvider } from '@apollo/client'
+import { PropsWithChildren, useContext, useEffect } from 'react'
+import { ApolloProvider, gql, useLazyQuery } from '@apollo/client'
 import { getApolloClient } from '@/lib/apolloClient'
 import i18n from '@/i18n'
 import LoadedZone from './LoadedZone'
@@ -18,6 +18,7 @@ import useAccountFunctions from '@/lib/useAccountFunctions'
 import ChatContextProvider from './ChatContextProvider'
 import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
 import Themed from './Themed'
+import { fromData, fromError, initial } from '@/lib/DataLoadState'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -96,6 +97,41 @@ export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
     </ApolloProvider>
 }
 
+export const GET_CATEGORIES = gql`query Categories($locale: String) {
+    allResourceCategories(condition: {locale: $locale}) {
+        nodes {
+          code
+          name
+        }
+      }
+}`
+
+const LookupDataProvider = (p: PropsWithChildren) => {
+    const uiDispatch = useContext(UiDispatchContext)
+    const uiContext = useContext(UiContext)
+    const [getCategories] = useLazyQuery(GET_CATEGORIES)
+
+    const loadCategories = async (lang: string) => {
+        try {
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: initial(true) })
+            const res = await getCategories({ variables: { locale: lang } })
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
+        } catch(e) {
+            uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
+        }
+    }
+
+    useEffect(() => {
+        if(!uiContext.categories.data && !uiContext.categories.loading) {
+            loadCategories(uiContext.i18n.lang)
+        }
+    }, [uiContext.i18n.lang])
+
+    return <LoadedZone loading={uiContext.loadingLookupData} error={uiContext.categories.error} containerStyle={{ overflow: 'hidden' }}>
+        {p.children}
+    </LoadedZone>
+}
+
 export const ClientWrapper = ({ children, version }: PropsWithVersion) => <AppContextProvider>
     <ChatContextProvider>
         <UiContextProvider>
@@ -103,7 +139,9 @@ export const ClientWrapper = ({ children, version }: PropsWithVersion) => <AppCo
                 <Themed>
                     <Translatable version={version}>
                         <ApolloWrapped version={version}>
-                            { children }
+                            <LookupDataProvider>
+                                { children }
+                            </LookupDataProvider>
                         </ApolloWrapped>
                     </Translatable>
                 </Themed>
