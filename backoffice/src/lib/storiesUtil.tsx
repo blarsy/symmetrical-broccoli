@@ -94,6 +94,7 @@ export const uiContextDecorator = (initial?: UiStateData) => {
     if(!initial){
         initial = {
             loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
+            loadingLookupData: false,
             version: 'v0_10',
             categories: fromData([])
         }
@@ -159,7 +160,7 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 
     return (Story: () => ReactNode) =>  <AppContextProvider initial={initialAppstate || { token: '', unreadNotifications: [], loading: false, subscriptions: []}}>
         <ChatContextProvider initial={initialChatState || { conversations: [], unreadConversations: [] }}>
-            <UiContextProvider initial={ initialUiState || { loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_10', categories: initial(false) }}>
+            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_10', categories: initial(false) }}>
                 <Translatable version="v0_10">
                     <MockedProvider mocks={
                         actualOps.map(op => ({

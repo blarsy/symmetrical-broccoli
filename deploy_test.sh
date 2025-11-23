@@ -5,6 +5,14 @@ cd ..
 
 # build the website
 cd backoffice
+
+if [[ -f ./build/webapi/.env.production.bak ]] ; then
+    echo 'File ".env.production.bak" for webapi is present, suggesting a previous test env deployment failed, restoring .env.production before going further.'
+    cp .env.production.bak .env.production
+    rm .env.production.bak
+fi
+
+
 cp .env.production .env.production.bak
 cp .env.test .env.production
 yarn build || exit 1
