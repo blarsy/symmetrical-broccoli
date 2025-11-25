@@ -78,7 +78,7 @@ const CreateCampaignDialog = (p: Props) => {
                     required onChange={handleChange('name')} 
                     onBlur={handleBlur('name')}/>
                 <ErrorMessage component={ErrorText} name="name" />
-                <TextField label="Description"  sx={{ flex: 1 }} value={values.description} 
+                <TextField label="Description" multiline sx={{ flex: 1 }} value={values.description} 
                     onChange={handleChange('description')} 
                     onBlur={handleBlur('description')}/>
                 <ErrorMessage component={ErrorText} name="description" />
@@ -92,7 +92,7 @@ const CreateCampaignDialog = (p: Props) => {
                 <DatetimeField label="Airdrop time" value={values.airdrop} onChange={newDate => setFieldValue('airdrop', newDate)} />
                 <ErrorMessage component={ErrorText} name="airdrop" />
                 <TextField label="Airdrop amount" sx={{ flex: 1 }} value={values.airdropAmount} 
-                    type="number" required onChange={handleChange('resourceRewardsMultiplier')} onBlur={handleBlur('airdropAmount')}/>
+                    type="number" required onChange={handleChange('airdropAmount')} onBlur={handleBlur('airdropAmount')}/>
                 <ErrorMessage component={ErrorText} name="airdropAmount" />
                 <Feedback severity="error" detail={campaignStatus.error?.detail} message={campaignStatus.error?.message}
                     onClose={() => setCampaignStatus(initial(false))} visible={!!campaignStatus.error}/>

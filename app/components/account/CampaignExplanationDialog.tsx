@@ -5,7 +5,7 @@ import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
 import { gql, useMutation } from "@apollo/client"
 import { Icon, Text, Tooltip } from "react-native-paper"
 import { t } from "@/i18n"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import dayjs from "dayjs"
 import { primaryColor } from "../layout/constants"
@@ -48,7 +48,7 @@ const CampaignExplanationDialog = (p: Props) => {
                         setSwipedToEnd(true)
                         await setKnowsAboutCampaigns()
                     }}>
-                        <View style={childStyle}>
+                        <ScrollView contentContainerStyle={childStyle}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
                                 <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{p.campaign.name}</Text>
                                 <View style={{ width: 120, height: 120, borderRadius: 10 }}>
@@ -60,7 +60,7 @@ const CampaignExplanationDialog = (p: Props) => {
                             <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation')}</Text>
                             <Text variant="headlineLarge">{t('rewardsMultiplied', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
                             <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
-                        </View>
+                        </ScrollView>
                         <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
                                 <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{t('airdropTitle')}</Text>

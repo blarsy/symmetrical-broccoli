@@ -80,7 +80,7 @@ const ExplainCampaign = (p: Props) => {
             { activeCampaign.data && <Stack direction="row" ref={sliderRef} className="keen-slider">
                 <Slide title={activeCampaign.data?.name} sx={{ gap: '1rem', alignItems: 'center' }}>
                     <Campaign />
-                    <Typography variant="body1" textAlign="center" color="primary.contrastText">{activeCampaign.data.description}</Typography>
+                    {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)}
                     <Divider sx={{ alignSelf: 'stretch' }}/>
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">
                         {uiContext.i18n.translator('createResourcesInCampaignExplanation')}

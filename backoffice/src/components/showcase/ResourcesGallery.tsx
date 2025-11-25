@@ -4,10 +4,13 @@ import { Box, Stack, Typography, useTheme } from "@mui/material"
 import { urlFromPublicId } from "@/lib/images"
 import { fonts } from "@/theme"
 import { lightPrimaryColor } from "@/utils"
+import Link from "next/link"
+import { getCommonConfig } from '@/config'
 
 const TOP_RESOURCES = gql`query TopResources {
   topResources {
     nodes {
+      id
       expiration
       accountByAccountId {
         id
@@ -29,10 +32,12 @@ const TOP_RESOURCES = gql`query TopResources {
 const ResourcesGallery = () => {
     const { loading, data, error } = useQuery(TOP_RESOURCES)
     const theme = useTheme()
+    const { mainVersion } = getCommonConfig()
 
     return <LoadedZone loading={loading} error={error} 
       containerStyle={{ alignSelf: 'stretch', flexDirection: 'row', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-        { data && data.topResources.nodes.map((rawRes:any, idx: number) => <Box key={idx} sx={{ 
+        { data && data.topResources.nodes.map((rawRes:any, idx: number) => 
+        <Box key={idx} sx={{ 
             borderWidth: 2,
             borderColor: '#000',
             borderStyle: "solid",
@@ -47,14 +52,16 @@ const ResourcesGallery = () => {
                 flex: '0 1 100%'
             }
         }}>
-            <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={14}
-                color="#000" borderBottom="2px solid #000"
-                sx={{
-                    backgroundColor: lightPrimaryColor
-                }}>{rawRes.accountByAccountId.name}</Typography>
-            <img style={{
-                width: '100%'
-            }} src={urlFromPublicId(rawRes.resourcesImagesByResourceId.nodes[0].imageByImageId.publicId)} />
+            <Link href={`/webapp/${mainVersion}/view/${rawRes.id}`}>
+              <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={14}
+                  color="#000" borderBottom="2px solid #000"
+                  sx={{
+                      backgroundColor: lightPrimaryColor
+                  }}>{rawRes.accountByAccountId.name}</Typography>
+              <img style={{
+                  width: '100%'
+              }} src={urlFromPublicId(rawRes.resourcesImagesByResourceId.nodes[0].imageByImageId.publicId)} />
+            </Link>
         </Box>) }
     </LoadedZone>
 }
