@@ -24,7 +24,7 @@ import QuestionIcon from "@mui/icons-material/QuestionMark"
 import QAIcon from "@mui/icons-material/QuestionAnswer"
 import { ApolloProvider } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
-import config, { getCommonConfig } from "@/config"
+import { getCommonConfig } from "@/config"
 import { keyframes, SxProps } from '@mui/system'
 import ResourcesGallery from "@/components/showcase/ResourcesGallery"
 import { ReactNode } from "react"

@@ -251,6 +251,53 @@ ORDER BY r.created DESC LIMIT 10;
 
 $BODY$;
 
+INSERT INTO sb.broadcast_prefs(event_type,account_id,days_between_summaries,last_summary_sent)
+SELECT 3, id, 1, '2025-11-24 1:00:00' FROM sb.accounts;
+
+CREATE OR REPLACE FUNCTION sb.register_account_external_auth(
+	email character varying,
+	token character varying,
+	account_name character varying,
+	language character varying,
+	auth_provider integer)
+    RETURNS jwt_token
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+DECLARE inserted_id integer;
+BEGIN
+	IF EXISTS(SELECT *
+		FROM sb.external_auth_tokens eat
+		WHERE eat.email = LOWER(register_account_external_auth.email) AND
+			eat.token = register_account_external_auth.token AND
+			eat.auth_provider = register_account_external_auth.auth_provider) THEN
+	
+		INSERT INTO sb.accounts(name, email, language, activated)
+		VALUES (account_name, LOWER(register_account_external_auth.email), 
+			register_account_external_auth.language, now())
+		RETURNING id INTO inserted_id;
+
+		INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+		VALUES (2, inserted_id, 1);
+		INSERT INTO sb.broadcast_prefs (event_type, account_id, days_between_summaries)
+		VALUES (3, inserted_id, 1);
+
+		PERFORM sb.create_notification(inserted_id, json_build_object(
+			'info', 'COMPLETE_PROFILE'
+		));
+	
+		RETURN (
+			inserted_id,
+			EXTRACT(epoch FROM now() + interval '100 day'),
+			'identified_account'
+		)::sb.jwt_token;
+	
+  	END IF;
+	RETURN NULL;
+END;
+$BODY$;
+
 DO
 $body$
 BEGIN

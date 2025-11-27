@@ -274,7 +274,7 @@ const getNewResourcesSummaryData = async (pool: Pool, version: string): Promise<
     INNER JOIN sb.accounts notified ON notified.id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
         n.read IS NULL AND
-        n.created > NOW() + interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
+        n.created > NOW() - interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
         author.id <> notified.id AND
@@ -304,8 +304,7 @@ const getNotificationsSummaryData = async (pool: Pool, version: string): Promise
         INNER JOIN sb.accounts a ON a.id = n.account_id
         INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 3 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
         WHERE n.data::json->>'resource_id' IS NULL AND (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
-            n.read IS NULL AND n.created > NOW() - interval '1 day' * bp.days_between_summaries AND
-            n.created > NOW() + interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
+            n.read IS NULL AND n.created > NOW() - interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
             a.email IS NOT NULL
         ORDER BY a.id, n.created DESC`, pool, 'Querying notifications to notify', version)
     
