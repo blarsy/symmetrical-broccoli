@@ -252,7 +252,8 @@ ORDER BY r.created DESC LIMIT 10;
 $BODY$;
 
 INSERT INTO sb.broadcast_prefs(event_type,account_id,days_between_summaries,last_summary_sent)
-SELECT 3, id, 1, '2025-11-24 1:00:00' FROM sb.accounts;
+SELECT 3, a.id, 1, '2025-11-24 1:00:00' FROM sb.accounts a
+WHERE NOT EXISTS (SELECT * FROM sb.broadcast_prefs WHERE event_type = 3 AND account_id = a.id);
 
 CREATE OR REPLACE FUNCTION sb.register_account_external_auth(
 	email character varying,
@@ -297,6 +298,31 @@ BEGIN
 	RETURN NULL;
 END;
 $BODY$;
+
+CREATE OR REPLACE FUNCTION sb.get_my_resources_without_price(
+	)
+    RETURNS SETOF resources 
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+	SELECT r.*
+	FROM sb.resources r
+	WHERE r.account_id = sb.current_account_id() AND r.deleted IS NULL AND (r.expiration IS NULL OR r.expiration > NOW())
+		AND r.price IS NULL;
+$BODY$;
+
+ALTER FUNCTION sb.get_my_resources_without_price()
+    OWNER TO sb;
+
+REVOKE ALL ON FUNCTION sb.get_my_resources_without_picture() FROM PUBLIC;
+REVOKE ALL ON FUNCTION sb.get_my_resources_without_price() FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION sb.get_my_resources_without_price() TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.get_my_resources_without_price() TO sb;
 
 DO
 $body$

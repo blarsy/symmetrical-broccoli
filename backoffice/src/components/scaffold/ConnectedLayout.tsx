@@ -4,7 +4,7 @@ import { PropsWithVersion } from "@/lib/utils"
 import { PropsWithChildren, useContext } from "react"
 import { AppContext } from "./AppContextProvider"
 import Login from "../user/Login"
-import { CircularProgress, Snackbar, Stack, Typography } from "@mui/material"
+import { CircularProgress, Container, Snackbar, Stack, Typography } from "@mui/material"
 import useRealtimeChatMessages from "@/lib/useRealtimeChatMessages"
 import { UiContext } from "./UiContextProvider"
 import { ChatContext } from "./ChatContextProvider"
@@ -33,9 +33,9 @@ const ConnectContent = (p: Props) => {
     if(!appContext.account && !p.allowAnonymous) {
         return <>
             <TopBar version={ p.version }/>
-            <Stack padding="1rem">
+            <Container maxWidth="lg" sx={{ padding: '1rem' }}>
                 <Login version={p.version} />
-            </Stack>
+            </Container>
         </>
     } else if(!appContext.account) {
         return <>

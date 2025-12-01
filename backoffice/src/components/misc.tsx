@@ -7,12 +7,16 @@ import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogConten
 import { PropsWithChildren } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import Tokens from '@/app/img/TOKENS.svg'
+import ErrorIcon from '@mui/icons-material/Error'
 
 export const screenSizesCoefficients = [0.8, 0.7, 0.5]
 export const makePxSize = (baseSize: number, coeff?: number) => `${(baseSize * (coeff || 1)).toFixed(2)}px`
 
 export const ErrorText= (props: PropsWithChildren) => {
-    return <Typography textAlign="center" variant="body1" sx={{ color: 'red' }}>{props.children}</Typography>
+    return <Stack direction="row" alignItems="center" gap="0.5rem" sx={{ color: 'red' }}>
+        <ErrorIcon/>
+        <Typography variant="body1">{props.children}</Typography>
+    </Stack>
 }
 
 interface RightAlignedModifyButtonsProps {
@@ -173,3 +177,15 @@ export const PriceTag = ({ value, label, big, testID }: { value: number, label?:
         </Stack>
     </Tooltip>
 }
+
+export const ZoomedImageDialog = ({ zoomedImg, onClose }: { zoomedImg: string | undefined, onClose: () => void}) => <Dialog open={!!zoomedImg} onClose={onClose} fullScreen>
+    <Stack sx={{ height: '100vh', backgroundColor: 'transparent', justifyItems: 'center', flexDirection: 'row' }}>
+        <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={e => {
+            e.stopPropagation()
+            onClose()
+        }} />
+        <Box margin="1rem 0 0 1rem" sx={{ cursor: 'pointer' }} onClick={onClose}>
+            <Close height="3.5rem" width="3.5rem" />
+        </Box>
+    </Stack>
+</Dialog>

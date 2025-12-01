@@ -11,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import PictureGallery from '../scaffold/PictureGallery'
 import { urlFromPublicId } from '@/lib/images'
 import ExpirationIndicator from './ExpirationIndicator'
-import { ConfirmDialog } from '../misc'
+import { ConfirmDialog, ZoomedImageDialog } from '../misc'
 import Link from 'next/link'
 import { UiContext } from '../scaffold/UiContextProvider'
 import LoadedList from '../scaffold/LoadedList'
@@ -197,11 +197,7 @@ const Resources = () => {
               onDeleteRequested={() => setDeletingResourceId(res.id)} onSuspensionHelpRequested={() => setHelpingSuspension(true)}
               images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}/>}
         />
-        <Dialog open={!!zoomedImg} onClose={() => setZoomedImg('')} fullScreen>
-            <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }} onClick={() => setZoomedImg(undefined)}>
-                <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
-            </Stack>
-        </Dialog>
+        <ZoomedImageDialog zoomedImg={zoomedImg} onClose={() => setZoomedImg('')} />
         <ExplainCampaign visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
         <ConfirmDialog visible={!!deletingResourceId} onClose={async res => {
           if(res) {

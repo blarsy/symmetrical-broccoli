@@ -3,7 +3,7 @@ import { Dimensions, StyleProp, View, ViewStyle } from "react-native"
 import { ThemedDialog } from "../ConfirmDialog"
 import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
 import { gql, useMutation } from "@apollo/client"
-import { Icon, Text, Tooltip } from "react-native-paper"
+import { Text } from "react-native-paper"
 import { t } from "@/i18n"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import SwiperFlatList from "react-native-swiper-flatlist"
@@ -29,7 +29,7 @@ const CampaignExplanationDialog = (p: Props) => {
     const { width: winWidth, height: winHeight } = Dimensions.get('screen')
     const dialogWidth = Math.min(400, winWidth)
     const height = Math.min(winHeight - 120, 700)
-    const childWidth = dialogWidth - 48, childPadding = 10, childActualSpace = childWidth - (childPadding * 2)
+    const childWidth = dialogWidth - 48
     const childStyle: StyleProp<ViewStyle> = { width: childWidth, gap: 15, alignItems: 'flex-start' }
     const subViewHeight = height - 80
     const [setKnowsAboutCampaigns] = useMutation(SET_KNOWS_ABOUT_CAMPAIGNS)
@@ -42,7 +42,7 @@ const CampaignExplanationDialog = (p: Props) => {
             height: subViewHeight, flex: 1, position: 'relative'
         }}
         content={
-            <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', position: 'relative' }}>
                 <GestureHandlerRootView>
                     { p.campaign && <SwiperFlatList onEndReached={async() => {
                         setSwipedToEnd(true)
@@ -74,7 +74,20 @@ const CampaignExplanationDialog = (p: Props) => {
                             </View>
                             <Text variant="bodyLarge">{t('create2ResourcesOnCampaign')}</Text>
                             <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
-                            <Text variant="bodyLarge">{t('ensureAirdropEligibility')}</Text>
+                            { dayjs(p.campaign.airdrop) > dayjs(new Date()) ?
+                                <View style={{ gap: 10 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+                                        <Text variant="bodyLarge">{dayjs(p.campaign.airdrop).fromNow()}</Text>
+                                        <Images.TimeUp height={35} width={35}/>
+                                    </View>
+                                    <Text variant="bodyLarge">{t('ensureAirdropEligibility')}</Text>
+                                </View>
+                                :
+                                <View style={{ gap: 10, alignItems: 'center' }}>
+                                    <Images.TimeUp height={65} width={65}/>
+                                    <Text variant="bodyLarge">{t('didYouGetIt')}</Text>
+                                </View>
+                            }
                         </View>
                         <View style={childStyle}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
@@ -90,7 +103,7 @@ const CampaignExplanationDialog = (p: Props) => {
                     </SwiperFlatList> }
                 </GestureHandlerRootView>
                 { !swipedToEnd && <AnimatedSwipeHand/> }
-            </>
+            </View>
         }/>
 }
 

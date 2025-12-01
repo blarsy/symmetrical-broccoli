@@ -202,3 +202,20 @@ export const singleResource = (id?: number, isDeleted: boolean = false, threeIma
         }: null
     }
 }
+
+export const fromToday = (days: number) =>
+    new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * days)
+
+export const defaultCampaign = {
+    airdrop: new Date(new Date().valueOf() + 10000000),
+    airdropDone: false,
+    airdropAmount: 5000,
+    beginning: new Date(),
+    created: new Date(),
+    defaultResourceCategories: [],
+    description: 'Ici, un texte engageant qui explique le thème de la campagne.',
+    ending: new Date(new Date().valueOf() + 100000000),
+    id: 1,
+    name: 'Vive la rentrée !',
+    resourceRewardsMultiplier: 5
+}

@@ -133,8 +133,9 @@ export function Main ({ screens }: Props) {
                 getInitialURL,
                 subscribe,
                 config: {
+                    //This is the structure on which universal links parsing is based (such as in push notifications)
                     screens: {
-                        main: {
+                        board: {
                             screens: {
                                 chat: {
                                     screens: {
@@ -146,7 +147,8 @@ export function Main ({ screens }: Props) {
                                         viewResource: 'viewresource',
                                         viewAccount: 'viewaccount'
                                     }
-                                }
+                                },
+                                notifications: 'notifications'
                             }
                         },
                         profile: 'profile'

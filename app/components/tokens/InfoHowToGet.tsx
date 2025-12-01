@@ -9,7 +9,7 @@ import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 import BareIconButton from "../layout/BareIconButton"
-import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/settings"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/settings"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import dayjs from "dayjs"
 import ContributeDialog from "./ContributeDialog"
@@ -123,6 +123,14 @@ export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture 
     }
   }`
 
+export const GET_RESOURCES_WITHOUT_PRICE = gql`query GetMyResourcesWithoutPrice {
+  getMyResourcesWithoutPrice {
+    nodes {
+      id
+    }
+  }
+}`
+
 const NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN = gql`query GetNumberOfActiveResourcesOnActiveCampaign {
   getNumberOfActiveResourcesOnActiveCampaign
 }`
@@ -134,13 +142,14 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
         navigation = useNavigation()
     const {data, loading, error, refetch} = useQuery(GraphQlLib.queries.GET_ACCOUNT, { variables: { id: appContext.account?.id } })
     const { data: resWithoutPics, loading: resWithoutPicsLoading, error: resWithoutPicsError } = useQuery(GET_RESOURCES_WITHOUT_PIC)
+    const { data: resWithoutPrice, loading: resWithoutPriceLoading, error: resWithoutPriceError } = useQuery(GET_RESOURCES_WITHOUT_PRICE)
     const { data: resOnCampaign, loading: resOnCampaignLoading, error: resOnCampaignError } = useQuery(NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN)
     const { activeCampaign } = useActiveCampaign()
     const [explainingToken, setExplainingToken] = useState(false)
 
     useEffect(() => {
-        if(error || resWithoutPicsError) appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: (error || resWithoutPicsError) as Error } })
-    }, [error])
+        if(error || resWithoutPicsError || resWithoutPriceError) appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: (error || resWithoutPicsError || resWithoutPriceError) as Error } })
+    }, [error, resWithoutPicsError, resWithoutPriceError])
 
     useEffect(() => {
         if(appContext.account) refetch()
@@ -163,6 +172,10 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
         <ReccurringTask text={t('howToGet_addPictureToResource')} 
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
+            onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />
+        <ReccurringTask text={t('howToGet_addPriceToResource')} 
+            remainingAmount={resWithoutPrice?.getMyResourcesWithoutPrice?.nodes.length} 
+            remainingText={ t('resourcesWithoutPrice') } reward={ADD_RESOURCE_PRICE_REWARD} loading={resWithoutPriceLoading} 
             onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />
         <PermanentTask text={t('howToGet_addNewResource')} 
             reward={CREATE_RESOURCE_REWARD}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@mui/material'
 import { apolloClientMocksDecorator, clientComponentDecorator, defaultCampaign } from '@/lib/storiesUtil'
 import { GET_ACTIVE_CAMPAIGN } from '@/lib/useActiveCampaign'
+import { fromToday } from '@/utils'
 
 const meta = {
   component: ExplainCampaign,
@@ -13,10 +14,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {},
   args: {  },
-  decorators: [apolloClientMocksDecorator([
-    { query: GET_ACTIVE_CAMPAIGN, result: {
-        getActiveCampaign: defaultCampaign }, variables: {} }
-  ]), clientComponentDecorator(), (Story) => {
+  decorators: [clientComponentDecorator(), (Story) => {
     const [showing, setShowing] = useState(false)
 
     return <>
@@ -29,4 +27,18 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Simple: Story = { args: { visible: false, onClose: console.log } }
+export const Simple: Story = { 
+  args: { visible: false, onClose: console.log },
+  decorators: [apolloClientMocksDecorator([
+    { query: GET_ACTIVE_CAMPAIGN, result: {
+        getActiveCampaign: defaultCampaign }, variables: {} }
+  ])]
+}
+
+export const AirdropPassed: Story = { 
+  args: { visible: false, onClose: console.log },
+  decorators: [apolloClientMocksDecorator([
+    { query: GET_ACTIVE_CAMPAIGN, result: {
+        getActiveCampaign: { ...defaultCampaign, ...{ airdrop: fromToday(-2) } } }, variables: {} }
+  ])]
+}

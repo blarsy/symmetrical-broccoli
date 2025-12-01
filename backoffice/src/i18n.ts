@@ -161,10 +161,12 @@ const resources = {
             "loadMore": "Load older",
             "howToEarnTitle": "Gagner des Topes",
             "resourcesWithoutPic": "resources w/o picture",
+            "resourcesWithoutPrice": "resources w/o price",
             "howToGet_addLink": "Add a link to your content",
             "howToGet_addLocation": "Enter your address on your profile",
             "howToGet_addLogo": "Add a profile picture or logo",
             "howToGet_addPictureToResource": "Add a picture to your resources",
+            "howToGet_addPriceToResource": "Set a price to your resource",
             "howToGet_addNewResource": "Add a new resource (and leave it for at least 1 day)",
             "howToGet_switchToContributionMode": "Become a contributor",
             "howToGet_beElligibleForAirdrop": "Airdrop: have at least 2 active resources on the current campaign on {{- date}}",
@@ -285,13 +287,17 @@ const resources = {
             "create2ResourcesOnCampaign": "for 2 active resources on the campaign on this precise moment:",
             "win": "to win",
             "ensureAirdropEligibility": "Want to check whether you meet all conditions ? See the 'contribution' section of your profile",
+            "didYouGetIt": "Time is up ! Did you get it ?",
             "campaignSummaryTitle": "In summary",
             "campaignAllowYouto": "With Tope-là campaigns, you get plenty of Topes and swap them against great resources.",
             "forFree": "And it's free !",
             "isOnTopeLa": " is on Tope-là",
             "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
             "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away.",
-            "inCurrentCampaign": "Active campaign `{{name}}`"
+            "inCurrentCampaign": "Active campaign `{{name}}`",
+            "noCategorySelectedLabel": "No category",
+            "addImageButtonLabel": "Add picture",
+            "fileNotRecognizedAsImage": "Image not recognized. Valid formats: jpeg, gif, webp"
         }
     },
     fr: { 
@@ -453,10 +459,12 @@ const resources = {
             "loadMore": "Plus ancien",
             "howToEarnTitle": "Gagner des Topes",
             "resourcesWithoutPic": "ressources sans photo",
+            "resourcesWithoutPrice": "ressources sans prix",
             "howToGet_addLink": "Ajouter un lien qui parle de toi",
             "howToGet_addLocation": "Entrer ton adresse sur ton profil",
             "howToGet_addLogo": "Ajouter ton logo ou photo",
             "howToGet_addPictureToResource": "Ajouter une photo à tes ressources",
+            "howToGet_addPriceToResource": "Fixe un prix sur ta ressource",
             "howToGet_addNewResource": "Ajouter une nouvelle ressource (et la laisser disponible au moins un jour)",
             "howToGet_switchToContributionMode": "Devenir contributeur",
             "howToGet_beElligibleForAirdrop": "Largage: Avoir au moins 2 ressources actives sur la campagne en cours au {{- date}}",
@@ -577,13 +585,17 @@ const resources = {
             "create2ResourcesOnCampaign": "avec 2 ressources actives sur cette campagne à ce moment précis:",
             "win": "à gagner",
             "ensureAirdropEligibility": "Remplis-tu les conditions ? Va voir à l'onglet 'Contribution' de ton profil",
+            "didYouGetIt": "Le temps est écoulé ! Tu l'as eu ?",
             "campaignSummaryTitle": "En résumé",
             "campaignAllowYouto": "Grâce aux campagnes Tope-là, fais le plein de Topes et échange-les contre des ressources intéressantes.",
             "forFree": "En plus c'est gratuit !",
             "isOnTopeLa": " est sur Tope-là",
             "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
             "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés.",
-            "inCurrentCampaign": "Campagne en cours `{{name}}`"
+            "inCurrentCampaign": "Campagne en cours `{{name}}`",
+            "noCategorySelectedLabel": "Aucune catégorie",
+            "addImageButtonLabel": "Ajouter une image",
+            "fileNotRecognizedAsImage": "Image non reconnue. Formats acceptés: jpeg, gif, webp"
         }
     }
 }

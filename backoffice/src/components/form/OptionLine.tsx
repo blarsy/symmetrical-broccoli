@@ -17,7 +17,6 @@ const OptionLine = (p: {
     return <Stack direction="row" alignItems="center" gap="1rem" margin="0 1rem" sx={p.sx}>
         <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{p.labels.title}</Typography>
         { Object.getOwnPropertyNames(p.values).map((val, idx) => <FormControlLabel key={idx} sx={{ 
-            flex: 1,
             '& .MuiFormControlLabel-label': {
                 color: 'primary.main'
             }

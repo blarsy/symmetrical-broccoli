@@ -29,7 +29,7 @@ const ViewAccount = (p: Props) => {
     useEffect(() => {
         if(data && data.getAccountPublicInfo.resourcesByAccountId.nodes && uiContext.categories.data) {
             setAccountResources(data.getAccountPublicInfo.resourcesByAccountId.nodes
-                .filter((res: any) => !res.deleted && dayjs(res.expiration).toDate() > new Date())
+                .filter((res: any) => !res.deleted && (dayjs(res.expiration).toDate() > new Date()) || !res.expiration)
                 .map((res:any) => fromServerGraphResource(res, uiContext.categories.data!)))
         }
     }, [data, uiContext.categories.data])

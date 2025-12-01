@@ -1,4 +1,4 @@
-import { alpha, Checkbox, FormControlLabel, FormGroup, IconButton, Stack, TextField, Typography, useTheme } from "@mui/material"
+import { alpha, Box, Checkbox, FormControlLabel, FormGroup, IconButton, Stack, SxProps, TextField, Theme, Typography, useTheme } from "@mui/material"
 import { ErrorMessage, Form, Formik } from "formik"
 import { useContext, useState } from "react"
 import * as yup from 'yup'
@@ -17,7 +17,7 @@ import { ApolloError, gql, useMutation } from "@apollo/client"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
-import EditImage from "./EditImage"
+import EditImages from "./EditImages"
 import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
 import ExplainToken from "../token/ExplainToken"
@@ -25,6 +25,7 @@ import useActiveCampaign from "@/lib/useActiveCampaign"
 
 interface Props {
     value?: Resource
+    sx?: SxProps<Theme>
 }
 
 export const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
@@ -103,7 +104,7 @@ const EditResource = (p: Props) => {
 
     const [saveState, setSaveState] = useState<DataLoadState<undefined>>(initial(false, undefined))
 
-    return <LoadedZone loading={profileAddress.loading || categories.loading} error={profileAddress.error}>
+    return <LoadedZone loading={profileAddress.loading || categories.loading} containerStyle={p.sx} error={profileAddress.error}>
         { categories.data && <Formik initialValues={p.value || blankResource} onSubmit={async values => {
             try {
                 await trySave(values)
@@ -147,100 +148,116 @@ const EditResource = (p: Props) => {
                     <Stack>
                         <Stack gap="1rem" flex="1" paddingBottom="6rem">
                             <Typography variant="body1" color="primary">{uiContext.i18n.translator('imagesLabel')}</Typography>
-                            { f.values.images.length > 0 && <Stack direction="row">
-                                { f.values.images.map((imgInfo, idx) => 
-                                <EditImage key={idx} initialValue={imgInfo.publicId!} 
-                                    onChange={(publicId, previousPublicId) => {
-                                        f.setFieldValue('images', [ ...f.values.images.filter(i => i.publicId != previousPublicId), { publicId } ])
-                                    }}
-                                    onDeleteRequested={imgInfo => 
-                                        f.setFieldValue('images', f.values.images.filter(i => i.publicId != imgInfo.publicId))} />) }                                
-                            </Stack>}
-                            <EditImage initialValue="" onDeleteRequested={() => {}} onChange={publicId => f.setFieldValue('images', [...f.values.images, { publicId }])} />
-                            <TextField size="small" id="title" name="title" value={f.values.title}
-                                label={uiContext.i18n.translator('titleLabel')} 
-                                onChange={f.handleChange('title')} onBlur={f.handleBlur('title')}/>
-                            <ErrorMessage component={ErrorText} name="title" />
-                            <TextField size="small" multiline id="description" name="description" value={f.values.description}
-                                label={uiContext.i18n.translator('descriptionLabel')} 
-                                onChange={f.handleChange('description')} onBlur={f.handleBlur('description')}/>
-                            <ErrorMessage component={ErrorText} name="description" />
-                            <TextField size="small" id="price" name="price" value={f.values.price || 0}
-                                label={uiContext.i18n.translator('Label')}
-                                onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
-                            <ErrorMessage component={ErrorText} name="price" />
+                            <EditImages sx={{ width: 'calc(100vw - 4rem)' }} initialValue={f.values.images.map(i => i.publicId!)}
+                                onChange={(publicId, previousPublicId) => {
+                                    f.setFieldValue('images', [ ...f.values.images.filter(i => i.publicId != previousPublicId), { publicId } ])
+                                }}
+                                onDeleteRequested={imgInfo => 
+                                    f.setFieldValue('images', f.values.images.filter(i => i.publicId != imgInfo.publicId))
+                                } />
+                            <Stack>
+                                <TextField size="small" id="title" name="title" value={f.values.title}
+                                    label={uiContext.i18n.translator('titleLabel')} 
+                                    onChange={f.handleChange('title')} onBlur={f.handleBlur('title')}/>
+                                <ErrorMessage component={ErrorText} name="title" />
+                            </Stack>
+                            <Stack>
+                                <TextField multiline id="description" name="description" value={f.values.description}
+                                    label={uiContext.i18n.translator('descriptionLabel')} minRows={3}
+                                    onChange={f.handleChange('description')} onBlur={f.handleBlur('description')}/>
+                                <ErrorMessage component={ErrorText} name="description" />
+                            </Stack>
+                            <Stack>
+                                <TextField size="small" id="price" name="price" value={f.values.price || 0}
+                                    label={uiContext.i18n.translator('Label')}
+                                    onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
+                                <ErrorMessage component={ErrorText} name="price" />
+                            </Stack>
                             { activeCampaign.data && <FormGroup sx={{ padding: '1rem', borderRadius: '1rem', backgroundColor: theme.palette.secondary.light }}>
                                 <FormControlLabel color={theme.palette.primary.contrastText} control={
                                     <Checkbox color="info" checked={!!f.values.campaignId} onChange={() => f.setFieldValue('campaignId', f.values.campaignId ? undefined : activeCampaign.data?.id)} onBlur={f.handleBlur('campaignId')} />} 
                                     label={`${uiContext.i18n.translator('resourceConformsToCampaign')}: '${activeCampaign.data.name}'`} />
                             </FormGroup> }
-                            <OptionLine sx={{ margin: 0 }} labels={{ 
-                                title: uiContext.i18n.translator('natureOptionsLabel'), 
-                                isProduct: 'isProduct',
-                                isService: 'isService'
-                            }} values={{ isProduct: f.values.isProduct, isService: f.values.isService }}
-                                onChange={val => { 
-                                    Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
-                                }}/>
-                            <ErrorMessage component={ErrorText} name="isProduct" />
-                            <Stack direction="row" alignItems="center" gap="1rem">
-                                <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
-                                <FormControlLabel sx={{ 
-                                    flex: 1,
-                                    '& .MuiFormControlLabel-label': {
-                                        color: 'primary.main'
-                                    }
-                                }}
-                                control={<Checkbox size="small" sx={{ padding: '0 0.25rem' }} checked={f.values.expiration === null} onChange={e => {
-                                    if(f.values.expiration === null) {
-                                        f.setFieldValue('expiration', dayjs().add(1, 'week'))
-                                    } else {
-                                        f.setFieldValue('expiration', null)
-                                    }
-                                }} />} label={uiContext.i18n.translator('permanentLabel')} />
-                                <DatePicker closeOnSelect defaultValue={dayjs()} disablePast disabled={f.values.expiration === null}
-                                    label={uiContext.i18n.translator('expirationLabel')} value={dayjs(f.values.expiration)} 
-                                    onChange={e => {
-                                        f.setFieldValue('expiration', e?.toDate())
-                                    }} />
+                            <Stack>
+                                <OptionLine sx={{ margin: 0 }} labels={{ 
+                                    title: uiContext.i18n.translator('natureOptionsLabel'), 
+                                    isProduct: 'isProduct',
+                                    isService: 'isService'
+                                }} values={{ isProduct: f.values.isProduct, isService: f.values.isService }}
+                                    onChange={val => { 
+                                        Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
+                                    }}/>
+                                <ErrorMessage component={ErrorText} name="isProduct" />
                             </Stack>
-                            <ErrorMessage component={ErrorText} name="expiration" />
-                            <Stack direction="row" justifyContent="space-between" gap="2rem" alignItems="center">
-                                <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('categoriesLabel')}</Typography>
-                                <Typography variant="body1" sx={{ flex: 1, cursor: 'pointer' }} color="primary" onClick={() => setEditedCategories(f.values.categories)}>{f.values.categories.map(cat => cat.name).join(', ')}</Typography>
-                                <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
+                            <Stack>
+                                <Stack direction="row" alignItems="center" gap="1rem">
+                                    <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('expirationFieldLabel')}</Typography>
+                                    <FormControlLabel sx={{
+                                        '& .MuiFormControlLabel-label': {
+                                            color: 'primary.main'
+                                        }
+                                    }}
+                                    control={<Checkbox size="small" sx={{ padding: '0 0.25rem' }} checked={f.values.expiration === null} onChange={e => {
+                                        if(f.values.expiration === null) {
+                                            f.setFieldValue('expiration', dayjs().add(1, 'week'))
+                                        } else {
+                                            f.setFieldValue('expiration', null)
+                                        }
+                                    }} />} label={uiContext.i18n.translator('permanentLabel')} />
+                                    <DatePicker closeOnSelect defaultValue={dayjs()} disablePast disabled={f.values.expiration === null}
+                                        label={uiContext.i18n.translator('expirationLabel')} value={dayjs(f.values.expiration)} 
+                                        onChange={e => {
+                                            f.setFieldValue('expiration', e?.toDate())
+                                        }} />
+                                </Stack>
+                                <ErrorMessage component={ErrorText} name="expiration" />
                             </Stack>
-                            <ErrorMessage component={ErrorText} name="categories" />
-                            <OptionLine sx={{ margin: 0 }} labels={{ 
-                                title: uiContext.i18n.translator('exchangeTypeOptionsLabel'),
-                                canBeGifted: 'canBeGifted',
-                                canBeExchanged: 'canBeExchanged'
-                            }} values={{ canBeGifted: f.values.canBeGifted, canBeExchanged: f.values.canBeExchanged }}
-                                onChange={val => { 
-                                    Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
-                                }}/>
-                            <ErrorMessage component={ErrorText} name="canBeGifted" />
-                            <OptionLine sx={{ margin: 0 }} labels={{ 
-                                title: uiContext.i18n.translator('deliveryOptionsLabel'),
-                                canBeTakenAway: f.values.isProduct ? 'canBeTakenAway' : 'onSite',
-                                canBeDelivered: f.values.isProduct ? 'canBeDelivered': 'placeToBeAgreed'
-                            }} values={{ canBeTakenAway: f.values.canBeTakenAway, canBeDelivered: f.values.canBeDelivered }}
-                                onChange={val => { 
-                                    Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
-                                }}/>
-                            <ErrorMessage component={ErrorText} name="canBeTakenAway" />
-                            <Typography variant="body1" color="primary">{uiContext.i18n.translator('addressEditTitle')}</Typography>
-                            <Stack alignItems="center">
-                                <EditAddress value={f.values.specificLocation}
-                                    onChange={newLoc => f.setFieldValue('specificLocation', newLoc)} />
+                            <Stack>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                    <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">{uiContext.i18n.translator('categoriesLabel')}</Typography>
+                                    <IconButton onClick={() => setEditedCategories(f.values.categories)}><Edit/></IconButton>
+                                    <Typography variant="body1" sx={{ flex: 1, cursor: 'pointer' }} color="primary" onClick={() => setEditedCategories(f.values.categories)}>{f.values.categories.length === 0 ? uiContext.i18n.translator('noCategorySelectedLabel') : f.values.categories.map(cat => cat.name).join(', ')}</Typography>
+                                </Stack>
+                                <ErrorMessage component={ErrorText} name="categories" />
                             </Stack>
-                            <ErrorMessage component={ErrorText} name="specificLocation" />
+                            <Stack>
+                                <OptionLine sx={{ margin: 0 }} labels={{ 
+                                    title: uiContext.i18n.translator('exchangeTypeOptionsLabel'),
+                                    canBeGifted: 'canBeGifted',
+                                    canBeExchanged: 'canBeExchanged'
+                                }} values={{ canBeGifted: f.values.canBeGifted, canBeExchanged: f.values.canBeExchanged }}
+                                    onChange={val => { 
+                                        Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
+                                    }}/>
+                                <ErrorMessage component={ErrorText} name="canBeGifted" />
+                            </Stack>
+                            <Stack>
+                                <OptionLine sx={{ margin: 0 }} labels={{ 
+                                    title: uiContext.i18n.translator('deliveryOptionsLabel'),
+                                    canBeTakenAway: f.values.isProduct ? 'canBeTakenAway' : 'onSite',
+                                    canBeDelivered: f.values.isProduct ? 'canBeDelivered': 'placeToBeAgreed'
+                                }} values={{ canBeTakenAway: f.values.canBeTakenAway, canBeDelivered: f.values.canBeDelivered }}
+                                    onChange={val => { 
+                                        Object.entries(val).forEach(v => f.setFieldValue(v[0], v[1]))
+                                    }}/>
+                                <ErrorMessage component={ErrorText} name="canBeTakenAway" />
+                            </Stack>
+                            <Stack>
+                                <Typography variant="body1" color="primary">{uiContext.i18n.translator('addressEditTitle')}</Typography>
+                                <Stack alignItems="center">
+                                    <EditAddress value={f.values.specificLocation}
+                                        onChange={newLoc => f.setFieldValue('specificLocation', newLoc)} />
+                                </Stack>
+                                <ErrorMessage component={ErrorText} name="specificLocation" />
+                            </Stack>
                         </Stack>
                         <Stack padding="1rem 2rem" sx={theme => ({ bottom: 0, left: 0, position: 'fixed', width: '100%', backgroundColor: alpha(theme.palette.secondary.main, 0.5) })} >
                             <Feedback severity="error" visible={!!saveState.error}
                                 onClose={() => setSaveState(initial(false, undefined))}
                                 detail={saveState.error?.detail} />
-                            { f.submitCount > 0 && !f.isValid && <ErrorText>{uiContext.i18n.translator('someValuesInvalid')}</ErrorText> }
+                            { f.submitCount > 0 && !f.isValid && <Stack alignItems="center">
+                                <ErrorText>{uiContext.i18n.translator('someValuesInvalid')}</ErrorText>
+                            </Stack> }
                             <Stack justifyContent="center" direction="row">
                                 <LoadingButton variant="contained" loading={saveState.loading} 
                                     disabled={saveState.loading} 

@@ -4,7 +4,7 @@ import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 import { t } from "@/i18n"
 
 
-const GET_ACTIVE_CAMPAIGN = gql`query GetActiveCampaign {
+export const GET_ACTIVE_CAMPAIGN = gql`query GetActiveCampaign {
   getActiveCampaign {
     airdrop
     airdropAmount

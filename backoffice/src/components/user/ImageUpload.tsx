@@ -8,6 +8,8 @@ import { STANDARD_RESOURCE_IMAGE_SQUARE_SIZE } from '@/lib/constants'
 import { uploadImage } from '@/lib/images'
 import Feedback from '../scaffold/Feedback'
 import { UiContext } from '../scaffold/UiContextProvider'
+import { primaryColor } from '@/utils'
+import { AppDispatchContext } from '../scaffold/AppContextProvider'
 
 const previewCroppedImage = async (canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop) => {
     const ctx = canvas.getContext('2d')
@@ -114,6 +116,11 @@ const uploadCroppedImage = async (image: HTMLImageElement, crop: Crop) => {
 interface Props {
     onUploaded: (publicId: string) => void
 }
+const isImageMimeType = (type: string): boolean => {
+    const matches = type.match(/^image:(gif|jpg|jpeg|webp|bmp)$/)
+    if(!matches) return false
+    return matches.length > 0
+}
 
 const ImageUpload = (p: Props) => {
     const uiContext = useContext(UiContext)
@@ -124,6 +131,8 @@ const ImageUpload = (p: Props) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     //const canvasRef = useRef<HTMLCanvasElement>(null)
     const imgRef = useRef<HTMLImageElement>(null)
+    const [isDraggedOver, setIsDraggedOver] = useState(false)
+    const [fileFormatError, setFileFormatError] = useState(false)
     //const [debouncedCompleteCrop] = useDebounce(completeCrop, 700)
 
     // useEffect(() => {
@@ -132,9 +141,27 @@ const ImageUpload = (p: Props) => {
     //     previewCroppedImage(canvasRef.current, imgRef.current, completeCrop)
     // }, [debouncedCompleteCrop])
 
-    return <Stack alignItems="center" color="primary" sx={{ padding: '2rem',
-        minWidth: '20rem', minHeight: '20rem', maxHeight: '100vh', gap: '1rem', borderRadius: '1rem', 
-        maxWidth: 'sm', overflow: 'auto', margin: 'auto' }}>
+    return <Stack component="div" alignItems="center" color="primary" sx={{ padding: '2rem',
+        minWidth: '20rem', minHeight: '20rem', maxHeight: '100vh', gap: '1rem', 
+        maxWidth: 'sm', overflow: 'auto', margin: 'auto', opacity: isDraggedOver ? 0.5 : 1, 
+        border: isDraggedOver ? `2px solid ${primaryColor}` : 'none' }} 
+        onDragEnter={e => {
+            setIsDraggedOver(true)
+        }} 
+        onDragLeave={() => {
+            setIsDraggedOver(false)
+        }}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => { 
+            e.preventDefault()
+            console.log(e.dataTransfer.files[0].type)
+            if(e.dataTransfer.files[0].type.match(/^image\/(gif|jpg|jpeg|webp)$/)) {
+                setImageFile(e.dataTransfer.files[0])
+            } else {
+                setFileFormatError(true)
+            }
+            setIsDraggedOver(false)
+        }}>
         <input type="file" accept="POST" style={{ display: "none" }}
             ref={fileInputRef}
             onChange={e => {
@@ -169,6 +196,8 @@ const ImageUpload = (p: Props) => {
                 }}>{uiContext.i18n.translator('uploadButtonCaption')}</LoadingButton>
             </Stack>
         </Stack> }
+        <Feedback severity="error" message={uiContext.i18n.translator('fileNotRecognizedAsImage')} visible={fileFormatError}
+            onClose={() => setFileFormatError(false)}/>
         <Feedback severity="error" message={uploadState.error?.message} visible={!!uploadState.error}
             onClose={() => setUploadState(initial(false, undefined))} />
     </Stack>

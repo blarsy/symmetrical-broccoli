@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import { gql, useQuery } from "@apollo/client"
-import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/constants"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/constants"
 import { CircularProgress, IconButton, Stack, Typography } from "@mui/material"
 import Check from '@/app/img/CHECK.svg'
 import Smiley from '@mui/icons-material/SentimentSatisfiedAlt'
@@ -135,6 +135,14 @@ export const GET_RESOURCES_WITHOUT_PIC = gql`query GetMyResourcesWithoutPicture 
     }
   }`
 
+export const GET_RESOURCES_WITHOUT_PRICE = gql`query GetMyResourcesWithoutPrice {
+  getMyResourcesWithoutPrice {
+    nodes {
+      id
+    }
+  }
+}`
+
 export const GET_ACCOUNT = gql`query Account {
   me {
     email
@@ -175,12 +183,13 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
     const [explainingToken, setExplainingToken] = useState(false)
     const {data, loading, error, refetch} = useQuery(GET_ACCOUNT)
     const { data: resWithoutPics, loading: resWithoutPicsLoading, error: resWithoutPicsError } = useQuery(GET_RESOURCES_WITHOUT_PIC)
+    const { data: resWithoutPrice, loading: resWithoutPriceLoading, error: resWithoutPriceError } = useQuery(GET_RESOURCES_WITHOUT_PRICE)
     const t = uiContext.i18n.translator
     useEffect(() => {
         if(appContext.account) refetch()
     }, [appContext.account])
 
-    return <LoadedZone loading={loading || resWithoutPicsLoading} containerStyle={{ gap: '0.25rem' }} error={error || resWithoutPicsError}>
+    return <LoadedZone loading={loading || resWithoutPicsLoading} containerStyle={{ gap: '0.25rem' }} error={error || resWithoutPicsError || resWithoutPriceError}>
         <OneTimeTask text={t('howToGet_switchToContributionMode')} 
             checked={!!appContext.account?.willingToContribute} 
             onClick={() => {
@@ -212,6 +221,14 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
         <ReccurringTask text={t('howToGet_addPictureToResource')} zeroRemainingMeansDone={false}
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
+            onClick={() => {
+                router.push(`/webapp/${version}/resources`)
+                onSomeTaskClicked && onSomeTaskClicked()
+            }} />
+        <Divider />
+        <ReccurringTask text={t('howToGet_addPriceToResource')} zeroRemainingMeansDone={false}
+            remainingAmount={resWithoutPrice?.getMyResourcesWithoutPrice?.nodes.length} 
+            remainingText={ t('resourcesWithoutPrice') } reward={ADD_RESOURCE_PRICE_REWARD} loading={resWithoutPriceLoading} 
             onClick={() => {
                 router.push(`/webapp/${version}/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()

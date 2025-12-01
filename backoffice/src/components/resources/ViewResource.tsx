@@ -15,7 +15,7 @@ import Chat from '@/app/img/CHAT.svg'
 import { primaryColor } from "@/utils"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { GET_RESOURCE } from "@/lib/apolloClient"
-import GiveIcon from '@mui/icons-material/VolunteerActivism'
+import GiveIcon from '@/app/img/bid-received.svg'
 import { AppContext } from "../scaffold/AppContextProvider"
 import CreateBidDialog from "../bids/CreateBidDialog"
 import Feedback from "../scaffold/Feedback"
@@ -130,7 +130,7 @@ const ViewResource = (p: Props) => {
                           { appContext.account && resource.data!.account!.id != appContext.account.id && resource.data!.canBeExchanged && <IconButton data-testid="BidButton" color="primary" onClick={() => {
                             setResourceToBidOn(resource.data)
                           }}>
-                            <GiveIcon sx={{ fontSize: '2.5rem' }} />
+                            <GiveIcon height="2.5rem" width="2.5rem"/>
                           </IconButton> }
                         </Stack>
                       </Stack>,

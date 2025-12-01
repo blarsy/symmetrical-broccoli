@@ -1,5 +1,5 @@
 "use client"
-import { primaryColor } from "@/utils"
+import { lightPrimaryColor, primaryColor } from "@/utils"
 import { Box, Stack, Theme, Typography, TypographyOwnProps, useTheme } from "@mui/material"
 import createTheme, { fonts } from '@/theme'
 import { ThemeProvider } from "@emotion/react"
@@ -244,11 +244,18 @@ const Page = () => {
                         <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
                     </Stack>
                     <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Version web</Typography>
-                    <Link target="_blank" href={`webapp/${mainVersion}`} style={{ color: '#000', fontSize: '1.7rem', fontFamily: fonts.general.style.fontFamily, fontWeight: 900 }}>
-                        <Box sx={{ backgroundImage: `url('/FOND-180.svg')`, height: 80, display: 'flex', alignItems: 'center', padding: '0 2rem' }}>
-                            Connexion
-                        </Box>
-                    </Link>
+                    <Stack  position="relative">
+                        <Typography position="absolute" variant="overline" color={primaryColor} 
+                            sx={{ top: '-1rem', left: '-4rem', padding: '0 0.5rem', fontSize: 20, 
+                                transform: 'rotate(-15deg)', backgroundColor: lightPrimaryColor,
+                                borderRadius: '0.5rem', borderColor: '#000', borderWidth: 2, 
+                                borderStyle: 'solid', lineHeight: 1.8 } }>Nouveau</Typography>
+                        <Link target="_blank" href={`webapp/${mainVersion}`} style={{ color: '#000', fontSize: '1.7rem', fontFamily: fonts.general.style.fontFamily, fontWeight: 900 }}>
+                            <Box sx={{ backgroundImage: `url('/FOND-180.svg')`, height: 80, display: 'flex', alignItems: 'center', padding: '0 2rem' }}>
+                                Connexion
+                            </Box>
+                        </Link>
+                    </Stack>
                     <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Suis-nous</Typography>
                     <Box display="flex" flexDirection="row" gap="1.5rem">
                         <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={60}/></Link>

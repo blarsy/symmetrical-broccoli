@@ -160,7 +160,11 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImageUrl: resource.account!.avatarImageUrl } },
                     onPress: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        navigation.navigate('viewResource', { resourceId: rawNotification.node.data.resource_id })
+                        navigation.navigate('resource', { 
+                            screen: 'viewResource' , params: { 
+                                resourceId: rawNotification.node.data.resource_id 
+                            }
+                        })
                         setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
                             if (notif.id === rawNotification.node.id) {
                                 return { ...notif, ...{ read: true } }
@@ -402,7 +406,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     break
                 case 'AIRDROP_RECEIVED':
                     otherNotifs.push(
-                        makeNotificationData(rawNotification, t('airdropHeadline1'), t('airdropHHeadline2', { grantorName: rawNotification.node.data.grantorName }), 
+                        makeNotificationData(rawNotification, t('airdropHeadline1'), t('airdropHeadline2', { campaignName: rawNotification.node.data.campaignName }), 
                             t('airdropDetails', { amountOfTokens: rawNotification.node.data.amountOfTokens }), 
                             () => {
                                 navigation.navigate('profile', {
@@ -512,7 +516,7 @@ export default ({ navigation }: RouteProps) => {
         { appContext.account ?
             <LoadedList loading={loading} error={error} data={data?.data} 
             loadEarlier={loadEarlier}
-            displayItem={(notif, idx) => {
+            displayItem={notif => {
                 return <ResponsiveListItem style={{ paddingLeft: 5, paddingRight: !notif.read? 4 : 24, borderBottomColor: '#CCC', borderBottomWidth: 1 }} 
                 left={() => <NotificationImage image={notif.image} />}
                 key={notif.id} onPress={notif.onPress}

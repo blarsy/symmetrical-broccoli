@@ -1,11 +1,12 @@
-import { Card, CardContent, CardHeader, CardMedia, Dialog, Stack, useTheme } from "@mui/material"
+import { Box, Card, CardContent, CardHeader, CardMedia, Dialog, Stack, useTheme } from "@mui/material"
 import { useRouter } from "next/navigation"
 import ExpirationIndicator from "./ExpirationIndicator"
 import PictureGallery from "../scaffold/PictureGallery"
 import { urlFromPublicId } from "@/lib/images"
-import { AccountAvatar } from "../misc"
+import { AccountAvatar, ZoomedImageDialog } from "../misc"
 import EmptyImage from '@/app/img/PHOTOS.svg'
 import { useState } from "react"
+import Close from '@/app/img/CROSS.svg'
 
 const limitTextLength = (text: string, maxLength: number) => {
     if(text.length < maxLength)
@@ -76,14 +77,7 @@ const ResourceCard = (p: Props) => {
                 ({ uri: urlFromPublicId(publicId), alt: idx.toString() }))} onImageClicked={img => setZoomedImg(img.uri)}/>
         </CardMedia>
         <CardContent>{limitTextLength(p.resource.description, 70)}</CardContent>
-        <Dialog open={!!zoomedImg} onClose={() => setZoomedImg(undefined)} fullScreen>
-            <Stack sx={{ height: '100vh', backgroundColor: 'transparent', alignItems: 'center' }}>
-                <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={e => {
-                    e.stopPropagation()
-                    setZoomedImg(undefined)
-                }} />
-            </Stack>
-        </Dialog>
+        <ZoomedImageDialog zoomedImg={zoomedImg} onClose={() => setZoomedImg(undefined)} />
     </Card>
 }
 

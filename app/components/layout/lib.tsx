@@ -2,7 +2,7 @@ import React, { PropsWithChildren, ReactNode, RefObject, useEffect, useState } f
 import { Button, ButtonProps, Icon, Text, TextInput, TextInputProps, TextProps, Tooltip } from "react-native-paper"
 import { lightPrimaryColor, primaryColor } from "./constants"
 import { DatePickerModal } from "react-native-paper-dates"
-import { Animated, ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
+import { ColorValue, Platform, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import dayjs from "dayjs"
 import { t } from "@/i18n"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
@@ -11,7 +11,7 @@ import BareIconButton from "./BareIconButton"
 import Images from "@/Images"
 import { Pressable } from "react-native-gesture-handler"
 import { PressableEvent } from "react-native-gesture-handler/lib/typescript/components/Pressable/PressableProps"
-import { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated"
+import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated"
 
 const mergeWith = (a: object, b: any): object => {
     if(b && typeof b === 'object') {

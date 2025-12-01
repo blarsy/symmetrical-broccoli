@@ -14,6 +14,7 @@ import useActiveCampaign from "@/lib/useActiveCampaign"
 import LoadedZone from "../scaffold/LoadedZone"
 import dayjs from "dayjs"
 import { PriceTag } from "../misc"
+import TimeUp from '@/app/img/time-up.svg'
 
 interface SlideProps extends PropsWithChildren {
     title: string
@@ -98,7 +99,20 @@ const ExplainCampaign = (p: Props) => {
                     </Stack>
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('create2ResourcesOnCampaign')}</Typography>
                     <Typography variant="subtitle1" color="primary.contrastText">{dayjs(activeCampaign.data.airdrop).format(uiContext.i18n.translator('dateTimeFormat'))}</Typography>
-                    <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('ensureAirdropEligibility')}</Typography>
+                    { dayjs(activeCampaign.data.airdrop) > dayjs(new Date()) ?
+                        <Stack>
+                            <Stack sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+                                <Typography variant="body1">{dayjs(activeCampaign.data.airdrop).fromNow()}</Typography>
+                                <TimeUp height={35} width={35}/>
+                            </Stack>
+                            <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('ensureAirdropEligibility')}</Typography>
+                        </Stack>
+                    :
+                        <Stack sx={{ gap: '1rem', alignItems: 'center' }}>
+                            <TimeUp height={65} width={65}/>
+                            <Typography variant="body1">{uiContext.i18n.translator('didYouGetIt')}</Typography>
+                        </Stack>
+                    }
                 </Slide>
                 <Slide title={uiContext.i18n.translator("campaignSummaryTitle")} sx={{ gap: '1rem' }}>
                     <Stack alignItems="center">

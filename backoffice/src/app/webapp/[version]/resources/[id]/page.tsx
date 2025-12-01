@@ -44,7 +44,7 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
         if(uiContext.categories.data && !error && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
     }, [uiContext.categories.data, address, loading, error, activeCampaign])
 
-    return <LoadedZone loading={resource.loading || loading} error={resource.error || error} containerStyle={{ overflow: 'auto', paddingLeft: '2rem', paddingRight: '2rem' }}>
+    return <LoadedZone loading={resource.loading || loading} error={resource.error || error} containerStyle={{ overflow: 'auto', alignItems: 'center', paddingLeft: '2rem', paddingRight: '2rem' }}>
         <EditResource value={resource.data}/>
     </LoadedZone>
 }
