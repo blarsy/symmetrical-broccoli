@@ -155,7 +155,7 @@ const fromRawConversation = (rawConversation: any, currentAccountId: number, cat
                 id: otherParticipant.accountByAccountId.id,
                 participantId: otherParticipant.id,
                 name: otherParticipant.accountByAccountId.name,
-                imagePublicId: otherParticipant.accountByAccountId.imageByAvatarImageId.publicId
+                imagePublicId: otherParticipant.accountByAccountId.imageByAvatarImageId?.publicId
             },
             resource: fromServerGraphResource(rawResource, categories)
         },
@@ -190,6 +190,7 @@ const Conversation = (p: Props) => {
               chatDispatch({ type: ChatReducerActionType.SetConversationRead, payload: conversationData.conversation.id })
             }, 0)
         } catch (e) {
+            console.log(e)
             setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

@@ -65,7 +65,7 @@ const ConversationMessages = ((p: Props) => {
                                 color={isMessageFromMe ? '#fff' : '#000'}
                                 textAlign={isMessageFromMe ? 'right': 'left'} 
                                 alignSelf={isMessageFromMe ? 'flex-end': 'flex-start'} padding="0.5rem" >
-                                {msg.text.split('\n').map(t => <Typography variant="body2" 
+                                {msg.text.split('\n').map((t, idx) => <Typography key={idx} variant="body2" 
                                     padding="0">
                                     {t}
                                 </Typography>)}

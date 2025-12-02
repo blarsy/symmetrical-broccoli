@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Resources, { RESOURCES } from './Resources'
 import { apolloClientMocksDecorator, configDayjsDecorator, clientComponentDecorator, makeDbRresource, defaultCampaign } from '@/lib/storiesUtil'
-import { GET_ACTIVE_CAMPAIGN } from '@/lib/useActiveCampaign'
-import { GET_ACCOUNT, GET_RESOURCES_WITHOUT_PIC, NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN } from '../token/EarningTokens'
+import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
 
 const meta = {
   component: Resources,

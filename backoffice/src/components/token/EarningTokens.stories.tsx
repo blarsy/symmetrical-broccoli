@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { apolloClientMocksDecorator, clientComponentDecorator, defaultCampaign } from '@/lib/storiesUtil'
 import EarningTokens, { GET_ACCOUNT, GET_RESOURCES_WITHOUT_PIC, NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN } from './EarningTokens'
-import { GET_ACTIVE_CAMPAIGN } from '@/lib/useActiveCampaign'
+import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
 
 const meta = {
   component: EarningTokens,

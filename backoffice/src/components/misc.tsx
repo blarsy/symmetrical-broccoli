@@ -3,7 +3,7 @@ import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import EmptyImage from '@/app/img/PHOTOS.svg'
-import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Paper, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
 import { PropsWithChildren } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import Tokens from '@/app/img/TOKENS.svg'
@@ -158,7 +158,7 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
             alt={name}>{makeAvatarLetters(name)}</Avatar>
     }
     if(onClick) {
-        return <Stack onClick={e => {
+        return <Stack sx={{ width: '100%', height: '100%' }} onClick={e => {
             e.stopPropagation()
             onClick()
         }}>
@@ -178,14 +178,16 @@ export const PriceTag = ({ value, label, big, testID }: { value: number, label?:
     </Tooltip>
 }
 
-export const ZoomedImageDialog = ({ zoomedImg, onClose }: { zoomedImg: string | undefined, onClose: () => void}) => <Dialog open={!!zoomedImg} onClose={onClose} fullScreen>
-    <Stack sx={{ height: '100vh', backgroundColor: 'transparent', justifyItems: 'center', flexDirection: 'row' }}>
-        <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} onClick={e => {
-            e.stopPropagation()
-            onClose()
-        }} />
-        <Box margin="1rem 0 0 1rem" sx={{ cursor: 'pointer' }} onClick={onClose}>
-            <Close height="3.5rem" width="3.5rem" />
-        </Box>
-    </Stack>
-</Dialog>
+export const ZoomedImageDialog = ({ zoomedImg, onClose }: { zoomedImg: string | undefined, onClose: () => void}) => 
+    <Dialog open={!!zoomedImg} onClose={onClose} onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        onClose()
+    }} fullScreen PaperProps={{ style: { alignItems: 'center' }}} >
+        <Stack sx={{ height: '100vh', backgroundColor: 'transparent', justifyItems: 'center', flexDirection: 'row' }}>
+            <img src={zoomedImg} style={{ height: 'inherit', width: 'auto' }} />
+            <Box margin="1rem 0 0 1rem" sx={{ cursor: 'pointer' }}>
+                <Close height="3.5rem" width="3.5rem" />
+            </Box>
+        </Stack>
+    </Dialog>

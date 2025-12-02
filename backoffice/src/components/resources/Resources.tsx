@@ -2,7 +2,7 @@ import { Button, Card, CardActions, CardContent, Dialog, IconButton, Typography 
 import { Stack, useTheme } from '@mui/material'
 import { useContext, useState } from 'react'
 import PlusIcon from '@mui/icons-material/Add'
-import CampaignIcon from '@mui/icons-material/Campaign'
+import CampaignIcon from '@/app/img/campaign.svg'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { gql, useMutation, useQuery } from '@apollo/client'
@@ -18,7 +18,7 @@ import LoadedList from '../scaffold/LoadedList'
 import { primaryColor } from '@/utils'
 import dayjs from 'dayjs'
 import useActiveCampaign from '@/lib/useActiveCampaign'
-import ExplainCampaign from '../user/ExplainCampaign'
+import ExplainCampaignDialog from '../user/ExplainCampaignDialog'
 import SuspensionHelp from './SuspensionHelp'
 
 export const RESOURCES = gql`query MyResources {
@@ -168,7 +168,7 @@ const Resources = () => {
 
     return <Stack gap="1rem" overflow="auto">
         { activeCampaign.data && <Stack direction="row" justifyContent="center" alignItems="center" gap="0.25rem">
-            <Button variant="contained" startIcon={<PlusIcon/>} endIcon={<CampaignIcon fontSize="large"/>} >
+            <Button variant="contained" startIcon={<PlusIcon/>} endIcon={<CampaignIcon height="3rem" width="3rem"/>} >
               <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0`, query: 'campaign=1' }}>
                 <Stack>
                   <Typography variant="subtitle1">{activeCampaign.data.name}</Typography>
@@ -198,7 +198,7 @@ const Resources = () => {
               images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}/>}
         />
         <ZoomedImageDialog zoomedImg={zoomedImg} onClose={() => setZoomedImg('')} />
-        <ExplainCampaign visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
+        <ExplainCampaignDialog visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
         <ConfirmDialog visible={!!deletingResourceId} onClose={async res => {
           if(res) {
             await deleteResource({ variables: { resourceId: deletingResourceId }})

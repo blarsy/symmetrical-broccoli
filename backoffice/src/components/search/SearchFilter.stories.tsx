@@ -3,8 +3,8 @@ import SearchFilter from "./SearchFilter"
 import { apolloClientMocksDecorator, clientComponentDecorator } from "@/lib/storiesUtil"
 import { DEFAULT_SEARCH_PARAMETERS } from "./Search"
 import { GET_CATEGORIES } from "@/lib/useCategories"
-import { GET_ACTIVE_CAMPAIGN } from "@/lib/useActiveCampaign"
 import { fromToday } from "@/utils"
+import { GET_ACTIVE_CAMPAIGN } from "@/lib/queries"
 
 const meta = {
     component: SearchFilter,

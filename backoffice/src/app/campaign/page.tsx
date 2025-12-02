@@ -15,7 +15,7 @@ const BulletList = ({texts, listStyleType} : { texts: string[], listStyleType?: 
 
 const Campaign = () => {
     return <Themed>
-        <Container maxWidth="xl" sx={{ height: '100vh'}}>
+        <Container maxWidth="md" sx={{ height: '100vh'}}>
             <Box display="flex" flexDirection="column" flex="1" justifyContent="flex-start" paddingTop="2rem">
                 <Stack alignItems="center">
                     <CampaignImg/>

@@ -36,7 +36,6 @@ export default ({ location, style, onLocationChanged, onDeleteRequested, orangeB
     const color = orangeBackground ? '#fff' : '#000'
 
     return <View style={{ gap: 20, alignContent: 'stretch', ...(style as object)}}>
-            <StyledLabel isMandatory={isMandatory} label={t('addressLabel')}/>
         { currentLocation ?
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text testID={`${testID}:address`} variant="headlineSmall" lineBreakMode="tail" numberOfLines={2} style={{ color, flexShrink: 1 }}>{currentLocation.address}</Text>

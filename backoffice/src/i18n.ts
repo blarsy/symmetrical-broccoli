@@ -290,6 +290,8 @@ const resources = {
             "didYouGetIt": "Time is up ! Did you get it ?",
             "campaignSummaryTitle": "In summary",
             "campaignAllowYouto": "With Tope-là campaigns, you get plenty of Topes and swap them against great resources.",
+            "infoOnCampaigns": "More info on campaigns",
+            "seeItInAction": "See it in action",
             "forFree": "And it's free !",
             "isOnTopeLa": " is on Tope-là",
             "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
@@ -297,7 +299,8 @@ const resources = {
             "inCurrentCampaign": "Active campaign `{{name}}`",
             "noCategorySelectedLabel": "No category",
             "addImageButtonLabel": "Add picture",
-            "fileNotRecognizedAsImage": "Image not recognized. Valid formats: jpeg, gif, webp"
+            "fileNotRecognizedAsImage": "Image not recognized. Valid formats: jpeg, gif, webp",
+            "noResultFound": "No result found"
         }
     },
     fr: { 
@@ -588,6 +591,8 @@ const resources = {
             "didYouGetIt": "Le temps est écoulé ! Tu l'as eu ?",
             "campaignSummaryTitle": "En résumé",
             "campaignAllowYouto": "Grâce aux campagnes Tope-là, fais le plein de Topes et échange-les contre des ressources intéressantes.",
+            "infoOnCampaigns": "Plus d'infos sur les campagnes",
+            "seeItInAction": "Voir tout ça en action",
             "forFree": "En plus c'est gratuit !",
             "isOnTopeLa": " est sur Tope-là",
             "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
@@ -595,7 +600,8 @@ const resources = {
             "inCurrentCampaign": "Campagne en cours `{{name}}`",
             "noCategorySelectedLabel": "Aucune catégorie",
             "addImageButtonLabel": "Ajouter une image",
-            "fileNotRecognizedAsImage": "Image non reconnue. Formats acceptés: jpeg, gif, webp"
+            "fileNotRecognizedAsImage": "Image non reconnue. Formats acceptés: jpeg, gif, webp",
+            "noResultFound": "Aucun résultat trouvé"
         }
     }
 }

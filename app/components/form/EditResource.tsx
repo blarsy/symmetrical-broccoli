@@ -167,6 +167,7 @@ export default ({ route, navigation }:RouteProps) => {
                     }} />
                     <ErrorMessage component={ErrorText} name="canBeTakenAway" />
                     <Hr />
+                    <StyledLabel isMandatory={false} style={{ marginLeft: 16 }} label={t('addressLabel')}/>
                     <LocationEdit isMandatory={values.canBeTakenAway} testID="resourceAddress" style={{ marginLeft: 16 }} location={values.specificLocation} 
                         onDeleteRequested={() => {
                             setFieldValue('specificLocation', null)

@@ -1,5 +1,5 @@
 import ViewAccountPage from "@/components/user/ViewAccountPage"
-import i18n, { initTranslations } from "@/i18n"
+import { initTranslations } from "@/i18n"
 import { GET_ACCOUNT_PUBLIC_INFO, getApolloClient } from "@/lib/apolloClient"
 import { urlFromPublicId } from "@/lib/images"
 

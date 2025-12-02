@@ -116,11 +116,6 @@ const uploadCroppedImage = async (image: HTMLImageElement, crop: Crop) => {
 interface Props {
     onUploaded: (publicId: string) => void
 }
-const isImageMimeType = (type: string): boolean => {
-    const matches = type.match(/^image:(gif|jpg|jpeg|webp|bmp)$/)
-    if(!matches) return false
-    return matches.length > 0
-}
 
 const ImageUpload = (p: Props) => {
     const uiContext = useContext(UiContext)
@@ -154,8 +149,7 @@ const ImageUpload = (p: Props) => {
         onDragOver={e => e.preventDefault()}
         onDrop={e => { 
             e.preventDefault()
-            console.log(e.dataTransfer.files[0].type)
-            if(e.dataTransfer.files[0].type.match(/^image\/(gif|jpg|jpeg|webp)$/)) {
+            if(e.dataTransfer.files[0].type.match(/^image\/(gif|png|jpg|jpeg|webp)$/)) {
                 setImageFile(e.dataTransfer.files[0])
             } else {
                 setFileFormatError(true)

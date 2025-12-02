@@ -1,7 +1,7 @@
 "use client"
 import { IconButton, Link, Stack, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
-import { gql, useQuery } from "@apollo/client"
+import { useQuery } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
 import DisplayLocation from "./DisplayLocation"
 import { AccountAvatar } from "../misc"
@@ -13,6 +13,8 @@ import { fromServerGraphResource, Resource } from "@/lib/schema"
 import dayjs from "dayjs"
 import useCategories from "@/lib/useCategories"
 import { GET_ACCOUNT_PUBLIC_INFO } from "@/lib/apolloClient"
+import { urlFromPublicId } from "@/lib/images"
+import { fonts } from "@/theme"
 
 interface Props {
     accountId: number
@@ -41,7 +43,7 @@ const ViewAccount = (p: Props) => {
             <Stack direction="row" gap="1rem" alignItems="center">
                 <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.getAccountPublicInfo.name}
                     avatarImagePublicId={data.getAccountPublicInfo.imageByAvatarImageId?.publicId} />
-                <Typography flex="1" color="primary" variant="h1">{data.getAccountPublicInfo.name}</Typography>
+                <Typography flex="1" color="primary" textTransform="uppercase" fontWeight="bold" fontFamily={fonts.title.style.fontFamily} fontSize="3rem" textAlign="center">{data.getAccountPublicInfo.name}</Typography>
                 <IconButton color="primary" onClick={() => {
                   setTokenTransferInfo({ destinatorAccount: data.getAccountPublicInfo.name, 
                     destinatorId: data.getAccountPublicInfo.id
@@ -50,6 +52,11 @@ const ViewAccount = (p: Props) => {
                   <GiveIcon sx={{ fontSize: '3rem' }} />
                 </IconButton>
             </Stack>
+            { data.getAccountPublicInfo.imageByAvatarImageId?.publicId &&
+                <Stack alignItems="center">
+                    <img style={{ maxWidth: '400px', width: '100%' }} src={urlFromPublicId(data.getAccountPublicInfo.imageByAvatarImageId?.publicId)} />
+                </Stack>
+            }
             { data.getAccountPublicInfo.accountsLinksByAccountId && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0 &&
                 <Stack>
                     <Typography variant="caption" color="primary">{uiContext.i18n.translator('linksLabel')}</Typography>
@@ -73,7 +80,8 @@ const ViewAccount = (p: Props) => {
                     { accountResources.map((res, idx) => <ResourceCard testId={`ResCard${res.id}`}
                         key={idx} version={p.version} resource={{
                             id: res.id, title: res.title, description: res.description, expiration: res.expiration,
-                            images: res.images.map((img) => img.publicId!)
+                            images: res.images.map((img) => img.publicId!), accountName: data.getAccountPublicInfo.name, 
+                            avatarPublicId: data.getAccountPublicInfo.imageByAvatarImageId?.publicId
                         }}/>)}
                 </Stack>
             } 

@@ -66,7 +66,7 @@ const PictureGallery = (p: Props) => {
                 onMouseLeave={() => setHovered(false)}
                 onClick={e => {
                     e.stopPropagation()
-                    e.bubbles = false
+                    e.preventDefault()
                     p.onImageClicked && p.onImageClicked(p.images[currentImage])
                 }}/>
         </ResponsivePhotoBox>

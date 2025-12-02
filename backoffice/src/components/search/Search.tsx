@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useContext, useEffect, useState } from "react"
-import { Stack } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
 import ResourceCard from "../resources/ResourceCard"
 import { DEFAULT_LOCATION } from "@/lib/constants"
@@ -51,11 +51,13 @@ export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: fal
 
 const Search = (p: {version: string}) => {
     const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const { profileData } = useProfile()
     const [ suggestResources, { loading, error }] = useMutation(SUGGEST_RESOURCES)
     const [suggestedResources, setSuggestedResources] = useState<any[]>([])
     const [initialSearchParams, setInitialSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS)
     const [loadingProfile, setLoadingProfile] = useState(true)
+    const [initialLoading, setInitialLoading] = useState(true)
 
     useEffect(() => {
       if(!appContext.account) {
@@ -81,6 +83,7 @@ const Search = (p: {version: string}) => {
           searchTerm: searchParameters.searchTerm, inActiveCampaign: searchParameters.inCurrentCampaign
        } })
       setSuggestedResources(res.data.suggestedResources.resources)
+      setInitialLoading(false)
     }
 
     return <Stack sx={{ paddingTop: '2rem', gap: '2rem', overflow: 'auto' }}>
@@ -92,13 +95,16 @@ const Search = (p: {version: string}) => {
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', 
                 gap: '1rem', justifyContent: 'center', overflow: 'auto' }}>
-            { suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx} version={p.version}
-              resource={{
-                id: res.id, accountName: res.accountByAccountId.name, description: res.description,
-                title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),
-                avatarPublicId: res.accountByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountByAccountId.id
-              }}/>
-            )}
+            { (suggestedResources.length === 0 && !initialLoading) ?
+                <Typography variant="subtitle1" textAlign="center">{uiContext.i18n.translator('noResultFound')}</Typography>
+              :
+              suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx} version={p.version}
+                resource={{
+                  id: res.id, accountName: res.accountByAccountId.name, description: res.description,
+                  title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),
+                  avatarPublicId: res.accountByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountByAccountId.id
+                }}/>)
+            }
         </LoadedZone>
     </Stack> 
 }

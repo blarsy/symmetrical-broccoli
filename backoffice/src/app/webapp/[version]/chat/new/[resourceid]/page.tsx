@@ -3,7 +3,6 @@ import Chat from "@/components/chat/Chat"
 import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import { usePagePath } from "@/lib/usePagePath"
 import { useRouter } from "next/navigation"
-import { useContext } from "react"
 
 const Page = () => {
     const { version, rest } = usePagePath()

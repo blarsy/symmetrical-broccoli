@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import ExplainCampaign from './ExplainCampaign'
+import ExplainCampaignDialog from './ExplainCampaignDialog'
 import { useState } from 'react'
 import { Button } from '@mui/material'
 import { apolloClientMocksDecorator, clientComponentDecorator, defaultCampaign } from '@/lib/storiesUtil'
-import { GET_ACTIVE_CAMPAIGN } from '@/lib/useActiveCampaign'
 import { fromToday } from '@/utils'
+import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
 
 const meta = {
-  component: ExplainCampaign,
+  component: ExplainCampaignDialog,
   parameters: {
     layout: 'centered',
   },
@@ -22,7 +22,7 @@ const meta = {
         <Story args={{ visible: showing, onClose: () => setShowing(false) }}/>
     </>
   }]
-} satisfies Meta<typeof ExplainCampaign>
+} satisfies Meta<typeof ExplainCampaignDialog>
 
 export default meta
 type Story = StoryObj<typeof meta>

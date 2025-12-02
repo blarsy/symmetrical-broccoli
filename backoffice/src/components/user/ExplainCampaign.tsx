@@ -1,31 +1,26 @@
-import { Dialog, Stack, SxProps, Theme, Typography, useTheme, useMediaQuery, IconButton, Divider } from "@mui/material"
-import React, { PropsWithChildren, useContext, useState } from 'react'
+import { LoadingButton } from "@mui/lab"
 import 'keen-slider/keen-slider.min.css'
-import { useKeenSlider } from 'keen-slider/react'
-import { UiContext } from "../scaffold/UiContextProvider"
+import { Typography, Divider, IconButton, Stack, useTheme, Theme, SxProps, Button } from "@mui/material"
 import Campaign from "@/app/img/campaign.svg"
 import Airdrop from "@/app/img/airdrop.svg"
 import MoneyIn from "@/app/img/money-in.svg"
 import Arrow from '@/app/img/fleche.svg'
-import Close from '@/app/img/CROSS.svg'
-import { gql, useMutation } from "@apollo/client"
-import { LoadingButton } from "@mui/lab"
-import useActiveCampaign from "@/lib/useActiveCampaign"
-import LoadedZone from "../scaffold/LoadedZone"
+import TimeUp from '@/app/img/time-up.svg'
 import dayjs from "dayjs"
 import { PriceTag } from "../misc"
-import TimeUp from '@/app/img/time-up.svg'
+import LoadedZone from "../scaffold/LoadedZone"
+import { PropsWithChildren, useContext, useState } from "react"
+import { UiContext } from "../scaffold/UiContextProvider"
+import { useKeenSlider } from "keen-slider/react"
+import { useMutation } from "@apollo/client"
+import { SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS } from "./ExplainCampaignDialog"
+import useActiveCampaign from "@/lib/useActiveCampaign"
+import Link from "next/link"
 
 interface SlideProps extends PropsWithChildren {
     title: string
     sx?: SxProps<Theme>
 }
-
-export const SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS = gql`mutation SetAccountKnowsAboutCampaigns {
-  setAccountKnowsAboutCampaigns(input: {}) {
-    integer
-  }
-}`
 
 const Slide = (p: SlideProps) => <Stack className="keen-slider__slide">
     <Stack sx={theme => ({
@@ -49,12 +44,7 @@ const Slide = (p: SlideProps) => <Stack className="keen-slider__slide">
     </Stack>
 </Stack>
 
-interface Props {
-    visible: boolean
-    onClose: () => void
-}
-
-const ExplainCampaign = (p: Props) => {
+const ExplainCampaign = (p: { onClose?: () => void }) => {
     const uiContext = useContext(UiContext)
     const [currentSlide, setCurrentSlide] = useState(0)
     const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({ 
@@ -67,16 +57,9 @@ const ExplainCampaign = (p: Props) => {
     })
     const [setAccountKnowsAboutCampaigns, { loading: settingCampaignBit }] = useMutation(SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS)
     const theme = useTheme()
-    const sm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
-    const md = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
     const { activeCampaign } = useActiveCampaign()
-
-    return <Dialog open={p.visible} onClose={p.onClose} fullWidth maxWidth="md" fullScreen={sm}>
-        <Stack alignItems="flex-end">
-            <IconButton onClick={p.onClose}>
-                <Close width="25px" fill={theme.palette.primary.contrastText} />
-            </IconButton>
-        </Stack>
+    
+    return <Stack>
         <LoadedZone loading={activeCampaign.loading} error={activeCampaign.error}>
             { activeCampaign.data && <Stack direction="row" ref={sliderRef} className="keen-slider">
                 <Slide title={activeCampaign.data?.name} sx={{ gap: '1rem', alignItems: 'center' }}>
@@ -121,14 +104,21 @@ const ExplainCampaign = (p: Props) => {
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
                     <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
                     <Divider/>
-                    <LoadingButton loading={settingCampaignBit} onClick={() => {
-                        setAccountKnowsAboutCampaigns()
-                        p.onClose()
-                    }}>{uiContext.i18n.translator('okButton')}</LoadingButton>
+                    { p.onClose ? 
+                        <LoadingButton loading={settingCampaignBit} onClick={() => {
+                            setAccountKnowsAboutCampaigns()
+                            p.onClose!()
+                        }}>{uiContext.i18n.translator('okButton')}</LoadingButton>
+                        :
+                        <Stack gap="0.5rem" alignItems="center">
+                            <Button variant="text" href={`${window.location.protocol}//${window.location.host}/campaign`}>{uiContext.i18n.translator('infoOnCampaigns')}</Button>
+                            <Button variant="contained" href={`${window.location.protocol}//${window.location.host}`}>{uiContext.i18n.translator('seeItInAction')}</Button>
+                        </Stack>
+                    }
                 </Slide>
             </Stack> }
         </LoadedZone>
-        <Stack direction="row" justifyContent="space-between">
+        <Stack direction="row" justifyContent="space-between" position='sticky' width="100%" bottom={0} right={0}>
             <IconButton sx={{ visibility: currentSlide === 0 ? 'hidden': 'inherit', transform: 'scaleX(-1)' }} onClick={() => instanceRef.current?.prev()}>
                 <Arrow width="30px" fill={theme.palette.primary.contrastText} />
             </IconButton>
@@ -136,7 +126,7 @@ const ExplainCampaign = (p: Props) => {
                 <Arrow width="30px" fill={theme.palette.primary.contrastText} />
             </IconButton>
         </Stack>
-    </Dialog>
+    </Stack>
 }
 
 export default ExplainCampaign

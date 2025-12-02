@@ -57,10 +57,16 @@ const ResourcesGallery = () => {
                   color="#000" borderBottom="2px solid #000"
                   sx={{
                       backgroundColor: lightPrimaryColor
-                  }}>{rawRes.accountByAccountId.name}</Typography>
+                  }}>{rawRes.title}</Typography>
               <img style={{
-                  width: '100%'
+                  width: '100%',
+                  display: 'block'
               }} src={urlFromPublicId(rawRes.resourcesImagesByResourceId.nodes[0].imageByImageId.publicId)} />
+              <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={14}
+                  color="#000" borderTop="2px solid #000"
+                  sx={{
+                      backgroundColor: lightPrimaryColor
+                  }}>par {rawRes.accountByAccountId.name}</Typography>
             </Link>
         </Box>) }
     </LoadedZone>
