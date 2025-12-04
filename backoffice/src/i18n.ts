@@ -300,7 +300,8 @@ const resources = {
             "noCategorySelectedLabel": "No category",
             "addImageButtonLabel": "Add picture",
             "fileNotRecognizedAsImage": "Image not recognized. Valid formats: jpeg, gif, webp",
-            "noResultFound": "No result found"
+            "noResultFound": "No result found",
+            "noActiveCampaign": "There is currently no active campaign"
         }
     },
     fr: { 
@@ -601,7 +602,8 @@ const resources = {
             "noCategorySelectedLabel": "Aucune catégorie",
             "addImageButtonLabel": "Ajouter une image",
             "fileNotRecognizedAsImage": "Image non reconnue. Formats acceptés: jpeg, gif, webp",
-            "noResultFound": "Aucun résultat trouvé"
+            "noResultFound": "Aucun résultat trouvé",
+            "noActiveCampaign": "Il n'y a pas de campagne en cours pour le moment"
         }
     }
 }

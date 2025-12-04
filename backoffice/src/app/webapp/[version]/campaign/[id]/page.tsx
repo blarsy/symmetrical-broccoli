@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { getApolloClient } from "@/lib/apolloClient"
 import { Metadata, ResolvingMetadata } from "next"
 import { GET_ACTIVE_CAMPAIGN } from "@/lib/queries"
+import { getCommonConfig } from '@/config'
 
 type Props = {
   params: Promise<{ version: string, id: string }>
@@ -16,22 +17,27 @@ export async function generateMetadata(
     try {
         // read route params
         const { id, version } = await params
+        const url = getCommonConfig().link1Url
 
         const client = getApolloClient(version)
         const res = await client.query({ query: GET_ACTIVE_CAMPAIGN, variables: {} })
+
+        if(!res.data.getActiveCampaign) return {}
+
         const headersList = await headers()
-        const currentUrl = headersList.get('referer')
         const title = `Une campagne sur Tope-là - ${res.data.getActiveCampaign.name}`
 
+        headersList.forEach(console.log)
+
         return {
-            metadataBase: new URL(currentUrl!),
+            metadataBase: new URL(url),
             title,
             description: res.data.getActiveCampaign.description,
             openGraph: {
                 title,
                 description: res.data.getActiveCampaign.description,
-                images: [{ url: `https://${headersList.get('host')}/campaign.png` }],
-                url: new URL(currentUrl!)
+                images: [{ url: `${url}/campaign.png` }],
+                url: '/'
             }
         }
     } catch (e) {

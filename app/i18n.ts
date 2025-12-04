@@ -356,7 +356,8 @@ const resources = {
       "errorReportSent": "An error report has been sent, but just to be safe, you may certainly tell us that something is wrong. Restart the app, tap on the '?' and follow the instructions.",
       "errorTechDetailsLabel": "Détails techniques",
       "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
-      "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away."
+      "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away.",
+      "noActiveCampaign": "There is currently no active campaign"
    }
   },
   fr: {
@@ -707,7 +708,8 @@ const resources = {
       "errorReportSent": "Un rapport d'erreur a été envoyé, mais pur être sûr, tu peux certainement nous signaler que quelque chose ne marche pas. Redémarre l'app, appuye sur '?', et suis les instructions.",
       "errorTechDetailsLabel": "Détails techniques",
       "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
-      "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés."
+      "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés.",
+      "noActiveCampaign": "Il n'y a pas de campagne en cours pour le moment"
     }
   }
 }
