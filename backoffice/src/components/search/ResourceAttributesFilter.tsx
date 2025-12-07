@@ -14,7 +14,7 @@ const ResourceAttributesFilter = (p: Props) => {
     const uiContext = useContext(UiContext)
     const t = uiContext.i18n.translator
 
-    return <Stack sx={p.sx} direction="row" gap="1rem">
+    return <Stack sx={p.sx} flexWrap="wrap" direction="row" gap="0.5rem">
         <Stack alignItems="center">
             <Typography variant="body1" color="primary">{t('natureOptionsLabel')}</Typography>
             <Stack direction="row" gap="0.25rem">

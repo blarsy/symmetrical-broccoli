@@ -25,7 +25,7 @@ interface ProximityParameters {
 const Settings = (p: ProximitySettingsProps) => {
     const uiContext = useContext(UiContext)
 
-    return <Stack direction="row" gap="1rem">
+    return <Stack direction="row" gap="1rem" flexWrap="wrap">
         <Stack direction="row" alignItems="center">
             <Typography variant="body1" color="primary">{p.address}</Typography>
             <IconButton onClick={p.onSetNewLocationRequest}>
@@ -36,7 +36,7 @@ const Settings = (p: ProximitySettingsProps) => {
             <Typography variant="body1" color="primary">{`${p.distance} ${uiContext.i18n.translator('distanceTo')}`}</Typography>
             <Slider color="primary" min={1} max={50} value={p.distance} onChange={(_e, val) => p.onChange(val as number, p.excludeUnlocated) } />
         </Stack>
-        <Tooltip title={uiContext.i18n.translator('onlyLocatedResourcesLabel')}>
+        <Tooltip style={{ alignItems: 'flex-start' }} title={uiContext.i18n.translator('onlyLocatedResourcesLabel')}>
             <FormControlLabel control={<Checkbox sx={{ padding: '0 0 0 1rem' }} checked={p.excludeUnlocated} onChange={e => {
                 p.onChange(p.distance, !p.excludeUnlocated)
             }} />} label={p.excludeUnlocated ? <LocationSetIcon/> : <LocationNotSetIcon />} sx={{

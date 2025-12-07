@@ -46,7 +46,7 @@ export async function generateMetadata(
             }
         }
     } catch (e) {
-        console.log('Unexpected error while generating metadata', e)
+        //console.log('Unexpected error while generating metadata', e)
         throw e
     }
 }

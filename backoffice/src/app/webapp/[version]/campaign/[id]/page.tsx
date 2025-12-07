@@ -27,8 +27,6 @@ export async function generateMetadata(
         const headersList = await headers()
         const title = `Une campagne sur Tope-là - ${res.data.getActiveCampaign.name}`
 
-        headersList.forEach(console.log)
-
         return {
             metadataBase: new URL(url),
             title,
@@ -41,7 +39,7 @@ export async function generateMetadata(
             }
         }
     } catch (e) {
-        console.log('Unexpected error while generating metadata', e)
+        //console.log('Unexpected error while generating metadata', e)
         throw e
     }
 }

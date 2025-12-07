@@ -16,12 +16,13 @@ import { useMutation } from "@apollo/client"
 import { SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS } from "./ExplainCampaignDialog"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import { fonts } from "@/theme"
+import { getCommonConfig } from "@/config"
 
 const GeneralInfoButtons = () => {
     const uiContext = useContext(UiContext)
     return <Stack gap="0.5rem" alignItems="center">
         <Button variant="text" href={`${window.location.protocol}//${window.location.host}/campaign`}>{uiContext.i18n.translator('infoOnCampaigns')}</Button>
-        <Button variant="contained" href={`${window.location.protocol}//${window.location.host}`}>{uiContext.i18n.translator('seeItInAction')}</Button>
+        <Button variant="contained" href={`${window.location.protocol}//${window.location.host}/webapp/${getCommonConfig().mainVersion}`}>{uiContext.i18n.translator('seeItInAction')}</Button>
     </Stack>
 }
 

@@ -30,6 +30,8 @@ import ResourcesGallery from "@/components/showcase/ResourcesGallery"
 import { ReactNode } from "react"
 import AccountsGallery from "@/components/showcase/AccountsGallery"
 import Roadmap from "@/components/showcase/Roadmap"
+import useActiveCampaign from "@/lib/useActiveCampaign"
+import CampaignImg from '@/app/img/campaign.svg'
 
 const { mainVersion, link2Url } = getCommonConfig()
 
@@ -159,6 +161,22 @@ const ParchmentContainer = ({ children }: { children: ReactNode}) => {
     </Stack>
 }
 
+const OngoingCampaignAnnouncement = ({ sx }: { sx: SxProps<Theme> }) => {
+    const { activeCampaign } = useActiveCampaign()
+
+    if(activeCampaign.loading || !activeCampaign.data || activeCampaign.error) {
+        return undefined
+    }
+
+    return <Stack component={Link} href={`webapp/${getCommonConfig().mainVersion}/campaign/${activeCampaign.data.id}`} direction="row" alignItems="center" sx={sx}>
+        <CampaignImg style={{ transform: 'rotate(20deg)' }}/>
+        <Stack alignItems="center">
+            <Typography fontFamily={fonts.title.style.fontFamily} fontSize={28} lineHeight={1}>Campagne en cours !</Typography>
+            <Typography fontFamily={fonts.title.style.fontFamily} fontSize={24} lineHeight={1} color="#000">Participer = gagner</Typography>    
+        </Stack>
+    </Stack>
+}
+
 const SMALL_TEXT_SIZE = 18
 
 const Page = () => {
@@ -168,7 +186,14 @@ const Page = () => {
     return <ApolloProvider client={getApolloClient(mainVersion)}>
         <ThemeProvider theme={theme}>
             <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <Stack alignItems="center" marginBottom="50px">
+                <Stack alignItems="center" marginBottom="50px" position="relative">
+                    <OngoingCampaignAnnouncement sx={{ 
+                        position: 'absolute', cursor: 'pointer', transform: 'rotate(10deg)',
+                        right: 30, top: 30,
+                        [theme.breakpoints.down('md')]: {
+                            position: 'relative', right: 10, top: 20,
+                        }
+                    }}/>
                     <Logo alt="Logo Tope-la" height={323}/>
                 </Stack>
                 <Stack flexDirection="row" justifyContent="center" alignItems="flex-start">
@@ -193,12 +218,9 @@ const Page = () => {
                             },
                             alignItems: 'center'
                         }}>
-                            <Typography component="p" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >La solidarit&#233;, on y croit dur comme fer.</Typography>
                             <Box sx={{ textAlign: 'center' }}>
-                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#000" >La mission de Tope-l&#224; est archi-simple : mettre en lien les passionné.e.s, engagé.e.s, inspiré.e.s qui ont des ressources &#224; partager avec ceux qui en ont besoin gr&#226;ce au </Typography>
-                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >don</Typography>
-                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#000" > ou </Typography>
-                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >l&#8217;&#233;change.</Typography>
+                                <Typography component="p" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#fff" >Trouve ce qu&#8217;il te faut, donne ce qui dort chez toi, et économise dès aujourd&#8217;hui.</Typography>
+                                <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" color="#000" >Avec Tope-là, tu accèdes à des objets, services et compétences partagés par ta communauté. Tu réduis tes dépenses, simplifies ton quotidien et fais circuler les ressources plutôt que les laisser se perdre.</Typography>
                             </Box>
                         </Box>
                         <Button variant="outlined" startIcon={<QuestionIcon/>} endIcon={<QAIcon/>} target="_blank"
@@ -226,8 +248,10 @@ const Page = () => {
                     <SectionTitle lines={[
                         [ { color: '#000', text: 'Tope là c\'est ' } ],[ { color: primaryColor, text: 'pour qui ?'} ],
                     ]} />
-                    <Stack flexDirection="row" gap="2rem" flexWrap="wrap" justifyContent="center">
+                    <Stack flexDirection="row" gap="2rem" flexWrap="wrap" alignItems="center" justifyContent="center">
                         <ToppersBar />
+                        <Typography component="span" variant="body2" fontSize={SMALL_TEXT_SIZE} textAlign="center" 
+                            sx={{ maxWidth: '20rem', paddingTop: '2rem' }} color="#000" >particuliers, familles, associations, et artisans souhaitant réutiliser, partager ou échanger objets, services et compétences, économiser, créer du lien social et participer à une économie circulaire.</Typography>
                     </Stack>
                 </ParchmentContainer>
                 <Stack alignItems="center" justifyContent="center" padding="3rem">

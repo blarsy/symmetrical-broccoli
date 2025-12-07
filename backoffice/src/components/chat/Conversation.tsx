@@ -1,4 +1,4 @@
-import { Stack, SxProps, Theme, Typography } from "@mui/material"
+import { IconButton, Stack, SxProps, Theme, Typography } from "@mui/material"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useContext, useEffect, useState } from "react"
 import { AppContext } from "../scaffold/AppContextProvider"
@@ -13,6 +13,7 @@ import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaf
 import { UiContext } from "../scaffold/UiContextProvider"
 import { urlFromPublicId } from "@/lib/images"
 import { useRouter } from "next/navigation"
+import BackIcon from '@mui/icons-material/ArrowBack'
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -135,6 +136,7 @@ export const asMessage = (msg: any): Message => {
 
 interface Props {
     sx?: SxProps<Theme>
+    onBackRequested: () => void
 }
 
 interface ConversationDisplayData { 
@@ -190,7 +192,6 @@ const Conversation = (p: Props) => {
               chatDispatch({ type: ChatReducerActionType.SetConversationRead, payload: conversationData.conversation.id })
             }, 0)
         } catch (e) {
-            console.log(e)
             setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
@@ -238,10 +239,19 @@ const Conversation = (p: Props) => {
         { chatContext.currentConversationId || chatContext.newConversationState ?
             <LoadedZone loading={conversationData?.loading} error={conversationData?.error} containerStyle={{ maxHeight: '100%', flex: '1' }}>
                 { conversationData.data && [
-                    <ResourceHeader key="header" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }} 
-                      data={conversationData.data!.conversation} 
-                      onAccountClicked={() => router.push(`/webapp/${uiContext.version}/account/${conversationData.data!.conversation.otherAccount!.id}`)}
-                      onResourceClicked={() => router.push(`/webapp/${uiContext.version}/view/${conversationData.data!.conversation.resource!.id}`)} />,
+                    <Stack key="header" direction="row" sx={{ borderTop: '1px solid #ccc', borderBottom: '1px solid #ccc' }}>
+                      <IconButton onClick={p.onBackRequested} sx={theme => ({
+                        [theme.breakpoints.up('sm')]: {
+                          display: 'none'
+                        }
+                      })}>
+                        <BackIcon />
+                      </IconButton>
+                      <ResourceHeader
+                        data={conversationData.data!.conversation} 
+                        onAccountClicked={() => router.push(`/webapp/${uiContext.version}/account/${conversationData.data!.conversation.otherAccount!.id}`)}
+                        onResourceClicked={() => router.push(`/webapp/${uiContext.version}/view/${conversationData.data!.conversation.resource!.id}`)} />
+                    </Stack>,
                     <ConversationMessages hasNew={conversationHasNewMessages} key="messages" data={currentMessages!} 
                       onBottom={() => setConversationHasNewMessages(false)}/>,
                     <MessageComposer key="composer" conversation={conversationData.data.conversation} 

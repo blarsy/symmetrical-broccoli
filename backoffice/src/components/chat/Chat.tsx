@@ -22,6 +22,7 @@ interface Props {
     onConversationSelected: (target: number, current?: number) => void
     conversationId?: number
     resourceId?: number
+    showConversationsRequested: () => void
 }
 
 const Chat = (p: Props) => {
@@ -63,8 +64,29 @@ const Chat = (p: Props) => {
     
     return <LoadedZone loading={loadState.loading} error={loadState.error} containerStyle={[ { overflow: 'auto' }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
         <Stack direction="row" flex="1" maxHeight="100%">
-            <Conversations onConversationSelected={p.onConversationSelected} sx={{ flex: '0 0 30%', borderRight: '1px solid #ccc', borderTop: '1px solid #ccc', maxHeight: '100%' }}/>
-            <Conversation sx={{ flex: '0 0 70%', maxHeight: '100%', borderTop: '1px solid #ccc' }}/>
+            <Conversations onConversationSelected={p.onConversationSelected} 
+                sx={theme => ({ 
+                    flex: '0 0 30%', 
+                    [theme.breakpoints.down('sm')]: {
+                        display: (chatContext.currentConversationId || chatContext.newConversationState) ? 'none': undefined,
+                        flex: 1
+                    },
+                    borderRight: '1px solid #ccc', borderTop: '1px solid #ccc', maxHeight: '100%' })}/>
+            <Conversation sx={theme => ({ 
+                flex: '0 0 70%', 
+                [theme.breakpoints.down('sm')]: {
+                    display: (!chatContext.currentConversationId && !chatContext.newConversationState) ? 'none': undefined,
+                    flex: 1
+                },
+                maxHeight: '100%', borderTop: '1px solid #ccc' })}
+                onBackRequested={() => {
+                    if(chatContext.currentConversationId) {
+                        chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: undefined })
+                    } else {
+                        chatDispatch({ type: ChatReducerActionType.SetNewConversation, payload: undefined })
+                    }
+                    p.showConversationsRequested()
+                }}/>
         </Stack>
     </LoadedZone>
 }

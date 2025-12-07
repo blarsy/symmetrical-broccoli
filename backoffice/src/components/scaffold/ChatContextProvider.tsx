@@ -35,7 +35,11 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
         newState = { unreadConversations: previousState.unreadConversations.filter(c => c !== action.payload) }
         break
     case ChatReducerActionType.SetCurrentConversationId:
-        newState = { currentConversationId: action.payload }
+        if(action.payload) {
+            newState = { currentConversationId: action.payload }
+        } else {
+            newState = { currentConversationId: undefined }
+        }
         break
     case ChatReducerActionType.SetNewChatMessage:
         const message = action.payload as NewMessage
@@ -74,7 +78,11 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
         newState = { conversations: action.payload }
         break
     case ChatReducerActionType.SetNewConversation:
-        newState = { newConversationState: { resource: action.payload } }
+        if(!action.payload) {
+            newState = { newConversationState: undefined, conversations: previousState.conversations.filter(c => !c.resourceId || c.resourceId != previousState.newConversationState?.resource.id) }
+        } else {
+            newState = { newConversationState: { resource: action.payload } }
+        }
         break
     default:
         throw new Error(`Unexpected reducer action type ${action.type}`)

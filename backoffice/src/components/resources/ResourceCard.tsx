@@ -57,7 +57,6 @@ const ResourceCard = (p: Props) => {
         avatar = <img style={{ borderRadius: '25px', width: '5rem', height: '5rem' }} alt="image" src={urlFromPublicId(p.resource.images[0])} />
     }
     return <Card data-testid={p.testId} key={p.resource.id} onClick={e => {
-        console.log(e)
         router.push(`/webapp/${p.version}/view/${p.resource.id}`)
     }} sx={theme => ({
         display: 'flex',

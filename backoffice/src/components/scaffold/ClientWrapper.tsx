@@ -127,7 +127,7 @@ const LookupDataProvider = (p: PropsWithChildren) => {
         }
     }, [uiContext.i18n.lang])
 
-    return <LoadedZone loading={uiContext.loadingLookupData} error={uiContext.categories.error} containerStyle={{ overflow: 'hidden' }}>
+    return <LoadedZone loading={uiContext.loadingLookupData} error={uiContext.categories.error} containerStyle={{ overflow: 'hidden', flex: 1 }}>
         {p.children}
     </LoadedZone>
 }

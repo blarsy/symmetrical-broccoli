@@ -53,7 +53,7 @@ const ConversationMessages = ((p: Props) => {
                 p.onBottom()
             }
         }}>
-        <Stack position="relative" gap="0.1rem">
+        <Stack position="relative" gap="0.2rem">
             {p.data.map((msg, idx) => {
                 const isMessageFromMe = msg.user.id === appContext.account!.id
                 return <Stack key={idx}>

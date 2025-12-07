@@ -481,6 +481,7 @@ const Notifications = ({ version }: { version: string }) => {
                         },
                         [theme.breakpoints.down('sm')]: {
                             width: '100%',
+                            padding: '5px'
                         }
                     })}>
                     <NotificationImage image={notif.image} />

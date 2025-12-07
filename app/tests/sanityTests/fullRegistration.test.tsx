@@ -56,7 +56,6 @@ test('register new user, then log in and out', async () => {
     simulateActivation(activationCode)
     
     await checkAccountActivated(email)
-    console.log('activation success')
 
     const main = render(<AppContextProvider>
         <Start splashScreenMinimumDuration={0} overrideVersionChecker={() => true}>
@@ -66,7 +65,6 @@ test('register new user, then log in and out', async () => {
 
     await waitFor(() => expect(main.getByTestId('Start')).toBeOnTheScreen())
     await waitFor(() => expect(main.getByTestId('openLoginScreen')).toBeOnTheScreen())
-    console.log('Login screen opened')
 
     fireEvent.press(main.getByTestId('openLoginScreen'))
 
@@ -77,7 +75,6 @@ test('register new user, then log in and out', async () => {
     fireEvent.press(main.getByTestId('login'))
     
     await waitFor(() => expect(main.getByTestId('openProfile')).toBeOnTheScreen())
-    console.log('Login on screen success')
     await checkBadgeNumeric('notificationUnreads', main)
 
     fireEvent.press(main.getByTestId('openProfile'))
@@ -87,7 +84,6 @@ test('register new user, then log in and out', async () => {
     fireEvent.press(main.getByTestId('logout'))
     
     await waitFor(() => expect(main.getByTestId('openLoginScreen')).toBeOnTheScreen())
-    console.log('Logout on screen success')
 
     const notif = await checkLastNotificationExists(email)
     const token = await authenticate(email, password)
