@@ -1,4 +1,4 @@
-import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, SvgIconTypeMap, Switch, Typography } from "@mui/material"
+import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, SvgIconTypeMap, Switch } from "@mui/material"
 import { Stack } from "@mui/system"
 import Link from "next/link"
 import { useContext, useState } from "react"
@@ -16,9 +16,10 @@ import { ChatContext } from "./ChatContextProvider"
 import { UiContext, UiDispatchContext, UiReducerActionType } from "./UiContextProvider"
 import { OverridableComponent } from "@mui/material/OverridableComponent"
 import MenuIcon from '@mui/icons-material/Menu'
-import Tokens from '@/app/img/TOKENS.svg'
+import MiniLogo from '@/app/img/minilogo.svg'
 import { useRouter } from "next/navigation"
 import { PriceTag } from "../misc"
+import { primaryColor } from "@/utils"
 
 interface LinkMenuProps {
     url: string
@@ -119,6 +120,9 @@ const TopBar = ({ version }: Props) => {
                 display: 'none'
             }
          })} direction="row">
+            <Link href="/" style={{ margin: '6px 8px', width: '3rem', height: '3rem' }}>
+                <MiniLogo width="100%" height="100%" fill={primaryColor}/>
+            </Link>
             {makeButtonsMenu()}
         </Stack>
         <IconButton color="primary" sx={theme => ({
