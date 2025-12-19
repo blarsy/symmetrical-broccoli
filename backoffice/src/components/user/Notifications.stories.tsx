@@ -40,9 +40,7 @@ export const fewNotifications: Story = {
   decorators: [ connectedComponent([{ query: GET_NOTIFICATIONS, variables: { first: 15 }, result: {
         myNotifications: {
             edges: [ 
-                {node: { id: 1, read: null, created: yesterday, data: { info: 'COMPLETE_PROFILE' } }},
-                {node: { id: 2, read: null, created: yesterday, data: { info: 'SOME_RESOURCES_SUSPENDED' } }},
-                {node: { id: 3, read: null, created: yesterday, data: { info: 'WARNING_LOW_TOKEN_AMOUNT' } }}
+                {node: { id: 1, read: null, created: yesterday, data: { info: 'COMPLETE_PROFILE' } }}
             ],
             pageInfo: {
                 hasNextPage: false,
@@ -93,8 +91,6 @@ export const OneNewResourceNotification: Story = {
                     }]
                 },
                 locationBySpecificLocationId: null,
-                suspended: null,
-                paidUntil: null,
                 created: yesterday,
                 deleted: null,
                 price: 100
@@ -151,8 +147,6 @@ export const EveryNotification: Story = {
                     ]
                 },
                 locationBySpecificLocationId: null,
-                suspended: null,
-                paidUntil: null,
                 created: yesterday,
                 deleted: null,
                 price: 100
@@ -164,8 +158,6 @@ export const EveryNotification: Story = {
             edges: [ 
                 {node: { id: 20, read: null, created: yesterday, data: { resource_id: 123 } }},
                 {node: { id: 1, read: null, created: yesterday, data: { info: 'COMPLETE_PROFILE' } }},
-                {node: { id: 2, read: null, created: yesterday, data: { info: 'SOME_RESOURCES_SUSPENDED' } }},
-                {node: { id: 3, read: null, created: yesterday, data: { info: 'WARNING_LOW_TOKEN_AMOUNT' } }},
                 {node: { id: 4, read: null, created: yesterday, data: { info: 'TOKENS_RECEIVED', fromAccount: 'Colonel Moutarde', amountReceived: 100 } }},
                 {node: { id: 5, read: null, created: yesterday, data: { info: 'TOKENS_SENT', toAccount: 'Madame Rose', amountSent: 200 } }},
                 {node: { id: 6, read: null, created: yesterday, data: { info: 'WELCOME_TOKEN_USER' } }},

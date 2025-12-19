@@ -29,6 +29,7 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
             canBeDelivered: false,
             canBeTakenAway: false,
             title: resourceTitle,
+            price: 10,
             account: {
                 email: 'other@other.com',
                 id: 2,
@@ -36,8 +37,6 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
             },
             deleted: resourceDeleted ? new Date() : null,
             specificLocation: null,
-            paidUntil: undefined,
-            suspended: undefined,
             id: 1, images: [], description: 'description de la ressource', categories: [], isService: false, isProduct: false, created: new Date()
         },
         otherAccount: {
@@ -47,7 +46,8 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
     }
 } as ConversationState, {
       messages: initial(false, []),
-      endCursor: ''
+      endCursor: '', 
+      loadingEarlier: false
 } as conversationMessagesState]
 
 export const SimpleConversationView: Story = {

@@ -31,7 +31,7 @@ export const LoggedIn: Story = {
     loading: false, token: 'token', account: {
       amountOfTokens: 20, name: 'Les patines de Christine', id: 234, email: 'mail@mail.com',
       activated: new Date(new Date().valueOf() - 10000), lastChangeTimestamp: new Date(new Date().valueOf() - 10000),
-      willingToContribute: true, avatarPublicId: '', unlimitedUntil: null, knowsAboutCampaigns: false
+      avatarPublicId: '', knowsAboutCampaigns: false
     }, unreadNotifications: [], subscriptions: []
   }) ]
 }

@@ -9,8 +9,7 @@ const InfoHowItWorks = () => {
 
     return <View style={{ alignItems: 'center' }}>
         <WhiteButton onPress={() => setExplaining(true)}>{t('showMe')}</WhiteButton>
-        <ContributeDialog onDismiss={() => setExplaining(false)} visible={explaining} 
-            title={t('contributionExplainationDialogTitle')} />
+        <ContributeDialog onDismiss={() => setExplaining(false)} visible={explaining} />
     </View>
 }
 

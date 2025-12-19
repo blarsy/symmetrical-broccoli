@@ -129,7 +129,7 @@ const launchJobWorker = async (pool: Pool, version: string) => {
             },
             burnTokens: async () => {
                 executeJob(async () => {
-                    await runAndLog(`SELECT sb.apply_resources_token_transactions()`, pool, 'Running burnTokens routine', version)
+                    await runAndLog(`SELECT sb.apply_resources_token_transactions()`, pool, 'Running rewards grant routine', version)
                 }, 'burnTokens', version)
             },
             handleResourcesAndBidsExpiration: async () => {

@@ -31,17 +31,18 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
             addImage: async() => {},
             deleteImage: async() => {},
             save: async() => {},
-            reset: () => { }
+            reset: () => { },
+            setCampaignToJoin: () => {}
     }}}>
     <StoryElement />
 </EditResourceContext.Provider>
 
-export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, willingToContribute: boolean = false, amountOfTopes: number = 0) => 
+export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, amountOfTopes: number = 0) => 
     (StoryElement: React.ElementType) => 
         makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
             activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
-            willingToContribute, amountOfTokens: willingToContribute ? amountOfTopes | 30 : amountOfTopes, unreadNotifications: [], 
-            unreadConversations: [], lastChangeTimestamp: new Date(), unlimitedUntil: null, numberOfExternalAuthProviders: 0,
+            amountOfTokens: amountOfTopes, unreadNotifications: [], 
+            unreadConversations: [], lastChangeTimestamp: new Date(), numberOfExternalAuthProviders: 0,
             knowsAboutCampaigns: true
          })
 
@@ -56,7 +57,7 @@ export const makeAppContextProvider = (StoryElement: React.ElementType, account?
     newChatMessage: '', categories: fromData(defaultResourceCategories), account, unreadNotifications: [],
     chatMessagesSubscription: undefined, lastConversationChangeTimestamp: 0, connecting: undefined, 
     apolloClient: undefined, unreadConversations: [],
-    notificationReceivedHandler: undefined, lastResourceChangedTimestamp: new Date().valueOf() }}>
+    notificationReceivedHandler: undefined, lastResourceChangedTimestamp: new Date().valueOf(), messageReceivedHandler: () => {} }}>
     <StoryElement />
 </AppContextProvider>
 
@@ -174,9 +175,7 @@ export const singleResource = (id?: number, isDeleted: boolean = false, threeIma
         title,
         created: new Date(2022, 1, 1),
         deleted: isDeleted ? new Date() : null,
-        suspended: null,
         price: null,
-        paidUntil: null,
         accountByAccountId: {
             email: 'me@me.com',
             id: 12,

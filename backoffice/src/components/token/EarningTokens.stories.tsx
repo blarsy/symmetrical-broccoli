@@ -36,8 +36,6 @@ export const NoCampaignVanillaAccount: Story = {
             title: 'Bonbon en sucre 4kg',
             deleted: null,
             expiration: null,
-            suspended: null,
-            paidUntil: null,
             resourcesImagesByResourceId: {
                 nodes: []},
             resourcesResourceCategoriesByResourceId: {
@@ -77,8 +75,6 @@ export const NoCampaignAccountFilled: Story = {
             title: 'Bonbon en sucre 4kg',
             deleted: null,
             expiration: null,
-            suspended: null,
-            paidUntil: null,
             resourcesImagesByResourceId: {
                 nodes: [
                     {
@@ -118,7 +114,7 @@ export const NoCampaignAccountFilled: Story = {
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: null}, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
-    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, willingToContribute: true, name: 'name', unlimitedUntil: null, lastChangeTimestamp: new Date()
+    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
 }
 export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
@@ -139,8 +135,6 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
             title: 'Bonbon en sucre 4kg',
             deleted: null,
             expiration: null,
-            suspended: null,
-            paidUntil: null,
             resourcesImagesByResourceId: {
                 nodes: []},
             resourcesResourceCategoriesByResourceId: {
@@ -158,8 +152,6 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
             title: 'Lot de 10 palettes',
             deleted: null,
             expiration: null,
-            suspended: null,
-            paidUntil: null,
             resourcesImagesByResourceId: {
                 nodes: []},
             resourcesResourceCategoriesByResourceId: {
@@ -193,7 +185,7 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: { nodes: [{ id: 5 }] }}, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
-    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, willingToContribute: true, name: 'name', unlimitedUntil: null, lastChangeTimestamp: new Date()
+    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
 }
 export const NoResourceInCampaign: Story = {

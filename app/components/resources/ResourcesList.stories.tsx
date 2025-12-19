@@ -5,8 +5,8 @@ import { RESOURCES, ResourcesList } from './ResourcesList'
 import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 
-const buildDecoratorList = (resourcesObj: any, willingToContribute: boolean = false) => [
-  paperProviderDecorator, appContextDecorator(false, false, willingToContribute),
+const buildDecoratorList = (resourcesObj: any) => [
+  paperProviderDecorator, appContextDecorator(false, false),
   gestureHandlerDecorator,
   navigationContainerDecorator(),
   searchFilterContextDecorator(), configDayjsDecorator,
@@ -48,22 +48,11 @@ const resourceListWithOneDeleted = {
   } 
 }
 
-const resourceListWithSomeSuspended = {
-  myResources: {
-    nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource', accountByAccountId: { name: 'super artisan' } },
-      { id: 1, title: 'Resource suspendud', description: 'description de la ressource', suspended: new Date(), accountByAccountId: { name: 'super artisan' } },
-      { id: 3, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date(), accountByAccountId: { name: 'super artisan' } },
-      { id: 4, title: 'Autre resource suspendue', description: 'desc', suspended: new Date(), accountByAccountId: { name: 'super artisan' } }
-    ]
-  }
-}
-
 const initialArgs = {
   route: {},
   addRequested: () => console.log('addrequested'),
   editRequested: () =>  console.log('editrequested'),
-  viewRequested: (id) =>  console.log(`viewrequested, id ${id}`)
+  viewRequested: (id: any) =>  console.log(`viewrequested, id ${id}`)
 }
 
 export const SimpleView: Story = {
@@ -84,11 +73,5 @@ export const Empty: Story = {
       nodes: []
     } 
   }),
-  args: initialArgs
-}
-
-export const WithSuspended: Story = {
-  name: 'With some suspended resources',
-  decorators: buildDecoratorList(resourceListWithSomeSuspended, true),
   args: initialArgs
 }

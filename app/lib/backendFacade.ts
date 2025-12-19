@@ -15,8 +15,6 @@ export const GraphQlLib = {
               title
               deleted
               expiration
-              suspended
-              paidUntil
               resourcesImagesByResourceId {
                 nodes {
                   imageByImageId {
@@ -88,11 +86,6 @@ export const GraphQlLib = {
           createResource(
             input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
           ) {
-            integer
-          }
-        }`,
-        SWITCH_TO_CONTRIBUTION_MODE: gql`mutation SwitchToContributionMode {
-          switchToContributionMode(input: {}) {
             integer
           }
         }`,

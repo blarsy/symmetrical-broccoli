@@ -1,16 +1,10 @@
 import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
-import { AppWithScreens, executeQuery } from "./lib"
+import { AppWithScreens } from "./lib"
 import { SearchResults } from "@/components/mainViews/Search"
-import { cleanupSearchableResources, getTestNum, searchableResourceTitles, setupSearchableResources } from "./datastoreSetupLib"
+import { cleanupSearchableResources, getTestNum, SearchableResources, searchableResourceTitles, setupSearchableResources } from "./datastoreSetupLib"
 
-let searchableData: {
-    accounts: {
-        name: string;
-        token: string;
-    }[];
-    resourceIds: [number, number, number, number, number, number, number];
-}
+let searchableData: SearchableResources
 
 beforeAll(async () => {
     searchableData = await setupSearchableResources(getTestNum())
@@ -33,7 +27,6 @@ test('Search on resource text (account name)', async () => {
         .toHaveTextContent(searchableResourceTitles[1])
     
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[0]}:Title`)).not.toBeOnTheScreen()
-    expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[6]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[5]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[3]}:Title`)).not.toBeOnTheScreen()
@@ -49,7 +42,6 @@ test('Search on resource text (account name)', async () => {
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[1]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[2]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[3]}:Title`)).not.toBeOnTheScreen()
-    expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[6]}:Title`)).not.toBeOnTheScreen()
 })
 
 const searchAndCheck = async (term: string, match: [number, number], nonMatches: number[]) => {
@@ -124,19 +116,4 @@ test('Search on resource attributes', async () => {
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[3]}:Title`)).not.toBeOnTheScreen()
     expect(screen.queryByTestId(`FoundResource:${searchableData.resourceIds[4]}:Title`)).not.toBeOnTheScreen()
     
-})
-
-test('search results should exclude suspended resources', async () => {
-    render(<AppWithScreens screens={[{ component: SearchResults, name: 'searchResults' }]} />)
-
-    await waitFor(() => expect(screen.getByTestId('categories:Button')).toBeOnTheScreen())
-
-    const suspendedResQuery = await executeQuery(`SELECT title FROM sb.resources WHERE id = ${searchableData.resourceIds[6]}`)
-    const resName = suspendedResQuery.rows[0].title
-    
-    fireEvent.changeText(screen.getByTestId('searchText'), resName)
-
-    await waitFor(() => expect(screen.getByTestId(`foundResources:Loader`)).toBeOnTheScreen())
-    await waitFor(() => expect(screen.queryByTestId(`foundResources:Loader`)).not.toBeOnTheScreen())
-    await waitFor(() => expect(screen.getByTestId(`foundResources:NoData`)).toBeOnTheScreen())
 })

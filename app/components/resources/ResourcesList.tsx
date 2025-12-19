@@ -16,7 +16,6 @@ import NoResourceYet from "./NoResourceYet"
 import { WhiteButton } from "../layout/lib"
 import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import { GraphQlLib } from "@/lib/backendFacade"
-import ContributeDialog from "../tokens/ContributeDialog"
 import BareIconButton from "../layout/BareIconButton"
 import Images from "@/Images"
 import { useFocusEffect } from "@react-navigation/native"
@@ -24,7 +23,6 @@ import { primaryColor } from "../layout/constants"
 import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 
-const NUMBER_OF_FREE_RESOURCES = 2
 export const RESOURCES = gql`query MyResources {
   myResources {
     nodes {
@@ -40,7 +38,6 @@ export const RESOURCES = gql`query MyResources {
       canBeGifted
       canBeDelivered
       deleted
-      suspended
       price
       accountByAccountId {
         id
@@ -94,7 +91,6 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const appDispatch = useContext(AppDispatchContext)
     const appAlertDispatch = useContext(AppAlertDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
-    const [explainingContributionMode, setExplainingContributionMode] = useState<{ callback: (() => void) | undefined }>({ callback: undefined })
     const [resources, setResources] = useState<Resource[]>([])
     const [deletingResource, setDeletingResource] = useState(0)
     const editResourceContext = useContext(EditResourceContext)
@@ -127,18 +123,6 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
       }
     }, [data, appContext.lastResourceChangedTimestamp])
 
-    const ensureContributionExplained = (resources: Resource[], cb: () => void) => {
-      if(resources.filter((res => !res.deleted && ((res.expiration && new Date(res.expiration) > new Date()) || res.expiration === null))).length < NUMBER_OF_FREE_RESOURCES){
-        cb()
-      } else {
-        if(!appContext.account!.willingToContribute && (!appContext.account?.unlimitedUntil || appContext.account?.unlimitedUntil < new Date())) {
-          setExplainingContributionMode({ callback: cb })
-        } else {
-          cb()
-        }
-      }
-    }
-
     const ensureCampaignsExplained = (cb: () => void) => {
       if(!appContext.account?.knowsAboutCampaigns) {
         setShowCampaignExplanationCallback({ callback: () => {
@@ -168,9 +152,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
         { appContext.account ? <>
           { activeCampaign.data && <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 6, gap: 6 }}>
             <TouchableOpacity style={{ flexDirection: 'row', backgroundColor: primaryColor, padding: 15, borderRadius: 15, borderColor: '#000', borderWidth: 1, gap: 6, alignItems: 'center' }} onPress={() => {
-              ensureContributionExplained(resources, () => {
                 ensureCampaignsExplained(() => addRequested(activeCampaign.data!.id))
-              })
             }}>
               <Icon source="plus" size={25} color="#fff"/>
               <View style={{ flexDirection: 'column' }}>
@@ -183,9 +165,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
             }} />
           </View> }
             <AppendableList testID="ResourcesAppendableList" state={{ data: resources, loading, error } as LoadState} dataFromState={state => state.data}
-              onAddRequested={() => {
-                ensureContributionExplained(resources, addRequested)
-              }} onRefreshRequested={() => {
+              onAddRequested={() => addRequested()} onRefreshRequested={() => {
                 refetch()
               }} noDataLabel={<NoResourceYet/>}
               contentContainerStyle={{ gap: 8, padding: aboveMdWidth() ? 20 : 5, flexDirection: 'row', 
@@ -220,11 +200,6 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 setDeletingResource(0)
               }
             }} onDismiss={() => setDeletingResource(0)}/>
-        <ContributeDialog testID="SwitchToContributionModeDialog" onBecameContributor={() => {
-          explainingContributionMode.callback!()
-          setExplainingContributionMode({ callback: undefined })
-        }} onDismiss={() => setExplainingContributionMode({ callback: undefined })} visible={!!explainingContributionMode.callback}
-            title={t('contributionExplainationDialogTitle')} />
         <CampaignExplanationDialog onDismiss={() =>{
           showCampaignExplanationCallback.callback!()
           setShowCampaignExplanationCallback({ callback: undefined})

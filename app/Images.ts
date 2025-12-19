@@ -5,7 +5,6 @@ import BackgroundChat from './assets/img/background-chat.svg'
 import Bell from './assets/img/BELL.svg'
 import BidReceived from './assets/img/bid-received.svg'
 import Bin from './assets/img/BIN.svg'
-import Broke from './assets/img/broke.svg'
 import Camera from './assets/img/CAMERA.svg'
 import Campaign from './assets/img/campaign.svg'
 import Caret from './assets/img/CARET.svg'
@@ -39,7 +38,6 @@ import Remove from './assets/img/REMOVE.svg'
 import Search from './assets/img/LOUPE.svg'
 import Send from './assets/img/SEND.svg'
 import Sent from './assets/img/ENVOYE.svg'
-import Suspended from './assets/img/suspended.svg'
 import Thanks from './assets/img/thanks.svg'
 import ThumbUp from './assets/img/thumb-up.svg'
 import TimeUp from './assets/img/time-up.svg'
@@ -56,7 +54,6 @@ export default {
     Bell,
     BidReceived,
     Bin,
-    Broke,
     Camera,
     Campaign,
     Caret,
@@ -90,7 +87,6 @@ export default {
     Search,
     Send, 
     Sent,
-    Suspended,
     Thanks,
     ThumbUp,
     TimeUp,

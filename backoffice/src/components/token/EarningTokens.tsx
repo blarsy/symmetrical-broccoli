@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import { gql, useQuery } from "@apollo/client"
-import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/constants"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD } from "@/lib/constants"
 import { CircularProgress, IconButton, Stack, Typography } from "@mui/material"
 import Check from '@/app/img/CHECK.svg'
 import Smiley from '@mui/icons-material/SentimentSatisfiedAlt'
@@ -190,13 +190,6 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
     }, [appContext.account])
 
     return <LoadedZone loading={loading || resWithoutPicsLoading} containerStyle={{ gap: '0.25rem' }} error={error || resWithoutPicsError || resWithoutPriceError}>
-        <OneTimeTask text={t('howToGet_switchToContributionMode')} 
-            checked={!!appContext.account?.willingToContribute} 
-            onClick={() => {
-                setExplainingToken(true)
-                onSomeTaskClicked && onSomeTaskClicked()
-            }} reward={SWITCH_TO_CONTRIBUTION_MODE_REWARD}/>
-        <Divider />
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
             onClick={() => {

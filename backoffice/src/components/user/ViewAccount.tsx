@@ -15,6 +15,7 @@ import useCategories from "@/lib/useCategories"
 import { GET_ACCOUNT_PUBLIC_INFO } from "@/lib/apolloClient"
 import { urlFromPublicId } from "@/lib/images"
 import { fonts } from "@/theme"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 interface Props {
     accountId: number
@@ -24,6 +25,7 @@ interface Props {
 const ViewAccount = (p: Props) => {
     const { data, loading, error } = useQuery(GET_ACCOUNT_PUBLIC_INFO, { variables: { id: p.accountId } })
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [tokenTransferInfo, setTokenTransferInfo] = useState<TokenTransferInfo>()
     const [accountResources, setAccountResources] = useState<Resource[]>([])
     useCategories()
@@ -31,7 +33,7 @@ const ViewAccount = (p: Props) => {
     useEffect(() => {
         if(data && data.getAccountPublicInfo.resourcesByAccountId.nodes && uiContext.categories.data) {
             setAccountResources(data.getAccountPublicInfo.resourcesByAccountId.nodes
-                .filter((res: any) => !res.deleted && (dayjs(res.expiration).toDate() > new Date()) || !res.expiration)
+                .filter((res: any) => !(res.deleted || (res.expiration && dayjs(res.expiration).toDate() < new Date())))
                 .map((res:any) => fromServerGraphResource(res, uiContext.categories.data!)))
         }
     }, [data, uiContext.categories.data])
@@ -44,13 +46,13 @@ const ViewAccount = (p: Props) => {
                 <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.getAccountPublicInfo.name}
                     avatarImagePublicId={data.getAccountPublicInfo.imageByAvatarImageId?.publicId} />
                 <Typography flex="1" color="primary" textTransform="uppercase" fontWeight="bold" fontFamily={fonts.title.style.fontFamily} fontSize="3rem" textAlign="center">{data.getAccountPublicInfo.name}</Typography>
-                <IconButton color="primary" onClick={() => {
+                {appContext.account?.id != data.getAccountPublicInfo.id && <IconButton color="primary" onClick={() => {
                   setTokenTransferInfo({ destinatorAccount: data.getAccountPublicInfo.name, 
                     destinatorId: data.getAccountPublicInfo.id
                   })
                 }}>
                   <GiveIcon sx={{ fontSize: '3rem' }} />
-                </IconButton>
+                </IconButton>}
             </Stack>
             { data.getAccountPublicInfo.imageByAvatarImageId?.publicId &&
                 <Stack alignItems="center">

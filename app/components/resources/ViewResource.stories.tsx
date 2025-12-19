@@ -110,7 +110,7 @@ export const OwnResource: Story = {
       result: simpleResource(1, false, false, true, 'Un titre de ressource', 'Super artisan')
     }]),
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date(), amountOfTokens: 0, willingToContribute: false, unreadConversations: [1,2,3], lastChangeTimestamp: new Date(), unlimitedUntil: null, unreadNotifications: [1,2,3] })
+        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date(), amountOfTokens: 0, unreadConversations: [1,2,3], lastChangeTimestamp: new Date(), unreadNotifications: [1,2,3], numberOfExternalAuthProviders: 0, knowsAboutCampaigns: false })
   ],
   args: initialArgs,
 }

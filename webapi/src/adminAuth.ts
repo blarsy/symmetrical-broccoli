@@ -38,6 +38,7 @@ export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res
                 
                 if(qryRes.rowCount != 1) {
                     // fail silently
+                    logger.error(`${req.body.publickey} not recognized as authorized admin public key`, {})
                     res.send({token: ''})
                     return
                 }
@@ -45,6 +46,7 @@ export default (app: Express, pool: Pool, corsMiddleware: (req: CorsRequest, res
 
                 if(adminPubKey != req.body.publickey) {
                     // fail silently
+                    logger.error('Failure to verify signature of given challenge.', {})
                     res.send({token: ''})
                     return
                 }

@@ -1,4 +1,4 @@
-import { alpha, Box, Checkbox, FormControlLabel, FormGroup, IconButton, Stack, SxProps, TextField, Theme, Typography, useTheme } from "@mui/material"
+import { alpha, Checkbox, FormControlLabel, FormGroup, IconButton, Stack, SxProps, TextField, Theme, Typography, useTheme } from "@mui/material"
 import { ErrorMessage, Form, Formik } from "formik"
 import { useContext, useState } from "react"
 import * as yup from 'yup'
@@ -13,14 +13,13 @@ import useCategories from "@/lib/useCategories"
 import Edit from "@mui/icons-material/Edit"
 import CategoriesDialog from "../form/CategoriesDialog"
 import EditAddress from "../user/EditAddress"
-import { ApolloError, gql, useMutation } from "@apollo/client"
+import { gql, useMutation } from "@apollo/client"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
 import EditImages from "./EditImages"
 import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
-import ExplainToken from "../token/ExplainToken"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 
 interface Props {
@@ -41,12 +40,6 @@ export const CREATE_RESOURCE = gql`mutation CreateResource($categoryCodes: [Int]
     input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
     ) {
     integer
-    }
-}`
-
-export const SWITCH_TO_CONTRIBUTION_MODE = gql`mutation SwitchToContributionMode {
-    switchToContributionMode(input: {}) {
-        integer
     }
 }`
 
@@ -77,8 +70,6 @@ const EditResource = (p: Props) => {
     const [editedCategories, setEditedCategories] = useState<Category[] | undefined>(undefined)
     const [createResource] = useMutation(CREATE_RESOURCE)
     const [updateResource] = useMutation(UPDATE_RESOURCE)
-    const [switchToContributionMode] = useMutation(SWITCH_TO_CONTRIBUTION_MODE)
-    const [explainingToken, setExplainingToken] = useState(false)
     const { activeCampaign } = useActiveCampaign()
     const theme = useTheme()
 
@@ -110,17 +101,7 @@ const EditResource = (p: Props) => {
                 await trySave(values)
                 router.push('.')
             } catch(e) {
-                if((e as ApolloError).message === 'ACCOUNT_CANNOT_CREATE_NON_FREE_RESOURCES') {
-                    try{
-                        await switchToContributionMode()
-                        await trySave(values)
-                        setExplainingToken(true)
-                    } catch(e2) {
-                        setSaveState(fromError(e2, uiContext.i18n.translator('requestError')))
-                    }
-                } else {
-                    setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
-                }
+                setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }} validationSchema={yup.object().shape({
             title: yup.string().max(30, t('max30Chars')).required(t('required_field')),
@@ -277,7 +258,6 @@ const EditResource = (p: Props) => {
                     
                 </Form>}
         </Formik> }
-        <ExplainToken visible={explainingToken} pureExplain onClose={() => router.push('.')} />
     </LoadedZone>
 }
 

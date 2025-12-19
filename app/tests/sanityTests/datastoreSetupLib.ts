@@ -40,14 +40,12 @@ export interface NewAccountData {
     id: number
 }
 
-export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false, contributor: boolean = false, unlimited: boolean = false): Promise<NewAccountData> => {
+export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false): Promise<NewAccountData> => {
     let client = getApolloClient('')
     try {
         const res = await client.mutate({ mutation: GraphQlLib.mutations.REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
         client = getApolloClient(res.data.registerAccount.jwtToken)
-        if(contributor) await client.mutate({ mutation: GraphQlLib.mutations.SWITCH_TO_CONTRIBUTION_MODE })
-        if(unlimited) await executeQuery('UPDATE sb.accounts SET unlimited_until = $1 WHERE email = $2', [new Date(new Date().valueOf() + 1000 * 50 * 50 * 24 * 365), email])
         const idRow = await executeQuery('SELECT id from sb.accounts WHERE lower(email) = $1', [email])
         return { token: (res.data.registerAccount.jwtToken as string), id: idRow.rows[0].id }
     } catch (e) {
@@ -129,18 +127,17 @@ export const createResource = async (jwtToken: string, title: string, descriptio
 interface ResourceRawData {
     title: string, description?: string, expiration: Date, accountId: number, created?: Date, 
     isService?: boolean, isProduct?: boolean, canBeDelivered?: boolean, canBeTakenAway?: boolean, 
-    canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date, suspended?: Date, paidUntil?: Date,
+    canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date,
     campaignIdToJoin?: number
 }
 
 export const createResourceLowLevel = async (res: ResourceRawData): Promise<number> => {
     const result = await executeQuery(`INSERT INTO sb.resources
-        (title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, deleted, suspended, paid_until)
-	    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) returning id`, [
+        (title, description, expiration, account_id, created, is_service, is_product, can_be_delivered, can_be_taken_away, can_be_exchanged, can_be_gifted, deleted)
+	    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) returning id`, [
             res.title, res.description || 'description', res.expiration, res.accountId, res.created || new Date(),
             res.isService || false, res.isProduct || false, res.canBeDelivered || false, res.canBeTakenAway || false, 
-            res.canBeExchanged || false, res.canBeGifted || false, res.deleted || null, res.suspended || null, 
-            res.paidUntil || null
+            res.canBeExchanged || false, res.canBeGifted || false, res.deleted || null
         ])
     
     if(res.campaignIdToJoin) {
@@ -178,14 +175,6 @@ const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesReward
 export const applyResourceRewards = async (jwtToken: string, accountId: number) => {
     const loggedInClient = getApolloClient(jwtToken)
     return loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
-}
-
-export const setResourceData = async (id: number, dates:{ suspended?: Date, deleted?: Date, paid_until?: Date, created?: Date}) => {
-    const sets = Object.entries(dates).map(([name, date], idx) => `${name} = $${idx + 2}`)
-    const vals = Object.entries(dates).map(([name, date]) => date)
-    await executeQuery(`update sb.resources r
-        set ${sets.join(',')}
-        where r.id = $1`, [ id, ...vals])
 }
 
 const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
@@ -236,12 +225,15 @@ export const makeTestAccountInfo = (amount: number): TestAccountInfo[] => {
 export interface TestAccountInput {
     confirm?: boolean
     contributor?: boolean
-    unlimited?: boolean
+    initialTokenAmount?: number
 }
 
 export const makeTestAccounts = (inputs: TestAccountInput[]): Promise<TestAccount[]> => {
     return Promise.all(makeTestAccountInfo(inputs.length).map(async (accountInfo, idx) => {
-        const accountData = await createAndLogIn(accountInfo.email, accountInfo.name, defaultPassword, inputs[idx].confirm, inputs[idx].contributor, inputs[idx].unlimited)
+        const accountData = await createAndLogIn(accountInfo.email, accountInfo.name, defaultPassword, inputs[idx].confirm)
+        if(inputs[idx].initialTokenAmount) {
+            await executeQuery('update sb.accounts set amount_of_tokens = $1 where id = $2', [inputs[idx].initialTokenAmount, accountData.id])
+        }
         return {
             info: accountInfo,
             data: accountData
@@ -253,12 +245,12 @@ export const cleanupTestAccounts = (accounts: TestAccount[]) => {
     return Promise.all(accounts.map(account => deleteAccount(account.info.email, defaultPassword)))
 }
 
-interface SearchableResources {
+export interface SearchableResources {
     accounts: {
         name: string;
         token: string;
     }[];
-    resourceIds: [number, number, number, number, number, number, number];
+    resourceIds: [number, number, number, number, number, number];
 }
 
 export const searchableResourceTitles = [
@@ -271,8 +263,8 @@ export const setupSearchableResources = async (testNum: string): Promise<Search
     const dateInFuture = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 4)
 
     const accounts = await Promise.all([ 
-        createAndLogIn(`me${testNum}-1@me.com`, searchableAccountNames[0], password, true, true),
-        createAndLogIn(`me${testNum}-2@me.com`, searchableAccountNames[1], password, true, true)
+        createAndLogIn(`me${testNum}-1@me.com`, searchableAccountNames[0], password, true),
+        createAndLogIn(`me${testNum}-2@me.com`, searchableAccountNames[1], password, true)
     ])
 
     const accountNames = [
@@ -287,9 +279,7 @@ export const setupSearchableResources = async (testNum: string): Promise<Search
         createResource(accounts[1].token, `${searchableAccountNames[1]}-1`, 'desc', false, true, false, true, false, false, new Date(), [2]),
         createResource(accounts[1].token, searchableResourceTitles[2], 'desc', false, true, false, true, false, false, dateInFuture, [2, 10]),
         createResource(accounts[1].token, searchableResourceTitles[3], 'desc', true, true, true, true, true, true, dateInFuture, [10]),
-        createResource(accounts[1].token, `suspended res`, 'desc', true, false, true, false, true, false, dateInFuture, [10]),
     ])
-    await setResourceData(resourceIds[6], { suspended: new Date() })
 
     return { accounts: accountNames.map((acc) => ({ name: acc.name, token: acc.data.token })), resourceIds }
 }

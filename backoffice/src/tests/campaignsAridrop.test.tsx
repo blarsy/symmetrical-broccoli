@@ -15,7 +15,7 @@ jest.mock('next/navigation', () => ({
 }))
 
 beforeEach(async () => {
-    accounts = [account1, account2, account3] = await makeTestAccounts([{ confirm: true, contributor: true },{ confirm: true, contributor: true },{ confirm: true, contributor: true }])
+    accounts = [account1, account2, account3] = await makeTestAccounts([{ confirm: true, contributor: true, initialTokenAmount: 30 },{ confirm: true, contributor: true, initialTokenAmount: 30 },{ confirm: true, contributor: true }])
 
     const campaignId = await createCampaign('test campaign airdrop', 'description for test campaign airdrop', new Date(new Date().valueOf() - 100), 5000, 6, fromToday(-2),  fromToday(4))
 
@@ -49,9 +49,9 @@ test('campaign airdrop is distributed', async () => {
     expect(match.rowCount).toEqual(1)
     expect(match.rows[0].count).toEqual('1')
 
-    await checkAccountTokens(account1.info.email, 29)
-    await checkAccountTokens(account2.info.email, 29)
-    await checkAccountTokens(account3.info.email, 5029)
+    await checkAccountTokens(account1.info.email, 30)
+    await checkAccountTokens(account2.info.email, 30)
+    await checkAccountTokens(account3.info.email, 5000)
 
 })
 

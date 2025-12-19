@@ -12,16 +12,6 @@ export const makeNotificationInfo = (data: any, t: TFunction<"translation", unde
                 title: t('pleaseCompleteProfile'),
                 summary: t('benefitsOrFillingProfile')
             }
-        case 'SOME_RESOURCES_SUSPENDED':
-            return {
-                title: t('someResourcesSuspended'),
-                summary: t('resourcesSuspendedSummary')
-            }
-        case 'WARNING_LOW_TOKEN_AMOUNT':
-            return {
-                title: t('warningLowAmountOfToken'),
-                summary: t('summaryLowAmountOfToken')
-            }
         case 'TOKENS_RECEIVED':
             return {
                 title: t('tokenReceived'),

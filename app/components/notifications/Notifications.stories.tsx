@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import Notifications, { GET_NOTIFICATIONS, GET_RESOURCES } from './Notifications'
-import React  from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator, singleResource } from '@/lib/storiesUtil'
 import { daysFromNow } from '@/lib/utils'
 
@@ -17,20 +16,6 @@ const meta: Meta<typeof Notifications> = {
                     created: daysFromNow(-2),
                     data: { info: 'COMPLETE_PROFILE' },
                     id: 1,
-                    read: null
-                },
-              },{
-                node: {
-                    created: daysFromNow(-1.5),
-                    data: { info: 'SOME_RESOURCES_SUSPENDED' },
-                    id: 2,
-                    read: null
-                },
-              },{
-                node: {
-                    created: daysFromNow(-1),
-                    data: { info: 'WARNING_LOW_TOKEN_AMOUNT' },
-                    id: 3,
                     read: null
                 },
               },{

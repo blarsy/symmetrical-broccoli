@@ -75,7 +75,7 @@ const CampaignExplanationDialog = (p: Props) => {
                             <Text variant="bodyLarge">{t('create2ResourcesOnCampaign')}</Text>
                             <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
                             { dayjs(p.campaign.airdrop) > dayjs(new Date()) ?
-                                <View style={{ gap: 10 }}>
+                                <View style={{ gap: 40 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
                                         <Text variant="bodyLarge">{dayjs(p.campaign.airdrop).fromNow()}</Text>
                                         <Images.TimeUp height={35} width={35}/>

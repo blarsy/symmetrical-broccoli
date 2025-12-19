@@ -25,11 +25,11 @@ export interface GraphQlOp {
 
 const defaultAccount: AccountInfo = {
     id: 123, name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
-    willingToContribute: true, amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
-    unlimitedUntil: null, avatarPublicId: '', knowsAboutCampaigns: false
+    amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
+    avatarPublicId: '', knowsAboutCampaigns: false
 }
 
-export const makeDbRresource = (title: string, description: string, deleted: Date | null, creatorName: string, imagesPublicIds: string[], expiration: Date | null = null, suspended: Date | null = null) => ({
+export const makeDbRresource = (title: string, description: string, deleted: Date | null, creatorName: string, imagesPublicIds: string[], expiration: Date | null = null) => ({
     id: new Date().valueOf(),
     expiration: null,
     description,
@@ -42,7 +42,6 @@ export const makeDbRresource = (title: string, description: string, deleted: Dat
     canBeGifted: true,
     canBeDelivered: true,
     deleted,
-    suspended,
     price: 0,
     accountByAccountId: {
         id: new Date().valueOf(),

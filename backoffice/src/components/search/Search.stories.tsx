@@ -9,9 +9,7 @@ const makeResourceData = (id: number, title: string, description: string, accoun
   id,
   title,
   description,
-  suspended: null,
   price: null,
-  paidUntil: null,
   accountByAccountId: {
     id,
     name: accountName,

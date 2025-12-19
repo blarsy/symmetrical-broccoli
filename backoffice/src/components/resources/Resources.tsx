@@ -1,5 +1,5 @@
-import { Button, Card, CardActions, CardContent, Dialog, IconButton, Typography } from '@mui/material'
-import { Stack, useTheme } from '@mui/material'
+import { Button, Card, CardActions, CardContent, IconButton, Typography } from '@mui/material'
+import { Stack } from '@mui/material'
 import { useContext, useState } from 'react'
 import PlusIcon from '@mui/icons-material/Add'
 import CampaignIcon from '@/app/img/campaign.svg'
@@ -19,7 +19,6 @@ import { primaryColor } from '@/utils'
 import dayjs from 'dayjs'
 import useActiveCampaign from '@/lib/useActiveCampaign'
 import ExplainCampaignDialog from '../user/ExplainCampaignDialog'
-import SuspensionHelp from './SuspensionHelp'
 
 export const RESOURCES = gql`query MyResources {
     myResources {
@@ -36,7 +35,6 @@ export const RESOURCES = gql`query MyResources {
         canBeGifted
         canBeDelivered
         deleted
-        suspended
         price
         accountByAccountId {
           id
@@ -82,8 +80,6 @@ interface ResourceCardProps {
   title: string
   images: { alt: string, uri: string }[]
   isExample?: boolean
-  isSuspended?: boolean
-  onSuspensionHelpRequested: () => void
 }
 
 const ResourceCard = (p: ResourceCardProps) => {
@@ -126,13 +122,6 @@ const ResourceCard = (p: ResourceCardProps) => {
       variant="overline">
       {uiContext.i18n.translator('ExampleLabel')}
     </Typography>}
-    { p.isSuspended && <Button onClick={p.onSuspensionHelpRequested} sx={{ position: 'absolute', top: '3rem', left: '2rem', transform: 'rotate(-13deg)' }}>
-        <Typography color="primary.contrastText" 
-          sx={{ backgroundColor: primaryColor, padding: '0rem 0.5rem' }} 
-          variant="overline">
-          {uiContext.i18n.translator('SuspendedLabel')}
-        </Typography>
-      </Button> }
   </Stack>
 }
 
@@ -144,15 +133,15 @@ const ExampleResources = () => {
       <ResourceCard id={1} deleted={false} title={uiContext.i18n.translator('childClothExampleResourceTitle')}
         expiration={dayjs().add(10, 'days').toDate()}
         images={[{ alt: 'example picture', uri: urlFromPublicId('uyn4yzdh6iiqzkrd33py') }]}
-        isExample onSuspensionHelpRequested={() => {}} />
+        isExample />
       <ResourceCard id={2} deleted={false} title={uiContext.i18n.translator('mangasResourceTitle')}
         expiration={dayjs().add(20, 'days').toDate()}
         images={[{ alt: 'example picture', uri: urlFromPublicId('he265cbgcsaqegbdsxy8') }]}
-        isExample onSuspensionHelpRequested={() => {}} />
+        isExample />
       <ResourceCard id={3} deleted={false} title={uiContext.i18n.translator('equipmentForRentResourceTitle')}
         expiration={undefined}
         images={[{ alt: 'example picture', uri: urlFromPublicId('jqmyhsmx1led7nhvilp3') }]}
-        isExample onSuspensionHelpRequested={() => {}} />
+        isExample />
     </Stack>
   </Stack>
 }
@@ -164,7 +153,6 @@ const Resources = () => {
     const [deleteResource] = useMutation(DELETE_RESOURCE)
     const { activeCampaign } = useActiveCampaign()
     const [explainingCampaign, setExplainingCampaign] = useState(false)
-    const [helpingSuspension, setHelpingSuspension] = useState(false)
 
     return <Stack gap="1rem" overflow="auto">
         { activeCampaign.data && <Stack direction="row" justifyContent="center" alignItems="center" gap="0.25rem">
@@ -193,8 +181,7 @@ const Resources = () => {
             renderNoData={ExampleResources}
             renderItem={(res: any) => <ResourceCard key={res.id} id={res.id} deleted={res.deleted} title={res.title} 
               expiration={res.expiration} onImageClicked={(uri: string) => setZoomedImg(uri)}
-              isSuspended={!!res.suspended}
-              onDeleteRequested={() => setDeletingResourceId(res.id)} onSuspensionHelpRequested={() => setHelpingSuspension(true)}
+              onDeleteRequested={() => setDeletingResourceId(res.id)}
               images={res.resourcesImagesByResourceId.nodes.map((img: any, idx: number) => ({ alt: idx, uri: urlFromPublicId(img.imageByImageId.publicId) }))}/>}
         />
         <ZoomedImageDialog zoomedImg={zoomedImg} onClose={() => setZoomedImg('')} />
@@ -206,7 +193,6 @@ const Resources = () => {
           }
           setDeletingResourceId(undefined)
         }} title={uiContext.i18n.translator('confirmDeleteResourceTitle')} />
-        <SuspensionHelp onClose={() => setHelpingSuspension(false)} visible={helpingSuspension} />
     </Stack>
 }
 

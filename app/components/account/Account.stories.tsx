@@ -67,8 +67,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }, {
                 id: 2,
                 canBeExchanged: false,
@@ -88,8 +87,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }, {
                 id: 3,
                 canBeExchanged: true,
@@ -109,8 +107,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }, {
                 id: 4,
                 canBeExchanged: true,
@@ -130,8 +127,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }, {
                 id: 5,
                 canBeExchanged: true,
@@ -151,8 +147,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }, {
                 id: 6,
                 canBeExchanged: true,
@@ -172,8 +167,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 accountByAccountId: {
                     id: accountId
                 },
-                deleted: null,
-                paidUntil: new Date()
+                deleted: null
             }
         ]
     }

@@ -9,7 +9,7 @@ import { View } from "react-native"
 import { gql, useQuery } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
 import BareIconButton from "../layout/BareIconButton"
-import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD, SWITCH_TO_CONTRIBUTION_MODE_REWARD } from "@/lib/settings"
+import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD } from "@/lib/settings"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import dayjs from "dayjs"
 import ContributeDialog from "./ContributeDialog"
@@ -157,9 +157,6 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
 
     return <Card style={{ backgroundColor: lightPrimaryColor, margin: 10, padding: 10 }}
         contentStyle={{ gap: 15 }}>
-        <OneTimeTask text={t('howToGet_switchToContributionMode')} 
-            checked={!!appContext.account?.willingToContribute} 
-            onPress={() => setExplainingToken(true)} reward={SWITCH_TO_CONTRIBUTION_MODE_REWARD}/>
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
             onPress={() => navigation.navigate('main')} reward={ADD_LOGO_REWARD}/>
@@ -188,7 +185,7 @@ const InfoHowToGet = ({ navigation }: { navigation?: any }) => {
         { activeCampaign.data && <PermanentTask key="rewardMultiplier" 
             reward={CREATE_RESOURCE_REWARD * activeCampaign.data.resourceRewardsMultiplier} 
             text={t('howToGet_createResourcesOnCampaign')} onPress={() => navigation.navigate('board', { screen: 'resource', params: { screen: 'resources' } })} />}
-        <ContributeDialog visible={explainingToken} onDismiss={() => setExplainingToken(false)} title={t('contributionExplainationDialogTitle')} />
+        <ContributeDialog visible={explainingToken} onDismiss={() => setExplainingToken(false)} />
     </ Card>
 }
 export default InfoHowToGet

@@ -1,7 +1,7 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { useContext, useEffect, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
-import { Box, Divider, Link, Stack, Theme, Typography } from "@mui/material"
+import { Divider, Link, Stack, Theme, Typography } from "@mui/material"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import DataLoadState, { fromData } from "@/lib/DataLoadState"
@@ -17,7 +17,6 @@ import dayjs from "dayjs"
 
 import Airdrop from '@/app/img/airdrop.svg'
 import BidReceived from '@/app/img/bid-received.svg'
-import Broke from '@/app/img/broke.svg'
 import Campaign from '@/app/img/campaign.svg'
 import Denied from '@/app/img/denied.svg'
 import GiftSent from '@/app/img/gift-sent.svg'
@@ -26,7 +25,6 @@ import GotGift from '@/app/img/got-gift.svg'
 import Hey from '@/app/img/hey.svg'
 import MoneyIn from '@/app/img/money-in.svg'
 import PrizeWon from '@/app/img/prize-won.svg'
-import Suspended from '@/app/img/suspended.svg'
 import Thanks from '@/app/img/thanks.svg'
 import ThumbUp from '@/app/img/thumb-up.svg'
 import TimeUp from '@/app/img/time-up.svg'
@@ -103,8 +101,6 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
             longitude
             id
         }
-        suspended
-        paidUntil
         created
         deleted
         price
@@ -243,18 +239,6 @@ const useNotifications = (version: string) => {
                     otherNotifs.push(
                         createOtherNotification(t('welcomeNotificationHeadline'), t('completeProcessNotificationHeadline'), 
                             t('completeProcessNotificationDetails'), `/webapp/${version}/profile`, rawNotification, Hey)
-                        )
-                    break
-                case 'SOME_RESOURCES_SUSPENDED':
-                    otherNotifs.push(
-                        createOtherNotification(t('resourcesSuspendedNotificationHeadline'), t('checkTokensNotificationHeadline'), 
-                            t('checkTokensNotificationDetails'), `/webapp/${version}/resources`, rawNotification, Suspended)
-                        )
-                    break
-                case 'WARNING_LOW_TOKEN_AMOUNT':
-                    otherNotifs.push(
-                        createOtherNotification(t('lowAmountOfTokenNotificationHeadline'), t('lowAmountOfTokenNotificationHeadline2'), 
-                            t('lowAmountOfTokenNotificationDetails'), `/webapp/${version}/profile/tokens`, rawNotification, Broke)
                         )
                     break
                 case 'TOKENS_RECEIVED':

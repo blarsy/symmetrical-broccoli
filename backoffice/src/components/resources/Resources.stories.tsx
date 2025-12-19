@@ -45,10 +45,6 @@ export const Initialized: Story = {
             'description courte', 
             new Date(new Date().valueOf() - 100000), 'Les patines de Christine', 
             ["itqjuvh6gntgzk7mjmwu"]),
-        makeDbRresource('Resource suspendue', 
-            'description courte', 
-            null, 'Les patines de Christine', 
-            [], null, new Date(new Date().valueOf() - 100000)),
         
         ] } }, variables: {} },
     { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null}, variables: {} },
@@ -73,11 +69,6 @@ export const WithActiveCampaign: Story = {
             'description courte', 
             new Date(new Date().valueOf() - 100000), 'Les patines de Christine', 
             ["itqjuvh6gntgzk7mjmwu"]),
-        makeDbRresource('Resource suspendue', 
-            'description courte', 
-            null, 'Les patines de Christine', 
-            [], null, new Date(new Date().valueOf() - 100000)),
-        
         ] } }, variables: {} },
     { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: defaultCampaign}, variables: {} }
   ])]

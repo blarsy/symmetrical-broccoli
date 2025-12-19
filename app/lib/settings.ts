@@ -38,7 +38,6 @@ export const googleAuthWebClienttId = config.googleAuthWebClienttId
 export const googleAuthIOSClientID = config.googleAuthIOSClientID
 export const diagnostic = config.diagnostic
 
-export const SWITCH_TO_CONTRIBUTION_MODE_REWARD = 30
 export const ADD_LOGO_REWARD = 20
 export const ADD_LOCATION_REWARD = 20
 export const ADD_LINK_REWARD = 20

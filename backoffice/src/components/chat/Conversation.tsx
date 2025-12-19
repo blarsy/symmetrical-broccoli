@@ -54,7 +54,6 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
             accountId
             accountByAccountId {
                 id
-                willingToContribute
                 name
                 imageByAvatarImageId {
                     publicId
@@ -102,8 +101,6 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
             longitude
         }
         created
-        suspended
-        paidUntil
         deleted
       }
     }

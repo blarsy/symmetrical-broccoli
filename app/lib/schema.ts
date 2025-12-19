@@ -5,7 +5,6 @@ export interface Account {
     id: number,
     email: string,
     avatarImageUrl?: string
-    willingToContribute?: boolean
 }
 
 export enum LinkTypes {
@@ -34,12 +33,10 @@ export interface AccountInfo {
     email: string
     avatarPublicId: string
     activated: Date
-    willingToContribute: boolean
     unreadConversations: number[]
     unreadNotifications: number[]
     amountOfTokens: number
     lastChangeTimestamp: Date
-    unlimitedUntil: Date | null
     numberOfExternalAuthProviders: number
     knowsAboutCampaigns: boolean
 }
@@ -78,8 +75,6 @@ export interface Resource {
     canBeDelivered: boolean
     canBeGifted: boolean
     canBeExchanged: boolean
-    suspended?: Date
-    paidUntil?: Date
     created: Date
     deleted: Date | null
     specificLocation: Location | null
@@ -126,12 +121,9 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
             name: rawRes.accountByAccountId.name,
             id: rawRes.accountByAccountId.id,
             email: rawRes.accountByAccountId.email,
-            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId),
-            willingToContribute: rawRes.accountByAccountId.willingToContribute
+            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId)
         },
         deleted: rawRes.deleted && new Date(rawRes.deleted),
-        suspended:  rawRes.suspended && new Date(rawRes.suspended),
-        paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
         campaignId: (rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId) || undefined
@@ -223,8 +215,7 @@ export const fromServerGraphAccount = (rawAccount: any): Account => ({
     name: rawAccount.name,
     id: rawAccount.id,
     email: rawAccount.email,
-    avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId),
-    willingToContribute: rawAccount.willingToContribute
+    avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId)
 })
 
 export const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {

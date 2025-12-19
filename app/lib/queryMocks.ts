@@ -60,9 +60,7 @@ const makeSearchResourceResult = (resources: Resource[]) => resources.map(resour
           resourceCategoryCode: cat.code
         }))
     },
-    locationBySpecificLocationId: null,
-    paidUntil: null,
-    suspended: null
+    locationBySpecificLocationId: null
 }))
 
 const makeGetResourceGraphQlOp = (res: Resource) => ({

@@ -35,7 +35,6 @@ export interface Account {
     id: number,
     email: string,
     avatarImagePublicId?: string
-    willingToContribute?: boolean
 }
 
 export interface ImageInfo {
@@ -62,8 +61,6 @@ export interface Resource {
     canBeDelivered: boolean
     canBeGifted: boolean
     canBeExchanged: boolean
-    suspended?: Date
-    paidUntil?: Date
     created: Date
     deleted: Date | null
     specificLocation: Location | null
@@ -75,8 +72,7 @@ export const fromServerGraphAccount = (rawAccount: any): Account => ({
     name: rawAccount.name,
     id: rawAccount.id,
     email: rawAccount.email,
-    avatarImagePublicId: rawAccount.imageByAvatarImageId ? rawAccount.imageByAvatarImageId.publicId : '',
-    willingToContribute: rawAccount.willingToContribute
+    avatarImagePublicId: rawAccount.imageByAvatarImageId ? rawAccount.imageByAvatarImageId.publicId : ''
 })
 
 export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
@@ -94,8 +90,6 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         categories: resourceCategories, 
         account: fromServerGraphAccount(rawRes.accountByAccountId),
         deleted: rawRes.deleted && new Date(rawRes.deleted),
-        suspended:  rawRes.suspended && new Date(rawRes.suspended),
-        paidUntil: rawRes.paidUntil && new Date(rawRes.paidUntil),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
         campaignId: (rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId) || undefined

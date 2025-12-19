@@ -55,7 +55,7 @@ test('Setting account address gives reward', async () => {
     // back and forth navigator-managed screens by switching their visibility (aria-hidden attribute), instead
     // of unmounting / mounting the pages. In this test, it simply never 
     const tokenCounter = await screen.findByTestId('TokenCounter:AmountOfTokens', { includeHiddenElements: true })
-    expect(tokenCounter).toHaveTextContent('X50')
+    expect(tokenCounter).toHaveTextContent('X20')
 
     expect(checkAccountAddress('Dummy address', DEFAUT_LOCATION.latitude, DEFAUT_LOCATION.longitude, testAccount.data.id)).toBeTruthy()
 })

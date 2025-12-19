@@ -4,7 +4,7 @@ import userEvent, { UserEvent } from '@testing-library/user-event'
 import dayjs from "dayjs"
 import { checkLastNotificationOnAccount, cleanupTestAccounts, createResource, executeQuery, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
 import BidsPage from "@/app/webapp/[version]/bids/page"
-import ViewResourcePage from "@/app/webapp/[version]/view/[id]/page"
+import ViewResourcePage from "@/components/resources/ViewResourcePage"
 import NotifsPage from "@/app/webapp/[version]/notifications/page"
 import ContribPage from "@/app/webapp/[version]/profile/tokens/page"
 
@@ -26,7 +26,7 @@ jest.mock('next/navigation', () => ({
 
 beforeEach(async () => {
     //create 2 accounts
-    accounts = await makeTestAccounts([{ confirm: true, contributor: true }, { confirm: true, contributor: true }])
+    accounts = await makeTestAccounts([{ confirm: true, contributor: true }, { confirm: true, contributor: true, initialTokenAmount: 30 }])
     //create resource on account 1
     resourceTitle = `Test res ${accounts[0].info.name}`
     resourceId = await createResource(accounts[0].data.token, resourceTitle, 'desc', true, true, true, false, true, false, dayjs().add(10, "days").toDate(), [1])
@@ -78,8 +78,9 @@ const createBidUsingUi = async (token: string, event: UserEvent) => {
     
     await event.click(viewResPage.getByTestId('CreateBidButton'))
     await waitFor(() => expect(viewResPage.getByTestId('CreateBidSuccess')).toBeInTheDocument())
-
+        
     return viewResPage
+
 }
 
 test('create a bid', async () => {
@@ -127,7 +128,7 @@ test('accept a bid', async () => {
     await waitFor(() => expect(account0bidPage.queryByTestId(`BidReceived:${bidId}:ConfirmDialog:ConfirmButton`)).not.toBeInTheDocument())
 
     //Token amount changed
-    await waitFor(() => expect(account0bidPage.getByTestId('TokenCounter',{  })).toHaveTextContent('50'))
+    await waitFor(() => expect(account0bidPage.getByTestId('TokenCounter',{  })).toHaveTextContent('20'))
 
     //Bid disappeared from accepter list
     expect(account0bidPage.queryByTestId(`BidReceived:${bidId}`)).toBeNull()
@@ -168,7 +169,7 @@ test('refuse a bid', async () => {
     await waitForAndClick(`BidReceived:${bidId}:RefuseButton`, event, account0bidPage)
     
     //Token amount of refuser not changed
-    await waitFor(() => expect(account0bidPage.getByTestId('TokenCounter')).toHaveTextContent('30'))
+    await waitFor(() => expect(account0bidPage.getByTestId('TokenCounter')).toHaveTextContent('0'))
 
     //Bid disappeared from refuser list
     await waitFor(() => expect(account0bidPage.queryByTestId(`BidReceived:${bidId}`)).not.toBeInTheDocument())

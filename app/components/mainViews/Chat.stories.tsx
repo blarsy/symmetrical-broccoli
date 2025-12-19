@@ -152,8 +152,6 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 nodes: []
             },
             created: new Date(),
-            paidUntil: null,
-            suspended: null,
             deleted: resourceDeleted ? new Date() : null
         }
     })

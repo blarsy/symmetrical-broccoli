@@ -66,7 +66,6 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
   accountById(id: $otherAccountId) {
     id
     name
-    willingToContribute
     imageByAvatarImageId {
       publicId
     }
@@ -103,8 +102,6 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
       }
     }
     created
-    suspended
-    paidUntil
     deleted
     campaignsResourcesByResourceId {
       nodes {
@@ -118,7 +115,7 @@ export interface ConversationState extends DataLoadState<{
       id: number
       participantId: number
       resource?: Resource
-      otherAccount: { id: number, name: string, willingToContribute: boolean } 
+      otherAccount: { id: number, name: string } 
 } | undefined> {}
 
 export interface conversationMessagesState {
@@ -147,7 +144,7 @@ const blankConversationState: ConversationState = initial(true, {
   id: 0,
   participantId: 0,
   resource: undefined, 
-  otherAccount: { id: 0, name: '', avatarPublicId: '', willingToContribute: false }
+  otherAccount: { id: 0, name: '', avatarPublicId: '' }
 })
 
 const blankMessagesState: conversationMessagesState = {
@@ -188,8 +185,7 @@ const ConversationContextProvider = ({ children }: Props) => {
                   otherAccount: { 
                     id: res.data.accountById.id, 
                     name: res.data.accountById.name, 
-                    avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId,
-                    willingToContribute: res.data.accountById.willingToContribute
+                    avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId
                   },
                   resource: fromServerGraphResource(res.data.resourceById, categories)
                 }

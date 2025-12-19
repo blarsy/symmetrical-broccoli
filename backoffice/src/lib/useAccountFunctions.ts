@@ -13,10 +13,8 @@ export interface AccountInfo {
     email: string
     avatarPublicId: string
     activated: Date
-    willingToContribute: boolean
     amountOfTokens: number
     lastChangeTimestamp: Date
-    unlimitedUntil: Date | null
     knowsAboutCampaigns: boolean
 }
 
@@ -30,9 +28,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       logLevel
       unreadConversations
       unreadNotifications
-      willingToContribute
       amountOfTokens
-      unlimitedUntil
     }
   }`
 
@@ -81,7 +77,6 @@ export const NOTFICATION_RECEIVED = gql`subscription NotificationSubscription {
 export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     accountChangeReceived {
       account {
-        willingToContribute
         knowsAboutCampaigns
         name
         language
@@ -126,8 +121,6 @@ const useAccountFunctions = (version: string) => {
                     email: payload.data.accountChangeReceived.account.email,
                     id: payload.data.accountChangeReceived.account.id,
                     name: payload.data.accountChangeReceived.account.name,
-                    willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
-                    unlimitedUntil: payload.data.unlimitedUntil || null,
                     knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns
                 }
                 appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
@@ -143,9 +136,7 @@ const useAccountFunctions = (version: string) => {
             email: res.data.getSessionDataWeb.email, 
             avatarPublicId: res.data.getSessionDataWeb.avatarPublicId,
             activated: res.data.getSessionDataWeb.activated,
-            willingToContribute: res.data.getSessionDataWeb.willingToContribute,
             amountOfTokens: res.data.getSessionDataWeb.amountOfTokens,
-            unlimitedUntil: res.data.getSessionDataWeb.unlimitedUntil || null,
             lastChangeTimestamp: new Date(),
             knowsAboutCampaigns: res.data.getSessionDataWeb.knowsAboutCampaigns
         }

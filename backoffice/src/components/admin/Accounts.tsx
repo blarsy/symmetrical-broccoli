@@ -16,12 +16,9 @@ const SEARCH_ACCOUNTS = gql`query SearchAccounts($searchTerm: String, $after: Cu
         id
         created
         language
-        lastSuspensionWarning
         name
         recoveryCode
         recoveryCodeExpiration
-        unlimitedUntil
-        willingToContribute
         logLevel
         locationByLocationId {
           address

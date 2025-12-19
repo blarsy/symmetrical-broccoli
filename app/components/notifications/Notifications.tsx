@@ -89,8 +89,6 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
         longitude
         id
       }
-      suspended
-      paidUntil
       created
       deleted
       price
@@ -228,26 +226,6 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             navigation.navigate('profile')
                         }
                     , Images.Hey))
-                    break
-                case 'SOME_RESOURCES_SUSPENDED':
-                    otherNotifs.push(makeNotificationData(rawNotification, t('resourcesSuspendedNotificationHeadline'),
-                        t('checkTokensNotificationHeadline'), t('checkTokensNotificationDetails'),
-                        () => {
-                            navigation.navigate('resource', {
-                                screen: 'resources'
-                            })
-                        }
-                    , Images.Suspended))
-                    break
-                case 'WARNING_LOW_TOKEN_AMOUNT':
-                    otherNotifs.push(makeNotificationData(rawNotification, t('lowAmountOfTokenNotificationHeadline'),
-                        t('lowAmountOfTokenNotificationHeadline2'), t('lowAmountOfTokenNotificationDetails'),
-                        () => {
-                            navigation.navigate('profile', {
-                                screen: 'tokens'
-                            })
-                        }
-                    , Images.Broke))
                     break
                 case 'TOKENS_RECEIVED':
                     otherNotifs.push(makeNotificationData(rawNotification, t('tokensReceivedHeadline1'),

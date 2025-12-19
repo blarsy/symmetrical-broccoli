@@ -86,7 +86,6 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
     accountByAccountId {
       id
       name
-      willingToContribute
       imageByAvatarImageId {
         publicId
       }
@@ -119,8 +118,6 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
       longitude
       id
     }
-    suspended
-    paidUntil
     created
     deleted
     price
@@ -147,8 +144,6 @@ export const GET_ACCOUNT_PUBLIC_INFO = gql`query Account($id: Int!) {
           description
           deleted
           expiration
-          suspended
-          paidUntil
           resourcesImagesByResourceId {
             nodes {
               imageByImageId {

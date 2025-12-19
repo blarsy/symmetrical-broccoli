@@ -59,14 +59,6 @@ export const checkActivationEmailSent = async (email: string): Promise<string> =
     return /"http(s?):\/\/.*activate\/([^"]*)"/.exec(result.rows[0].html_content)![2]
 }
 
-export const checkAccountWillingToContribute = async (email: string) => {
-    const result = await executeQuery(`select *
-        from sb.accounts
-        where email = lower($1) and willing_to_contribute and amount_of_tokens = 30`, [email])
-
-    return result.rowCount && result.rowCount > 0
-}
-
 export const checkAccountActivated = async (email: string) => {
     const result = await executeQuery(`select *
         from sb.accounts
@@ -98,17 +90,17 @@ export const checkResourcePresent = async (accountEmail: string, title: string, 
         inner join sb.resources_resource_categories rrc on rc.code = rrc.resource_category_code and rc.locale='fr'
         where rrc.resource_id = $1`, [result.rows[0].resource_id])
 
-        expect(result.rows[0].description).toBe(description)
-        expect(result.rows[0].is_product).toBe(isProduct)
-        expect(result.rows[0].is_service).toBe(isService)
-        expect(result.rows[0].can_be_delivered).toBe(canBeDelivered)
-        expect(result.rows[0].can_be_taken_away).toBe(canBeTakenAway)
-        expect(result.rows[0].can_be_gifted).toBe(canBeGifted)
-        expect(result.rows[0].can_be_exchanged).toBe(canBeExchanged)
-        expect(result.rows[0].expiration).toEqual(expiration)
-        const cats = await catsPromise
-        expect(cats.rowCount).toBe(categoryCodes.length)
-        categoryCodes.forEach(code => expect((cats.rows as any[]).some(row => row.code === code)).toBe(true))
+    expect(result.rows[0].description).toBe(description)
+    expect(result.rows[0].is_product).toBe(isProduct)
+    expect(result.rows[0].is_service).toBe(isService)
+    expect(result.rows[0].can_be_delivered).toBe(canBeDelivered)
+    expect(result.rows[0].can_be_taken_away).toBe(canBeTakenAway)
+    expect(result.rows[0].can_be_gifted).toBe(canBeGifted)
+    expect(result.rows[0].can_be_exchanged).toBe(canBeExchanged)
+    expect(result.rows[0].expiration).toEqual(expiration)
+    const cats = await catsPromise
+    expect(cats.rowCount).toBe(categoryCodes.length)
+    categoryCodes.forEach(code => expect((cats.rows as any[]).some(row => row.code === code)).toBe(true))
 }
 
 export const checkHasNotifications = async (email: string, uniquePropNames: string[]): Promise<{ notifId: number, uniquePropName: string, uniquePropValue: any }[]> => {

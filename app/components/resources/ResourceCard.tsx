@@ -1,5 +1,5 @@
 import { t } from "i18next"
-import React, { useState } from "react"
+import React from "react"
 import { GestureResponderEvent, StyleProp, TouchableOpacity, View, ViewStyle } from "react-native"
 import { Text } from "react-native-paper"
 import { deletedGrayColor, lightPrimaryColor, primaryColor } from "../layout/constants"
@@ -8,8 +8,6 @@ import { Resource } from "@/lib/schema"
 import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import BareIconButton from "../layout/BareIconButton"
-import { InfoDialog } from "../ConfirmDialog"
-import InfoSuspension from "../tokens/InfoSuspension"
 import { useNavigation } from "@react-navigation/native"
 import Images from '@/Images'
 
@@ -43,7 +41,6 @@ const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
 export default ({ resource, editRequested, deleteRequested, isExample, style, testID}: Props) => {
     const navigation = useNavigation()
-    const [suspensionExplanation, setSuspensionExplanation] = useState(false)
     let size: number
     if(aboveMdWidth()) {
         size = percentOfWidth(31)
@@ -70,14 +67,5 @@ export default ({ resource, editRequested, deleteRequested, isExample, style, te
              style={{ position: 'absolute', backgroundColor: primaryColor, color: '#fff', 
                  transform: [{ rotate: '-15deg' }], paddingVertical: 5, paddingHorizontal: 30,
                  left: 10, top: 10 }}>{t('example')}</Text>}
-        { resource.suspended && <TouchableOpacity onPress={() => setSuspensionExplanation(true)} style={{ position: 'absolute', 
-                transform: [{ rotate: '-10deg' }], right: 'auto', top: 70,
-                backgroundColor: primaryColor, gap: 30,
-                paddingVertical: 5, paddingHorizontal: 30 }}>
-            <Text variant="headlineSmall" style={{ color: '#fff' }}>{t('suspended')}</Text>
-        </TouchableOpacity>}
-        <InfoDialog onDismiss={() => setSuspensionExplanation(false)} visible={ suspensionExplanation }
-            title={t('suspensionExplanationDialogTitle')} buttonCaptionI18n="ok_caption" 
-            content={<InfoSuspension navigation={navigation} />} />
     </View>
 }

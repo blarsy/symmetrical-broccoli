@@ -6571,6 +6571,7 @@ __metadata:
     "@types/react": ~19.0.10
     babel-loader: ^9.1.3
     babel-plugin-module-resolver: ^5.0.2
+    baseline-browser-mapping: latest
     compare-versions: ^6.1.0
     core-js: ^3.42.0
     cross-fetch: ^4.0.0
@@ -7039,6 +7040,15 @@ __metadata:
   bin:
     baseline-browser-mapping: dist/cli.js
   checksum: 929b3f2b5f4beb3b9e02b660a4a8b24f62e43cc7efdc38a726ef061137f9529d3372e1c70298eacde191ac70f5defd21ae4a29ff9e470c4c2b7fd7be68320241
+  languageName: node
+  linkType: hard
+
+"baseline-browser-mapping@npm:latest":
+  version: 2.9.9
+  resolution: "baseline-browser-mapping@npm:2.9.9"
+  bin:
+    baseline-browser-mapping: dist/cli.js
+  checksum: c3bb28a9d6243623cdae1ee7bdd0fe3141403c877efa2410e514c512a48f0fbd02c8d338b0e19b274fb7d3d329ef95a343bad16d5332654e1b7ab9cbb2af2de6
   languageName: node
   linkType: hard
 

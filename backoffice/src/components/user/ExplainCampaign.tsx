@@ -99,7 +99,7 @@ const ExplainCampaign = (p: { onClose?: () => void }) => {
                     <Typography variant="body1" textAlign="center" color="primary.contrastText">{uiContext.i18n.translator('create2ResourcesOnCampaign')}</Typography>
                     <Typography variant="subtitle1" color="primary.contrastText">{dayjs(activeCampaign.data.airdrop).format(uiContext.i18n.translator('dateTimeFormat'))}</Typography>
                     { dayjs(activeCampaign.data.airdrop) > dayjs(new Date()) ?
-                        <Stack>
+                        <Stack gap="2rem">
                             <Stack sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
                                 <Typography variant="body1">{dayjs(activeCampaign.data.airdrop).fromNow()}</Typography>
                                 <TimeUp height={35} width={35}/>

@@ -19,9 +19,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
     logLevel
     unreadConversations
     unreadNotifications
-    willingToContribute
     amountOfTokens
-    unlimitedUntil
     numberOfExternalAuthProviders
     knowsAboutCampaigns
   }
@@ -77,7 +75,6 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
 export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     accountChangeReceived {
       account {
-        willingToContribute
         knowsAboutCampaigns
         name
         language
@@ -128,9 +125,7 @@ export default () => {
             activated: res.data.getSessionData.activated,
             unreadConversations: res.data.getSessionData.unreadConversations,
             unreadNotifications: res.data.getSessionData.unreadNotifications,
-            willingToContribute: res.data.getSessionData.willingToContribute,
             amountOfTokens: res.data.getSessionData.amountOfTokens,
-            unlimitedUntil: res.data.getSessionData.unlimitedUntil || null,
             lastChangeTimestamp: new Date(),
             knowsAboutCampaigns: res.data.getSessionData.knowsAboutCampaigns
         }
@@ -171,10 +166,8 @@ export default () => {
                 email: payload.data.accountChangeReceived.account.email,
                 id: payload.data.accountChangeReceived.account.id,
                 name: payload.data.accountChangeReceived.account.name,
-                willingToContribute: payload.data.accountChangeReceived.account.willingToContribute,
                 unreadConversations: [],
                 unreadNotifications: [],
-                unlimitedUntil: payload.data.unlimitedUntil || null,
                 knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns,
                 // Does not change, so just repeat it from previous account value
                 numberOfExternalAuthProviders: account.numberOfExternalAuthProviders

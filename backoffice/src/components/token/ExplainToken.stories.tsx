@@ -27,10 +27,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const OnlyExplain: Story = {
-  args: { visible: true, onClose: console.log, pureExplain: true }
-}
-
-export const ExplainAndSwithToContributionMode: Story = {
+export const Simple: Story = {
   args: { visible: true, onClose: console.log }
 }
