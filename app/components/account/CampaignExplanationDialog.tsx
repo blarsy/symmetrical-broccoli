@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { Dimensions, StyleProp, View, ViewStyle } from "react-native"
 import { ThemedDialog } from "../ConfirmDialog"
 import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
@@ -12,6 +12,7 @@ import { primaryColor } from "../layout/constants"
 import { Campaign } from "@/lib/useActiveCampaign"
 import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
 import Images from "@/Images"
+import { AppContext } from "../AppContextProvider"
 
 const SET_KNOWS_ABOUT_CAMPAIGNS = gql`mutation SetKnowsAboutCampaigns {
   setAccountKnowsAboutCampaigns(input: {}) {
@@ -23,9 +24,11 @@ interface Props {
     campaign?: Campaign
     onDismiss: () => void
     testID?: string
+    onOnboardRequested?: () => void
 }
 
 const CampaignExplanationDialog = (p: Props) => {
+    const appContext = useContext(AppContext)
     const { width: winWidth, height: winHeight } = Dimensions.get('screen')
     const dialogWidth = Math.min(400, winWidth)
     const height = Math.min(winHeight - 120, 700)
@@ -98,7 +101,19 @@ const CampaignExplanationDialog = (p: Props) => {
                             </View>
                             <Text variant="bodyLarge">{t('campaignAllowYouto')}</Text>
                             <Text variant="bodyLarge">{t('forFree')}</Text>
-                            <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={p.onDismiss}>{t('ok_caption')}</OrangeButton>
+                            <OrangeButton mode="contained" style={{ alignSelf: 'center' }} onPress={() => {
+                                p.onDismiss()
+                                if(!appContext.account) {
+                                    p.onOnboardRequested && p.onOnboardRequested()
+                                }
+                            }}>
+                                { appContext.account ? t('ok_caption') :
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Text variant="labelLarge" style={{ color: '#FFF' }}>{t('createResourceInCampaignButtonLabelMain')}</Text>
+                                        <Text variant="labelMedium" style={{ color: '#FFF' }}>{t('createResourceInCampaignButtonLabelSub')}</Text>
+                                    </View>
+                                }
+                                </OrangeButton>
                         </View>
                     </SwiperFlatList> }
                 </GestureHandlerRootView>

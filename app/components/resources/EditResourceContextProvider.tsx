@@ -27,7 +27,7 @@ interface EditResourceActions {
     addImage: (img: ImageInfo, resource: Resource) => Promise<void>
     deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
     save: (resource: Resource) => Promise<void>
-    reset: (accountLocation?: Location, campaignToJoin?: number) => void
+    reset: (accountLocation?: Location, joinCampaign?: boolean) => void
     setCampaignToJoin: (campaignId?: number) => void
 }
 
@@ -60,7 +60,7 @@ export const EditResourceContext = createContext<EditResourceContextProps>({
         addImage: async() => {},
         deleteImage: async() => {},
         save: async() => {},
-        reset: (accountLocation?: Location, campaignToJoin?: number) => {},
+        reset: (accountLocation?: Location, joinCampaign?: boolean) => {},
         setCampaignToJoin: (campaignId => {})
     }
 })
@@ -170,11 +170,12 @@ const EditResourceContextProvider = ({ children }: Props) => {
             }
             editResourceState.changeCallbacks.forEach(cb => cb())
         },
-        reset: (accountLocation?: Location, campaignToJoin?: number) => {
+        reset: (accountLocation?: Location, joinCampaign?: boolean) => {
             const newResource = { ...blankResource }
             newResource.specificLocation = accountLocation || null
+            if(joinCampaign) newResource.inActiveCampaign = true
             
-            const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [], campaignToJoin }}
+            const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [] }}
             setState( newResourceState )
         },
         setCampaignToJoin: (campaignToJoin?: number) => {

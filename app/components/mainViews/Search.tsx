@@ -123,6 +123,21 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                     searchFilterContext.actions.requery(appContext.categories.data!)
                 }} />
             </View>
+            { activeCampaign.data && [
+                <TouchableOpacity key="activeCampaignSwitch" style={{ flexDirection: 'row', paddingTop: 10, 
+                    paddingBottom: 10, justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16, 
+                    alignItems: 'center', backgroundColor: primaryColor, borderRadius: 15, marginTop: 10 }} 
+                    onPress={() => setExplainingCampaign(true)}>
+                    <Images.Campaign height={60} width={60}/>
+                    <View>
+                        <Text style={{ color: '#fff' }} variant="bodySmall">{t('activeCampaign')}</Text>
+                        <Text style={{ fontWeight: '700', color: '#fff' }} variant="bodyMedium">{activeCampaign.data.name}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => searchFilterContext.actions.setSearchFilter({...searchFilterContext.filter, ...{ inActiveCampaign: !searchFilterContext.filter.inActiveCampaign } })}>
+                        <Icon source={ searchFilterContext.filter.inActiveCampaign ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={searchFilterContext.filter.inActiveCampaign ?  lightPrimaryColor : '#fff'} />
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            ] }
             <CategoriesSelect testID="categories" inline value={searchFilterContext.filter.categories} labelVariant="bodyMedium"
                 onChange={categories => searchFilterContext.actions.setSearchFilter({ search: searchFilterContext.filter.search, categories, options: searchFilterContext.filter.options, location: searchFilterContext.filter.location, inActiveCampaign: searchFilterContext.filter.inActiveCampaign })} />
             <Hr />
@@ -159,22 +174,6 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         searchFilterContext.actions.setSearchFilter(newFilter)
                     }} />
             </AccordionItem>
-            { activeCampaign.data && [
-                <Hr key="line" />,
-                <TouchableOpacity key="activeCampaignSwitch" style={{ flexDirection: 'row', paddingTop: 10, 
-                    paddingBottom: 10, justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16, 
-                    alignItems: 'center', backgroundColor: primaryColor, borderRadius: 15 }} 
-                    onPress={() => setExplainingCampaign(true)}>
-                    <Images.Campaign height={60} width={60}/>
-                    <View>
-                        <Text style={{ color: '#fff' }} variant="bodySmall">{t('activeCampaign')}</Text>
-                        <Text style={{ fontWeight: '700', color: '#fff' }} variant="bodyMedium">{activeCampaign.data.name}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => searchFilterContext.actions.setSearchFilter({...searchFilterContext.filter, ...{ inActiveCampaign: !searchFilterContext.filter.inActiveCampaign } })}>
-                        <Icon source={ searchFilterContext.filter.inActiveCampaign ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={searchFilterContext.filter.inActiveCampaign ?  lightPrimaryColor : '#fff'} />
-                    </TouchableOpacity>
-                </TouchableOpacity>
-            ] }
 
             <LoadedList testID="foundResources" style={{ padding: 0, flex: 1 }} contentContainerStyle={{ gap: 8 }} 
                 loading={searchFilterContext.results.loading || appContext.categories.loading} 
@@ -196,7 +195,13 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         }}
                         onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
                 }} />
-            <CampaignExplanationDialog campaign={explainingCampaign ? activeCampaign.data : undefined} onDismiss={() => setExplainingCampaign(false)}/>
+            <CampaignExplanationDialog campaign={explainingCampaign ? activeCampaign.data : undefined} onDismiss={() => {
+                setExplainingCampaign(false)
+            }} onOnboardRequested={() => {
+                setTimeout(() => navigation.navigate('board', {
+                    screen: 'resource'
+                }))
+            }}/>
         </ScrollView>
 }
 

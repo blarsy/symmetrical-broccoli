@@ -342,7 +342,9 @@ const resources = {
       "explainTokensForBids1": "The Topes will be reserved until the bid expires, unless you cancel it, or it is rejected.",
       "explainTokensForBids2": "When your bid is accepted, the Topes are transferred right away.",
       "noActiveCampaign": "There is currently no active campaign" ,
-      "activeCampaign": "Ongoing campaign"
+      "activeCampaign": "Ongoing campaign",
+      "createResourceInCampaignButtonLabelMain": "Let's go !",
+      "createResourceInCampaignButtonLabelSub": "Creating resources"
    }
   },
   fr: {
@@ -679,7 +681,9 @@ const resources = {
       "explainTokensForBids1": "Les Topes seront réservés jusqu'à l'expiration de l'offre, sauf si tu l'annules, ou qu'elle est rejetée.",
       "explainTokensForBids2": "Quand ton offre est acceptée, tes Topes sont immédiatement transférés.",
       "noActiveCampaign": "Il n'y a pas de campagne en cours pour le moment",
-      "activeCampaign": "Campagne en cours"
+      "activeCampaign": "Campagne en cours",
+      "createResourceInCampaignButtonLabelMain": "J'y vais !",
+      "createResourceInCampaignButtonLabelSub": "Créer des ressources"
     }
   }
 }
