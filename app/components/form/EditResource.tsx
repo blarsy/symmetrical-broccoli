@@ -60,6 +60,10 @@ export default ({ route, navigation }:RouteProps) => {
         }
     },  [defaultLocation])
 
+    useEffect(() => {
+        editResourceContext.actions.setCampaignToJoin(activeCampaign.data?.id)
+    }, [activeCampaign.data])
+
     return <View style={{ flex: 1, backgroundColor: '#fff' }}>
         { loadingAddress ? <ActivityIndicator color={primaryColor}/> :
 
@@ -109,8 +113,8 @@ export default ({ route, navigation }:RouteProps) => {
                         onChangeText={handleChange('title')} onBlur={handleBlur('title')} />
                     <ErrorMessage component={ErrorText} name="title" />
                     { activeCampaign.data && <View style={{ backgroundColor: lightPrimaryColor, borderRadius: IMAGE_BORDER_RADIUS, padding: 6, flexDirection: 'row', alignItems: 'center' }}>
-                        <OptionSelect title={`${t('resourceConformsToCampaign')} '${activeCampaign.data.name}'`} value={!!editResourceContext.state.campaignToJoin} onChange={() => {
-                            editResourceContext.actions.setCampaignToJoin(editResourceContext.state.campaignToJoin ? undefined : activeCampaign.data!.id)
+                        <OptionSelect title={`${t('resourceConformsToCampaign')} '${activeCampaign.data.name}'`} value={values.inActiveCampaign} onChange={() => {
+                            setFieldValue('inActiveCampaign', !values.inActiveCampaign)
                         }} />
                         <BareIconButton color="#000" Image="help" size={20} onPress={() => setExplainingCampaign(true)} />
                     </View> }

@@ -79,7 +79,7 @@ export interface Resource {
     deleted: Date | null
     specificLocation: Location | null
     price: number | null
-    campaignId?: number
+    inActiveCampaign: boolean
 }
 
 export interface ConversationData {
@@ -104,13 +104,17 @@ export const parseLocationFromGraph = (raw: any): Location | null => {
     })
 }
 
-export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
+export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: number):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
         []
     const images = rawRes.resourcesImagesByResourceId && rawRes.resourcesImagesByResourceId.nodes ?
         rawRes.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ publicId: imgData.imageByImageId.publicId} as ImageInfo)) :
         []
+    let inActiveCampaign = false
+    if(activeCampaignId && rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0) {
+        inActiveCampaign = !!rawRes.campaignsResourcesByResourceId.nodes.find((cr: any) => cr.campaignId === activeCampaignId)
+    }
     return {
         id: rawRes.id, title: rawRes.title, description: rawRes.description, 
         expiration: rawRes.expiration && new Date(rawRes.expiration), created: rawRes.created && new Date(rawRes.created),
@@ -126,12 +130,12 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
-        campaignId: (rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId) || undefined
+        inActiveCampaign
 } as Resource
 }
 
-export const fromServerGraphResources = (data: any[], categories: Category[]): Resource[] => {
-    return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories))
+export const fromServerGraphResources = (data: any[], categories: Category[], activeCampaignId?: number): Resource[] => {
+    return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories, activeCampaignId))
 }
 
 export const fromServerGraphConversations = (data: any[], loggedInAccountId: number): ConversationData[] => {
@@ -170,7 +174,8 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                     categories: [],
                     created: new Date(),
                     deleted: null,
-                    specificLocation: null
+                    specificLocation: null,
+                    inActiveCampaign: false
                 }
             },
             withUser: {

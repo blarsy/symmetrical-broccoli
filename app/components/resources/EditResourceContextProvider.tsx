@@ -44,7 +44,7 @@ const blankResource: Resource = { id: 0, description: '', title: '', images: [],
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
     canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null, specificLocation: null,
-    price: null
+    price: null, inActiveCampaign: false
 }
 
 export const EditResourceContext = createContext<EditResourceContextProps>({
@@ -83,7 +83,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
     }
     
     const setResource = (resource: Resource) => {
-        setState( {...editResourceState, ...{ editedResource: getResourceWithExpiration(resource), campaignToJoin: resource.campaignId } })
+        setState( {...editResourceState, ...{ editedResource: getResourceWithExpiration(resource) } })
     }
 
     const actions: EditResourceActions = {
@@ -137,7 +137,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     imagesPublicIds: resource.images.map(img => img.publicId),
                     specificLocation: resource.specificLocation,
                     price: resource.price || null,
-                    campaignToJoin: editResourceState.campaignToJoin
+                    campaignToJoin: resource.inActiveCampaign ? editResourceState.campaignToJoin : undefined
                 }})
                 setState({ ...editResourceState, imagesToAdd: [], editedResource: resource })
             } else {
@@ -160,7 +160,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
                     imagesPublicIds,
                     specificLocation: resource.specificLocation,
                     price: resource.price || null,
-                    campaignToJoin: editResourceState.campaignToJoin
+                    campaignToJoin: resource.inActiveCampaign ? editResourceState.campaignToJoin : undefined
                 }
 
                 await createResource({ variables })

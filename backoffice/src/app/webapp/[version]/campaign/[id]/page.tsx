@@ -24,18 +24,15 @@ export async function generateMetadata(
 
         if(!res.data.getActiveCampaign) return {}
 
-        const headersList = await headers()
-        const title = `Une campagne sur Tope-là - ${res.data.getActiveCampaign.name}`
+        const title = `${res.data.getActiveCampaign.name} - Une campagne Tope-là`
 
         return {
-            metadataBase: new URL(url),
             title,
             description: res.data.getActiveCampaign.description,
             openGraph: {
                 title,
                 description: res.data.getActiveCampaign.description,
-                images: [{ url: `${url}/campaign.png` }],
-                url: '/'
+                images: [{ url: `${url}/campaign.png` }]
             }
         }
     } catch (e) {

@@ -28,12 +28,12 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
                 if(rawRes.data.resourceById.accountByAccountId.id != appContext.account!.id) {
                     throw new Error('This resource cannot be edited')
                 }
-                setResource(fromData(fromServerGraphResource(rawRes.data.resourceById, uiContext.categories.data)))
+                setResource(fromData(fromServerGraphResource(rawRes.data.resourceById, uiContext.categories.data, activeCampaign.data?.id)))
             } else {
                 setResource(fromData({
                     specificLocation: address || null, isService: false, isProduct: false, canBeDelivered: false, canBeExchanged: false,
                     canBeGifted: false, canBeTakenAway: false, created: new Date(), deleted: null, price: null,
-                    id: 0, images: [], title: '', description: '', categories: [], campaignId: p.inCampaign ? activeCampaign.data!.id : undefined
+                    id: 0, images: [], title: '', description: '', categories: [], inActiveCampaign: false
                 }))
             }
         } catch (e) {

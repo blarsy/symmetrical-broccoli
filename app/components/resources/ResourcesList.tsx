@@ -119,9 +119,9 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
 
     useEffect(() => {
       if(data) {
-        setResources(fromServerGraphResources(data.myResources?.nodes, appContext.categories.data || []))
+        setResources(fromServerGraphResources(data.myResources?.nodes, appContext.categories.data || [], activeCampaign.data?.id))
       }
-    }, [data, appContext.lastResourceChangedTimestamp])
+    }, [data, activeCampaign.data, appContext.lastResourceChangedTimestamp])
 
     const ensureCampaignsExplained = (cb: () => void) => {
       if(!appContext.account?.knowsAboutCampaigns) {

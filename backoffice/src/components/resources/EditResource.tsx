@@ -58,7 +58,8 @@ const blankResource: Resource = {
     created: new Date(),
     deleted: null,
     specificLocation: null,
-    price: null
+    price: null,
+    inActiveCampaign: false
 }
 
 const EditResource = (p: Props) => {
@@ -81,14 +82,14 @@ const EditResource = (p: Props) => {
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
                 specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null,
-                campaignToJoin: value.campaignId } })
+                campaignToJoin: value.inActiveCampaign ? activeCampaign.data?.id : undefined } })
         } else {
             await createResource({ variables: { canBeDelivered: value.canBeDelivered, canBeExchanged: value.canBeExchanged, 
                 canBeGifted: value.canBeGifted, canBeTakenAway: value.canBeTakenAway, categoryCodes: value.categories.map(c => c.code), 
                 description: value.description, expiration: value.expiration, imagesPublicIds: value.images.map(img => img.publicId), 
                 isProduct: value.isProduct, isService: value.isService, title: value.title, 
                 specificLocation: value.specificLocation, price: value.price ? Number(value.price) : null,
-                campaignToJoin: value.campaignId } })
+                campaignToJoin: value.inActiveCampaign ? activeCampaign.data?.id : undefined } })
         } 
         setSaveState(fromData(undefined))
     }
@@ -156,7 +157,7 @@ const EditResource = (p: Props) => {
                             </Stack>
                             { activeCampaign.data && <FormGroup sx={{ padding: '1rem', borderRadius: '1rem', backgroundColor: theme.palette.secondary.light }}>
                                 <FormControlLabel color={theme.palette.primary.contrastText} control={
-                                    <Checkbox color="info" checked={!!f.values.campaignId} onChange={() => f.setFieldValue('campaignId', f.values.campaignId ? undefined : activeCampaign.data?.id)} onBlur={f.handleBlur('campaignId')} />} 
+                                    <Checkbox color="info" checked={f.values.inActiveCampaign} onChange={() => f.setFieldValue('inActiveCampaign', !f.values.inActiveCampaign)} onBlur={f.handleBlur('inActiveCampaign')} />} 
                                     label={`${uiContext.i18n.translator('resourceConformsToCampaign')}: '${activeCampaign.data.name}'`} />
                             </FormGroup> }
                             <Stack>

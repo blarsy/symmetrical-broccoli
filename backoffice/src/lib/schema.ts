@@ -65,7 +65,7 @@ export interface Resource {
     deleted: Date | null
     specificLocation: Location | null
     price: number | null
-    campaignId?: number
+    inActiveCampaign: boolean
 }
 
 export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
@@ -75,13 +75,17 @@ export const fromServerGraphAccount = (rawAccount: any): Account => ({
     avatarImagePublicId: rawAccount.imageByAvatarImageId ? rawAccount.imageByAvatarImageId.publicId : ''
 })
 
-export const fromServerGraphResource = (rawRes: any, categories: Category[]):Resource => {
+export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: number):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
         []
     const images = rawRes.resourcesImagesByResourceId && rawRes.resourcesImagesByResourceId.nodes ?
         rawRes.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ publicId: imgData.imageByImageId.publicId} as ImageInfo)) :
         []
+    let inActiveCampaign = false
+    if(activeCampaignId && rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0) {
+        inActiveCampaign = !!rawRes.campaignsResourcesByResourceId.nodes.find((cr: any) => cr.campaignId === activeCampaignId)
+    }
     return {
         id: rawRes.id, title: rawRes.title, description: rawRes.description, 
         expiration: rawRes.expiration && new Date(rawRes.expiration), created: rawRes.created && new Date(rawRes.created),
@@ -92,7 +96,7 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[]):Res
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
-        campaignId: (rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0 && rawRes.campaignsResourcesByResourceId.nodes[0].campaignId) || undefined
+        inActiveCampaign
 } as Resource
 }
 

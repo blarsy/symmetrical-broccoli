@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
 import { ActivityIndicator, Icon, IconButton, Text, TextInput } from "react-native-paper"
@@ -25,6 +25,7 @@ import useProfileAddress from "@/lib/useProfileAddress"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import EditResource from "../form/EditResource"
 import useActiveCampaign from "@/lib/useActiveCampaign"
+import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
 
 const StackNav = createNativeStackNavigator()
 
@@ -92,6 +93,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
     const { ensureConnected } = useUserConnectionFunctions()
     const { data: defaultAddress, loading: loadingAddress } = useProfileAddress()
     const { activeCampaign } = useActiveCampaign()
+    const [explainingCampaign, setExplainingCampaign] = useState(false)
 
     useEffect(() => {
         if(!loadingAddress) {
@@ -162,9 +164,15 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                 <TouchableOpacity key="activeCampaignSwitch" style={{ flexDirection: 'row', paddingTop: 10, 
                     paddingBottom: 10, justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16, 
                     alignItems: 'center', backgroundColor: primaryColor, borderRadius: 15 }} 
-                    onPress={() => searchFilterContext.actions.setSearchFilter({...searchFilterContext.filter, ...{ inActiveCampaign: !searchFilterContext.filter.inActiveCampaign } })}>
-                    <Text style={{ fontWeight: '700', color: '#fff' }} variant="bodyMedium">{t(activeCampaign.data.name)}</Text>
-                    <Icon source={ searchFilterContext.filter.inActiveCampaign ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={searchFilterContext.filter.inActiveCampaign ?  lightPrimaryColor : '#fff'} />
+                    onPress={() => setExplainingCampaign(true)}>
+                    <Images.Campaign height={60} width={60}/>
+                    <View>
+                        <Text style={{ color: '#fff' }} variant="bodySmall">{t('activeCampaign')}</Text>
+                        <Text style={{ fontWeight: '700', color: '#fff' }} variant="bodyMedium">{activeCampaign.data.name}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => searchFilterContext.actions.setSearchFilter({...searchFilterContext.filter, ...{ inActiveCampaign: !searchFilterContext.filter.inActiveCampaign } })}>
+                        <Icon source={ searchFilterContext.filter.inActiveCampaign ? 'checkbox-marked' : 'checkbox-blank-outline' } size={28} color={searchFilterContext.filter.inActiveCampaign ?  lightPrimaryColor : '#fff'} />
+                    </TouchableOpacity>
                 </TouchableOpacity>
             ] }
 
@@ -188,6 +196,7 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         }}
                         onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
                 }} />
+            <CampaignExplanationDialog campaign={explainingCampaign ? activeCampaign.data : undefined} onDismiss={() => setExplainingCampaign(false)}/>
         </ScrollView>
 }
 
