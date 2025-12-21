@@ -14,7 +14,6 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import { EditableChipList, EditableChipListOptions } from "./ChipList"
 import useCategories from "@/lib/useCategories"
 import CategoriesDialog from "../form/CategoriesDialog"
-import useActiveCampaign from "@/lib/useActiveCampaign"
 import MoreFilterIcon from '@mui/icons-material/Tune'
 
 export interface SearchParameters {
@@ -39,7 +38,6 @@ interface Props {
 
 const SearchFilter = (p: Props) => {
     const uiContext = useContext(UiContext)
-    const { activeCampaign } = useActiveCampaign()
     const [searchParameters, setSearchParameters] = useState(p.value)
     const [selectingCategories, setSelectingCategories] = useState(false)
     const [debouncedSearchParameters] = useDebounce(searchParameters, 700)
@@ -115,15 +113,6 @@ const SearchFilter = (p: Props) => {
                         referenceLocation: proximityParams.referenceLocation
                     })} />
             </Stack>
-            { activeCampaign.data && <FormControlLabel control={
-                <Checkbox size="small" sx={{ padding: '0 0.5rem 0 2rem' }} checked={searchParameters.inCurrentCampaign} onChange={e => {
-                    setParams({ inCurrentCampaign: !searchParameters.inCurrentCampaign })
-                }} />} label={uiContext.i18n.translator('inCurrentCampaign', { name: activeCampaign.data.name })} sx={{
-                '& .MuiFormControlLabel-label': {
-                    color: 'primary.contrastText'
-                },
-                backgroundColor: "primary", borderRadius: '0.5rem', padding: '0.25rem'
-            }} />}
             <Divider />
         </Stack>}
         <CategoriesDialog visible={selectingCategories}

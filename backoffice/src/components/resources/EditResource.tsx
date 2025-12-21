@@ -21,6 +21,8 @@ import EditImages from "./EditImages"
 import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
 import useActiveCampaign from "@/lib/useActiveCampaign"
+import InfoIcon from '@mui/icons-material/Info'
+import ExplainCampaignDialog from "../user/ExplainCampaignDialog"
 
 interface Props {
     value?: Resource
@@ -73,6 +75,7 @@ const EditResource = (p: Props) => {
     const [updateResource] = useMutation(UPDATE_RESOURCE)
     const { activeCampaign } = useActiveCampaign()
     const theme = useTheme()
+    const [explainingCampaign, setExplainingCampaign] = useState(false)
 
     const trySave = async (value: Resource) => {
         setSaveState(beginOperation())
@@ -155,11 +158,16 @@ const EditResource = (p: Props) => {
                                     onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
                                 <ErrorMessage component={ErrorText} name="price" />
                             </Stack>
-                            { activeCampaign.data && <FormGroup sx={{ padding: '1rem', borderRadius: '1rem', backgroundColor: theme.palette.secondary.light }}>
-                                <FormControlLabel color={theme.palette.primary.contrastText} control={
-                                    <Checkbox color="info" checked={f.values.inActiveCampaign} onChange={() => f.setFieldValue('inActiveCampaign', !f.values.inActiveCampaign)} onBlur={f.handleBlur('inActiveCampaign')} />} 
-                                    label={`${uiContext.i18n.translator('resourceConformsToCampaign')}: '${activeCampaign.data.name}'`} />
-                            </FormGroup> }
+                            { activeCampaign.data && <Stack direction="row" gap="0.5rem" alignItems="center">
+                                <FormGroup sx={{ padding: '1rem', borderRadius: '1rem', backgroundColor: theme.palette.secondary.light }}>
+                                    <FormControlLabel color={theme.palette.primary.contrastText} control={
+                                        <Checkbox color="info" checked={f.values.inActiveCampaign} onChange={() => f.setFieldValue('inActiveCampaign', !f.values.inActiveCampaign)} onBlur={f.handleBlur('inActiveCampaign')} />} 
+                                        label={`${uiContext.i18n.translator('resourceConformsToCampaign')}: '${activeCampaign.data.name}'`} />
+                                </FormGroup>
+                                <IconButton onClick={() => setExplainingCampaign(true)}>
+                                    <InfoIcon />
+                                </IconButton>
+                            </Stack> }
                             <Stack>
                                 <OptionLine sx={{ margin: 0 }} labels={{ 
                                     title: uiContext.i18n.translator('natureOptionsLabel'), 
@@ -259,6 +267,7 @@ const EditResource = (p: Props) => {
                     
                 </Form>}
         </Formik> }
+        <ExplainCampaignDialog explainOnly visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
     </LoadedZone>
 }
 

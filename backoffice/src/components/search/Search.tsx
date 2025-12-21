@@ -1,13 +1,17 @@
 import { gql, useMutation } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useContext, useEffect, useState } from "react"
-import { Stack, Typography } from "@mui/material"
+import { Checkbox, FormControlLabel, Stack, Typography } from "@mui/material"
 import SearchFilter, { SearchParameters } from "./SearchFilter"
 import ResourceCard from "../resources/ResourceCard"
 import { DEFAULT_LOCATION } from "@/lib/constants"
 import { UiContext } from "../scaffold/UiContextProvider"
 import { AppContext } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
+import useActiveCampaign from "@/lib/useActiveCampaign"
+import { primaryColor } from "@/utils"
+import Campaign from '@/app/img/campaign.svg'
+import ExplainCampaignDialog from "../user/ExplainCampaignDialog"
 
 export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0", $inActiveCampaign: Boolean) {
   suggestedResources(
@@ -58,6 +62,8 @@ const Search = (p: {version: string}) => {
     const [initialSearchParams, setInitialSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS)
     const [loadingProfile, setLoadingProfile] = useState(true)
     const [initialLoading, setInitialLoading] = useState(true)
+    const { activeCampaign } = useActiveCampaign()
+    const [explainingCampaign, setExplainingCampaign] = useState(false)
 
     useEffect(() => {
       if(!appContext.account) {
@@ -92,6 +98,22 @@ const Search = (p: {version: string}) => {
               loadResources(searchParams)
           }} />}
         </LoadedZone>
+        { activeCampaign.data && <Stack alignSelf="center" gap="1rem" direction="row" 
+          sx={{ backgroundColor: primaryColor, color: '#FFF', padding: '0.5rem', 
+            borderRadius: '1rem' }}>
+          <Stack direction="row" sx={{ cursor: 'pointer' }}  onClick={() => setExplainingCampaign(true)}>
+            <Campaign width={60} height={60} />
+            <Stack>
+              <Typography variant="body1" color="#fff">{uiContext.i18n.translator('inCurrentCampaign')}</Typography>
+              <Typography variant="body1" color="#fff" sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{activeCampaign.data.name}</Typography>
+            </Stack>
+          </Stack>
+          <Checkbox color="info" size="large" checked={initialSearchParams.inCurrentCampaign} onChange={e => {
+            const newSearchParams = { ...initialSearchParams, ...{ inCurrentCampaign: !initialSearchParams.inCurrentCampaign } }
+            setInitialSearchParams(newSearchParams)
+            loadResources(newSearchParams)
+          }} />
+        </Stack>}
         <LoadedZone loading={loading} error={error} 
             containerStyle={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', 
                 gap: '1rem', justifyContent: 'center', overflow: 'auto' }}>
@@ -106,6 +128,7 @@ const Search = (p: {version: string}) => {
                 }}/>)
             }
         </LoadedZone>
+        <ExplainCampaignDialog visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
     </Stack> 
 }
 

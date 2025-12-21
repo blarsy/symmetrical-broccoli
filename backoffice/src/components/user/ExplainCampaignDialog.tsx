@@ -13,6 +13,7 @@ export const SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS = gql`mutation SetAccountKnowsAbou
 interface Props {
     visible: boolean
     onClose: () => void
+    explainOnly?: boolean
 }
 
 const ExplainCampaignDialog = (p: Props) => {
@@ -26,7 +27,7 @@ const ExplainCampaignDialog = (p: Props) => {
                 <Close width="25px" fill={theme.palette.primary.contrastText} />
             </IconButton>
         </Stack>
-        <ExplainCampaign onClose={p.onClose} />
+        <ExplainCampaign onClose={p.onClose} explainOnly />
     </Dialog>
 }
 

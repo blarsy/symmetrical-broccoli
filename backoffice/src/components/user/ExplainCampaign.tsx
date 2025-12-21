@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation"
 const OnboardingActions = () => {
     const uiContext = useContext(UiContext)
     const theme = useTheme()
-    return <Stack gap="0.5rem" marginBottom="1rem" alignItems="flex-start">
+    return <Stack gap="0.5rem" alignItems="flex-start">
         <Stack direction="row" gap="1rem">
             👉
             <Typography variant="subtitle1">{uiContext.i18n.translator('optionalInstallAppOnboardingStep')}</Typography>
@@ -61,7 +61,7 @@ interface StepInfo {
     content: ReactNode
 }
 
-const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean }) => {
+const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explainOnly?: boolean }) => {
     const router = useRouter()
     const uiContext = useContext(UiContext)
     const [setAccountKnowsAboutCampaigns, { loading: settingCampaignBit }] = useMutation(SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS)
@@ -79,7 +79,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean }) => {
 
     useEffect(() => {
         if(activeCampaign.data) {
-            setSteps([
+            const steps = [
                 { title: uiContext.i18n.translator("campaignSummaryTitle"), stepLabel: uiContext.i18n.translator("summaryStepLabel"),
                     content: <>
                         <Stack alignItems="center">
@@ -123,12 +123,14 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean }) => {
                         <Typography variant="h5" textAlign="center" color="primary.contrastText">
                             {uiContext.i18n.translator('rewardsMultiplied', { multiplier: activeCampaign.data.resourceRewardsMultiplier })}
                         </Typography>
-                        <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('thatsNotAll')}</Typography>
                     </>},
-                { title: uiContext.i18n.translator("onboardingInstructions"), stepLabel: uiContext.i18n.translator("onboardingStepLabel"),
+            ]
+
+            if(!p.explainOnly) {
+                steps.push({ title: uiContext.i18n.translator("onboardingInstructions"), stepLabel: uiContext.i18n.translator("onboardingStepLabel"),
                     content: <>
                         { p.onClose ? 
-                            <LoadingButton loading={settingCampaignBit} onClick={async() => {
+                            <LoadingButton variant="contained" loading={settingCampaignBit} onClick={async() => {
                                 await setAccountKnowsAboutCampaigns()
                                 p.onClose!()
                                 router.push(`/webapp/${uiContext.version}/resources/0?campaign=1`)
@@ -136,13 +138,15 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean }) => {
                             :
                             <OnboardingActions />
                         }
-                    </>},
-            ])
+                    </>})
+            }
+            setSteps(steps)
         }
     }, [activeCampaign.data])
     
     return <LoadedZone loading={activeCampaign.loading} error={activeCampaign.error} containerStyle={theme => ({
         margin: 'auto',
+        paddingBottom: '2rem',
         width: '800px',
         [theme.breakpoints.down('lg')]: {
             width: '500px',
