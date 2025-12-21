@@ -6,8 +6,6 @@ import { ThemeProvider } from "@emotion/react"
 import FbLogo from './img/FACEBOOK.svg'
 import InstaLogo from './img/INSTAGRAM.svg'
 import Logo from './img/LOGO-TOPE LA.svg'
-import Googleplay from './img/google-play.svg'
-import AppStore from './img/app-store.svg'
 import TopperBabysitter from './img/toppers/babysitter.svg'
 import TopperBikeRepairer from './img/toppers/bike-repairer.svg'
 import TopperDev from './img/toppers/dev.svg'
@@ -32,6 +30,7 @@ import AccountsGallery from "@/components/showcase/AccountsGallery"
 import Roadmap from "@/components/showcase/Roadmap"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import CampaignImg from '@/app/img/campaign.svg'
+import { AppDownloadButtons } from "@/components/misc"
 
 const { mainVersion, link2Url } = getCommonConfig()
 
@@ -256,17 +255,7 @@ const Page = () => {
                 </ParchmentContainer>
                 <Stack alignItems="center" justifyContent="center" padding="3rem">
                     <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Télécharge sur</Typography>
-                    <Stack sx={theme => ({
-                        flexDirection: 'column',
-                        gap: '1rem',
-                        [theme.breakpoints.up('sm')]: {
-                            flexDirection: 'row',
-                            gap: '0'
-                        },
-                    })}>
-                        <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={80}/></Link>
-                        <Link target="_blank" href="https://apps.apple.com/app/tope-la/id6470202780"><AppStore height={80}/></Link>
-                    </Stack>
+                    <AppDownloadButtons />
                     <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Version web</Typography>
                     <Stack  position="relative">
                         <Typography position="absolute" variant="overline" color={primaryColor} 

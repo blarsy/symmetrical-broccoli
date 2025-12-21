@@ -3,11 +3,14 @@ import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import EmptyImage from '@/app/img/PHOTOS.svg'
-import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Paper, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContentText, DialogTitle, IconButton, Paper, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
 import { PropsWithChildren } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import Tokens from '@/app/img/TOKENS.svg'
 import ErrorIcon from '@mui/icons-material/Error'
+import Link from "next/link"
+import Googleplay from '@/app/img/google-play.svg'
+import AppStore from '@/app/img/app-store.svg'
 
 export const screenSizesCoefficients = [0.8, 0.7, 0.5]
 export const makePxSize = (baseSize: number, coeff?: number) => `${(baseSize * (coeff || 1)).toFixed(2)}px`
@@ -191,3 +194,15 @@ export const ZoomedImageDialog = ({ zoomedImg, onClose }: { zoomedImg: string | 
             </Box>
         </Stack>
     </Dialog>
+
+export const AppDownloadButtons = ({size}: { size?: number }) => <Stack sx={theme => ({
+    flexDirection: 'column',
+    gap: '1rem',
+    [theme.breakpoints.up('sm')]: {
+        flexDirection: 'row',
+        gap: '0'
+    },
+})}>
+    <Link target="_blank" href="https://play.google.com/store/apps/details?id=com.topela"><Googleplay height={size || 80}/></Link>
+    <Link target="_blank" href="https://apps.apple.com/be/app/tope-la/id6470202780"><AppStore height={size || 80}/></Link>
+</Stack>

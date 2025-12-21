@@ -56,7 +56,7 @@ export const Translatable = ({ children, version }: PropsWithVersion) => {
 
     return <LoadedZone loading={uiContext.loading} error={uiContext.error} containerStyle={{ 
             height: '100vh', 
-            overflow: 'clip', 
+            overflow: 'hidden', 
             display: 'flex'
         }}>
         { !uiContext.loading && <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={uiContext.i18n.lang}>

@@ -9,7 +9,7 @@ const CampaignPage = () => {
 
     return <ClientWrapper version={version}>
         <Stack sx={{ overflow: 'auto' }}>
-            <ExplainCampaign />
+            <ExplainCampaign fullscreen />
         </Stack>
     </ClientWrapper>
 }
