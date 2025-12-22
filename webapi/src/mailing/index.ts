@@ -1,6 +1,5 @@
 import { readFile } from 'fs/promises'
 import Handlebars from 'handlebars'
-import { recordMail } from './recordMail'
 import getConfig,{ getCommonConfig } from '../config'
 import initTranslations from '../i18n'
 import { runAndLog } from '../db_jobs/utils'
@@ -46,7 +45,7 @@ export const sendMail = async (from: string, to: string, subject: string, plainT
 
     const promises: Promise<void>[] = (config.production && !config.doNotSendMails) ?
         [sendViaMailgun(msg)] :
-        [recordMail(msg)]
+        []
 
     promises.push(persistMail(msg, pool, version))
 

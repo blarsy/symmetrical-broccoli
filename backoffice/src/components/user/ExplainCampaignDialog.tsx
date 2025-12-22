@@ -27,7 +27,7 @@ const ExplainCampaignDialog = (p: Props) => {
                 <Close width="25px" fill={theme.palette.primary.contrastText} />
             </IconButton>
         </Stack>
-        <ExplainCampaign onClose={p.onClose} explainOnly />
+        <ExplainCampaign onClose={p.onClose} explainOnly={p.explainOnly} />
     </Dialog>
 }
 

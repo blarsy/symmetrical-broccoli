@@ -13,7 +13,7 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import { useMutation } from "@apollo/client"
 import { SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS } from "./ExplainCampaignDialog"
 import useActiveCampaign from "@/lib/useActiveCampaign"
-import theme, { fonts } from "@/theme"
+import { fonts } from "@/theme"
 import { getCommonConfig } from "@/config"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
@@ -87,6 +87,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                         </Stack>
                         <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
                         <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
+                        <Button target="_blank" href={`/campaign`} variant="text">{uiContext.i18n.translator('moreInfoOnCampaigns')}</Button>
                     </>},
                 { title: uiContext.i18n.translator("airdropTitle"), stepLabel: uiContext.i18n.translator("bonusStepLabel"),
                     content: <>

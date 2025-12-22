@@ -49,7 +49,9 @@ const CampaignExplanationDialog = (p: Props) => {
                 <GestureHandlerRootView>
                     { p.campaign && <SwiperFlatList onEndReached={async() => {
                         setSwipedToEnd(true)
-                        await setKnowsAboutCampaigns()
+                        if(appContext.account) {
+                            await setKnowsAboutCampaigns()
+                        }
                     }}>
                         <ScrollView contentContainerStyle={childStyle}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>

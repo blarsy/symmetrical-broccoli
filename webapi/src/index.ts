@@ -79,7 +79,7 @@ const executeJob = async (executor: (payload?: any, helpers?: JobHelpers) => Pro
 }
 
 const launchJobWorker = async (pool: Pool, version: string) => {
-    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 0 * * * cleanOldServerLogs\n0 8 * * * sendSummaries\n*/10 * * * * burnTokens\n0 1 * * * cleanOldNotifications\n*/10 * * * * handleResourcesAndBidsExpiration\n0 1 * * * cleanupOldSearches\n*/10 * * * * applyAirdrop\n'
+    let crontab = '0 0 * * * databaseBackup\n0 0 * * * cleanOldClientLogs\n0 0 * * * cleanOldServerLogs\n0 8 * * * sendSummaries\n*/10 * * * * applyRewards\n0 1 * * * cleanOldNotifications\n*/10 * * * * handleResourcesAndBidsExpiration\n0 1 * * * cleanupOldSearches\n*/10 * * * * applyAirdrop\n'
 
     const runner = await run({
         pgPool: pool,
@@ -127,10 +127,10 @@ const launchJobWorker = async (pool: Pool, version: string) => {
             sendSummaries: async () => {
                 executeJob(() => sendSummaries(pool, version), 'sendSummaries', version)
             },
-            burnTokens: async () => {
+            applyRewards: async () => {
                 executeJob(async () => {
                     await runAndLog(`SELECT sb.apply_resources_token_transactions()`, pool, 'Running rewards grant routine', version)
-                }, 'burnTokens', version)
+                }, 'applyRewards', version)
             },
             handleResourcesAndBidsExpiration: async () => {
                 executeJob(async () => {
