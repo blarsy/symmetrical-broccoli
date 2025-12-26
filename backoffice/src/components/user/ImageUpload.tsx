@@ -9,7 +9,6 @@ import { uploadImage } from '@/lib/images'
 import Feedback from '../scaffold/Feedback'
 import { UiContext } from '../scaffold/UiContextProvider'
 import { primaryColor } from '@/utils'
-import { AppDispatchContext } from '../scaffold/AppContextProvider'
 
 const previewCroppedImage = async (canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop) => {
     const ctx = canvas.getContext('2d')

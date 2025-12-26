@@ -49,14 +49,14 @@ if [[ ! -f ./docker/environments/test/.env ]] ; then
 fi
 
 # create docker folder
-ssh root@103.13.210.152 "mkdir -p /home/symbro_test/docker/containers;mkdir -p /home/symbro_test/docker/environments/test;"
+ssh topela-test "mkdir -p /home/deploy/symbro_test/docker/containers;mkdir -p /home/deploy/symbro_test/docker/environments/test;"
 # copy docker files
-scp -rp ./docker/containers/* root@103.13.210.152:/home/symbro_test/docker/containers
-scp -rp ./docker/environments/test/.env root@103.13.210.152:/home/symbro_test/docker/environments/test
-scp -rp ./docker/environments/test/* root@103.13.210.152:/home/symbro_test/docker/environments/test
+scp -rp ./docker/containers/* topela-test:/home/deploy/symbro_test/docker/containers
+scp -rp ./docker/environments/test/.env topela-test:/home/deploy/symbro_test/docker/environments/test
+scp -rp ./docker/environments/test/* topela-test:/home/deploy/symbro_test/docker/environments/test
 
-scp -rp ./build.zip root@103.13.210.152:/home/symbro_test
+scp -rp ./build.zip topela-test:/home/deploy/symbro_test
 
 
 # execute remote deployment script
-ssh root@103.13.210.152 "sh " < ./remote_test.sh
+ssh topela-test "sh " < ./remote_test.sh
