@@ -150,8 +150,8 @@ const Chat = ({ onSend, testID, messages, otherAccount, onLoadEarlier, canLoadEa
                                 { msg.image && <TouchableOpacity onPress={() => setFocusedImage(imgSourceFromPublicId(msg.image!))}>
                                     <Image style={{ width: chatImageSize, height: chatImageSize, borderRadius: 10 }} source={imgSourceFromPublicId(msg.image)} />
                                 </TouchableOpacity> }
-                                <Text variant="displayMedium" testID={`${testID}:Messages:${index}`}>{msg.text}</Text>
-                                <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#aaa' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
+                                <Text variant="displayMedium" style={{ color: fromOther ? "#333" : '#fff' }} testID={`${testID}:Messages:${index}`}>{msg.text}</Text>
+                                <Text variant="bodySmall" style={{ marginTop: 5, color: fromOther ? '#333' : '#fff' }}>{dayjs(msg.createdAt).format('HH:mm')}</Text>
                             </View>
                         </View>}) }
             </ScrollView>
