@@ -44,14 +44,14 @@ if [[ ! -f ./docker/environments/prod/.env ]] ; then
 fi
 
 # create docker folder
-ssh root@45.91.168.78 "mkdir -p /home/symbro/docker/containers;mkdir -p /home/symbro/docker/environments/prod;"
+ssh topela-prod "mkdir -p /home/deploy/symbro/docker/containers;mkdir -p /home/deploy/symbro/docker/environments/prod;"
 # copy docker files
-scp -rp ./docker/containers/* root@45.91.168.78:/home/symbro/docker/containers
-scp -rp ./docker/environments/prod/.env root@45.91.168.78:/home/symbro/docker/environments/prod
-scp -rp ./docker/environments/prod/* root@45.91.168.78:/home/symbro/docker/environments/prod
+scp -rp ./docker/containers/* topela-prod:/home/deploy/symbro/docker/containers
+scp -rp ./docker/environments/prod/.env topela-prod:/home/deploy/symbro/docker/environments/prod
+scp -rp ./docker/environments/prod/* topela-prod:/home/deploy/symbro/docker/environments/prod
 
-scp -rp ./build.zip root@45.91.168.78:/home/symbro
+scp -rp ./build.zip topela-prod:/home/deploy/symbro
 
 
 # execute remote deployment script
-ssh root@45.91.168.78 "sh " < ./remote.sh
+ssh topela-prod "sh " < ./remote.sh

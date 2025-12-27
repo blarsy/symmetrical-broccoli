@@ -1,4 +1,4 @@
-cd /home/symbro
+cd /home/deploy/symbro
 
 # create build directory if needed
 rm -rf build
@@ -14,7 +14,7 @@ cp -r webapi ./../docker/containers/webapi/webapi
 rm -rf ./../docker/containers/website/website
 cp -r website ./../docker/containers/website/website
 
-cd /home/symbro/docker/environments/prod
+cd /home/deploy/symbro/docker/environments/prod
 docker compose down
 docker compose build --no-cache
 docker compose up -d

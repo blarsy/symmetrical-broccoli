@@ -1,6 +1,13 @@
 version: '2.1'
 services:
   sb_web:
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       - sb_webapi
     build:
@@ -20,6 +27,10 @@ services:
       - "3001"
     restart: always
   sb_proxy:
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
     build:
       context: './proxy'
     depends_on:
