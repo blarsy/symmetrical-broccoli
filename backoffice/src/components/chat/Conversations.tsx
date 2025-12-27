@@ -129,13 +129,14 @@ const Conversations = (p: Props) => {
         let conversations: ConversationData[] = []
         
         if(chatContext.newConversationState) {
+          const otherAccount = chatContext.newConversationState.withAccount || chatContext.newConversationState.resource.account!
           conversations = [{ 
-            accountName: chatContext.newConversationState.resource.account!.name,
+            accountName: otherAccount.name,
             id: -1,
             numberOfUnreadMessages: 0,
             resourceId: chatContext.newConversationState.resource.id,
             resourceName: chatContext.newConversationState.resource.title,
-            imagePublicId: chatContext.newConversationState.resource.account!.avatarImagePublicId,
+            imagePublicId: otherAccount.avatarImagePublicId,
             resourceImagePublicId: chatContext.newConversationState.resource.images.length > 0 ?
               chatContext.newConversationState.resource.images[0].publicId:
               undefined

@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client"
 import { LoadingButton } from "@mui/lab"
-import { Card, CardContent, Typography, CardActions, Button, Stack } from "@mui/material"
+import { Card, CardContent, Typography, CardActions, Button, Stack, IconButton } from "@mui/material"
 import Link from "next/link"
 import { useContext } from "react"
 import { PriceTag } from "../misc"
@@ -12,6 +12,8 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import DeleteIcon from '@mui/icons-material/Delete'
 import dayjs from "dayjs"
 import { urlFromPublicId } from "@/lib/images"
+import Chat from '@/app/img/CHAT.svg'
+import { primaryColor } from "@/utils"
 
 export const DELETE_BID = gql`mutation DeleteBid($bidId: Int) {
   deleteBid(input: {bidId: $bidId}) {
@@ -37,12 +39,19 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
 
     return <Card>
         <CardContent sx={{ paddingBottom: 0 }}>
-            <ResourceHeader sx={{ padding: 0 }} data={{
-                id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
-                    id: bid.resource.account!.id, name: bid.resource.account!.name,
-                    participantId: 0, avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
-                }
-            }}/>
+            <Stack direction="row" justifyContent="space-between">
+                <ResourceHeader sx={{ padding: 0 }} data={{
+                    id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
+                        id: bid.resource.account!.id, name: bid.resource.account!.name,
+                        participantId: 0, avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
+                    }
+                }}/>
+                <Link href={`/webapp/${uiContext.version}/chat/new/${bid.resource.id}?with=${bid.account.id}`}>
+                    <IconButton color="primary">
+                        <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
+                    </IconButton>
+                </Link>
+            </Stack>
             <Stack data-testid={`BidSent:${bid.id}`} direction="row" gap="0.5rem" alignItems="center">
                 <PriceTag value={bid.amountOfTokens} label={uiContext.i18n.translator('yourBidAmountOfTokenLabel')}/>
                 {bid.resource.price && <Stack direction="row" gap="0.5rem" alignItems="center">

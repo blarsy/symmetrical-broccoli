@@ -17,6 +17,8 @@ import { IconButton, Text } from "react-native-paper"
 import OperationFeedback from "../OperationFeedback"
 import ConfirmDialog from "../ConfirmDialog"
 import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
+import Images from "@/Images"
+import BareIconButton from "../layout/BareIconButton"
 
 const PAGE_SIZE = 10
 
@@ -117,10 +119,19 @@ const ReceivedBidCard = ({ bid, navigation, onBidHandled }: ReceivedBidCardProps
     const [confirmingRefusal, setConfirmingRefusal] = useState(false)
     return <View 
         style={{ backgroundColor: lightPrimaryColor, borderRadius: IMAGE_BORDER_RADIUS, padding: 6 }}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <ResourceAuthorHeader avatarAccountInfo={bid.account!} resource={bid.resource} onPress={() => {
                 navigation.navigate('viewResource', { resourceId: bid.resource.id })
             }} />
+            <BareIconButton size={35} onPress={() => {
+              setTimeout(() => navigation.navigate('chat', {
+                  screen: 'conversation',
+                  params: {
+                      resourceId: bid.resource.id,
+                      otherAccountId: bid.account.id
+                  }
+              }))
+            } } Image={Images.Chat} />
         </View>
         <View style={{ alignItems: 'center' }}>
           <PriceTag value={bid.amountOfTokens} label={t('receivedBidLabel')} size={PriceTagSizeEnum.normal}/>

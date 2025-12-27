@@ -5,8 +5,8 @@ import { Theme } from "@emotion/react"
 import { useContext, useEffect, useState } from "react"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
 import { gql, useLazyQuery } from "@apollo/client"
-import { GET_RESOURCE } from "@/lib/apolloClient"
-import { fromServerGraphResource } from "@/lib/schema"
+import { GET_ACCOUNT_PUBLIC_INFO, GET_RESOURCE } from "@/lib/apolloClient"
+import { fromServerGraphAccount, fromServerGraphResource } from "@/lib/schema"
 import { UiContext } from "../scaffold/UiContextProvider"
 import LoadedZone from "../scaffold/LoadedZone"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
@@ -23,6 +23,7 @@ interface Props {
     conversationId?: number
     resourceId?: number
     showConversationsRequested: () => void
+    withAccountId?: number
 }
 
 const Chat = (p: Props) => {
@@ -30,6 +31,7 @@ const Chat = (p: Props) => {
     const chatDispatch = useContext(ChatDispatchContext)
     const uiContext = useContext(UiContext)
     const [getResource] = useLazyQuery(GET_RESOURCE)
+    const [getAccountPublicInfo] =useLazyQuery(GET_ACCOUNT_PUBLIC_INFO)
     const [getConversationForResource] = useLazyQuery(GET_CONVERSATION_FOR_RESOURCE)
     const [loadState, setLoadState] = useState<DataLoadState<null>>(initial(false))
 
@@ -41,10 +43,21 @@ const Chat = (p: Props) => {
                 chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: conv.data.getConversationForResource.id })
             } else {
                 const res = await getResource({ variables: { id: p.resourceId } })
-                chatDispatch({ 
-                    type: ChatReducerActionType.SetNewConversation,
-                    payload: fromServerGraphResource(res.data.resourceById, uiContext.categories.data!) 
-                })
+                if(p.withAccountId) {
+                    const accountRes = await getAccountPublicInfo({ variables: { id: p.withAccountId } })
+                    chatDispatch({ 
+                        type: ChatReducerActionType.SetNewConversation,
+                        payload: { 
+                            resource: fromServerGraphResource(res.data.resourceById, uiContext.categories.data!),
+                            withAccount: fromServerGraphAccount(accountRes.data.getAccountPublicInfo)
+                        }
+                    })                    
+                } else {
+                    chatDispatch({ 
+                        type: ChatReducerActionType.SetNewConversation,
+                        payload: { resource: fromServerGraphResource(res.data.resourceById, uiContext.categories.data!)  }
+                    })
+                }
             }
             setLoadState(fromData(null))
         } catch(e) {

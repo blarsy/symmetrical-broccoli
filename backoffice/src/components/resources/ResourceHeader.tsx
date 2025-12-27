@@ -1,10 +1,10 @@
 import { SxProps } from "@mui/system"
-import { ResourceHeaderyData } from "../chat/lib"
+import { ResourceHeaderData } from "../chat/lib"
 import ResourceImage from "../ResourceImage"
 import { Stack, Theme, Typography } from "@mui/material"
 
 interface Props {
-    data: ResourceHeaderyData
+    data: ResourceHeaderData
     sx?: SxProps<Theme>
     onResourceClicked?: () => void
     onAccountClicked?: () => void

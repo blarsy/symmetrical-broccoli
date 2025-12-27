@@ -6,7 +6,7 @@ import { AppContext } from "../AppContextProvider"
 import LoadedList from "../LoadedList"
 import React from "react"
 import { t } from "@/i18n"
-import { Dimensions, View } from "react-native"
+import { View } from "react-native"
 import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import { NavigationHelpers, ParamListBase } from "@react-navigation/native"
@@ -18,6 +18,7 @@ import { OptionSelect } from "../layout/lib"
 import OperationFeedback from "../OperationFeedback"
 import ConfirmDialog from "../ConfirmDialog"
 import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
+import BareIconButton from "../layout/BareIconButton"
 
 const PAGE_SIZE = 10
 
@@ -112,10 +113,19 @@ const SentBidCard = ({ bid, navigation, onBidHandled }: SentBidCardProps) => {
     const [confirmDelete, setConfirmDelete] = useState(false)
     return <View 
         style={{ backgroundColor: lightPrimaryColor, borderRadius: IMAGE_BORDER_RADIUS, padding: 6, gap: 6 }}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <ResourceAuthorHeader avatarAccountInfo={bid.resource.account!} resource={bid.resource} onPress={() => {
                 navigation.navigate('viewResource', { resourceId: bid.resource.id })
             }} />
+            <BareIconButton size={35} onPress={() => {
+              setTimeout(() => navigation.navigate('chat', {
+                  screen: 'conversation',
+                  params: {
+                      resourceId: bid.resource.id,
+                      otherAccountId: bid.account.id
+                  }
+              }))
+            } } Image={Images.Chat} />
         </View>
         <View style={{ alignItems: 'center' }}>
           <PriceTag size={PriceTagSizeEnum.normal} value={bid.amountOfTokens} label={t('sentBidLabel')}/>

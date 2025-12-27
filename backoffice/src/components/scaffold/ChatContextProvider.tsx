@@ -1,6 +1,6 @@
 import { createContext, Dispatch, useReducer } from "react"
 import { ConversationData, NewMessage } from "../chat/lib"
-import { Resource } from "@/lib/schema"
+import { Account, Resource } from "@/lib/schema"
 
 export interface ChatStateData {
   unreadConversations: number[]
@@ -10,6 +10,7 @@ export interface ChatStateData {
   chatMessageCustomHandler?: (msg: any) => void
   newConversationState?: {
     resource: Resource
+    withAccount?: Account
   }
 }
 
@@ -81,7 +82,7 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
         if(!action.payload) {
             newState = { newConversationState: undefined, conversations: previousState.conversations.filter(c => !c.resourceId || c.resourceId != previousState.newConversationState?.resource.id) }
         } else {
-            newState = { newConversationState: { resource: action.payload } }
+            newState = { newConversationState: action.payload }
         }
         break
     default:

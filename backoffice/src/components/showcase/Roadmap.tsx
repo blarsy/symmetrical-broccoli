@@ -2,12 +2,14 @@ import { Box, Stack, Typography, useTheme } from "@mui/material"
 import CheckEmpty from '@/app/img/roadmap/check-empty.svg'
 import Check from '@/app/img/roadmap/check.svg'
 import { fonts } from "@/theme"
+import Link from "next/link"
 
 interface StepStoneProps {
     leftText: string
     done?: boolean
     rightTextTitle: string
     rightTextDetail: string
+    linkUrl?: string
 }
 
 const StepStone = (p: StepStoneProps) => {
@@ -46,7 +48,17 @@ const StepStone = (p: StepStoneProps) => {
                 },[theme.breakpoints.down('md')]: {
                     fontSize: 16
                 }
-            }}>{p.rightTextTitle}</Typography>
+            }}>{p.rightTextTitle}{p.linkUrl && <Link style={{ 
+                marginLeft: '1rem', 
+                fontSize: 18,
+                textDecoration: 'underline',
+                textTransform: 'none',
+                [theme.breakpoints.down('lg')]: {
+                    fontSize: 20
+                },[theme.breakpoints.down('md')]: {
+                    fontSize: 12
+                }
+            }} href={p.linkUrl}>Info</Link>}</Typography>
             <Typography color="#000" fontFamily={fonts.sugar.style.fontFamily} lineHeight={1} sx={{
                 fontSize: 22,
                 fontWeight: 'bolder',
@@ -91,7 +103,7 @@ const Roadmap = () => {
             <StepStone leftText={'Décembre 2024'} done rightTextTitle={'Version stable'} rightTextDetail={'Une version jolie et complètement fonctionnelle, pour commencer les choses sérieuses.'}/>
             <StepStone leftText={'Juin 2025'} done rightTextTitle={'Mode "contributeur"'} rightTextDetail={`Pour les motivé.e.s, Tope-là devient un jeu gagnant-gagnant.`}/>
             <StepStone leftText={'Novembre 2025'} done rightTextTitle={'Campagnes d\'échange'} rightTextDetail={`Des campagnes ciblées pour lancer le réseau.`}/>
-            <StepStone leftText={'2026'} rightTextTitle={'Collectivisation'} rightTextDetail={`Tope-là devient progressibement un projet 100% auto-géré par ses utilisateurs.`}/>
+            <StepStone leftText={'2026'} linkUrl="/collectif" rightTextTitle={'Collectivisation'} rightTextDetail={`Tope-là devient progressibement un projet 100% auto-géré par ses utilisateurs.`}/>
         </Stack>
     </Stack>
 }

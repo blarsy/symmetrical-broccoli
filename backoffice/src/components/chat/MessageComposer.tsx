@@ -1,5 +1,5 @@
 import { CircularProgress, Dialog, IconButton, Stack, TextField, useTheme } from "@mui/material"
-import { ResourceHeaderyData } from "./lib"
+import { ResourceHeaderData } from "./lib"
 import ImageIcon from '@/app/img/PHOTOS.svg'
 import { useContext, useState } from "react"
 import ImageUpload from "../user/ImageUpload"
@@ -18,7 +18,7 @@ export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourc
 
 
 interface Props {
-    conversation: ResourceHeaderyData
+    conversation: ResourceHeaderData
     onMessageSent: (id: number, text: string, imagePublicId?: string) => void
 }
 

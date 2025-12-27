@@ -6,7 +6,7 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import ResourceHeader from "../resources/ResourceHeader"
-import { ResourceHeaderyData, ConversationState, Message, NewMessage } from "./lib"
+import { ResourceHeaderData, ConversationState, Message, NewMessage } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
@@ -137,7 +137,7 @@ interface Props {
 }
 
 interface ConversationDisplayData { 
-    conversation: ResourceHeaderyData,
+    conversation: ResourceHeaderData,
     messages: Message[] 
 }
 
@@ -204,13 +204,14 @@ const Conversation = (p: Props) => {
         if(uiContext.categories.data) {
           if(chatContext.newConversationState) {
             setCurrentMessages([])
+            const otherAccount = chatContext.newConversationState.withAccount || chatContext.newConversationState.resource.account!
             const newConversationState: ConversationDisplayData = {
               conversation: {
                 id: -1,
                 otherAccount: {
-                  id: chatContext.newConversationState.resource.account!.id,
-                  name: chatContext.newConversationState.resource.account!.name,
-                  imagePublicId: chatContext.newConversationState.resource.account!.avatarImagePublicId && urlFromPublicId(chatContext.newConversationState.resource.account!.avatarImagePublicId),
+                  id: otherAccount.id,
+                  name: otherAccount.name,
+                  imagePublicId: otherAccount.avatarImagePublicId,
                   participantId: 0
                 },
                 participantId: 0,
@@ -245,7 +246,7 @@ const Conversation = (p: Props) => {
                         <BackIcon />
                       </IconButton>
                       <ResourceHeader
-                        data={conversationData.data!.conversation} 
+                        data={conversationData.data!.conversation}
                         onAccountClicked={() => router.push(`/webapp/${uiContext.version}/account/${conversationData.data!.conversation.otherAccount!.id}`)}
                         onResourceClicked={() => router.push(`/webapp/${uiContext.version}/view/${conversationData.data!.conversation.resource!.id}`)} />
                     </Stack>,
