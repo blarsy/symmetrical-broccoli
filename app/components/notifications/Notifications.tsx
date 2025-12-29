@@ -418,6 +418,20 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                             }, Images.Airdrop)
                         )
                     break
+                case 'GRANT_RECEIVED':
+                    otherNotifs.push(
+                        makeNotificationData(rawNotification, t('grantReceivedHeadline1'), t('grantReceivedHeadline2', { amount: rawNotification.node.data.amount }), 
+                            t('grantReceivedDetails', { title: rawNotification.node.data.title }), 
+                            () => {
+                                navigation.navigate('profile', {
+                                    screen: 'tokens',
+                                    params: {
+                                        showHistory: true
+                                    }
+                                })
+                            }, Images.GotGift)
+                        )
+                    break
             }
         })
 

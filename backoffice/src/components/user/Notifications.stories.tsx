@@ -171,6 +171,7 @@ export const EveryNotification: Story = {
                 {node: { id: 14, read: null, created: yesterday, data: { info: 'AIRDROP_RECEIVED', campaignName: 'Vive la rentrée', amountOfTokens: 'Légo tricot' } }},
                 {node: { id: 15, read: null, created: yesterday, data: { info: 'CAMPAIGN_BEGUN', campaignName: 'Vive la rentrée', airdropAmount: 4000, multiplier: 10, airdrop: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 10) } }},
                 {node: { id: 16, read: null, created: yesterday, data: { info: 'AIRDROP_SOON', campaignName: 'Vive la rentrée', airdropAmount: 3000, airdrop: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24) } }},
+                {node: { id: 17, read: null, created: yesterday, data: { info: 'GRANT_RECEIVED', title: 'Bonus par QR code!', amount: 1234 } }},
             ],
             pageInfo: {
                 hasNextPage: false,

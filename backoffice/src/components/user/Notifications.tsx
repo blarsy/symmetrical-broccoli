@@ -339,6 +339,13 @@ const useNotifications = (version: string) => {
                             `/webapp/${version}/profile/tokens`, rawNotification, Airdrop)
                         )
                     break
+                case 'TOKEN_GRANTED':
+                    otherNotifs.push(
+                        createOtherNotification(t('grantReceivedHeadline1'), t('grantReceivedHeadline2', { amount: rawNotification.node.data.amount }), 
+                            t('grantReceivedDetails', { title: rawNotification.node.data.title }), 
+                            `/webapp/${version}/profile/tokens`, rawNotification, GotGift)
+                        )
+                    break
             }
         })
 

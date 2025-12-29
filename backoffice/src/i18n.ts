@@ -253,6 +253,9 @@ const resources = {
             "airdropSoonHeadline1" : "{{airdropAmount}} Topes will be airdropped soon !",
             "airdropSoonHeadline2" : "On {{- airdrop}}, all participants will win...",
             "airdropSoonDetails" : "Create quickly 2 resources on the theme '{{name}}'!",
+            "grantReceivedHeadline1": "Topes received !",
+            "grantReceivedHeadline2": "{{amount}} Topes were granted to you.",
+            "grantReceivedDetails": "You earned it thanks to the '{{title}}' grant link",
             "expiresIn": "Expires ",
             "acceptOfferConfirmDialogTitle": "Important reminder",
             "meaningOfAcceptingOffer": "Upon accepting, you will be immediately transfered the agreed amount of Topes, and you commit to provide the ressource as described. It is a good moment to ensure the logistics are taken care of: make an appointment for the delivery, the takeaway or the execution. If it is a rent, make sure the delay before returning the resource is clear.",
@@ -303,7 +306,14 @@ const resources = {
             "themeStepLabel": "Theme",
             "bonusStepLabel": "Bonus",
             "summaryStepLabel": "Campaign ?",
-            "addResourceButton": "Add a resource to the campaign"
+            "addResourceButton": "Add a resource to the campaign",
+            "grantTitle": "Token grant",
+            "grantExpired": "This grant has expired, sorry.",
+            "maxNumerOfGrantsReached": "This grant has already reached its maximum amount of awards, sorry.",
+            "notOnWhiteList": "Oops, this grant can be awarded to a fixed list of accounts. We don't find your email '{{email}}' in it, sorry.",
+            "notAParticipantToTheConfiguredCampaign": "Oop, this grant rewards the participant of a specific campaign. It looks like you did not take part in this campaign.",
+            "grantSucceeded": "Even more Topes to swap for great resources !",
+            "youWon": "You won "
         }
     },
     fr: { 
@@ -557,6 +567,9 @@ const resources = {
             "airdropSoonHeadline1" : "Largage de {{airdropAmount}} Topes imminent !",
             "airdropSoonHeadline2" : "Le {{- airdrop}}, tous les participants gagnent...",
             "airdropSoonDetails" : "Trouve vite 2 ressources sur le thème '{{name}}' à mettre sur Tope-là !",
+            "grantReceivedHeadline1": "Topes reçus !",
+            "grantReceivedHeadline2": "{{amount}} Topes t'ont été attribués.",
+            "grantReceivedDetails": "Tu les as gagnés grâce à un lien bonus '{{title}}'",
             "expiresIn": "Expire ",
             "acceptOfferConfirmDialogTitle": "Rappel important",
             "meaningOfAcceptingOffer": "En acceptant l'offre, tu vas immédiatement recevoir les Topes. Ca veut aussi dire que tu t'engages à fournir la ressource selon les conditions mentionnées. C'est le bon moment pour t'assurer des détails logistiques: prendre un rendez-vous pour la livraison ou l'enlèvement, ou la prestation, et si c'est une location, définir le délai avant le retour de la ressource.",
@@ -607,7 +620,14 @@ const resources = {
             "themeStepLabel": "Thème",
             "bonusStepLabel": "Bonus",
             "summaryStepLabel": "Une campagne ?",
-            "addResourceButton": "Créer une ressource sur la campagne"
+            "addResourceButton": "Créer une ressource sur la campagne",
+            "grantTitle": "Code bonus",
+            "grantExpired": "Ce code bonus a expiré, désolé.",
+            "maxNumerOfGrantsReached": "Ce code bonus a déjà dépassé son nombre maximum de gagnants, désolé.",
+            "notOnWhiteList": "Arf, désolé, ce bonus est pour une liste de comptes déterminée. Sauf erreur, on n'y retrouve pas ton adresse '{{email}}'",
+            "notAParticipantToTheConfiguredCampaign": "Arf, désolé, ce bonus est pour les participants d'une campagne précise. Sauf erreur, tu n'y as pas participé.",
+            "grantSucceeded": "Autant de Topes en plus pour faire des échanges !",
+            "youWon": "Tu as gagné"
         }
     }
 }
