@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material"
-import CheckEmpty from '@/app/img/roadmap/check-empty.svg'
-import Check from '@/app/img/roadmap/check.svg'
+import CheckEmpty from '@/app/img/roadmap/check-empty.svg?react'
+import Check from '@/app/img/roadmap/check.svg?react'
 import { fonts } from "@/theme"
 import Link from "next/link"
 

@@ -3,18 +3,18 @@ import { lightPrimaryColor, primaryColor } from "@/utils"
 import { Box, Stack, Theme, Typography, TypographyOwnProps, useTheme } from "@mui/material"
 import createTheme, { fonts } from '@/theme'
 import { ThemeProvider } from "@emotion/react"
-import FbLogo from './img/FACEBOOK.svg'
-import InstaLogo from './img/INSTAGRAM.svg'
-import Logo from './img/LOGO-TOPE LA.svg'
-import TopperBabysitter from './img/toppers/babysitter.svg'
-import TopperBikeRepairer from './img/toppers/bike-repairer.svg'
-import TopperDev from './img/toppers/dev.svg'
-import TopperGardener from './img/toppers/gardener.svg'
-import TopperHandyman from './img/toppers/handyman.svg'
-import TopperPainter from './img/toppers/painter.svg'
-import TopperPastryChef from './img/toppers/pastry-chef.svg'
-import TopperScout from './img/toppers/scout.svg'
-import TopperJeweler from './img/toppers/jewelry-maker.svg'
+import FbLogo from './img/FACEBOOK.svg?react'
+import InstaLogo from './img/INSTAGRAM.svg?react'
+import Logo from './img/LOGO-TOPE LA.svg?react'
+import TopperBabysitter from './img/toppers/babysitter.svg?react'
+import TopperBikeRepairer from './img/toppers/bike-repairer.svg?react'
+import TopperDev from './img/toppers/dev.svg?react'
+import TopperGardener from './img/toppers/gardener.svg?react'
+import TopperHandyman from './img/toppers/handyman.svg?react'
+import TopperPainter from './img/toppers/painter.svg?react'
+import TopperPastryChef from './img/toppers/pastry-chef.svg?react'
+import TopperScout from './img/toppers/scout.svg?react'
+import TopperJeweler from './img/toppers/jewelry-maker.svg?react'
 import Link from "next/link"
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { Button } from "@mui/material"
@@ -29,7 +29,7 @@ import { ReactNode } from "react"
 import AccountsGallery from "@/components/showcase/AccountsGallery"
 import Roadmap from "@/components/showcase/Roadmap"
 import useActiveCampaign from "@/lib/useActiveCampaign"
-import CampaignImg from '@/app/img/campaign.svg'
+import CampaignImg from '@/app/img/campaign.svg?react'
 import { AppDownloadButtons } from "@/components/misc"
 
 const { mainVersion, link2Url } = getCommonConfig()

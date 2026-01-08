@@ -33,6 +33,7 @@ const ConnectContent = (p: Props) => {
     if(!appContext.account && !p.allowAnonymous) {
         return <>
             <TopBar version={ p.version }/>
+            <Typography variant="h2" textAlign="center">{uiContext.i18n.translator('pleaseConnectTitle')}</Typography>
             <Container maxWidth="lg" sx={{ padding: '1rem' }}>
                 <Login version={p.version} />
             </Container>

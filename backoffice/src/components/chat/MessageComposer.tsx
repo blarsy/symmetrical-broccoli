@@ -1,6 +1,6 @@
 import { CircularProgress, Dialog, IconButton, Stack, TextField, useTheme } from "@mui/material"
 import { ResourceHeaderData } from "./lib"
-import ImageIcon from '@/app/img/PHOTOS.svg'
+import ImageIcon from '@/app/img/PHOTOS.svg?react'
 import { useContext, useState } from "react"
 import ImageUpload from "../user/ImageUpload"
 import Send from '@mui/icons-material/Send'

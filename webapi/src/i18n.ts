@@ -60,7 +60,9 @@ const resources = {
         "campaignBegun": "Campaign begun: '{{campaignName}}'",
         "campaignBegunSummary": "Create resources in this campaign to win {{multiplier}} times more rewards + airdrop of {{airdropAmount}} Topes if you have 2 active resources.",
         "airdropSoon": "Don't miss the {{airdropAmount}} Topes, only 2 resources are needed !",
-        "airdropSoonSummary": "Create 2 resources under the theme '{{campaignName}}' to win the airdrop on the {{airdrop}}."
+        "airdropSoonSummary": "Create 2 resources under the theme '{{campaignName}}' to win the airdrop on the {{airdrop}}.",
+        "grantReceived": "You won {{amount}} Topes.",
+        "grantReceivedSummary": "The grant is '{{title}}'"
     }},
     fr: { translation: {
         "recover_account_subject": "Récupération d'accès à ton compte'",
@@ -118,7 +120,9 @@ const resources = {
         "campaignBegun": "Nouvelle campagne lancée: '{{campaignName}}'",
         "campaignBegunSummary": "Crée des ressources pour cette campagne et gagne {{multiplier}} fois plus de récompenses en Topes + largage de {{airdropAmount}} Topes si tu as 2 ressources disponibles.",
         "airdropSoon": "Ne rate pas les {{airdropAmount}} Topes, il suffit de créer 2 ressources !",
-        "airdropSoonSummary": "Crée 2 ressources en rapport avec le thème '{{campaignName}}' pour le {{airdrop}}, et tu gagnes le largage."
+        "airdropSoonSummary": "Crée 2 ressources en rapport avec le thème '{{campaignName}}' pour le {{airdrop}}, et tu gagnes le largage.",
+        "grantReceived": "Tu as gagné {{amount}} Topes.",
+        "grantReceivedSummary": "C'est le code bonus '{{title}}'"
     }}
 }
 

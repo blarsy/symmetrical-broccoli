@@ -2,8 +2,8 @@ import { fonts } from "@/theme"
 import { gql, useQuery } from "@apollo/client"
 import { Box, keyframes, Stack, Theme, Typography, useTheme } from "@mui/material"
 import { urlFromPublicId } from "@/lib/images"
-import SketchyCircle from '@/app/img/sketchy-circle.svg'
-import StairHands from '@/app/img/stair-hands.svg'
+import SketchyCircle from '@/app/img/sketchy-circle.svg?react'
+import StairHands from '@/app/img/stair-hands.svg?react'
 import { useEffect, useState } from "react"
 import { primaryColor } from "@/utils"
 

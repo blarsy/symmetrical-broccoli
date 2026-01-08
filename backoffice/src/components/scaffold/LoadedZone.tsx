@@ -20,6 +20,7 @@ const isBottom = (el: Element) => {
 }
 
 function LoadedZone({ loading, error, children, containerStyle, onBottom, ref, testID }: Props) {
+    //if(error) console.log('error', error)
     return <Stack data-testid={testID} ref={ref} sx={containerStyle || { flexDirection: 'column', justifyContent: 'center' }} onScroll={e => {
         if(onBottom && isBottom(e.currentTarget)) {
             onBottom()

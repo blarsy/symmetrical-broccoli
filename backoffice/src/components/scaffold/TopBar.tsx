@@ -16,7 +16,7 @@ import { ChatContext } from "./ChatContextProvider"
 import { UiContext, UiDispatchContext, UiReducerActionType } from "./UiContextProvider"
 import { OverridableComponent } from "@mui/material/OverridableComponent"
 import MenuIcon from '@mui/icons-material/Menu'
-import MiniLogo from '@/app/img/minilogo.svg'
+import MiniLogo from '@/app/img/minilogo.svg?react'
 import { useRouter } from "next/navigation"
 import { PriceTag } from "../misc"
 import { primaryColor } from "@/utils"

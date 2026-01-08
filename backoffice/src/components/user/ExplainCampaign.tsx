@@ -1,10 +1,10 @@
 import { LoadingButton } from "@mui/lab"
 import { Typography, Divider, Stack, Button, Stepper, Step, StepContent, StepButton, useTheme } from "@mui/material"
-import Campaign from "@/app/img/campaign.svg"
-import Airdrop from "@/app/img/airdrop.svg"
-import MoneyIn from "@/app/img/money-in.svg"
-import TimeUp from '@/app/img/time-up.svg'
-import MobileAppConnectIcon from '@/app/img/NOT_CONNECTED.svg'
+import Campaign from '@/app/img/campaign.svg?react'
+import Airdrop from '@/app/img/airdrop.svg?react'
+import MoneyIn from '@/app/img/money-in.svg?react'
+import TimeUp from '@/app/img/time-up.svg?react'
+import MobileAppConnectIcon from '@/app/img/NOT_CONNECTED.svg?react'
 import dayjs from "dayjs"
 import { AppDownloadButtons, PriceTag } from "../misc"
 import LoadedZone from "../scaffold/LoadedZone"

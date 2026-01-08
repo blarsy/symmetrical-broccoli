@@ -106,7 +106,7 @@ export const GET_CATEGORIES = gql`query Categories($locale: String) {
       }
 }`
 
-const LookupDataProvider = (p: PropsWithChildren) => {
+export const LookupDataProvider = (p: PropsWithChildren) => {
     const uiDispatch = useContext(UiDispatchContext)
     const uiContext = useContext(UiContext)
     const [getCategories] = useLazyQuery(GET_CATEGORIES)
@@ -128,7 +128,7 @@ const LookupDataProvider = (p: PropsWithChildren) => {
     }, [uiContext.i18n.lang])
 
     return <LoadedZone loading={uiContext.loadingLookupData} error={uiContext.categories.error} containerStyle={{ overflow: 'hidden', flex: 1 }}>
-        {p.children}
+        {uiContext.categories.data && p.children}
     </LoadedZone>
 }
 

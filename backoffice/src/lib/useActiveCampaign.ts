@@ -25,7 +25,7 @@ function useActiveCampaign () {
     const load = async () => {
         try {
             const res = await getActiveCampaign({ variables: {} })
-            //console.log('res', res.data)
+
             if(res.data.getActiveCampaign === null) {
                 setActiveCampaign(fromData(undefined))
             } else {

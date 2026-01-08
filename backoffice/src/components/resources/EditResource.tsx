@@ -154,7 +154,7 @@ const EditResource = (p: Props) => {
                             </Stack>
                             <Stack>
                                 <TextField size="small" id="price" name="price" value={f.values.price || 0}
-                                    label={uiContext.i18n.translator('Label')}
+                                    label={uiContext.i18n.translator('PriceLabel')}
                                     onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
                                 <ErrorMessage component={ErrorText} name="price" />
                             </Stack>

@@ -7,8 +7,8 @@ import { ErrorText } from "../misc"
 import { useContext, useState } from "react"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { useGoogleLogin } from '@react-oauth/google'
-import GoogleLogo from '../../app/img/google-logo.svg'
-import AppleLogo from '../../app/img/apple-logo.svg'
+import GoogleLogo from '../../app/img/google-logo.svg?react'
+import AppleLogo from '../../app/img/apple-logo.svg?react'
 import Feedback from "../scaffold/Feedback"
 import { appleAuthHelpers } from 'react-apple-signin-auth'
 import { v4 as uuid } from 'uuid'

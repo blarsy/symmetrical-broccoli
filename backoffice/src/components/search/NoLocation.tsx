@@ -1,4 +1,4 @@
-import Pin from '@/app/img/PIN.svg'
+import Pin from '@/app/img/PIN.svg?react'
 import { primaryColor } from "@/utils"
 import { Typography, IconButton } from '@mui/material'
 import { Stack } from '@mui/system'

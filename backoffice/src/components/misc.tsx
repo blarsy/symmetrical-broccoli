@@ -2,15 +2,16 @@ import Check from "@mui/icons-material/Check"
 import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
-import EmptyImage from '@/app/img/PHOTOS.svg'
+import EmptyImage from '@/app/img/PHOTOS.svg?react'
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContentText, DialogTitle, IconButton, Paper, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
-import { PropsWithChildren } from "react"
+import { PropsWithChildren, useContext } from "react"
 import { urlFromPublicId } from "@/lib/images"
-import Tokens from '@/app/img/TOKENS.svg'
+import Tokens from '@/app/img/TOKENS.svg?react'
 import ErrorIcon from '@mui/icons-material/Error'
 import Link from "next/link"
-import Googleplay from '@/app/img/google-play.svg'
-import AppStore from '@/app/img/app-store.svg'
+import Googleplay from '@/app/img/google-play.svg?react'
+import AppStore from '@/app/img/app-store.svg?react'
+import { UiContext } from "./scaffold/UiContextProvider"
 
 export const screenSizesCoefficients = [0.8, 0.7, 0.5]
 export const makePxSize = (baseSize: number, coeff?: number) => `${(baseSize * (coeff || 1)).toFixed(2)}px`
@@ -172,8 +173,9 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
 }
 
 export const PriceTag = ({ value, label, big, testID }: { value: number, label?: string, big?: boolean, testID?: string }) => {
-    return <Tooltip title={`${value} Topes = ${value / 100} Euro`}>
-        <Stack direction="row" gap="1rem" alignItems="center">
+    const uiContext = useContext(UiContext)
+    return <Tooltip title={uiContext.i18n.translator('topeTooltip')}>
+        <Stack direction="row" gap="0.5rem" alignItems="center">
             { label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{label}</Typography> }
             <Typography data-testid={testID} color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value}</Typography>
             <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>

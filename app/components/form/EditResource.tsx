@@ -133,7 +133,7 @@ export default ({ route, navigation }:RouteProps) => {
                     <ErrorMessage component={ErrorText} name="isProduct" />
                     <Hr />
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TransparentTextInput style={{ flex: 1 }} testID="price" label={<StyledLabel label={t('Label')} />} value={values.price?.toString()}
+                        <TransparentTextInput style={{ flex: 1 }} testID="price" label={<StyledLabel label={t('PriceLabel')} />} value={values.price?.toString()}
                             onChangeText={handleChange('price')} onBlur={handleBlur('price')} />
                         <InfoIcon text={t('Tooltip')} />
                     </View>

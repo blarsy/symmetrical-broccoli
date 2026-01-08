@@ -11,11 +11,11 @@ import { AccountAvatar, PriceTag, ResponsiveImage, ZoomedImageDialog } from "../
 import { urlFromPublicId } from "@/lib/images"
 import DisplayLocation from "../user/DisplayLocation"
 import { UiContext } from "../scaffold/UiContextProvider"
-import Chat from '@/app/img/CHAT.svg'
+import Chat from '@/app/img/CHAT.svg?react'
 import { primaryColor } from "@/utils"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { GET_RESOURCE } from "@/lib/apolloClient"
-import GiveIcon from '@/app/img/bid-received.svg'
+import GiveIcon from '@/app/img/bid-received.svg?react'
 import { AppContext } from "../scaffold/AppContextProvider"
 import CreateBidDialog from "../bids/CreateBidDialog"
 import Feedback from "../scaffold/Feedback"
@@ -160,7 +160,7 @@ const ViewResource = (p: Props) => {
                       </Stack>)
                     if(resource.data.price) {
                       fields.push(
-                        <Typography key="price" color="primary" variant="body1">{uiContext.i18n.translator('Label')}</Typography>,
+                        <Typography key="price" color="primary" variant="body1">{uiContext.i18n.translator('PriceLabel')}</Typography>,
                         <PriceTag key="tag" value={resource.data?.price} />)
                     }
                     if(resource.data.canBeDelivered || resource.data.canBeTakenAway) {

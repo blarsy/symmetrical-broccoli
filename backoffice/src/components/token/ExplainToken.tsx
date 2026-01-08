@@ -3,12 +3,12 @@ import React, { PropsWithChildren, useContext, useState } from 'react'
 import 'keen-slider/keen-slider.min.css'
 import { useKeenSlider } from 'keen-slider/react'
 import { UiContext } from "../scaffold/UiContextProvider"
-import ChiclenOrEgg from '@/app/img/tokens/chicken-egg.svg'
-import TopeValue from '@/app/img/tokens/Tope-value.svg'
-import Arrow from '@/app/img/fleche.svg'
-import Close from '@/app/img/CROSS.svg'
-import Tokens from '@/app/img/TOKENS.svg'
-import Check from '@/app/img/CHECK.svg'
+import ChiclenOrEgg from '@/app/img/tokens/chicken-egg.svg?react'
+import TopeValue from '@/app/img/tokens/Tope-value.svg?react'
+import Arrow from '@/app/img/fleche.svg?react'
+import Close from '@/app/img/CROSS.svg?react'
+import Tokens from '@/app/img/TOKENS.svg?react'
+import Check from '@/app/img/CHECK.svg?react'
 
 interface SlideProps extends PropsWithChildren {
     title: string
@@ -81,7 +81,8 @@ const ExplainToken = (p: Props) => {
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep2Title")} sx={{ gap: '1rem' }}>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('barterIsCool')}</Typography>
-                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('moneyToTheRescue')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue')}</Typography>
+                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue2')}</Typography>
                 <Stack sx={theme => ({ 
                     margin: 'auto', width: '450px',
                     [theme.breakpoints.down('md')]: {

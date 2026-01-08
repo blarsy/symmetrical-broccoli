@@ -63,7 +63,6 @@ const GrantConditionsEditor = (p : { value: GrantConditions, onChange: (newValue
         maxNumberOfGrants: yup.number().min(1),
         activeInCampaign: yup.number()
     })} onSubmit={val => {
-        console.log('val', val)
         p.onChange(val)
     }}>
         { ({ handleSubmit, handleChange, handleBlur, values, setFieldValue, dirty }) =>

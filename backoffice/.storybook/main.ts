@@ -1,54 +1,36 @@
-import type { StorybookConfig } from "@storybook/nextjs";
+import type { StorybookConfig } from '@storybook/nextjs-vite'
+import svgr from 'vite-plugin-svgr'
 
 const config: StorybookConfig = {
-  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
-
-  addons: [
-    "@storybook/addon-essentials",
+  "stories": [
+    "../src/**/*.mdx",
+    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+  ],
+  "addons": [
     "@chromatic-com/storybook",
-    "@storybook/addon-interactions",
-    "@storybook/addon-mdx-gfm",
-    "@newhighsco/storybook-addon-svgr",
-    "@storybook/addon-themes"
+    "@storybook/addon-vitest",
+    "@storybook/addon-a11y",
+    "@storybook/addon-docs"
   ],
-
-  framework: {
-    name: "@storybook/nextjs",
-    options: {},
-  },
-
-  staticDirs: ["../public",
-    {
-      from: "../src/app", // Path to your font files from the .storybook directory
-      to: "/src/app",     // Path where Storybook should serve them from
-    },
+  "framework": "@storybook/nextjs-vite",
+  "staticDirs": [
+    "../public"
   ],
+  viteFinal: config => {
+    config.plugins ??= []
 
-  docs: {},
+    const svgrPlugin = svgr({
+      svgrOptions: {
+        icon: true,
+        ref: true,
+      }
+    })
 
-  typescript: {
-    reactDocgen: "react-docgen-typescript"
-  },
-  webpackFinal: async (config) => {
-    config.module = config.module || {};
-    config.module.rules = config.module.rules || [];
-  
-    config.module.rules
-      .filter(rule => rule && rule['test'] && rule['test'].test('.svg'))
-      .forEach(rule => rule!['exclude'] = /\.svg$/i)
-  
-    // Configure .svg files to be loaded with @svgr/webpack
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: [
-        {
-          loader: '@svgr/webpack'
-        }
-      ],
-    });
-  
-    return config;
+    svgrPlugin.enforce = 'pre'; // ✅ correct place
+
+    config.plugins.push(svgrPlugin);
+
+    return config
   }
-};
-
-export default config;
+}
+export default config

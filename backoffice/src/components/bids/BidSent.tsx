@@ -12,7 +12,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import DeleteIcon from '@mui/icons-material/Delete'
 import dayjs from "dayjs"
 import { urlFromPublicId } from "@/lib/images"
-import Chat from '@/app/img/CHAT.svg'
+import Chat from '@/app/img/CHAT.svg?react'
 import { primaryColor } from "@/utils"
 
 export const DELETE_BID = gql`mutation DeleteBid($bidId: Int) {

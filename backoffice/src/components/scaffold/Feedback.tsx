@@ -22,7 +22,7 @@ const Feedback = ({ message, detail, severity, onClose, sx, testID, visible = tr
         return <Alert sx={sx} severity={severity} onClose={onClose}>
             <Stack>
                 <Stack direction="row" justifyItems="space-between" gap="1rem" data-testid={testID}>
-                    <Typography>{message}</Typography>
+                    <Typography data-testid={`${testID}:Message`}>{message}</Typography>
                     {detail && <Tooltip title={detail}>
                         <InfoIcon/>
                     </Tooltip>}

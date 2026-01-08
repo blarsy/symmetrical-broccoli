@@ -18,7 +18,7 @@ const Tokens = ({version} : { version: string }) => {
                 <Typography color="primary" variant="h2" sx={{ paddingTop: 0, paddingBottom: 0 }}>{appContext.account?.amountOfTokens}</Typography>
                 <Typography color="primary" variant="h2" sx={{ paddingTop: 0, paddingBottom: 0 }}>{uiContext.i18n.translator('tokenNamePlural')}</Typography>
             </Stack>
-            <Typography color="primary">{`${appContext.account?.amountOfTokens} Topes = ${appContext.account!.amountOfTokens / 100} Euro`}</Typography>
+            <Typography color="primary">{uiContext.i18n.translator('topeTooltip')}</Typography>
         </Stack>
         <Typography color="primary" variant="h4">{uiContext.i18n.translator('howTokensWork')}</Typography>
         <Button variant="contained" color="primary" onClick={() => setExplainingToken(true)}>{uiContext.i18n.translator('showMeButtonLabel')}</Button>

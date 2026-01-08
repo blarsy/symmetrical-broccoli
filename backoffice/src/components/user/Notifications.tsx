@@ -1,5 +1,5 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import { useContext, useEffect, useRef, useState } from "react"
+import { ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "../scaffold/AppContextProvider"
 import { Divider, Link, Stack, Theme, Typography } from "@mui/material"
 import { UiContext } from "../scaffold/UiContextProvider"
@@ -15,19 +15,19 @@ import { makePxSize, ResponsivePhotoBox, screenSizesCoefficients } from "../misc
 import FiberManualRecord from '@mui/icons-material/FiberManualRecord'
 import dayjs from "dayjs"
 
-import Airdrop from '@/app/img/airdrop.svg'
-import BidReceived from '@/app/img/bid-received.svg'
-import Campaign from '@/app/img/campaign.svg'
-import Denied from '@/app/img/denied.svg'
-import GiftSent from '@/app/img/gift-sent.svg'
-import Gone from '@/app/img/gone.svg'
-import GotGift from '@/app/img/got-gift.svg'
-import Hey from '@/app/img/hey.svg'
-import MoneyIn from '@/app/img/money-in.svg'
-import PrizeWon from '@/app/img/prize-won.svg'
-import Thanks from '@/app/img/thanks.svg'
-import ThumbUp from '@/app/img/thumb-up.svg'
-import TimeUp from '@/app/img/time-up.svg'
+import Airdrop from '@/app/img/airdrop.svg?react'
+import BidReceived from '@/app/img/bid-received.svg?react'
+import Campaign from '@/app/img/campaign.svg?react'
+import Denied from '@/app/img/denied.svg?react'
+import GiftSent from '@/app/img/gift-sent.svg?react'
+import Gone from '@/app/img/gone.svg?react'
+import GotGift from '@/app/img/got-gift.svg?react'
+import Hey from '@/app/img/hey.svg?react'
+import MoneyIn from '@/app/img/money-in.svg?react'
+import PrizeWon from '@/app/img/prize-won.svg?react'
+import Thanks from '@/app/img/thanks.svg?react'
+import ThumbUp from '@/app/img/thumb-up.svg?react'
+import TimeUp from '@/app/img/time-up.svg?react'
 
 interface NotificationData {
     id: number
@@ -339,7 +339,7 @@ const useNotifications = (version: string) => {
                             `/webapp/${version}/profile/tokens`, rawNotification, Airdrop)
                         )
                     break
-                case 'TOKEN_GRANTED':
+                case 'GRANT_RECEIVED':
                     otherNotifs.push(
                         createOtherNotification(t('grantReceivedHeadline1'), t('grantReceivedHeadline2', { amount: rawNotification.node.data.amount }), 
                             t('grantReceivedDetails', { title: rawNotification.node.data.title }), 
@@ -409,8 +409,9 @@ const NotificationImage = ({ image } : { image: string | {
                 accountImagePublicId={image.account.avatarImagePublicId} baseWidth={NOTIFICATION_IMAGE_BASE_SIZE}
                 resourceImagePublicId={image.resource.images.length > 0 ? image.resource.images[0].publicId : undefined} />
         } else {
+            const Img = image
             return <Stack sx={svgNotificationSizeSx} justifyContent="center">
-                {image() }
+                <Img />
             </Stack>
         }
     }

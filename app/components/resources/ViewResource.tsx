@@ -174,7 +174,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
                 <Hr thickness={2}/>
             </View>}
             {resource.data.price && <>
-                <ViewField title={t('Label')}>
+                <ViewField title={t('PriceLabel')}>
                     <PriceTag value={resource.data.price}/>
                 </ViewField>
                 <Hr thickness={2}/>

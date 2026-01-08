@@ -1,7 +1,7 @@
 import Images from "@/Images"
 import { t } from "i18next"
 import React, { FC, useState } from "react"
-import { View, ViewStyle, StyleProp } from "react-native"
+import { View, ViewStyle, StyleProp, ScrollView } from "react-native"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import { Icon, Text } from "react-native-paper"
 import ChickenEgg from '@/assets/img/howitworks/chicken-egg.svg'
@@ -45,15 +45,16 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                     <ChickenEgg width="100%" height={childActualSpace / (702 / 400)} />
                 </View>
             </View>
-            <View style={childStyle}>
+            <ScrollView contentContainerStyle={childStyle}>
                 <Text variant="headlineLarge">{t('howItWorksStep2Title')}</Text>
                 <Text variant="bodyLarge">{t('barterIsCool')}</Text>
-                <Text variant="bodyLarge">{t('moneyToTheRescue')}</Text>
-                <View style={{ flexDirection: 'row', paddingTop: 50 }}>
-                    <TopeValue width="100%" height={childActualSpace / (702 / 400)} />
+                <Text variant="bodyLarge">{t('tokenToTheRescue')}</Text>
+                <Text variant="bodyLarge">{t('tokenToTheRescue2')}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <TopeValue width="100%" height={childActualSpace / (502 / 400)} />
                 </View>
-            </View>
-            <View style={ { ...childStyle, ...{ alignItems: 'flex-start' } }}>
+            </ScrollView>
+            <ScrollView contentContainerStyle={ { ...childStyle, ...{ alignItems: 'flex-start' } }}>
                 <Text variant="headlineLarge">{t('howItWorksStep4Title')}</Text>
                 <Text variant="bodyLarge" style={{ alignSelf: 'center' }}>{t('earnTokens')}</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', gap: 20, marginTop: 50, alignItems: 'center' }}>
@@ -80,7 +81,7 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
                     <WinToken />
                     <Text variant="bodyMedium">...</Text>
                 </View>
-            </View>
+            </ScrollView>
         </SwiperFlatList>
         { !swipedToEnd && <AnimatedSwipeHand/> }
     </View>

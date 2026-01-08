@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import Resources, { RESOURCES } from './Resources'
-import { apolloClientMocksDecorator, configDayjsDecorator, clientComponentDecorator, makeDbRresource, defaultCampaign } from '@/lib/storiesUtil'
+import { configDayjsDecorator, clientComponentDecorator, makeDbRresource, defaultCampaign } from '@/lib/storiesUtil'
 import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
 
 const meta = {
@@ -11,7 +11,7 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {},
-  decorators: [ clientComponentDecorator(), configDayjsDecorator ]
+  decorators: [ configDayjsDecorator ]
 } satisfies Meta<typeof Resources>
 
 export default meta
@@ -19,10 +19,10 @@ type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {
   args: {
-    onChange: console.log,
+    onChange: console.log
   },
-  decorators: [apolloClientMocksDecorator([
-    { query: RESOURCES, result: { myResources: { nodes: [] } }, variables: {} },
+  decorators: [clientComponentDecorator(undefined, undefined, undefined, [
+    { query: RESOURCES, result: { myResources: { nodes: [] } }, variables: {}},
     { query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null}, variables: {} }
   ])]
 }
@@ -31,7 +31,7 @@ export const Initialized: Story = {
   args: {
     onChange: console.log,
   },
-  decorators: [apolloClientMocksDecorator([
+  decorators: [clientComponentDecorator(undefined, undefined, undefined,[
     { query: RESOURCES, result: { myResources: { nodes: [
         makeDbRresource('Resource active avec images', 
             'Une très longue description. Pour tester comment un champ gère correctement une chaîne de caractère de grande longueur, rien de tel que de lui en donner une interminable.', 
@@ -55,7 +55,7 @@ export const WithActiveCampaign: Story = {
   args: {
     onChange: console.log,
   },
-  decorators: [apolloClientMocksDecorator([
+  decorators: [clientComponentDecorator(undefined, undefined, undefined,[
     { query: RESOURCES, result: { myResources: { nodes: [
         makeDbRresource('Resource active avec images', 
             'Une très longue description. Pour tester comment un champ gère correctement une chaîne de caractère de grande longueur, rien de tel que de lui en donner une interminable.', 

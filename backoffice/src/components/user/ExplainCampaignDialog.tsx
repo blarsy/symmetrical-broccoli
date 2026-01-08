@@ -1,7 +1,7 @@
-import { Dialog, Stack, SxProps, Theme, useTheme, useMediaQuery, IconButton } from "@mui/material"
+import { Dialog, Stack, Theme, useTheme, useMediaQuery, IconButton } from "@mui/material"
 import React from 'react'
 import 'keen-slider/keen-slider.min.css'
-import Close from '@/app/img/CROSS.svg'
+import Close from '@/app/img/CROSS.svg?react'
 import { gql } from "@apollo/client"
 import ExplainCampaign from "./ExplainCampaign"
 export const SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS = gql`mutation SetAccountKnowsAboutCampaigns {

@@ -51,3 +51,5 @@ test.txt
 /app/android
 /app/tests/sanityTests/config.ts
 *storybook.log
+
+storybook-static

@@ -82,6 +82,11 @@ export const makeNotificationInfo = (data: any, t: TFunction<"translation", unde
                 title: t('airdropSoon', { airdropAmount: data.airdropAmount }),
                 summary: t('airdropSoonSummary', { airdrop: dayjs(data.airdrop).format(t('full_date_format')), campaignName: data.campaignName })
             }
+        case 'GRANT_RECEIVED':
+            return {
+                title: t('grantReceived', { amount: data.amount }),
+                summary: t('grantReceivedSummary', { title: data.title })
+            }
         default:
             throw new Error(`Unexpected notification type '${data.info}'`)
     }

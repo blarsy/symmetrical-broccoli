@@ -6,8 +6,8 @@ import { ErrorText } from "../misc"
 import Feedback from "../scaffold/Feedback"
 import { useContext, useState } from "react"
 import { isValidPassword } from "@/utils"
-import GoogleLogo from '../../app/img/google-logo.svg'
-import AppleLogo from '../../app/img/apple-logo.svg'
+import GoogleLogo from '../../app/img/google-logo.svg?react'
+import AppleLogo from '../../app/img/apple-logo.svg?react'
 import { AuthProviders } from "@/lib/utils"
 import { useGoogleLogin } from "@react-oauth/google"
 import { v4 as uuid } from 'uuid'

@@ -3,7 +3,7 @@ import Edit from "@mui/icons-material/Edit"
 import { useContext, useState } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import ImageUpload from "../user/ImageUpload"
-import PicturePlaceholder from '@/app/img/PHOTOS.svg'
+import PicturePlaceholder from '@/app/img/PHOTOS.svg?react'
 import Delete from '@mui/icons-material/Delete'
 import { ImageInfo } from "@/lib/schema"
 import { UiContext } from "../scaffold/UiContextProvider"

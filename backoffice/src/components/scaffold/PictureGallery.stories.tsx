@@ -1,18 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import PictureGallery from './PictureGallery'
 import { urlFromPublicId } from '@/lib/images'
 
 const meta = {
   component: PictureGallery,
-  parameters: {
-    // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-  argTypes: {},
-  args: {  },
-  decorators: []
 } satisfies Meta<typeof PictureGallery>
 
 export default meta

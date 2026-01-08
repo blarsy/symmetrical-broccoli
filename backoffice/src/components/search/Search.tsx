@@ -10,7 +10,7 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import useProfile from "@/lib/useProfile"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import { primaryColor } from "@/utils"
-import Campaign from '@/app/img/campaign.svg'
+import Campaign from '@/app/img/campaign.svg?react'
 import ExplainCampaignDialog from "../user/ExplainCampaignDialog"
 
 export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $categoryCodes: [Int], $excludeUnlocated: Boolean = false, $isProduct: Boolean, $isService: Boolean, $referenceLocationLatitude: BigFloat = "0", $referenceLocationLongitude: BigFloat = "0", $searchTerm: String, $distanceToReferenceLocation: BigFloat = "0", $inActiveCampaign: Boolean) {

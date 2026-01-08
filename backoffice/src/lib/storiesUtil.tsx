@@ -10,7 +10,7 @@ import 'dayjs/locale/fr'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import '../app/globals.css'
-import { Translatable } from "@/components/scaffold/ClientWrapper"
+import { LookupDataProvider, Translatable } from "@/components/scaffold/ClientWrapper"
 import { ReactNode } from "react"
 import ChatContextProvider, { ChatStateData } from "@/components/scaffold/ChatContextProvider"
 import { AccountInfo } from "./useAccountFunctions"
@@ -23,7 +23,7 @@ export interface GraphQlOp {
     variables?: Record<string, any>
 }
 
-const defaultAccount: AccountInfo = {
+export const defaultAccount: AccountInfo = {
     id: 123, name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
     amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
     avatarPublicId: '', knowsAboutCampaigns: false
@@ -94,7 +94,7 @@ export const uiContextDecorator = (initial?: UiStateData) => {
         initial = {
             loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
             loadingLookupData: false,
-            version: 'v0_10',
+            version: 'v0_11',
             categories: fromData([])
         }
 
@@ -143,13 +143,13 @@ export const configDayjsDecorator = (Story: React.ElementType) => {
 }
 
 export const clientComponentDecorator = (initialAppstate?: AppStateData, initialChatState?: ChatStateData, 
-    initialUiState?: UiStateData, ops?: GraphQlOp[]) => {
+    initialUiState?: UiStateData, ops?: GraphQlOp[], categories?: { code: number, name: string}[]) => {
     const actualOps: GraphQlOp[] = [{
         query: GET_CATEGORIES,
         variables: { locale: 'fr' },
         result : {
             allResourceCategories: { 
-                nodes: []
+                nodes: categories || []
             }
         }
     }]
@@ -159,8 +159,8 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 
     return (Story: () => ReactNode) =>  <AppContextProvider initial={initialAppstate || { token: '', unreadNotifications: [], loading: false, subscriptions: []}}>
         <ChatContextProvider initial={initialChatState || { conversations: [], unreadConversations: [] }}>
-            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_10', categories: initial(false) }}>
-                <Translatable version="v0_10">
+            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_11', categories: initial(false) }}>
+                <Translatable version="v0_11">
                     <MockedProvider mocks={
                         actualOps.map(op => ({
                             delay: 2000,
@@ -168,7 +168,9 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
                             result: { data: op.result }
                         } as MockedResponse<any, any>))
                     }>
-                        <Story />
+                        <LookupDataProvider>
+                            <Story />
+                        </LookupDataProvider>
                     </MockedProvider>
                 </Translatable>
             </UiContextProvider>

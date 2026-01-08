@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import React  from 'react'
 import { apolloClientMocksDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'

@@ -2,7 +2,7 @@ import { Button, Card, CardActions, CardContent, IconButton, Typography } from '
 import { Stack } from '@mui/material'
 import { useContext, useState } from 'react'
 import PlusIcon from '@mui/icons-material/Add'
-import CampaignIcon from '@/app/img/campaign.svg'
+import CampaignIcon from '@/app/img/campaign.svg?react'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { gql, useMutation, useQuery } from '@apollo/client'
@@ -147,7 +147,7 @@ const ExampleResources = () => {
 }
 const Resources = () => {
     const uiContext = useContext(UiContext)
-    const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
+    const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache', variables: {} })
     const [zoomedImg, setZoomedImg] = useState<string | undefined>('')
     const [deletingResourceId, setDeletingResourceId] = useState<number | undefined>(undefined)
     const [deleteResource] = useMutation(DELETE_RESOURCE)

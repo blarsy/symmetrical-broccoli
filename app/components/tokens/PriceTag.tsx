@@ -4,6 +4,7 @@ import { Text, Tooltip } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import Images from "@/Images"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
+import { t } from "@/i18n"
 
 export enum PriceTagSizeEnum {
     small,
@@ -31,7 +32,7 @@ const PriceTag = ({ value, label, size }: { value: number, label?: string, size?
             variant= 'bodyMedium'
     }
     
-    return <Tooltip title={`${value} Topes = ${value / 100} Euro`} enterTouchDelay={1}>
+    return <Tooltip title={t('topeTooltip')} enterTouchDelay={1}>
         <View style={{ flexDirection: 'row', gap: '0.5rem', alignItems: 'center' }}>
             { label && <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{label} </Text> }
             <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{value} </Text>

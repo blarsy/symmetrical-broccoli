@@ -63,6 +63,8 @@ const getTokenMovementTitle = (tokenHistory: any) => {
             return t('priceSetOnResource')
         case 16:
             return t('airdropReceived')
+        case 17:
+            return t('grantReceived')
         default:
             throw new Error(`Unexpected token transaction type ${tokenHistory.node.tokenTransactionTypeByTokenTransactionTypeId.id}`)
     }

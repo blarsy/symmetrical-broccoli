@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import LocationSelector from './LocationSelector'
 import { uiContextDecorator } from '@/lib/storiesUtil'
 import { Stack } from '@mui/material'

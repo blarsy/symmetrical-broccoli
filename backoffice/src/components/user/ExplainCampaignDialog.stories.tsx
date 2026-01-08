@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import ExplainCampaignDialog from './ExplainCampaignDialog'
 import { useState } from 'react'
 import { Button } from '@mui/material'
@@ -10,6 +10,9 @@ const meta = {
   component: ExplainCampaignDialog,
   parameters: {
     layout: 'centered',
+    nextjs: {
+      appDirectory: true,
+    },
   },
   tags: ['autodocs'],
   argTypes: {},

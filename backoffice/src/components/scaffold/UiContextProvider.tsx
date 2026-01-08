@@ -1,7 +1,6 @@
 import { createContext, Dispatch, Key, useReducer } from "react"
 import { Category } from "@/lib/schema"
 import DataLoadState, { initial } from "@/lib/DataLoadState"
-import LoadedZone from "./LoadedZone"
 
 export interface UiStateData {
   loading: boolean

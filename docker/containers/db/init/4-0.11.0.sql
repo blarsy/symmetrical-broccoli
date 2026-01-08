@@ -67,19 +67,19 @@ BEGIN
 	FROM sb.grants
 	WHERE id = grant_id;
 
-	IF grant_expiaration > NOW() THEN
+	IF grant_expiration < NOW() THEN
 		RETURN -1; -- expired grant
 	END IF;
 
 	IF grant_data -> 'maxNumberOfGrants' IS NOT NULL AND
-		(SELECT COUNT(*) FROM sb.grants_accounts ga WHERE ga.grant_id = grant_hit.grant_id) >= grant_data -> 'maxNumberOfGrants' THEN
+		(SELECT COUNT(*) FROM sb.grants_accounts ga WHERE ga.grant_id = grant_hit.grant_id) >= (grant_data ->> 'maxNumberOfGrants')::integer THEN
 
 		RETURN -2; -- max number of grants reached
 
 	END IF;
 	
 	IF grant_data -> 'emails' IS NOT NULL AND
-		NOT EXISTS (SELECT json_array_elements_text(grant_data -> 'emails') as email 
+		NOT EXISTS (SELECT * FROM (SELECT json_array_elements_text as email FROM json_array_elements_text(grant_data -> 'emails')) emails
 				WHERE LOWER(email) = (SELECT email FROM sb.accounts WHERE id = sb.current_account_id()) ) THEN
 		
 		RETURN -3; -- not on the whitelist
@@ -99,11 +99,11 @@ BEGIN
 	
 	-- insert grant_account
 	INSERT INTO sb.grants_accounts (grant_id, account_id)
-	VALUES (grant_hit.grant_id, sb.current_user_id());
+	VALUES (grant_hit.grant_id, sb.current_account_id());
 	
 	-- create transaction history record
 	INSERT INTO sb.accounts_token_transactions (account_id, token_transaction_type_id, movement)
-	VALUES (sb.current_user_id(), 17, grant_amount);
+	VALUES (sb.current_account_id(), 17, grant_amount);
 	
 	-- increase account token amount
 	UPDATE sb.accounts SET amount_of_tokens = amount_of_tokens + grant_amount

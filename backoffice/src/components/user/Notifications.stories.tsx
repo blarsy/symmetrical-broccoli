@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { apolloClientMocksDecorator, connectedComponent } from '@/lib/storiesUtil'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { connectedComponent } from '@/lib/storiesUtil'
 import Notifications, { GET_NOTIFICATIONS, GET_RESOURCES } from './Notifications'
 
 const meta = {
@@ -7,6 +7,9 @@ const meta = {
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
     layout: 'centered',
+    nextjs: {
+      appDirectory: true,
+    },
   },
   tags: ['autodocs'],
   args: { 

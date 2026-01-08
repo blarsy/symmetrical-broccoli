@@ -1,7 +1,7 @@
 import { IconButton, Stack, SxProps, Theme, Typography, useTheme } from "@mui/material"
 import { useContext, useState } from "react"
-import Arrow from '@/app/img/fleche.svg'
-import EmptyImage from '@/app/img/PHOTOS.svg'
+import Arrow from '@/app/img/fleche.svg?react'
+import EmptyImage from '@/app/img/PHOTOS.svg?react'
 import { ResponsivePhotoBox } from "../misc"
 import { UiContext } from "./UiContextProvider"
 

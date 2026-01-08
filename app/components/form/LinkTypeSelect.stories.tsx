@@ -1,5 +1,5 @@
 import { paperProviderDecorator } from '@/lib/storiesUtil'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import React  from 'react'
 import LinkTypeSelect from './LinkTypeSelect'
 

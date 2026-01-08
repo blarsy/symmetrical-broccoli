@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { gql, useQuery } from "@apollo/client"
 import { ADD_LINK_REWARD, ADD_LOCATION_REWARD, ADD_LOGO_REWARD, ADD_RESOURCE_PICTURE_REWARD, ADD_RESOURCE_PRICE_REWARD, CREATE_RESOURCE_REWARD } from "@/lib/constants"
 import { CircularProgress, IconButton, Stack, Typography } from "@mui/material"
-import Check from '@/app/img/CHECK.svg'
+import Check from '@/app/img/CHECK.svg?react'
 import Smiley from '@mui/icons-material/SentimentSatisfiedAlt'
 import AlarmIcon from '@mui/icons-material/Alarm'
 import ArrowForward from '@mui/icons-material/ArrowForward'

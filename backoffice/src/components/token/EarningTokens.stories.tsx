@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { apolloClientMocksDecorator, clientComponentDecorator, defaultCampaign } from '@/lib/storiesUtil'
-import EarningTokens, { GET_ACCOUNT, GET_RESOURCES_WITHOUT_PIC, NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN } from './EarningTokens'
+import EarningTokens, { GET_ACCOUNT, GET_RESOURCES_WITHOUT_PIC, GET_RESOURCES_WITHOUT_PRICE, NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN } from './EarningTokens'
 import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
 
 const meta = {
@@ -8,6 +8,9 @@ const meta = {
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
     layout: 'centered',
+    nextjs: {
+      appDirectory: true,
+    },
   },
   tags: ['autodocs'],
   argTypes: {},
@@ -55,6 +58,8 @@ export const NoCampaignVanillaAccount: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: null}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator()]
 }
 export const NoCampaignAccountFilled: Story = {
@@ -113,6 +118,8 @@ export const NoCampaignAccountFilled: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: null}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
     activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
@@ -184,6 +191,8 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: { nodes: [{ id: 5 }] }}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
     activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
@@ -208,6 +217,8 @@ export const NoResourceInCampaign: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: { nodes: [] }}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator()]
 }
 export const EligibleToFutureAirdrop: Story = {
@@ -230,6 +241,8 @@ export const EligibleToFutureAirdrop: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: { nodes: [] }}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator()]
 }
 export const AirdropDone: Story = {
@@ -252,5 +265,7 @@ export const AirdropDone: Story = {
     } }, variables: {}
   }, {
     query: GET_RESOURCES_WITHOUT_PIC, result: {getMyResourcesWithoutPicture: { nodes: [] }}, variables: {}
+  }, {
+    query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator()]
 }

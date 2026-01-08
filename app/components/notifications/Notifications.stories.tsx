@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import Notifications, { GET_NOTIFICATIONS, GET_RESOURCES } from './Notifications'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator, singleResource } from '@/lib/storiesUtil'

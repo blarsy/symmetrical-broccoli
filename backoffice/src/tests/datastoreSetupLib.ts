@@ -1,5 +1,5 @@
 import { getApolloClient } from "@/lib/apolloClient"
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client"
+import { gql } from "@apollo/client"
 import dayjs from "dayjs"
 import config from "./config"
 import { Client, QueryResult } from "pg"
@@ -13,8 +13,9 @@ import { RenderResult } from "@testing-library/react"
 import { UPDATE_ACCOUNT_PUBLIC_INFO } from "@/lib/useProfile"
 import { Location } from '@/lib/schema'
 import { SUGGEST_RESOURCES } from "@/components/search/Search"
+import { UUID } from "crypto"
 
-const VERSION = 'v0_10'
+const VERSION = 'v0_11'
 
 export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
   createCampaign(
@@ -48,6 +49,7 @@ export const executeQuery = async (query: string, parameters?: any[]): Promise<Q
     const client = await getOpenConnection()
     
     try {
+        //console.log('exec', query, parameters)
         return await client.query(query , parameters)
     } catch(e) {
         console.error(`Error while executing ${query} with params ${parameters}`, e)
@@ -93,7 +95,6 @@ export const authenticate = async (email: string, password: string) => {
     const client = getApolloClient(VERSION, '')
     try {
         const res = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } } )
-        //console.log('jwt', res.data.jwtToken, 'res.data', res.data)
         return res.data.authenticate.jwtToken
     } catch (e) {
         console.debug('Error while trying to authenticate', e)
@@ -343,9 +344,36 @@ export const checkAccountTokens = async (email: string, expectedAmountOfTokens: 
     expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
 }
 
+export const checkLastTokenTransactionOnAccount = async (email: string, amount: number, transationType: number) => {
+    const result = await executeQuery(`select * from sb.accounts_token_transactions 
+        where account_id = (SELECT id from sb.accounts WHERE email = $1) and
+        movement = $2 and
+        token_transaction_type_id = $3`, [email, amount, transationType])
+    
+    expect(result.rowCount).toBe(1)
+}
+
 export const removeActiveCampaign = async () => {
     await executeQuery(`
         delete from sb.campaigns_resources where campaign_id = (select id from sb.get_active_campaign());
         delete from sb.campaigns where id = (select id from sb.get_active_campaign());
     `)
+}
+
+export const createGrant = async (title: string, amount: number, expiration?: Date, maxNumberOfGrants?: number, whiteList?: string[], campaignId?: number): Promise<UUID> => {
+    let data = {} as any
+    
+    if(maxNumberOfGrants != undefined) data.maxNumberOfGrants = maxNumberOfGrants
+    if(whiteList) data.emails = whiteList
+    if(campaignId) data.activeInCampaign = campaignId
+
+    const res = await executeQuery(`INSERT INTO sb.grants(title, description, amount, data, expiration)
+	    VALUES ($1, $2, $3, $4, $5) RETURNING id;`, [title, 'description', amount, data, expiration || new Date(new Date().valueOf() + 1000 * 60 * 60 * 24) ])
+    
+        return res.rows[0].id
+}
+
+export const deleteGrant = async (grantId: UUID) => {
+    await executeQuery(`DELETE FROM sb.grants_accounts WHERE grant_id = $1;`, [grantId])
+    return executeQuery(`DELETE FROM sb.grants WHERE id = $1`, [grantId])
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import Start from '@/components/mainViews/Start'
-import { AppRegistry, StatusBar, View } from 'react-native'
+import { AppRegistry, StatusBar } from 'react-native'
 import { primaryColor } from './components/layout/constants'
 import { en, fr, registerTranslation } from 'react-native-paper-dates'
 import relativeTime from 'dayjs/plugin/relativeTime'

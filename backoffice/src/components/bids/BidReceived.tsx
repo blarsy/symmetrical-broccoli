@@ -13,7 +13,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import dayjs from "dayjs"
 import { ConfirmDialog, PriceTag } from "../misc"
 import { urlFromPublicId } from "@/lib/images"
-import Chat from '@/app/img/CHAT.svg'
+import Chat from '@/app/img/CHAT.svg?react'
 import { primaryColor } from "@/utils"
 
 export const ACCEPT_BID = gql`mutation AcceptBid($bidId: Int) {
