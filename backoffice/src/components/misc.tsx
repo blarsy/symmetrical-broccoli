@@ -3,8 +3,8 @@ import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
 import EmptyImage from '@/app/img/PHOTOS.svg?react'
-import { Avatar, Box, Button, Dialog, DialogActions, DialogContentText, DialogTitle, IconButton, Paper, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
-import { PropsWithChildren, useContext } from "react"
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
+import { JSX, PropsWithChildren, useContext } from "react"
 import { urlFromPublicId } from "@/lib/images"
 import Tokens from '@/app/img/TOKENS.svg?react'
 import ErrorIcon from '@mui/icons-material/Error'

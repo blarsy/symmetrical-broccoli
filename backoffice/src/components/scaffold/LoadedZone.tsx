@@ -11,7 +11,7 @@ interface Props {
     children?: React.ReactNode,
     containerStyle?: SxProps<Theme>
     onBottom?: () => void
-    ref?: RefObject<HTMLDivElement>
+    ref?: RefObject<HTMLDivElement | null>
     testID?: string
 }
 

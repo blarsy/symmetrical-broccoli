@@ -1,5 +1,5 @@
 import { AccountInfo } from "@/lib/useAccountFunctions"
-import { createContext, Dispatch, useReducer } from "react"
+import { createContext, Dispatch, JSX, useReducer } from "react"
 
 export interface AppStateData {
   token: string
@@ -82,7 +82,7 @@ interface Props {
     initial?: AppStateData
 }
 const AppContextProvider = ({ children, initial }: Props) => {
-    const [appState, dispatch] = useReducer<(previousState: AppStateData, action: { type: AppReducerActionType, payload: any }) => AppStateData>(appReducer, initial || blankAppContext)
+    const [appState, dispatch] = useReducer(appReducer, initial || blankAppContext)
 
     return <AppContext.Provider value={appState}>
         <AppDispatchContext.Provider value={dispatch} >

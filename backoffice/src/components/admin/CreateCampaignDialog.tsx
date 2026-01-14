@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from "@mui/material"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { LoadingButton } from "@mui/lab"
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import Feedback from "../scaffold/Feedback"
@@ -8,7 +8,10 @@ import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorText } from "../misc"
+import { Editor } from '@tinymce/tinymce-react'
 import dayjs from "dayjs"
+import { TinyMCE } from "tinymce"
+import BundledEditor from "./BundledEditor"
 
 export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
   createCampaign(
@@ -41,6 +44,7 @@ interface Props {
 const CreateCampaignDialog = (p: Props) => {
     const [campaignStatus, setCampaignStatus] = useState<DataLoadState<undefined>>(initial(false))
     const [createCampaign] = useMutation(CREATE_CAMPAIGN)
+    const editorRef = useRef<Editor | null>(null)
 
     return <Formik initialValues={{ name: '', description: '', beginning: dayjs().add(1, "day").toDate(), ending: dayjs().add(1, "month").toDate(), 
         airdrop: dayjs().add(2, "week").toDate(), airdropAmount: 3000, resourceRewardsMultiplier: 5 }}
@@ -78,9 +82,23 @@ const CreateCampaignDialog = (p: Props) => {
                     required onChange={handleChange('name')} 
                     onBlur={handleBlur('name')}/>
                 <ErrorMessage component={ErrorText} name="name" />
-                <TextField label="Description" multiline sx={{ flex: 1 }} value={values.description} 
-                    onChange={handleChange('description')} 
-                    onBlur={handleBlur('description')}/>
+                <Stack direction="row">
+                    <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">Description</Typography>
+                    <BundledEditor
+                        init={{
+                            plugins: [
+                                'link', 'anchor', 'autoresize', 'lists',
+                                'searchreplace', 'visualblocks', 'fullscreen',
+                                'table', 'wordcount'
+                            ],
+                            toolbar: 'undo redo | formatselect | ' +
+                            'bold italic backcolor | alignleft aligncenter ' +
+                            'alignright alignjustify | bullist numlist outdent indent | ' +
+                            'removeformat | help',
+                        }} value={values.description}
+                        onEditorChange={handleChange('description')}
+                        onBlur={handleBlur('description')} />
+                </Stack>
                 <ErrorMessage component={ErrorText} name="description" />
                 <TextField label="Resource rewards multiplier" sx={{ flex: 1 }} value={values.resourceRewardsMultiplier} 
                     type="number" required onChange={handleChange('resourceRewardsMultiplier')} onBlur={handleBlur('resourceRewardsMultiplier')}/>

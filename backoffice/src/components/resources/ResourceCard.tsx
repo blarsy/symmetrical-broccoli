@@ -5,7 +5,7 @@ import PictureGallery from "../scaffold/PictureGallery"
 import { urlFromPublicId } from "@/lib/images"
 import { AccountAvatar, ZoomedImageDialog } from "../misc"
 import EmptyImage from '@/app/img/PHOTOS.svg?react'
-import { useState } from "react"
+import { JSX, useState } from "react"
 
 const limitTextLength = (text: string, maxLength: number) => {
     if(text.length < maxLength)

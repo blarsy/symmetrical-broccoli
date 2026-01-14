@@ -1,6 +1,6 @@
 import { SxProps, Theme } from "@mui/material"
 import LoadedZone from "./LoadedZone"
-import { RefObject } from "react"
+import { JSX, RefObject } from "react"
 
 export interface StateError extends Error {
     detail?: string
@@ -14,7 +14,7 @@ interface Props {
     renderNoData?: () => JSX.Element
     containerStyle?: SxProps<Theme>
     onBottom?: () => void
-    ref?: RefObject<HTMLDivElement>
+    ref?: RefObject<HTMLDivElement | null>
     testID?: string
 }
 

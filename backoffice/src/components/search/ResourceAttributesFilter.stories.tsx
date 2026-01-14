@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react/*"
+import { Meta, StoryObj } from "@storybook/nextjs-vite"
 import { clientComponentDecorator } from "@/lib/storiesUtil"
 import ResourceAttributesFilter from "./ResourceAttributesFilter"
 

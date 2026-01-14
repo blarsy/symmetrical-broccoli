@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react/*"
+import { Meta, StoryObj } from "@storybook/nextjs-vite"
 import SearchFilter from "./SearchFilter"
 import { apolloClientMocksDecorator, clientComponentDecorator } from "@/lib/storiesUtil"
 import { DEFAULT_SEARCH_PARAMETERS } from "./Search"

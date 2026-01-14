@@ -26,9 +26,9 @@ const config: StorybookConfig = {
       }
     })
 
-    svgrPlugin.enforce = 'pre'; // ✅ correct place
+    svgrPlugin.enforce = 'pre'
 
-    config.plugins.push(svgrPlugin);
+    config.plugins.push(svgrPlugin)
 
     return config
   }

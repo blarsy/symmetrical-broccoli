@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 
 import Roadmap from './Roadmap'
 import { clientComponentDecorator } from '@/lib/storiesUtil'

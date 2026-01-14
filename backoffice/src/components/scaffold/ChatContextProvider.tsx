@@ -1,4 +1,4 @@
-import { createContext, Dispatch, useReducer } from "react"
+import { createContext, Dispatch, JSX, useReducer } from "react"
 import { ConversationData, NewMessage } from "../chat/lib"
 import { Account, Resource } from "@/lib/schema"
 
@@ -100,7 +100,7 @@ interface Props {
     initial?: ChatStateData
 }
 const ChatContextProvider = ({ children, initial }: Props) => {
-    const [chatState, dispatch] = useReducer<(previousState: ChatStateData, action: { type: ChatReducerActionType, payload: any }) => ChatStateData>(chatReducer, initial || blankChatContext)
+    const [chatState, dispatch] = useReducer(chatReducer, initial || blankChatContext)
 
     return <ChatContext.Provider value={chatState}>
         <ChatDispatchContext.Provider value={dispatch}>

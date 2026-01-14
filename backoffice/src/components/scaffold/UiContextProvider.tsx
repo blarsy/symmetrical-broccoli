@@ -1,4 +1,4 @@
-import { createContext, Dispatch, Key, useReducer } from "react"
+import { createContext, Dispatch, JSX, Key, useReducer } from "react"
 import { Category } from "@/lib/schema"
 import DataLoadState, { initial } from "@/lib/DataLoadState"
 
@@ -60,7 +60,7 @@ interface Props {
     initial?: UiStateData
 }
 const UiContextProvider = ({ children, initial }: Props) => {
-    const [uiState, dispatch] = useReducer<(previousState: UiStateData, action: { type: UiReducerActionType, payload: any }) => UiStateData>(uiReducer, initial || blankUiContext)
+    const [uiState, dispatch] = useReducer(uiReducer, initial || blankUiContext)
 
     return <UiContext.Provider value={uiState}>
         <UiDispatchContext.Provider value={dispatch}>

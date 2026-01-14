@@ -116,7 +116,8 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                 { title: activeCampaign.data?.name, stepLabel: uiContext.i18n.translator("themeStepLabel"),
                     content: <>
                         <Campaign />
-                        {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)}
+                        <p dangerouslySetInnerHTML={{ __html: activeCampaign.data.description }}/>
+                        {/* {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)} */}
                         <Divider sx={{ alignSelf: 'stretch' }}/>
                         <Typography variant="body1" textAlign="center" color="primary.contrastText">
                             {uiContext.i18n.translator('createResourcesInCampaignExplanation')}

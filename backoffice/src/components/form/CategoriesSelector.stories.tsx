@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import CategoriesSelector from './CategoriesSelector'
 import { apolloClientMocksDecorator, clientComponentDecorator } from '@/lib/storiesUtil'
 import { GET_CATEGORIES } from '@/lib/useCategories'

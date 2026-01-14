@@ -21,7 +21,7 @@ web-build/
 
 .env
 .env.development
-.env.production
+*.production
 .env.production.bak
 .env.test
 *.config.json

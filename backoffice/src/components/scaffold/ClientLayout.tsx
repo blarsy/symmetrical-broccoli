@@ -1,6 +1,7 @@
 import { Typography, Container, Box } from "@mui/material"
 import Footer from '@/app/Footer'
 import ClientWrapper from "./ClientWrapper"
+import { JSX } from "react"
 
 interface Props {
     title?: string,

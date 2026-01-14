@@ -2,7 +2,6 @@ import { Alert, AlertColor, Stack, SxProps, Theme, Tooltip, Typography } from "@
 import InfoIcon from '@mui/icons-material/Info'
 import { useContext } from "react"
 import { UiContext } from "./UiContextProvider"
-import { p } from "graphql-ws/dist/common-DY-PBNYy"
 
 interface Props {
     message?: string

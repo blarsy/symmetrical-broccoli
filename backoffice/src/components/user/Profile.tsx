@@ -50,7 +50,7 @@ interface Props {
 const InlineFormTextInput = (p: Props) => {
     const uiContext = useContext(UiContext)
     const [editing, setEditing] = useState(false)
-    const textInputRef = useRef<HTMLInputElement>()
+    const textInputRef = useRef<HTMLInputElement>(null)
 
     return <Formik initialValues={{ value: p.initialValue }} 
         validationSchema={yup.object().shape({

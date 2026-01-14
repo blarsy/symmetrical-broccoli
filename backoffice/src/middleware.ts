@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
       `'unsafe-eval'`
       : ''};
     connect-src 'self' https://maps.googleapis.com https://region1.google-analytics.com ${versions.map(v => v.apiUrl).join(' ')} ${versions.map(v => v.subscriptionsUrl).join(' ')};
-    img-src 'self' blob: data: https://res.cloudinary.com https://maps.gstatic.com https://maps.googleapis.com;
+    img-src 'self' blob: data: https://res.cloudinary.com https://maps.gstatic.com https://maps.googleapis.com https://fonts.gstatic.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
 `
   // Replace newline characters and spaces

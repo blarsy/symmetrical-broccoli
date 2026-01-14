@@ -193,7 +193,7 @@ const Page = () => {
                             position: 'relative', right: 10, top: 20,
                         }
                     }}/>
-                    <Logo alt="Logo Tope-la" height={323}/>
+                    <Logo height={323}/>
                 </Stack>
                 <Stack flexDirection="row" justifyContent="center" alignItems="flex-start">
                     <Stack sx={theme => ({
@@ -271,8 +271,8 @@ const Page = () => {
                     </Stack>
                     <Typography color="#000" textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={28} fontWeight={400} paddingTop="1rem" paddingBottom="1rem">Suis-nous</Typography>
                     <Box display="flex" flexDirection="row" gap="1.5rem">
-                        <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo alt="Logo Facebook" height={60}/></Link>
-                        <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo alt="Logo Instagram" height={60}/></Link>
+                        <Link href="https://www.facebook.com/profile.php?id=61552205033496" target="_blank"><FbLogo height={60}/></Link>
+                        <Link href="https://www.instagram.com/tope.la.app/" target="_blank"><InstaLogo height={60}/></Link>
                     </Box>
                 </Stack>
                 <Stack alignItems="center" justifyContent="center" gap="1rem" direction="column" padding="3rem">

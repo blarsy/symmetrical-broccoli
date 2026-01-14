@@ -1,6 +1,6 @@
 import { useLazyQuery } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
-import { useContext, useEffect, useState } from "react"
+import { JSX, useContext, useEffect, useState } from "react"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
 import { Chip, Dialog, IconButton, Stack, Tooltip, Typography } from "@mui/material"

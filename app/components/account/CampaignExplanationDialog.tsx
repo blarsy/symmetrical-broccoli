@@ -1,18 +1,19 @@
 import React, { useContext, useState } from "react"
-import { Dimensions, StyleProp, View, ViewStyle } from "react-native"
+import { Dimensions, Platform, StyleProp, View, ViewStyle } from "react-native"
 import { ThemedDialog } from "../ConfirmDialog"
 import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
 import { gql, useMutation } from "@apollo/client"
-import { Text } from "react-native-paper"
+import { ActivityIndicator, Text } from "react-native-paper"
 import { t } from "@/i18n"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import dayjs from "dayjs"
-import { primaryColor } from "../layout/constants"
+import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import { Campaign } from "@/lib/useActiveCampaign"
 import PriceTag, { PriceTagSizeEnum } from "../tokens/PriceTag"
 import Images from "@/Images"
 import { AppContext } from "../AppContextProvider"
+import { WebView, WebViewProps } from 'react-native-webview'
 
 const SET_KNOWS_ABOUT_CAMPAIGNS = gql`mutation SetKnowsAboutCampaigns {
   setAccountKnowsAboutCampaigns(input: {}) {
@@ -27,11 +28,35 @@ interface Props {
     onOnboardRequested?: () => void
 }
 
+const AutoHeightWebView = (p: WebViewProps) => {
+    const [sectionHeight, setSectionHeight] = useState<number | undefined>()
+
+    return <WebView style={{ height: sectionHeight }} 
+        onMessage={(event) => {
+            const data = event.nativeEvent.data
+
+            if (!isNaN(parseInt(data))) {
+                // If "data" is a number, we can use that the set the height of the webview dynamically
+                setSectionHeight(parseInt(data))
+            }
+        }}
+        scalesPageToFit={Platform.OS === 'ios'}
+        scrollEnabled={false}
+        automaticallyAdjustContentInsets
+        injectedJavaScript={`(function() {
+            setTimeout(function() {
+                window.ReactNativeWebView.postMessage(document.body.scrollHeight.toString())
+            }, 100)
+        })()`}
+        {...p}  
+    />
+}
+
 const CampaignExplanationDialog = (p: Props) => {
     const appContext = useContext(AppContext)
     const { width: winWidth, height: winHeight } = Dimensions.get('screen')
-    const dialogWidth = Math.min(400, winWidth)
-    const height = Math.min(winHeight - 120, 700)
+    const dialogWidth = winWidth > 500 ? winWidth - 100 : winWidth
+    const height = winHeight > 700 ? winHeight - 120 : winHeight
     const childWidth = dialogWidth - 48
     const childStyle: StyleProp<ViewStyle> = { width: childWidth, gap: 15, alignItems: 'flex-start' }
     const subViewHeight = height - 80
@@ -60,23 +85,41 @@ const CampaignExplanationDialog = (p: Props) => {
                                     <Images.Campaign height="100%" width="100%" />
                                 </View>
                             </View>
-                            <Text variant="bodyLarge">{p.campaign.description}</Text>
+                            <AutoHeightWebView containerStyle={{ alignSelf: 'stretch' }}
+                                source={{ html: `<html>
+                                    <head>
+                                        <style>
+                                            body {
+                                                background-color: ${lightPrimaryColor};
+                                            }
+                                            div {
+                                                font-size: 20px;
+                                            }
+                                            img {
+                                                width: 20;
+                                                height: 20;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        ${p.campaign.description}
+                                    </body>
+                                </html>` }}
+                            />
                             <Hr color="#000" />
                             <Text variant="bodyLarge">{t('createResourcesInCampaignExplanation')}</Text>
                             <Text variant="headlineLarge">{t('rewardsMultiplied', { multiplier: p.campaign.resourceRewardsMultiplier })}</Text>
                             <Text variant="bodyLarge">{t('thatsNotAll')}</Text>
                         </ScrollView>
-                        <View style={{ ...childStyle, ...{ alignItems: 'center' }}}>
+                        <ScrollView contentContainerStyle={{ ...childStyle, ...{ alignItems: 'center' }}}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
-                                <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{t('airdropTitle')}</Text>
+                                <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1, height: 60 }}>{t('airdropTitle')}</Text>
                                 <View style={{ width: 120, height: 120, borderRadius: 10 }}>
                                     <Images.Airdrop height="100%" width="100%" />
                                 </View>
                             </View>
-                            <View style={{ flexDirection: 'row', gap: '8', alignItems: 'center' }}>
-                                <PriceTag size={PriceTagSizeEnum.big} value={p.campaign.airdropAmount} label=""/>
-                                <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30, lineHeight: 30 }}>{t('win')}</Text>
-                            </View>
+                            <Text variant="headlineLarge" style={{ color: primaryColor, fontSize: 30, lineHeight: 30 }}>{t('win')}</Text>
+                            <PriceTag size={PriceTagSizeEnum.big} value={p.campaign.airdropAmount} label=""/>
                             <Text variant="bodyLarge">{t('create2ResourcesOnCampaign')}</Text>
                             <Text variant="bodyLarge" style={{ textAlign: 'center' }}>{dayjs(p.campaign.airdrop).format(t('dateTimeFormat'))}</Text>
                             { dayjs(p.campaign.airdrop) > dayjs(new Date()) ?
@@ -93,8 +136,8 @@ const CampaignExplanationDialog = (p: Props) => {
                                     <Text variant="bodyLarge">{t('didYouGetIt')}</Text>
                                 </View>
                             }
-                        </View>
-                        <View style={childStyle}>
+                        </ScrollView>
+                        <ScrollView contentContainerStyle={childStyle}>
                             <View style={{ alignItems: 'center', alignSelf: 'stretch', gap: 10 }}>
                                 <Text variant="headlineLarge" style={{ fontSize: 30, lineHeight: 30, textTransform: 'uppercase', flex: 1 }}>{t('campaignSummaryTitle')}</Text>
                                 <View style={{ width: 120, height: 120, borderRadius: 10 }}>
@@ -116,7 +159,7 @@ const CampaignExplanationDialog = (p: Props) => {
                                     </View>
                                 }
                                 </OrangeButton>
-                        </View>
+                        </ScrollView>
                     </SwiperFlatList> }
                 </GestureHandlerRootView>
                 { !swipedToEnd && <AnimatedSwipeHand/> }
