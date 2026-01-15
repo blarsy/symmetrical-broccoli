@@ -4,14 +4,21 @@ import { Inter } from 'next/font/google'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/fr'
 import { headers } from 'next/headers'
+import { Metadata } from 'next'
+import { urlFromPublicId } from '@/lib/images'
 
 const inter = Inter({ subsets: ['latin'] })
 
 dayjs.extend(relativeTime)
 
-export const metadata = {
-  title: 'Tope-la',
-  description: 'Don, échanges, troc'
+export const metadata: Metadata = {
+  title: 'Tope-là',
+  description: 'Dons, échanges, troc',
+  openGraph: {
+    title: 'Tope-là',
+    description: 'Dons, échanges, troc',
+    images: [{ url: urlFromPublicId('LOGO-TOPE_LA-fond_orange_ibkbfc'), width: 1000, height: 651 }]
+  }
 }
 
 export default async function RootLayout({

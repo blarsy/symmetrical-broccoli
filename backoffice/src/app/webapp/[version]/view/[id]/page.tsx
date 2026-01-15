@@ -1,6 +1,7 @@
 import ViewResourcePage from "@/components/resources/ViewResourcePage"
 import { GET_RESOURCE, getApolloClient } from "@/lib/apolloClient"
 import { urlFromPublicId } from "@/lib/images"
+import { width } from "@mui/system"
 
 import type { Metadata, ResolvingMetadata } from 'next'
  
@@ -26,7 +27,7 @@ export async function generateMetadata(
               title: res.data.resourceById.title,
               description: res.data.resourceById.description,
               images: res.data.resourceById.resourcesImagesByResourceId.nodes.length > 0 ? 
-                  res.data.resourceById.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ url: urlFromPublicId(imgData.imageByImageId.publicId) }))
+                  res.data.resourceById.resourcesImagesByResourceId.nodes.map((imgData: any) => ({ url: urlFromPublicId(imgData.imageByImageId.publicId), width: 400, height: 400 }))
                   :
                   undefined
           }

@@ -21,14 +21,14 @@ export async function generateMetadata(
         const res = await client.query({ query: GET_ACCOUNT_PUBLIC_INFO, variables: { id: Number.parseInt(id) } })
         const tPromise = initTranslations(res.data.getAccountPublicInfo.language)
 
-        const images: { url: string }[] = []
+        const images: { url: string, width: number, height: number }[] = []
         if(res.data.getAccountPublicInfo.imageByAvatarImageId) {
-            images.push({ url: urlFromPublicId(res.data.getAccountPublicInfo.imageByAvatarImageId.publicId) })
+            images.push({ url: urlFromPublicId(res.data.getAccountPublicInfo.imageByAvatarImageId.publicId), width: 400, height: 400 })
         }
         if(res.data.getAccountPublicInfo.resourcesByAccountId.nodes.length > 0) {
             res.data.getAccountPublicInfo.resourcesByAccountId.nodes.forEach((resData : any) => {
                 resData.resourcesImagesByResourceId.nodes.forEach((imgData: any) => {
-                    images.push({ url: urlFromPublicId(imgData.imageByImageId.publicId) })
+                    images.push({ url: urlFromPublicId(imgData.imageByImageId.publicId), width: 400, height: 400 })
                 })
             })
         }

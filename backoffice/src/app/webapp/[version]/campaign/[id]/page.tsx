@@ -1,10 +1,10 @@
 
 import CampaignPage from "@/components/CampaignPage"
-import { headers } from "next/headers"
 import { getApolloClient } from "@/lib/apolloClient"
 import { Metadata, ResolvingMetadata } from "next"
 import { GET_ACTIVE_CAMPAIGN } from "@/lib/queries"
 import { getCommonConfig } from '@/config'
+import { urlFromPublicId } from "@/lib/images"
 
 type Props = {
   params: Promise<{ version: string, id: string }>
@@ -32,7 +32,7 @@ export async function generateMetadata(
             openGraph: {
                 title,
                 description: res.data.getActiveCampaign.description,
-                images: [{ url: `${url}/campaign.png` }]
+                images: [{ url: urlFromPublicId('bullhorn_r3n9ka'), width: 600, height: 600 }]
             }
         }
     } catch (e) {

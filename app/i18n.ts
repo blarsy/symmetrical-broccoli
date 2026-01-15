@@ -657,7 +657,7 @@ const resources = {
       "inactiveBecauseRefused": "Refusée le {{- date}}",
       "inactiveBecauseExpired": "Expirée depuis {{- date}}",
       "inactiveBecauseDeleted": "Annulée le {{- date}}",
-      "resourcePriceLabel": "Prix demandé",
+      "resourcePriceLabel": "Contrepartie demandée",
       "createBidTitle": "Créer une offre",
       "mustBeMax48Hours": "Max 48 heures",
       "mustBeAtLeastObeHour": "Au moins 1 heure",

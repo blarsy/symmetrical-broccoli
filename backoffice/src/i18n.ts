@@ -535,7 +535,7 @@ const resources = {
             "yourReceivedBidAmountOfTokenLabel": "Offre reçue",
             "viewResourceButton": "Voir",
             "deleteBidButton": "Annuler",
-            "resourcePriceLabel": "Prix demandé",
+            "resourcePriceLabel": "Contrepartie demandée",
             "bidCreationSuccessMessage": "Ton offre a bien été envoyée !",
             "acceptBidButton": "Accepter",
             "RefuseBidButton": "Refuser",
