@@ -21,7 +21,7 @@ const jestConfig = async () => {
     moduleNameMapper: {
       // Workaround to put our SVG mock first
       "\\.svg(\\?react)?$": "<rootDir>/__mocks__/svg.js",
-      ...nextJestConfig.moduleNameMapper,
+      ...nextJestConfig.moduleNameMapper
     },
   }
 }

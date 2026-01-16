@@ -28,7 +28,7 @@ export const getApolloClient = (token: string) => {
     if(typeof fetch === 'undefined') {
       customFetch = require('cross-fetch')
     }
-
+    console.log('http', { uri: graphQlApiUrl, fetch: customFetch || undefined })
     const httpLink = createHttpLink({ uri: graphQlApiUrl, fetch: customFetch || undefined })
     const wsLink = new GraphQLWsLink(
       createClient({ 

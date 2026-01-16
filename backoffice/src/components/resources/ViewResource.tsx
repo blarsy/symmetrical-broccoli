@@ -52,7 +52,7 @@ const ViewResource = (p: Props) => {
       }
     }, [categories.data])
 
-    return <LoadedZone loading={resource.loading} containerStyle={{ overflow: 'auto', paddingBottom: '2rem' }} error={resource.error}>
+    return <LoadedZone testID="ViewResourceZone" loading={resource.loading} containerStyle={{ overflow: 'auto', paddingBottom: '2rem' }} error={resource.error}>
       <Stack sx={theme => ({ 
         flexDirection: 'row', 
         [theme.breakpoints.down('sm')]: {

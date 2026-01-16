@@ -1,6 +1,7 @@
 import { TextEncoder, TextDecoder } from 'util'
 import 'react-native-gesture-handler/jestSetup'
 import { enableScreens } from 'react-native-screens'
+import React from 'react'
 
 enableScreens(false)
 
@@ -16,6 +17,14 @@ jest.mock('expo-linking', () => {
     })
   }
 })
+
+const WebView = (props: any) => {
+  return React.createElement('WebView', props, props.children);
+}
+
+jest.mock('react-native-webview', () => ({ 
+  __esModule: true,
+  default: WebView }))
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

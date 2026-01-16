@@ -8,6 +8,8 @@ import { ErrorResponse, onError } from "@apollo/client/link/error"
 
 export const getApolloClient = (version: string, token?: string, onSessionExpired? : () => void) => {
     const config = getConfig(version)
+  //console.error('config', version, config)
+    
     const isSsr = typeof window === 'undefined'
 
     let webSocketImpl

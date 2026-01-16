@@ -7,6 +7,7 @@ import BidsPage from "@/app/webapp/[version]/bids/page"
 import ViewResourcePage from "@/components/resources/ViewResourcePage"
 import NotifsPage from "@/app/webapp/[version]/notifications/page"
 import ContribPage from "@/app/webapp/[version]/profile/tokens/page"
+import config from './config'
 
 let resourceId: number
 let accounts: TestAccount[]
@@ -67,7 +68,7 @@ const checkBidWasDeleted = async (bidId: number) => {
 
 const createBidUsingUi = async (token: string, event: UserEvent) => {
     //create bid on resource from account 2
-    mockUsePathname.mockImplementation(() => `/webapp/v0_10/view/${resourceId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/view/${resourceId}`)
     localStorage.setItem('token', token)
     const viewResPage = render(<ViewResourcePage/>)
 
@@ -90,7 +91,7 @@ test('create a bid', async () => {
 
     //Check tokens amount updated
     await waitFor(() => expect(viewResPage.getByTestId('TokenCounter')).toHaveTextContent('10'))
-    mockUsePathname.mockImplementation(() => `/webapp/v0_10/bids`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/bids`)
     
     const bidId = await check1ActiveBidOnResource(resourceId)
     const transactionId = await checkLastTokenTransactionOnAccount(accounts[1].data.id, -20, 10)

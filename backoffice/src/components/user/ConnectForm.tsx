@@ -115,7 +115,7 @@ const ConnectForm = (p: Props) => {
                                 p.onPasswordRecoveryRequested()
                             }}>{uiContext.i18n.translator('forgotPasswordButtonLink')}</Link>
                         </Stack>
-                        <Feedback visible={!!connectionStatus.error} onClose={() => {
+                        <Feedback testID="ConnectFormFeedback" visible={!!connectionStatus.error} onClose={() => {
                             setConnectionStatus({ loading: false })
                         }} detail={connectionStatus.error?.message} severity="error" />
                     </Stack>

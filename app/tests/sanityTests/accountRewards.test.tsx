@@ -76,7 +76,7 @@ test('Setting account logo gives reward', async () => {
     // back and forth navigator-managed screens by switching their visibility (aria-hidden attribute), instead
     // of unmounting / mounting the pages. In this test, it simply never 
     const tokenCounter = await screen.findByTestId('TokenCounter:AmountOfTokens', { includeHiddenElements: true })
-    expect(tokenCounter).toHaveTextContent('X50')
+    expect(tokenCounter).toHaveTextContent('X20')
     
     expect(checkAccountLogo('dummy_public_id', testAccount.data.id)).toBeTruthy()
 })

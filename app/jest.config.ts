@@ -17,7 +17,7 @@ export default {
             'react-native-google-places-autocomplete',
             'react-native-swiper-flatlist',
             'react-native-geocoding',
-
+            'react-native-webview',
             // Expo ecosystem
             'expo',
             '@expo',

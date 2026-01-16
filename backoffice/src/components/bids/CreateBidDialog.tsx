@@ -80,7 +80,7 @@ const CreateBidDialog = (p: Props) => {
                 <TextField helperText={t('explainTokensForBids1')} label={t('hoursValidLabel')} sx={{ flex: 1 }} value={values.hoursValid} 
                     type="number" required onChange={handleChange('hoursValid')} onBlur={handleBlur('hoursValid')}/>
                 <ErrorMessage component={ErrorText} name="hoursValid" />
-                <Feedback severity="error" detail={bidStatus.error?.detail} message={bidStatus.error?.message}
+                <Feedback testID="BidStatusFeedback" severity="error" detail={bidStatus.error?.detail} message={bidStatus.error?.message}
                     onClose={() => setBidStatus(initial(false))} visible={!!bidStatus.error}/>
             </DialogContent>
             <DialogActions>

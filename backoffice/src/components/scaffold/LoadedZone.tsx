@@ -18,7 +18,7 @@ interface Props {
 const isBottom = (el: Element) => {
     return Math.abs(el.scrollHeight - (el.scrollTop + el.clientHeight)) <= 30
 }
-
+ 
 function LoadedZone({ loading, error, children, containerStyle, onBottom, ref, testID }: Props) {
     //if(error) console.log('error', error)
     return <Stack data-testid={testID} ref={ref} sx={containerStyle || { flexDirection: 'column', justifyContent: 'center' }} onScroll={e => {
@@ -30,7 +30,7 @@ function LoadedZone({ loading, error, children, containerStyle, onBottom, ref, t
             <CircularProgress color="primary" />
         </Stack> }
         { !loading && !error && children }
-        <Feedback visible={!!error} severity="error" detail={error?.message} />
+        <Feedback testID={`${testID}:Feedback`} visible={!!error} severity="error" detail={error?.message} />
     </Stack>
 }
 

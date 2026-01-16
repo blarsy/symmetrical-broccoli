@@ -1,12 +1,13 @@
 import { fromToday } from "@/utils"
 import { checkAccountTokens, checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, createResource, executeQuery, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
+import config from './config'
 
 let accounts : TestAccount[]
 let account1: TestAccount, account2: TestAccount, account3: TestAccount
 
 jest.mock('next/navigation', () => ({
   usePathname() {
-    return '/webapp/v0_10/notifications'
+    return `/webapp/${config.version}/notifications`
   },
   useRouter() {
     return {}
