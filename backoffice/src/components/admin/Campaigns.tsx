@@ -33,6 +33,7 @@ const Campaigns = () => {
             { data && <DataGrid  columns={[
                 { field: 'id', headerName: 'Id'},
                 { field: 'name', headerName: 'Name'},
+                { field: 'summary', headerName: 'Summary'},
                 { field: 'description', headerName: 'Description'},
                 { field: 'airdrop', headerName: 'Date airdrop'},
                 { field: 'airdropAmount', headerName: 'Airdrop amount'},

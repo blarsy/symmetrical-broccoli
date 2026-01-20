@@ -29,8 +29,6 @@ export const NoCampaignVanillaAccount: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 0 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: [{
             id: 123,
@@ -70,8 +68,6 @@ export const NoCampaignAccountFilled: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 0 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: [{
             id: 123,
@@ -132,8 +128,6 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 0 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: [{
             id: 123,
@@ -205,8 +199,6 @@ export const NoResourceInCampaign: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 0 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: []},
         imageByAvatarImageId: null,
@@ -229,8 +221,6 @@ export const EligibleToFutureAirdrop: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 2 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: []},
         imageByAvatarImageId: null,
@@ -253,8 +243,6 @@ export const AirdropDone: Story = {
     query: NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN, result: { getNumberOfActiveResourcesOnActiveCampaign: 2 }, variables: {}
   }, {
     query: GET_ACCOUNT, result: { me: {
-        email: 'me@me.com',
-        name: 'Super artisan',
         id: 321,
         resourcesByAccountId: { nodes: []},
         imageByAvatarImageId: null,

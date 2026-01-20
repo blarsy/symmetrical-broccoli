@@ -7,6 +7,7 @@ export const GET_ACTIVE_CAMPAIGN = gql`query GetActiveCampaign {
     beginning
     created
     defaultResourceCategories
+    summary
     description
     ending
     id

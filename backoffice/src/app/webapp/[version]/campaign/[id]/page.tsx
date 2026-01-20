@@ -28,10 +28,10 @@ export async function generateMetadata(
 
         return {
             title,
-            description: res.data.getActiveCampaign.description,
+            description: res.data.getActiveCampaign.summary,
             openGraph: {
                 title,
-                description: res.data.getActiveCampaign.description,
+                description: res.data.getActiveCampaign.summary,
                 images: [{ url: urlFromPublicId('bullhorn_r3n9ka'), width: 600, height: 600 }]
             }
         }

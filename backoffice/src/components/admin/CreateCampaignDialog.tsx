@@ -1,21 +1,19 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from "@mui/material"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { LoadingButton } from "@mui/lab"
-import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
+import { DateTimePicker } from '@mui/x-date-pickers'
 import Feedback from "../scaffold/Feedback"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import { gql, useMutation } from "@apollo/client"
 import { ErrorText } from "../misc"
-import { Editor } from '@tinymce/tinymce-react'
 import dayjs from "dayjs"
-import { TinyMCE } from "tinymce"
 import BundledEditor from "./BundledEditor"
 
-export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
+export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int, $summary: String) {
   createCampaign(
-    input: {airdrop: $airdrop, defaultResourceCategories: $defaultResourceCategories, description: $description, ending: $ending, beginning: $beginning, name: $name, resourceRewardsMultiplier: $resourceRewardsMultiplier, airdropAmount: $airdropAmount}
+    input: {airdrop: $airdrop, defaultResourceCategories: $defaultResourceCategories, description: $description, ending: $ending, beginning: $beginning, name: $name, resourceRewardsMultiplier: $resourceRewardsMultiplier, airdropAmount: $airdropAmount, summary: $summary}
   ) {
     integer
   }
@@ -44,15 +42,14 @@ interface Props {
 const CreateCampaignDialog = (p: Props) => {
     const [campaignStatus, setCampaignStatus] = useState<DataLoadState<undefined>>(initial(false))
     const [createCampaign] = useMutation(CREATE_CAMPAIGN)
-    const editorRef = useRef<Editor | null>(null)
 
-    return <Formik initialValues={{ name: '', description: '', beginning: dayjs().add(1, "day").toDate(), ending: dayjs().add(1, "month").toDate(), 
+    return <Formik initialValues={{ name: '', summary: '', description: '', beginning: dayjs().add(1, "day").toDate(), ending: dayjs().add(1, "month").toDate(), 
         airdrop: dayjs().add(2, "week").toDate(), airdropAmount: 3000, resourceRewardsMultiplier: 5 }}
         onSubmit={async values => {
             setCampaignStatus(initial(true))
             try {
                 const res = await createCampaign({ variables: { 
-                    name: values.name, beginning: values.beginning, ending: values.ending, description: values.description, 
+                    name: values.name, summary: values.summary, beginning: values.beginning, ending: values.ending, description: values.description, 
                     defaultResourceCategories: [], airdrop: values.airdrop, airdropAmount: values.airdropAmount, resourceRewardsMultiplier: values.resourceRewardsMultiplier
                  } })
                 if(res.data.createCampaign.integer && res.data.createCampaign.integer < 0) {
@@ -82,6 +79,9 @@ const CreateCampaignDialog = (p: Props) => {
                     required onChange={handleChange('name')} 
                     onBlur={handleBlur('name')}/>
                 <ErrorMessage component={ErrorText} name="name" />
+                <TextField label="Summary" sx={{ flex: 1 }} value={values.summary} 
+                    required onChange={handleChange('summary')} onBlur={handleBlur('summary')}/>
+                <ErrorMessage component={ErrorText} name="summary" />
                 <Stack direction="row">
                     <Typography variant="body1" sx={{ flex: '0 0 7rem' }} color="primary">Description</Typography>
                     <BundledEditor

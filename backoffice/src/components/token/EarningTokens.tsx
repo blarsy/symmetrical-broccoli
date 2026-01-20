@@ -145,8 +145,6 @@ export const GET_RESOURCES_WITHOUT_PRICE = gql`query GetMyResourcesWithoutPrice 
 
 export const GET_ACCOUNT = gql`query Account {
   me {
-    email
-    name
     id
     imageByAvatarImageId {
       publicId
