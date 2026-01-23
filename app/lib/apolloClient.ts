@@ -1,6 +1,6 @@
 import { createHttpLink, split, ApolloLink, ApolloClient, from, InMemoryCache } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
-import { ErrorResponse, onError } from "@apollo/client/link/error"
+import { ErrorLink, ErrorResponse, onError } from "@apollo/client/link/error"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { createClient } from "graphql-ws"
@@ -28,7 +28,7 @@ export const getApolloClient = (token: string) => {
     if(typeof fetch === 'undefined') {
       customFetch = require('cross-fetch')
     }
-    console.log('http', { uri: graphQlApiUrl, fetch: customFetch || undefined })
+    
     const httpLink = createHttpLink({ uri: graphQlApiUrl, fetch: customFetch || undefined })
     const wsLink = new GraphQLWsLink(
       createClient({ 

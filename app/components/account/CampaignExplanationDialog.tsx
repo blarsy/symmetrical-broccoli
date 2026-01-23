@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react"
-import { Dimensions, Platform, StyleProp, View, ViewStyle } from "react-native"
+import { Dimensions, StyleProp, View, ViewStyle } from "react-native"
 import { ThemedDialog } from "../ConfirmDialog"
 import { AnimatedSwipeHand, Hr, OrangeButton } from "../layout/lib"
 import { gql, useMutation } from "@apollo/client"
-import { ActivityIndicator, Text } from "react-native-paper"
+import { Text } from "react-native-paper"
 import { t } from "@/i18n"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler"
 import SwiperFlatList from "react-native-swiper-flatlist"
@@ -34,18 +34,18 @@ const AutoHeightWebView = (p: WebViewProps) => {
     return <WebView style={{ height: sectionHeight }} 
         onMessage={(event) => {
             const data = event.nativeEvent.data
-
+            
             if (!isNaN(parseInt(data))) {
                 // If "data" is a number, we can use that the set the height of the webview dynamically
                 setSectionHeight(parseInt(data))
             }
         }}
-        scalesPageToFit={Platform.OS === 'ios'}
+        scalesPageToFit={false}
         scrollEnabled={false}
         automaticallyAdjustContentInsets
         injectedJavaScript={`(function() {
             setTimeout(function() {
-                window.ReactNativeWebView.postMessage(document.body.scrollHeight.toString())
+                window.ReactNativeWebView.postMessage(document.body.offsetHeight.toString())
             }, 100)
         })()`}
         {...p}  
@@ -88,11 +88,10 @@ const CampaignExplanationDialog = (p: Props) => {
                             <AutoHeightWebView containerStyle={{ alignSelf: 'stretch' }}
                                 source={{ html: `<html>
                                     <head>
+                                        <meta name="viewport" content="width=device-width"/>
                                         <style>
                                             body {
                                                 background-color: ${lightPrimaryColor};
-                                            }
-                                            div {
                                                 font-size: 20px;
                                             }
                                             img {

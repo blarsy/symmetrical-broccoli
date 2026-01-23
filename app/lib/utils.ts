@@ -3,8 +3,8 @@ import { Dimensions } from "react-native"
 import { Location, Message } from "./schema"
 import { ApolloError, gql } from "@apollo/client"
 import { getLocales } from "expo-localization"
-import { MediaTypeOptions, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
-import { ImageResult, manipulateAsync } from "expo-image-manipulator"
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker"
+import { ImageManipulator, ImageResult } from "expo-image-manipulator"
 import Constants from 'expo-constants'
 import { compareVersions } from "compare-versions"
 import { nativeApplicationVersion } from 'expo-application'
@@ -151,28 +151,36 @@ export const getLanguage = (): string => {
 export const pickImage = async (success: ((img: ImageResult)=> void), height: number) => {
     await requestMediaLibraryPermissionsAsync(true)
     let result = await launchImageLibraryAsync({
-        mediaTypes: MediaTypeOptions.Images,
+        mediaTypes: [ 'images' ],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
     })
     
     if(!result.canceled && result.assets.length > 0) {
-        const img = await manipulateAsync(result.assets[0].uri, [{ resize: { height, width: height }}])
-
+        const ctx = ImageManipulator.manipulate(result.assets[0].uri)
+        ctx.resize({ height, width: height })
+        const imgRef = await ctx.renderAsync()
+        const img = await imgRef.saveAsync()
+        
         success(img)
     }
 }
 
 export const cropImageCenterVertically = async (uri: string, size: number, currentHeight: number, currentWidth: number) => {
   info({ message: `manipulations on ${JSON.stringify({uri, currentHeight, currentWidth})} : ${JSON.stringify([
-    { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
+    { crop: {  originX: 0, originY: ((currentHeight - currentWidth) / 2), width: currentWidth, height: currentWidth }},
     { resize: { height: size, width: size } }
   ])}` })
-  return await manipulateAsync(uri, [
-    { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
-    { resize: { height: size, width: size } }
-  ])
+  const ctx = ImageManipulator.manipulate(uri)
+  ctx.crop({  originX: 0, originY: ((currentHeight - currentWidth) / 2), width: currentWidth, height: currentWidth })
+  ctx.resize({ height: size, width: size })
+  const imgRef = await ctx.renderAsync()
+  return await imgRef.saveAsync()
+  // return await manipulateAsync(uri, [
+  //   { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
+  //   { resize: { height: size, width: size } }
+  // ])
 }
 
 export const GET_RESOURCE = gql`query GetResource($id: Int!) {

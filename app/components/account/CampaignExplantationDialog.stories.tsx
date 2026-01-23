@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/react';
 import CampaignExplanationDialog from './CampaignExplanationDialog'
 import { apolloClientMocksDecorator, appContextDecorator, defaultCampaign, fromToday, paperProviderDecorator } from '@/lib/storiesUtil'
 
