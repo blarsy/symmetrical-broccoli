@@ -169,11 +169,11 @@ export const pickImage = async (success: ((img: ImageResult)=> void), height: nu
 
 export const cropImageCenterVertically = async (uri: string, size: number, currentHeight: number, currentWidth: number) => {
   info({ message: `manipulations on ${JSON.stringify({uri, currentHeight, currentWidth})} : ${JSON.stringify([
-    { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
+    { crop: {  originX: 0, originY: ((currentHeight - currentWidth) / 2), width: currentWidth, height: currentWidth }},
     { resize: { height: size, width: size } }
   ])}` })
   const ctx = ImageManipulator.manipulate(uri)
-  ctx.crop({  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight })
+  ctx.crop({  originX: 0, originY: ((currentHeight - currentWidth) / 2), width: currentWidth, height: currentWidth })
   ctx.resize({ height: size, width: size })
   const imgRef = await ctx.renderAsync()
   return await imgRef.saveAsync()
