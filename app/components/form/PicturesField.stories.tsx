@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import React  from 'react'
-import CategoriesSelect from './CategoriesSelect'
+import PictureField from './PicturesField'
 import { appContextDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 
-const meta: Meta<typeof CategoriesSelect> = {
-  component: CategoriesSelect,
+const meta: Meta<typeof PictureField> = {
+  component: PictureField,
   decorators: [
     paperProviderDecorator,
     appContextDecorator()
@@ -13,12 +13,11 @@ const meta: Meta<typeof CategoriesSelect> = {
 }
 
 export default meta
-type Story = StoryObj<typeof CategoriesSelect>
+type Story = StoryObj<typeof PictureField>
 
 export const Primary: Story = {
   args: {
-    onChange: console.log,
-    value: []
+    
   },
   
 }

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { apolloClientMocksDecorator, appContextDecorator, conversationContextDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Conversation, { CREATE_MESSAGE, SET_PARTICIPANT_READ } from './Conversation'

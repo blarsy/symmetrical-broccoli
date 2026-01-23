@@ -31,6 +31,7 @@ import Roadmap from "@/components/showcase/Roadmap"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import CampaignImg from '@/app/img/campaign.svg?react'
 import { AppDownloadButtons } from "@/components/misc"
+import AdsClick from '@mui/icons-material/AdsClick'
 
 const { mainVersion, link2Url } = getCommonConfig()
 
@@ -163,16 +164,21 @@ const ParchmentContainer = ({ children }: { children: ReactNode}) => {
 const OngoingCampaignAnnouncement = ({ sx }: { sx: SxProps<Theme> }) => {
     const { activeCampaign } = useActiveCampaign()
 
+    const wave = keyframes`
+        50%   {bottom: -15px; left: 70px; opacity: 0.2;}`
+
     if(activeCampaign.loading || !activeCampaign.data || activeCampaign.error) {
         return undefined
     }
-
-    return <Stack component={Link} href={`webapp/${getCommonConfig().mainVersion}/campaign/${activeCampaign.data.id}`} direction="row" alignItems="center" sx={sx}>
+ 
+    return <Stack component={Link} href={`webapp/${getCommonConfig().mainVersion}/campaign/${activeCampaign.data.id}`} 
+        direction="row" alignItems="center" sx={sx} position="relative">
         <CampaignImg style={{ transform: 'rotate(20deg)' }}/>
         <Stack alignItems="center">
             <Typography fontFamily={fonts.title.style.fontFamily} fontSize={28} lineHeight={1}>Campagne en cours !</Typography>
             <Typography fontFamily={fonts.title.style.fontFamily} fontSize={24} lineHeight={1} color="#000">Participer = gagner</Typography>    
         </Stack>
+        <AdsClick fontSize="large" sx={{ position: 'absolute', bottom: 0, left: 80, color: '#fff', animation: `${wave} 1s linear 0s infinite` }} />
     </Stack>
 }
 

@@ -12,6 +12,7 @@ import { AppAlertDispatchContext, AppAlertReducerActionType } from "../AppContex
 import { CameraCapturedPicture, CameraView, useCameraPermissions } from "expo-camera"
 import Slider from '@react-native-community/slider'
 import { error } from "@/lib/logger"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const PICTURE_SIZE = 400
 
@@ -26,9 +27,8 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
     const [cameraReady, setCameraReady] = useState(false)
     const [processing, setProcessing] = useState(false)
     const [zoom, setZoom] = useState(0)
-    const ref = useRef<Camera | null>(null)
+    const ref = useRef<CameraView | null>(null)
 
-    //const previewSize = Math.min(Dimensions.get('screen').width, Dimensions.get('screen').height)
     const vertical = Dimensions.get('screen').width < Dimensions.get('screen').height
     
 
@@ -44,40 +44,44 @@ const CameraButton = ({ children, onDone }: CameraButtonProps) => {
     }}>
         { children }
         { takingPicture && <Portal>
-            <View style={{ width: Dimensions.get('screen').width, height: Dimensions.get('screen').height - 80, 
-                backgroundColor: lightPrimaryColor, alignItems: 'center',
-                flexDirection: vertical ? 'column' : 'row', gap: 20 }}>
-                <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
-                <CameraView ref={ref} zoom={zoom} pictureSize="1:1" ratio="1:1"
-                    style={{ flex: 1, alignSelf: 'stretch', justifyContent: processing ? 'space-between' : 'flex-end', 
-                        alignItems: 'center', padding: 10, gap: 5 }}
-                    onCameraReady={() => setCameraReady(true)}>
+            <SafeAreaView style={{ width: Dimensions.get('screen').width, height: Dimensions.get('screen').height - 80, 
+                backgroundColor: lightPrimaryColor }}>
+                <View style={{ flexDirection: vertical ? 'column' : 'row', flex: 1, alignItems: 'center', gap: 20, position: 'relative' }}>
+                    <IconButton icon={p => <Images.Cross/>} onPress={ () => setTakingPicture(false)}/>
+                    <CameraView ref={ref} zoom={zoom} pictureSize="1:1" ratio="1:1"
+                        style={{ flex: 1, alignSelf: 'stretch', justifyContent: processing ? 'space-between' : 'flex-end', 
+                            alignItems: 'center', padding: 10, gap: 5 }}
+                        onCameraReady={() => setCameraReady(true)} />
                     { processing && <ActivityIndicator color={primaryColor}
-                        style={{ backgroundColor: '#000', borderRadius: 25 }} /> }
-                    <View style={{ flexDirection: 'row' }}>
+                        style={{ backgroundColor: '#000', borderRadius: 25, position: 'absolute', top: 20 }} /> }
+                    <View style={{ flexDirection: 'row', position: 'absolute', justifyContent: 'center', alignItems: 'center', gap: 10, bottom: 20 }}>
                         <Icon color="#fff" size={20} source="magnify"/>
                         <Slider thumbTintColor={primaryColor} maximumTrackTintColor={lightPrimaryColor} 
                             minimumTrackTintColor={lightPrimaryColor}
                             onValueChange={val => setZoom(val / 100)} minimumValue={0} value={zoom * 100}
                             maximumValue={100} style={{ width: '70%' }} />
                     </View>
-                </CameraView>
-                <IconButton style={{ borderRadius: 3 }} disabled={!cameraReady} icon={Images.Camera} onPress={async () => {
-                    setProcessing(true)
-                    try {
-                        const img = await ref.current?.takePictureAsync({ skipProcessing: true })
-                        await ref.current?.pausePreview()
-                        setTakingPicture(false)
-                        if(img) {
-                            await onDone(img)
+                </View>
+                <View style={{ 
+                    backgroundColor: lightPrimaryColor, alignItems: 'center', flexGrow: 0, flexShrink: 0,
+                    flexDirection: vertical ? 'column' : 'row', gap: 20, position: 'relative' }}>
+                    <IconButton style={{ borderRadius: 3 }} disabled={!cameraReady} icon={Images.Camera} onPress={async () => {
+                        setProcessing(true)
+                        try {
+                            const img = await ref.current?.takePictureAsync({ skipProcessing: true })
+                            await ref.current?.pausePreview()
+                            setTakingPicture(false)
+                            if(img) {
+                                await onDone(img)
+                            }
+                        } catch(e) {
+                            error({ message: (e as Error).message }, true)
+                        } finally {
+                            setProcessing(false)
                         }
-                    } catch(e) {
-                        error({ message: (e as Error).message }, true)
-                    } finally {
-                        setProcessing(false)
-                    }
-                }} />
-            </View>
+                    }} />
+                </View>
+            </SafeAreaView>
         </Portal>}
     </TouchableOpacity>
 }
