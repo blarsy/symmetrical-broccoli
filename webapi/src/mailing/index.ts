@@ -161,7 +161,7 @@ export const sendNotificationsSummaryMail = async (email: string, headingI18nCod
 const persistMail = async (msg: { to: string; from: string; subject: string; text: string; html: string }, pool: Pool, version: string): Promise<void> => {
     runAndLog(`INSERT INTO sb.mails(
         account_id, email, sent_from, subject, text_content, html_content)
-        VALUES ((SELECT id FROM sb.accounts WHERE email = '${msg.to}' ), '${msg.to}', '${msg.from}', 
+        VALUES ((SELECT account_id FROM sb.accounts_private_data WHERE email = '${msg.to}' ), '${msg.to}', '${msg.from}', 
         $1, $2, $3);`, pool, 'Persisting mail', version, [
             msg.subject, msg.text, msg.html
         ])

@@ -21,7 +21,7 @@ export const GET_ACTIVE_CAMPAIGN = gql`query GetActiveCampaign {
 }`
 
 export interface Campaign {
-    id: number
+    id: string
     name: string
     description: string
     airdrop: Date

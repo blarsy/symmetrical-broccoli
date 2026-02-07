@@ -4,6 +4,7 @@ import React from 'react'
 import { apolloClientMocksDecorator, appContextDecorator, configDayjsDecorator, makeAppContextProvider, paperProviderDecorator, singleResource } from '@/lib/storiesUtil'
 import ViewResource from './ViewResource'
 import { GET_RESOURCE } from '@/lib/utils'
+import { v4 } from 'uuid';
 
 const meta: Meta<typeof ViewResource> = {
   component: ViewResource,
@@ -14,7 +15,7 @@ const meta: Meta<typeof ViewResource> = {
   ]
 }
 
-const simpleResource = (id?: number, isDeleted: boolean = false, threeImage: boolean = true, 
+const simpleResource = (id?: string, isDeleted: boolean = false, threeImage: boolean = true, 
   hasAddress: boolean = false, title: string = 'Une super ressource', 
   accountName: string = 'Artisan incroyable') => ({
   resourceById: singleResource(id, isDeleted, threeImage, hasAddress, title, accountName)
@@ -27,18 +28,19 @@ const initialArgs = {
   route: { params: { resourceId: 1 }, name: 'Irrelevant'},
   addRequested: () => console.log('addrequested'),
   editRequested: () =>  console.log('editrequested'),
-  viewRequested: (id: number) =>  console.log(`viewrequested, id ${id}`)
+  viewRequested: (id: string) =>  console.log(`viewrequested, id ${id}`)
 }
 
+const resId = v4()
 export const SimpleView: Story = {
   name: 'Simple view',
   decorators: [
     apolloClientMocksDecorator([ { 
       query: GET_RESOURCE,
       variables: {
-        id: 1
+        id: resId
       },
-      result: simpleResource(1, false)
+      result: simpleResource(resId, false)
     }])
   ],
   args: initialArgs
@@ -50,9 +52,9 @@ export const SingleImageView: Story = {
     apolloClientMocksDecorator([ { 
       query: GET_RESOURCE,
       variables: {
-        id: 1
+        id: resId
       },
-      result: simpleResource(1, false, false)
+      result: simpleResource(resId, false, false)
     }])
   ],
   args: initialArgs
@@ -64,9 +66,9 @@ export const DeletedView: Story = {
     apolloClientMocksDecorator([ { 
       query: GET_RESOURCE,
       variables: {
-        id: 1
+        id: resId
       },
-      result: simpleResource(1, true)
+      result: simpleResource(resId, true)
     }])
   ],
   args: initialArgs
@@ -77,9 +79,9 @@ export const WithSpecificAddress: Story = {
       apolloClientMocksDecorator([ { 
         query: GET_RESOURCE,
         variables: {
-          id: 1
+          id: resId
         },
-        result: simpleResource(1, true,false, true)
+        result: simpleResource(resId, true,false, true)
       }])
     ],
     args: initialArgs
@@ -91,9 +93,9 @@ export const WithLongTexts: Story = {
     apolloClientMocksDecorator([ { 
       query: GET_RESOURCE,
       variables: {
-        id: 1
+        id: resId
       },
-      result: simpleResource(1, false, false, true, 'Un titre de ressource abusé comme il est trop long', `Un nom d'activité déliramment trop long aussi`)
+      result: simpleResource(resId, false, false, true, 'Un titre de ressource abusé comme il est trop long', `Un nom d'activité déliramment trop long aussi`)
     }])
   ],
   args: initialArgs
@@ -105,12 +107,12 @@ export const OwnResource: Story = {
     apolloClientMocksDecorator([ { 
       query: GET_RESOURCE,
       variables: {
-        id: 1
+        id: resId
       },
-      result: simpleResource(1, false, false, true, 'Un titre de ressource', 'Super artisan')
+      result: simpleResource(resId, false, false, true, 'Un titre de ressource', 'Super artisan')
     }]),
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, { id: 12, email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date(), amountOfTokens: 0, unreadConversations: [1,2,3], lastChangeTimestamp: new Date(), unreadNotifications: [1,2,3], numberOfExternalAuthProviders: 0, knowsAboutCampaigns: false })
+        makeAppContextProvider(StoryElement, { id: v4(), email: 'me@me.com', name: 'Super artisan', avatarPublicId: '', activated: new Date(), amountOfTokens: 0, unreadConversations: [v4(),v4(),v4()], lastChangeTimestamp: new Date(), unreadNotifications: [v4(),v4(),v4()], numberOfExternalAuthProviders: 0, knowsAboutCampaigns: false })
   ],
   args: initialArgs,
 }

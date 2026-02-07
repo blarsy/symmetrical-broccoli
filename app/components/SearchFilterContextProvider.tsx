@@ -55,7 +55,7 @@ export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: 
     input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm, inActiveCampaign: $inActiveCampaign}
   ) {
     resources {
-      accountByAccountId {
+      accountsPublicDatumByAccountId {
         name
         id
       }

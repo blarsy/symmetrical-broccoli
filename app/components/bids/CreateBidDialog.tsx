@@ -17,11 +17,11 @@ interface Props {
     testID?: string
 }
 
-export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: Int) {
+export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: UUID) {
   createBid(
     input: {amountOfTokens: $amountOfTokens, hoursValid: $hoursValid, resourceId: $resourceId}
   ) {
-    integer
+    uuid
   }
 }`
 

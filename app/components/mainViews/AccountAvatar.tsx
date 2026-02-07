@@ -12,7 +12,7 @@ interface AccountAvatarProps extends AvatarIconProps {
 }
 
 export interface AvatarIconAccountInfo {
-    id: number
+    id: string
     avatarPublicId?: string
     name: string
     avatarImageUrl?: string

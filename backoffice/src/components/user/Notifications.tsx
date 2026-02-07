@@ -30,13 +30,13 @@ import ThumbUp from '@/app/img/thumb-up.svg?react'
 import TimeUp from '@/app/img/time-up.svg?react'
 
 interface NotificationData {
-    id: number
+    id: string
     read: boolean
     created: Date
     headline1: string
     headline2: string
     text: string
-    image?: string | { resource: Resource, account: { id: number, name: string, avatarImagePublicId?: string} } | any
+    image?: string | { resource: Resource, account: { id: string, name: string, avatarImagePublicId?: string} } | any
     onClick: () => void
 }
 
@@ -62,11 +62,10 @@ export const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: 
     }
   }`
 
-export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
+export const GET_RESOURCES = gql`query GetResources($resourceIds: [UUID]) {
     getResources(resourceIds: $resourceIds) {
       nodes {
-        accountByAccountId {
-            email
+        accountsPublicDatumByAccountId {
             id
             name
             imageByAvatarImageId {
@@ -108,7 +107,7 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
     }
 }`
 
-const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: Int) {
+const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: UUID) {
     setNotificationRead(input: {notificationId: $notificationId}) {
       integer
     }
@@ -157,7 +156,7 @@ const useNotifications = (version: string) => {
         const result = [] as NotificationData[]
         
         const resources = {} as {
-            [resourceId: number]: any
+            [resourceId: string]: any
         }
         
         resourcesData.getResources.nodes.forEach((rawRes: any) => resources[rawRes.id] = rawRes)
@@ -169,7 +168,7 @@ const useNotifications = (version: string) => {
                     id: rawNotification.node.id,
                     created: rawNotification.node.created, 
                     headline1: t('newResourceFrom_notificationHeadline'),
-                    headline2: resources[rawNotification.node.data.resource_id].accountByAccountId.name,
+                    headline2: resources[rawNotification.node.data.resource_id].accountsPublicDatumByAccountId.name,
                     read: rawNotification.node.read,
                     text: resources[rawNotification.node.data.resource_id].title,
                     image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImagePublicId: resource.account!.avatarImagePublicId } },
@@ -196,7 +195,7 @@ const useNotifications = (version: string) => {
     const createOtherNotification = (headline1: string, headline2: string, details: string, url: string, rawNotification: any, image?: string | {
         resource: Resource,
         account: {
-            id: number,
+            id: string,
             name: string,
             avatarImagePublicId?: string
         }
@@ -394,7 +393,7 @@ const svgNotificationSizeSx = (theme: Theme) => ({
 const NOTIFICATION_IMAGE_BASE_SIZE = 120
 const NotificationImage = ({ image } : { image: string | {
     resource: Resource;
-    account: { id: number, name: string, avatarImagePublicId?: string };
+    account: { id: string, name: string, avatarImagePublicId?: string };
 } | any | undefined }) => {
     if(!image) {
         return <NotificationsActive color="primary" sx={svgNotificationSizeSx} />

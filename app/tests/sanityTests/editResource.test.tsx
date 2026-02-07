@@ -20,7 +20,7 @@ const title2 = 'title2', description2= 'description2', isProduct2= true, isServi
     canBeTakenAway2= false, canBeExchanged2= false, canBeGifted2= true, 
     expiration2= new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 4), categoryCodes2= [4, 8]
 
-let account: TestAccount, resourceId: number
+let account: TestAccount, resourceId: string
 
 beforeEach(async () => {
     [account] = await makeTestAccounts([{}])

@@ -22,7 +22,7 @@ const meta: Meta<typeof ReceivedBids> = {
                         refused: null,
                         validUntil: daysFromNow(10),
                         resourceByResourceId: {
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 12,
                                 imageByAvatarImageId: {
                                     publicId: 'pwb8arnohwpjahnebyxj'
@@ -44,7 +44,7 @@ const meta: Meta<typeof ReceivedBids> = {
                                 nodes:[]
                             }
                         },
-                        accountByAccountId: {
+                        accountsPublicDatumByAccountId: {
                             id: 32,
                             imageByAvatarImageId: {
                                 publicId: 'jqmyhsmx1led7nhvilp3'
@@ -63,7 +63,7 @@ const meta: Meta<typeof ReceivedBids> = {
                         refused: null,
                         validUntil: daysFromNow(10),
                         resourceByResourceId: {
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 12,
                                 imageByAvatarImageId: {
                                     publicId: 'pwb8arnohwpjahnebyxj'
@@ -85,7 +85,7 @@ const meta: Meta<typeof ReceivedBids> = {
                                 nodes:[]
                             }
                         },
-                        accountByAccountId: {
+                        accountsPublicDatumByAccountId: {
                             id: 32,
                             imageByAvatarImageId: {
                                 publicId: 'jqmyhsmx1led7nhvilp3'
@@ -104,7 +104,7 @@ const meta: Meta<typeof ReceivedBids> = {
                         refused: new Date(),
                         validUntil: daysFromNow(10),
                         resourceByResourceId: {
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 12,
                                 imageByAvatarImageId: {
                                     publicId: 'pwb8arnohwpjahnebyxj'
@@ -126,7 +126,7 @@ const meta: Meta<typeof ReceivedBids> = {
                                 nodes:[]
                             }
                         },
-                        accountByAccountId: {
+                        accountsPublicDatumByAccountId: {
                             id: 32,
                             imageByAvatarImageId: {
                                 publicId: 'jqmyhsmx1led7nhvilp3'
@@ -145,7 +145,7 @@ const meta: Meta<typeof ReceivedBids> = {
                         refused: null,
                         validUntil: daysFromNow(10),
                         resourceByResourceId: {
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 12,
                                 imageByAvatarImageId: {
                                     publicId: 'pwb8arnohwpjahnebyxj'
@@ -167,7 +167,7 @@ const meta: Meta<typeof ReceivedBids> = {
                                 nodes:[]
                             }
                         },
-                        accountByAccountId: {
+                        accountsPublicDatumByAccountId: {
                             id: 32,
                             imageByAvatarImageId: {
                                 publicId: 'jqmyhsmx1led7nhvilp3'
@@ -186,7 +186,7 @@ const meta: Meta<typeof ReceivedBids> = {
                         refused: null,
                         validUntil: daysFromNow(10),
                         resourceByResourceId: {
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 12,
                                 imageByAvatarImageId: {
                                     publicId: 'pwb8arnohwpjahnebyxj'
@@ -208,7 +208,7 @@ const meta: Meta<typeof ReceivedBids> = {
                                 nodes:[]
                             }
                         },
-                        accountByAccountId: {
+                        accountsPublicDatumByAccountId: {
                             id: 32,
                             imageByAvatarImageId: {
                                 publicId: 'jqmyhsmx1led7nhvilp3'

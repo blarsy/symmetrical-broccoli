@@ -3,6 +3,7 @@ import { render, waitFor } from "@testing-library/react"
 import { checkAccountTokens, checkLastNotificationOnAccount, checkLastTokenTransactionOnAccount, cleanupTestAccounts, createCampaign, createGrant, createResource, deleteGrant, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
 import { UUID } from "crypto"
 import { fromToday } from "@/utils"
+import config from "./config"
 
 let grantId: UUID
 let account: TestAccount
@@ -27,7 +28,7 @@ beforeEach(async () => {
 test('Grant successful', async () => {
     grantId = await createGrant('grant title', 3000)
 
-    mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
     const grantPage = render(<Page/>)
 
@@ -40,7 +41,7 @@ test('Grant successful', async () => {
 test('Grant expired', async () => {
     grantId = await createGrant('grant title', 3000, new Date(new Date().valueOf() - 1000 * 60))
 
-    mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
     const grantPage = render(<Page/>)
 
@@ -50,7 +51,7 @@ test('Grant expired', async () => {
 test('Grant reached max', async () => {
     grantId = await createGrant('grant title', 3000, undefined, 0)
 
-    mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
     const grantPage = render(<Page/>)
 
@@ -60,7 +61,7 @@ test('Grant reached max', async () => {
 test('Grant not in whilelist', async () => {
     grantId = await createGrant('grant title', 3000, undefined, undefined, ['bi@dul.be', 'ma@chin.be'])
 
-    mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
     const grantPage = render(<Page/>)
 
@@ -70,7 +71,7 @@ test('Grant not in whilelist', async () => {
 test('Grant success in whilelist', async () => {
     grantId = await createGrant('grant title', 3000, undefined, undefined, ['bi@dul.be', 'ma@chin.be', account.info.email])
 
-    mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
     const grantPage = render(<Page/>)
 
@@ -82,7 +83,7 @@ test('Grant not in campaign participation', async () => {
     try {
         grantId = await createGrant('grant title', 3000, undefined, undefined, undefined, campaignId)
 
-        mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+        mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
         const grantPage = render(<Page/>)
     
@@ -98,7 +99,7 @@ test('Grant success in campaign participation', async () => {
     try {
         grantId = await createGrant('grant title', 3000, undefined, undefined, undefined, campaignId)
 
-        mockUsePathname.mockImplementation(() => `/webapp/v0_11/grant/${grantId}`)
+        mockUsePathname.mockImplementation(() => `/webapp/${config.version}/grant/${grantId}`)
 
         const grantPage = render(<Page/>)
     

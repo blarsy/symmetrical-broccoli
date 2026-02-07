@@ -8,26 +8,35 @@ import LoadedZone from "../scaffold/LoadedZone"
 
 const PAGE_SIZE = 10
 const SEARCH_ACCOUNTS = gql`query SearchAccounts($searchTerm: String, $after: Cursor, $before: Cursor, $first: Int, $last: Int) {
-  searchAccounts(searchTerm: $searchTerm, first: $first, last: $last, after: $after, before: $before) {
+  searchAccounts(
+    searchTerm: $searchTerm
+    first: $first
+    last: $last
+    after: $after
+    before: $before
+  ) {
     edges {
       node {
         amountOfTokens
         email
-        id
         created
         language
-        name
         recoveryCode
         recoveryCodeExpiration
         logLevel
-        locationByLocationId {
-          address
-          latitude
-          longitude
-        }
         activated
-        imageByAvatarImageId {
-          publicId
+        accountId
+        accountsPublicDatumByAccountId {
+          name
+          id
+          locationByLocationId {
+            address
+            latitude
+            longitude
+          }
+          imageByAvatarImageId {
+            publicId
+          }
         }
       }
     }
@@ -62,15 +71,15 @@ const Accounts = () => {
         }}/>
         <LoadedZone loading={loading} error={error}>
             { data && <DataGrid paginationMode="server" paginationModel={paginationModel} rowCount={data.searchAccounts.totalCount} columns={[
-                { field: 'id', headerName: 'Id'},
-                { field: 'name', headerName: 'Name'},
+                { field: 'id', headerName: 'Id', valueGetter: (value, row) => row.accountsPublicDatumByAccountId && row.accountsPublicDatumByAccountId.id },
+                { field: 'name', headerName: 'Name', valueGetter: (value, row) => row.accountsPublicDatumByAccountId && row.accountsPublicDatumByAccountId.name },
                 { field: 'email', headerName: 'Email'},
                 { field: 'language', headerName: 'Lang'},
                 { field: 'amountOfTokens', headerName: '#Topes'},
                 { field: 'created', headerName: 'Date Création'},
                 { field: 'recoveryCode', headerName: 'Code récup'},
                 { field: 'recoveryCodeExpiration', headerName: 'Exp. code'},
-                { field: 'address', headerName: 'Address', valueGetter: (value, row) => row.locationByLocationId && row.locationByLocationId.address }
+                { field: 'address', headerName: 'Address', valueGetter: (value, row) => row.accountsPublicDatumByAccountId.locationByLocationId && row.locationByLocationId.address }
             ]}
             rows={data.searchAccounts.edges.map((sa: any) => sa.node)}
             onPaginationModelChange={(model, details) => {

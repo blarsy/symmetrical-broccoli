@@ -12,10 +12,6 @@ const TOP_RESOURCES = gql`query TopResources {
     nodes {
       id
       expiration
-      accountByAccountId {
-        id
-        name
-      }
       title
       resourcesImagesByResourceId(first: 1) {
         nodes {
@@ -24,6 +20,10 @@ const TOP_RESOURCES = gql`query TopResources {
             id
           }
         }
+      }
+      accountsPublicDatumByAccountId {
+        id
+        name
       }
     }
   }
@@ -66,7 +66,7 @@ const ResourcesGallery = () => {
                   color="#000" borderTop="2px solid #000"
                   sx={{
                       backgroundColor: lightPrimaryColor
-                  }}>par {rawRes.accountByAccountId.name}</Typography>
+                  }}>par {rawRes.accountsPublicDatumByAccountId.name}</Typography>
             </Link>
         </Box>) }
     </LoadedZone>

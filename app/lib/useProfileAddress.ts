@@ -4,7 +4,7 @@ import { Location, parseLocationFromGraph } from "./schema"
 import { fromData, fromError, initial } from "./DataLoadState"
 import { gql, useLazyQuery } from "@apollo/client"
 
-export const ACCOUNT_LOCATION = gql`query AccountLocation($id: Int!) {
+export const ACCOUNT_LOCATION = gql`query AccountLocation($id: UUID!) {
     getAccountPublicInfo(id: $id) {
       id
       locationByLocationId {

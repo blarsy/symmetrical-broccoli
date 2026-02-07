@@ -18,7 +18,7 @@ export const SUGGEST_RESOURCES = gql`mutation SuggestResources($canBeDelivered: 
     input: {canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, distanceToReferenceLocation: $distanceToReferenceLocation, excludeUnlocated: $excludeUnlocated, isProduct: $isProduct, isService: $isService, referenceLocationLatitude: $referenceLocationLatitude, referenceLocationLongitude: $referenceLocationLongitude, searchTerm: $searchTerm, inActiveCampaign: $inActiveCampaign}
   ) {
     resources {
-      accountByAccountId {
+      accountsPublicDatumByAccountId {
         name
         id
         imageByAvatarImageId {
@@ -122,9 +122,9 @@ const Search = (p: {version: string}) => {
               :
               suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx} version={p.version}
                 resource={{
-                  id: res.id, accountName: res.accountByAccountId.name, description: res.description,
+                  id: res.id, accountName: res.accountsPublicDatumByAccountId.name, description: res.description,
                   title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),
-                  avatarPublicId: res.accountByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountByAccountId.id
+                  avatarPublicId: res.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountsPublicDatumByAccountId.id
                 }}/>)
             }
         </LoadedZone>

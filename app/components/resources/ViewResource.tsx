@@ -79,7 +79,7 @@ const ViewResource = ({ route, navigation }:RouteProps) => {
     const baseTestId = 'viewResource'
     const appState = useContext(AppContext)
     const editResourceContext = useContext(EditResourceContext)
-    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: new Number(route.params.resourceId) }})
+    const { data, loading, error } = useQuery(GET_RESOURCE, { variables: { id: route.params.resourceId }})
     const [resource, setResource] = useState<{ data: Resource, expirationInfo: { text: string, date: string } } | undefined>()
     const [ focusedImage, setFocusedImage] = useState<ImageSourcePropType | undefined>(undefined)
     const { ensureConnected } = useUserConnectionFunctions()

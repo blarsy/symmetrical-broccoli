@@ -9,21 +9,21 @@ import { makeNotificationInfo } from "./common"
 import { loggers } from "../logger"
 
 interface NewMessageNotificationPayload {
-    messageId: number
+    messageId: string
     text: string
     sender: string
-    resourceId: number
-    otherAccountId: number
+    resourceId: string
+    otherAccountId: string
     otherAccountName: string
     pushToken: string
 }
 
 interface MessagePayload {
-    message_id: number
+    message_id: string
     text: string
     sender: string
-    resource_id: number
-    other_account_id: number
+    resource_id: string
+    other_account_id: string
     other_account_name: string
     push_token: string
     }
@@ -55,7 +55,7 @@ export const handleResourceCreated = async (notification: PgParsedNotification, 
     const logger = loggers[config.version]
     try {
         //Find all accounts that can be suggested the new resource
-        const cmdResult = await runAndLog(`SELECT sb.get_accounts_to_notify_of_new_resource(${notification.payload.resource_id});`,
+        const cmdResult = await runAndLog(`SELECT sb.get_accounts_to_notify_of_new_resource('${notification.payload.resource_id}');`,
             pool, `Gathering accounts to notifiy for new resource ${JSON.stringify(notification.payload)}`, config.version)
     
         const accountsToNotify = cmdResult.rows[0][Object.getOwnPropertyNames(cmdResult.rows[0])[0]]
@@ -70,8 +70,8 @@ export const handleResourceCreated = async (notification: PgParsedNotification, 
             const notifsToPushRes =  await runAndLog(`SELECT token, r.id as resourceId, r.title, creator.name as accountName, destinator.language
                 FROM sb.accounts_push_tokens apt
                 INNER JOIN sb.resources r ON r.id = $1
-                INNER JOIN sb.accounts creator ON creator.id = r.account_id
-                INNER JOIN sb.accounts destinator ON destinator.id = apt.account_id
+                INNER JOIN sb.accounts_public_data creator ON creator.id = r.account_id
+                INNER JOIN sb.accounts_private_data destinator ON destinator.account_id = apt.account_id
                 LEFT JOIN sb.broadcast_prefs bp ON bp.account_id = apt.account_id AND event_type = 2 AND days_between_summaries IS NOT NULL
                 WHERE bp.id IS NULL
                 AND apt.account_id = ANY($2)`, pool, `Sending push notifications for new resource ${JSON.stringify(notification.payload)}`, config.version,
@@ -125,7 +125,7 @@ export const handleNotificationCreated = async (notification: PgParsedNotificati
         await Promise.all(languages.map(async lang => ts[lang] = await initTranslations(lang)))
 
         const notifRecord = await runAndLog(`SELECT n.data, apt.token, a.language FROM sb.notifications n
-            INNER JOIN sb.accounts a ON a.id = n.account_id
+            INNER JOIN sb.accounts_private_data a ON a.account_id = n.account_id
             INNER JOIN sb.accounts_push_tokens apt ON apt.account_id = n.account_id
             WHERE n.id = ($1)`, pool, 
             `Gather notification data for push notification ${notification.payload.notification_id}`, config.version, 

@@ -17,12 +17,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { View } from 'react-native'
 import { IMessage } from '@/components/chat/Chat'
 import { ConversationContext, conversationMessagesState, ConversationState } from '@/components/chat/ConversationContextProvider'
+import { v4 } from 'uuid'
 
 export const editResourceContextDecorator = (initialResource?: Resource) => (StoryElement: any) => <EditResourceContext.Provider value={{ state: 
     {
-        editedResource: initialResource || { id: 0, created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
+        editedResource: initialResource || { id: v4(), created: new Date(), images: [], title: '', description: '', canBeDelivered: false, 
             canBeExchanged: false, canBeGifted: false, canBeTakenAway: false, categories: [], isProduct: false,
-            isService: false, deleted: null, specificLocation: null, expiration: new Date(), price: null },
+            isService: false, deleted: null, specificLocation: null, expiration: new Date(), price: null, inActiveCampaign: false },
         changeCallbacks: [], imagesToAdd: []},
         actions: {
             setResource: () => {},
@@ -39,7 +40,7 @@ export const editResourceContextDecorator = (initialResource?: Resource) => (Sto
 
 export const appContextDecorator = (noAccount: boolean = false, noAccountLogo: boolean = true, amountOfTopes: number = 0) => 
     (StoryElement: React.ElementType) => 
-        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: 1, email: 'me@me.com', name: 'Artisans inspirés', 
+        makeAppContextProvider(StoryElement, noAccount ? undefined : { id: v4(), email: 'me@me.com', name: 'Artisans inspirés', 
             activated: new Date(), avatarPublicId: noAccountLogo ? '' : 'zkuqb85k5v1xvjdx0yjv', 
             amountOfTokens: amountOfTopes, unreadNotifications: [], 
             unreadConversations: [], lastChangeTimestamp: new Date(), numberOfExternalAuthProviders: 0,
@@ -159,7 +160,7 @@ const oneImage = [
     }
 ]
 
-export const singleResource = (id?: number, isDeleted: boolean = false, threeImage: boolean = true, 
+export const singleResource = (id?: string, isDeleted: boolean = false, threeImage: boolean = true, 
     hasAddress: boolean = false, title: string = 'Une super ressource', 
     accountName: string = 'Artisan incroyable') => {
     return {
@@ -168,7 +169,7 @@ export const singleResource = (id?: number, isDeleted: boolean = false, threeIma
         canBeGifted: true,
         canBeTakenAway: true,
         description: 'description de la ressource',
-        id: id || 1,
+        id: id || '',
         isProduct: true,
         isService: true,
         expiration: new Date(2025,1,1),
@@ -176,7 +177,7 @@ export const singleResource = (id?: number, isDeleted: boolean = false, threeIma
         created: new Date(2022, 1, 1),
         deleted: isDeleted ? new Date() : null,
         price: null,
-        accountByAccountId: {
+        accountsPublicDatumByAccountId: {
             email: 'me@me.com',
             id: 12,
             name: accountName,

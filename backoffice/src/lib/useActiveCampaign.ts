@@ -1,11 +1,11 @@
-import { gql, useLazyQuery } from "@apollo/client"
+import { useLazyQuery } from "@apollo/client"
 import { useContext, useEffect, useState } from "react"
 import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
 import { GET_ACTIVE_CAMPAIGN } from "./queries"
 
 export interface Campaign {
-    id: number
+    id: string
     name: string
     description: string
     airdrop: Date

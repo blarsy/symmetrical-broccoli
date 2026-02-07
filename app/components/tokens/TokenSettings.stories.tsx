@@ -23,7 +23,7 @@ const meta: Meta<typeof TokenSettings> = {
         id: 1
       },
       result: {
-          accountById: {
+          getAccountPublicInfo: {
               id: 1,
               email: 'me@me.com',
               name: 'Artisan trop super',

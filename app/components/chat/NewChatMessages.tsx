@@ -6,7 +6,7 @@ import Images from "@/Images"
 
 interface Props {
     newMessages: any[]
-    onRequestConversationOpen: (resourceId: number, otherAccountId: number, otherAccountName: string) => void
+    onRequestConversationOpen: (resourceId: string, otherAccountId: string, otherAccountName: string) => void
     onClose: () => void
 }
 
@@ -14,12 +14,12 @@ const NewChatMessages = ({ newMessages, onRequestConversationOpen, onClose }: Pr
     return <View style={{ flexDirection: 'row', flexWrap: 'nowrap', flex: 1 }}>
         <View style={{ flexDirection: 'column', flex: 1 }}>
             <ListOf data={newMessages} 
-                displayItem={(data, idx) => <List.Item key={idx} title={data.participantByParticipantId.accountByAccountId.name} 
+                displayItem={(data, idx) => <List.Item key={idx} title={data.participantByParticipantId.accountsPublicDatumByAccountId.name} 
                     description={data.text || '<image>'} onPress={() => {
                         onRequestConversationOpen(
                             data.participantByParticipantId.conversationByConversationId.resourceByResourceId.id, 
-                            data.participantByParticipantId.accountByAccountId.id,
-                            data.participantByParticipantId.accountByAccountId.name
+                            data.participantByParticipantId.accountsPublicDatumByAccountId.id,
+                            data.participantByParticipantId.accountsPublicDatumByAccountId.name
                         )
                     }} />} />
         </View>

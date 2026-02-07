@@ -19,6 +19,7 @@ import { primaryColor } from '@/utils'
 import dayjs from 'dayjs'
 import useActiveCampaign from '@/lib/useActiveCampaign'
 import ExplainCampaignDialog from '../user/ExplainCampaignDialog'
+import { v4 } from 'uuid'
 
 export const RESOURCES = gql`query MyResources {
     myResources {
@@ -36,10 +37,9 @@ export const RESOURCES = gql`query MyResources {
         canBeDelivered
         deleted
         price
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           name
-          email
         }
         resourcesImagesByResourceId {
           nodes {
@@ -65,14 +65,14 @@ export const RESOURCES = gql`query MyResources {
     }
 }`
 
-export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: Int) {
+export const DELETE_RESOURCE = gql`mutation DeleteResource($resourceId: UUID) {
   deleteResource(input: {resourceId: $resourceId}) {
     integer
   }
 }`
 
 interface ResourceCardProps {
-  id: number
+  id: string
   deleted: boolean
   onImageClicked?: (uri: string) => void
   onDeleteRequested?: () => void
@@ -130,15 +130,15 @@ const ExampleResources = () => {
   return <Stack alignItems="center">
     <Typography variant="overline">{uiContext.i18n.translator('noResourceYet')}</Typography>
     <Stack sx={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem', overflow: 'auto' }}>
-      <ResourceCard id={1} deleted={false} title={uiContext.i18n.translator('childClothExampleResourceTitle')}
+      <ResourceCard id={v4()} deleted={false} title={uiContext.i18n.translator('childClothExampleResourceTitle')}
         expiration={dayjs().add(10, 'days').toDate()}
         images={[{ alt: 'example picture', uri: urlFromPublicId('uyn4yzdh6iiqzkrd33py') }]}
         isExample />
-      <ResourceCard id={2} deleted={false} title={uiContext.i18n.translator('mangasResourceTitle')}
+      <ResourceCard id={v4()} deleted={false} title={uiContext.i18n.translator('mangasResourceTitle')}
         expiration={dayjs().add(20, 'days').toDate()}
         images={[{ alt: 'example picture', uri: urlFromPublicId('he265cbgcsaqegbdsxy8') }]}
         isExample />
-      <ResourceCard id={3} deleted={false} title={uiContext.i18n.translator('equipmentForRentResourceTitle')}
+      <ResourceCard id={v4()} deleted={false} title={uiContext.i18n.translator('equipmentForRentResourceTitle')}
         expiration={undefined}
         images={[{ alt: 'example picture', uri: urlFromPublicId('jqmyhsmx1led7nhvilp3') }]}
         isExample />
@@ -157,7 +157,7 @@ const Resources = () => {
     return <Stack gap="1rem" overflow="auto">
         { activeCampaign.data && <Stack direction="row" justifyContent="center" alignItems="center" gap="0.25rem">
             <Button variant="contained" startIcon={<PlusIcon/>} endIcon={<CampaignIcon height="3rem" width="3rem"/>} >
-              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0`, query: 'campaign=1' }}>
+              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/new`, query: 'campaign=1' }}>
                 <Stack>
                   <Typography variant="subtitle1">{activeCampaign.data.name}</Typography>
                   <Typography variant="body1">{`${uiContext.i18n.translator('rewards')} X ${activeCampaign.data.resourceRewardsMultiplier}`}</Typography>
@@ -170,7 +170,7 @@ const Resources = () => {
         </Stack>}
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
             <Button variant="outlined" startIcon={<PlusIcon/>}>
-              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/0` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
+              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/new` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
             </Button>
             <IconButton color="primary" onClick={() => refetch()}>
                 <RefreshIcon/>

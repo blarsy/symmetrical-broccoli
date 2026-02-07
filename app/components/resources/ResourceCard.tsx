@@ -8,7 +8,6 @@ import { Resource } from "@/lib/schema"
 import { aboveMdWidth, hasMinWidth, percentOfWidth } from "@/lib/utils"
 import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import BareIconButton from "../layout/BareIconButton"
-import { useNavigation } from "@react-navigation/native"
 import Images from '@/Images'
 
 const TopBar = ({resource, onDeleteRequested}: {resource: Resource, onDeleteRequested : (e: GestureResponderEvent) => void}) => {
@@ -28,9 +27,9 @@ const TopBar = ({resource, onDeleteRequested}: {resource: Resource, onDeleteRequ
 }
 
 interface Props {
-    viewRequested:  (resourceId: number) => void
+    viewRequested:  (resourceId: string) => void
     editRequested: () => void
-    deleteRequested: (resourceId: number) => void
+    deleteRequested: (resourceId: string) => void
     resource: Resource
     isExample?: boolean
     style?: StyleProp<ViewStyle>
@@ -40,7 +39,6 @@ interface Props {
 const iconButtonsSize = aboveMdWidth() ? 60 : 40
 
 export default ({ resource, editRequested, deleteRequested, isExample, style, testID}: Props) => {
-    const navigation = useNavigation()
     let size: number
     if(aboveMdWidth()) {
         size = percentOfWidth(31)

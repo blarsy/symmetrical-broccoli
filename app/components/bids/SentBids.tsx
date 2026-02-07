@@ -34,7 +34,7 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
         refused
         validUntil
         resourceByResourceId {
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             id
             imageByAvatarImageId {
               publicId
@@ -58,7 +58,7 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
             }
           }
         }
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           imageByAvatarImageId {
             publicId
@@ -77,7 +77,7 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
   }
 }`
 
-export const DELETE_BID = gql`mutation DeleteBid($bidId: Int) {
+export const DELETE_BID = gql`mutation DeleteBid($bidId: UUID) {
   deleteBid(input: {bidId: $bidId}) {
     integer
   }

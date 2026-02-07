@@ -177,16 +177,11 @@ export const cropImageCenterVertically = async (uri: string, size: number, curre
   ctx.resize({ height: size, width: size })
   const imgRef = await ctx.renderAsync()
   return await imgRef.saveAsync()
-  // return await manipulateAsync(uri, [
-  //   { crop: {  originX: 0, originY: ((currentWidth - currentHeight) / 2), width: currentHeight, height: currentHeight }},
-  //   { resize: { height: size, width: size } }
-  // ])
 }
 
-export const GET_RESOURCE = gql`query GetResource($id: Int!) {
+export const GET_RESOURCE = gql`query GetResource($id: UUID!) {
   resourceById(id: $id) {
-    accountByAccountId {
-      email
+    accountsPublicDatumByAccountId {
       id
       name
       imageByAvatarImageId {

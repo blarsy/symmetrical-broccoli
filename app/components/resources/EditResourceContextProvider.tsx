@@ -4,8 +4,9 @@ import React from "react"
 import { uploadImage } from "@/lib/images"
 import { gql, useMutation } from "@apollo/client"
 import { GraphQlLib } from "@/lib/backendFacade"
+import { v4 } from "uuid"
 
-export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: Int) {
+export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: UUID, $categoryCodes: [Int], $canBeDelivered: Boolean, $canBeExchanged: Boolean, $canBeGifted: Boolean, $canBeTakenAway: Boolean, $title: String, $isService: Boolean, $isProduct: Boolean, $imagesPublicIds: [String], $expiration: Datetime, $description: String, $specificLocation: NewLocationInput = {}, $price: Int, $campaignToJoin: UUID) {
   updateResource(
     input: {resourceId: $resourceId, canBeDelivered: $canBeDelivered, canBeExchanged: $canBeExchanged, canBeGifted: $canBeGifted, canBeTakenAway: $canBeTakenAway, categoryCodes: $categoryCodes, description: $description, expiration: $expiration, imagesPublicIds: $imagesPublicIds, isProduct: $isProduct, isService: $isService, title: $title, specificLocation: $specificLocation, price: $price, campaignToJoin: $campaignToJoin}
   ) {
@@ -15,7 +16,7 @@ export  const UPDATE_RESOURCE = gql`mutation UpdateResource($resourceId: Int, $c
 
 interface EditResourceState {
     editedResource: Resource
-    campaignToJoin?: number
+    campaignToJoin?: string
     changeCallbacks: (() => void)[]
     imagesToAdd: ImageInfo[]
 }
@@ -28,7 +29,7 @@ interface EditResourceActions {
     deleteImage: (img: ImageInfo, resource: Resource) => Promise<void>
     save: (resource: Resource) => Promise<void>
     reset: (accountLocation?: Location, joinCampaign?: boolean) => void
-    setCampaignToJoin: (campaignId?: number) => void
+    setCampaignToJoin: (campaignId?: string) => void
 }
 
 export interface EditResourceContextProps {
@@ -40,7 +41,7 @@ interface Props {
     children: ReactNode
 }
 
-const blankResource: Resource = { id: 0, description: '', title: '', images: [], expiration: new Date(),
+const blankResource: Resource = { id: '', description: '', title: '', images: [], expiration: new Date(),
     categories: [], isProduct: false, isService: false,
     canBeDelivered: false, canBeTakenAway: false,
     canBeExchanged: false,  canBeGifted: false, created: new Date(), deleted: null, specificLocation: null,
@@ -178,7 +179,7 @@ const EditResourceContextProvider = ({ children }: Props) => {
             const newResourceState = {...editResourceState, ...{ editedResource: newResource, imagesToAdd: [] }}
             setState( newResourceState )
         },
-        setCampaignToJoin: (campaignToJoin?: number) => {
+        setCampaignToJoin: (campaignToJoin?: string) => {
             setState(prev => ({ ...prev, ...{ campaignToJoin } }))
         }
     }

@@ -27,14 +27,14 @@ const futureDate = new Date(new Date().valueOf() + 1000*60*60*24)
 const initialResourceList = { 
   myResources: {
     nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 3, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 4, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 5, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 6, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 7, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
-      { id: 8, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountByAccountId: { name: 'super artisan' } },
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 3, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 4, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 5, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 6, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 7, title: 'Super ressource', description: 'description de la super ressource', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 8, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', expiration: futureDate, accountsPublicDatumByAccountId: { name: 'super artisan' } },
     ]
   } 
 }
@@ -42,8 +42,8 @@ const initialResourceList = {
 const resourceListWithOneDeleted = { 
   myResources: {
     nodes: [
-      { id: 1, title: 'Super ressource', description: 'description de la super ressource', accountByAccountId: { name: 'super artisan' } },
-      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date(), accountByAccountId: { name: 'super artisan' } }
+      { id: 1, title: 'Super ressource', description: 'description de la super ressource', accountsPublicDatumByAccountId: { name: 'super artisan' } },
+      { id: 2, title: 'Location de ressource inutilisée', description: 'De toute façon, on en fait rien', deleted: new Date(), accountsPublicDatumByAccountId: { name: 'super artisan' } }
     ]
   } 
 }

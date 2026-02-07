@@ -11,7 +11,7 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import LoadedZone from "../scaffold/LoadedZone"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 
-const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($resourceId: Int) {
+const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($resourceId: UUID) {
   getConversationForResource(resourceId: $resourceId) {
     id
   }
@@ -19,11 +19,12 @@ const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($reso
 
 interface Props {
     sx?: SxProps<Theme>
-    onConversationSelected: (target: number, current?: number) => void
-    conversationId?: number
-    resourceId?: number
+    onConversationSelected: (target: string, current?: string) => void
+    onConversationCreated?: (conversationId: string) => void
+    conversationId?: string
+    resourceId?: string
     showConversationsRequested: () => void
-    withAccountId?: number
+    withAccountId?: string
 }
 
 const Chat = (p: Props) => {
@@ -77,14 +78,13 @@ const Chat = (p: Props) => {
     
     return <LoadedZone loading={loadState.loading} error={loadState.error} containerStyle={[ { overflow: 'auto' }, ...(Array.isArray(p.sx) ? p.sx : [p.sx])]}>
         <Stack direction="row" flex="1" maxHeight="100%">
-            <Conversations onConversationSelected={p.onConversationSelected} 
-                sx={theme => ({ 
-                    flex: '0 0 30%', 
-                    [theme.breakpoints.down('sm')]: {
-                        display: (chatContext.currentConversationId || chatContext.newConversationState) ? 'none': undefined,
-                        flex: 1
-                    },
-                    borderRight: '1px solid #ccc', borderTop: '1px solid #ccc', maxHeight: '100%' })}/>
+            <Conversations onConversationSelected={p.onConversationSelected} sx={theme => ({ 
+                flex: '0 0 30%', 
+                [theme.breakpoints.down('sm')]: {
+                    display: (chatContext.currentConversationId || chatContext.newConversationState) ? 'none': undefined,
+                    flex: 1
+                },
+                borderRight: '1px solid #ccc', borderTop: '1px solid #ccc', maxHeight: '100%' })}/>
             <Conversation sx={theme => ({ 
                 flex: '0 0 70%', 
                 [theme.breakpoints.down('sm')]: {
@@ -99,7 +99,12 @@ const Chat = (p: Props) => {
                         chatDispatch({ type: ChatReducerActionType.SetNewConversation, payload: undefined })
                     }
                     p.showConversationsRequested()
-                }}/>
+                }} onConversationCreated={async () => {
+                    const conv = await getConversationForResource({ variables: { resourceId: p.resourceId } })
+                    //TODO: make sure the new Conversation gets mutated to a definitive one
+                    chatDispatch({ type: ChatReducerActionType.SetConversationCreated, payload: conv.data.getConversationForResource.id })
+                    p.onConversationCreated!(conv.data.getConversationForResource.id)
+                } }/>
         </Stack>
     </LoadedZone>
 }

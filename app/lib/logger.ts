@@ -10,7 +10,7 @@ const LOG_LEVEL_STORE_KEY = 'loglevel'
 export const activityId = uuid.v4()
 
 export interface ClientLogMessage {
-    accountId?: number
+    accountId?: string
     message: string
     device?: string
 }
@@ -33,7 +33,7 @@ const levelFromLevelCode = (code?: number): string => {
     }
 }
 
-const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: Int, $data: String, $level: Int, $activityId: String) {
+const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: UUID, $data: String, $level: Int, $activityId: String) {
     createClientLog(
       input: {accountId: $accountId, data: $data, level: $level, activityId: $activityId}
     ) {

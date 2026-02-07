@@ -20,14 +20,14 @@ const limitTextLength = (text: string, maxLength: number) => {
 interface Props {
     version: string
     resource: {
-        id: number
+        id: string
         avatarPublicId?: string
         accountName?: string
         expiration?: Date
         title: string
         description: string
         images: string[]
-        accountId?: number
+        accountId?: string
     }
     testId: string
 }

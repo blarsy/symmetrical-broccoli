@@ -18,7 +18,7 @@ import { fonts } from "@/theme"
 import { AppContext } from "../scaffold/AppContextProvider"
 
 interface Props {
-    accountId: number
+    accountId: string
     version: string
 }
 
@@ -88,7 +88,7 @@ const ViewAccount = (p: Props) => {
                 </Stack>
             } 
         </>}
-        <TransferTokensDialog transferInfo={tokenTransferInfo} onClose={() => setTokenTransferInfo(undefined)} />
+        { appContext.account && <TransferTokensDialog transferInfo={tokenTransferInfo} onClose={() => setTokenTransferInfo(undefined)} /> }
     </LoadedZone>
 }
 

@@ -2,14 +2,14 @@ import '@testing-library/jest-dom'
 import { render, waitFor } from '@testing-library/react'
 import userEvent, { UserEvent } from '@testing-library/user-event'
 import dayjs from "dayjs"
-import { checkLastNotificationOnAccount, cleanupTestAccounts, createResource, executeQuery, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
+import { cleanupTestAccounts, createResource, executeQuery, getLastNotificationOnAccount, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
 import BidsPage from "@/app/webapp/[version]/bids/page"
 import ViewResourcePage from "@/components/resources/ViewResourcePage"
 import NotifsPage from "@/app/webapp/[version]/notifications/page"
 import ContribPage from "@/app/webapp/[version]/profile/tokens/page"
 import config from './config'
 
-let resourceId: number
+let resourceId: string
 let accounts: TestAccount[]
 let resourceTitle: string
 
@@ -33,13 +33,13 @@ beforeEach(async () => {
     resourceId = await createResource(accounts[0].data.token, resourceTitle, 'desc', true, true, true, false, true, false, dayjs().add(10, "days").toDate(), [1])
 })
 
-const check1ActiveBidOnResource = async(resourceId: number) => {
+const check1ActiveBidOnResource = async(resourceId: string) => {
     const res = await executeQuery(`SELECT id FROM sb.bids WHERE resource_id = ($1) AND deleted IS NULL AND accepted IS NULL AND refused IS NULL AND valid_until > NOW()`, [resourceId])
     expect(res.rowCount === 1)
     return res.rows[0].id
 }
 
-const checkLastTokenTransactionOnAccount = async(accountId: number, expectedMovement: number, expectedTypeId: number) => {
+const checkLastTokenTransactionOnAccount = async(accountId: string, expectedMovement: number, expectedTypeId: number) => {
     const res = await executeQuery(`SELECT id FROM sb.accounts_token_transactions
         WHERE account_id = ($1) AND token_transaction_type_id = ($2) and movement = ($3)
         ORDER BY id desc 
@@ -48,22 +48,30 @@ const checkLastTokenTransactionOnAccount = async(accountId: number, expectedMove
     return res.rows[0].id
 }
 
-const checkBidWasAccepted = async (bidId: number) => {
+const checkBidWasAccepted = async (bidId: string) => {
     const res = await executeQuery(`SELECT id FROM sb.bids WHERE id=($1) AND accepted IS NOT NULL`, [bidId])
 
     if(res.rowCount != 1) throw new Error(`Bid ${bidId} was not accepted`)
 }
 
-const checkBidWasRefused = async (bidId: number) => {
+const checkBidWasRefused = async (bidId: string) => {
     const res = await executeQuery(`SELECT id FROM sb.bids WHERE id=($1) AND refused IS NOT NULL`, [bidId])
 
     if(res.rowCount != 1) throw new Error(`Bid ${bidId} was not refused`)
 }
 
-const checkBidWasDeleted = async (bidId: number) => {
+const checkBidWasDeleted = async (bidId: string) => {
     const res = await executeQuery(`SELECT id FROM sb.bids WHERE id=($1) AND deleted IS NOT NULL`, [bidId])
 
     if(res.rowCount != 1) throw new Error(`Bid ${bidId} was not deleted`)
+}
+
+const checkNotifCreatedAndDisplayed = async (accountId: string, checkData: (parsed: any) => boolean) => {
+    await waitFor(() => expect(getLastNotificationOnAccount(accountId, checkData)).toBeTruthy(), { timeout: 8000, interval: 900 })
+
+    const notifId = await getLastNotificationOnAccount(accountId, checkData)
+    expect(notifId).toBeTruthy()
+    return notifId
 }
 
 const createBidUsingUi = async (token: string, event: UserEvent) => {
@@ -106,8 +114,7 @@ test('create a bid', async () => {
     const account0bidPage = render(<BidsPage />)
     await waitFor(() => expect(account0bidPage.getByTestId(`BidReceived:${bidId}`)).toBeInTheDocument())
     
-    const notifId = await checkLastNotificationOnAccount(accounts[0].data.id, 
-        parsed => parsed.info === 'BID_RECEIVED' && parsed.resourceId === resourceId && 
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[0].data.id, parsed => parsed.info === 'BID_RECEIVED' && parsed.resourceId === resourceId && 
         parsed.resourceTitle === resourceTitle && parsed.receivedFrom === accounts[1].info.name)
     const account0NotifPage = render(<NotifsPage />)
 
@@ -148,8 +155,9 @@ test('accept a bid', async () => {
     //Proposer gets a notification
     account1bidPage.unmount()
     
-    const notifId = await checkLastNotificationOnAccount(accounts[1].data.id, parsed => parsed.info === 'BID_ACCEPTED' && parsed.resourceId === resourceId &&
-        parsed.resourceTitle === resourceTitle && parsed.acceptedBy === accounts[0].info.name)
+
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[1].data.id, parsed => parsed.info === 'BID_ACCEPTED' && parsed.resourceId === resourceId &&
+            parsed.resourceTitle === resourceTitle && parsed.acceptedBy === accounts[0].info.name)
     const account1NotifsPage = render(<NotifsPage />)
     await waitFor(() => expect(account1NotifsPage.getByTestId(`Notification:${notifId}`)).toBeInTheDocument())
 
@@ -195,7 +203,7 @@ test('refuse a bid', async () => {
     account1bidPage.unmount()
     
     //Proposer gets a notification
-    const notifId = await checkLastNotificationOnAccount(accounts[1].data.id, parsed => parsed.info === 'BID_REFUSED' && parsed.resourceId === resourceId &&
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[1].data.id, parsed => parsed.info === 'BID_REFUSED' && parsed.resourceId === resourceId &&
         parsed.resourceTitle === resourceTitle && parsed.refusedBy === accounts[0].info.name)
     const account1NotifsPage = render(<NotifsPage />)
     await waitFor(() => expect(account1NotifsPage.getByTestId(`Notification:${notifId}`)).toBeInTheDocument())
@@ -231,7 +239,7 @@ test('create, then delete a bid', async () => {
 
 
     //resource creator got a notification
-    const notifId = await checkLastNotificationOnAccount(accounts[0].data.id, parsed => parsed.info === 'BID_CANCELLED' && parsed.resourceId === resourceId &&
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[0].data.id, parsed => parsed.info === 'BID_CANCELLED' && parsed.resourceId === resourceId &&
         parsed.resourceTitle === resourceTitle && parsed.cancelledBy === accounts[1].info.name)
 
     localStorage.setItem('token', accounts[0].data.token)
@@ -268,9 +276,10 @@ test('create a bid, let it expire', async () => {
     await waitFor(() => expect(account1BidsPage.getByTestId('TokenCounter')).toHaveTextContent('30'))
 
     //Bid creator should have a notif
-    const notifId = await checkLastNotificationOnAccount(accounts[1].data.id, 
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[1].data.id, 
         parsed => parsed.info === 'BID_EXPIRED' && parsed.resourceId === resourceId && 
                 parsed.resourceTitle === resourceTitle && parsed.resourceAuthor === accounts[0].info.name)
+    console.log('notifid', notifId)
     const account1NotifPage = render(<NotifsPage />)
 
     await waitFor(() => expect(account1NotifPage.getByTestId(`Notification:${notifId}`)).toBeInTheDocument())
@@ -301,9 +310,10 @@ test('create a bid on a resource, let the resource expire', async () => {
     await waitFor(() => expect(account1BidsPage.getByTestId('TokenCounter')).toHaveTextContent('30'))
 
     //Bid creator should have a notif
-    const notifId = await checkLastNotificationOnAccount(accounts[1].data.id, 
+    const notifId = await checkNotifCreatedAndDisplayed(accounts[1].data.id, 
         parsed => parsed.info === 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED' && parsed.resourceId === resourceId && 
                 parsed.resourceTitle === resourceTitle && parsed.resourceAuthor === accounts[0].info.name)
+    
     const account1NotifPage = render(<NotifsPage />)
 
     await waitFor(() => expect(account1NotifPage.getByTestId(`Notification:${notifId}`)).toBeInTheDocument())

@@ -8,7 +8,6 @@ import { ErrorResponse, onError } from "@apollo/client/link/error"
 
 export const getApolloClient = (version: string, token?: string, onSessionExpired? : () => void) => {
     const config = getConfig(version)
-  //console.error('config', version, config)
     
     const isSsr = typeof window === 'undefined'
 
@@ -83,9 +82,9 @@ export const getApolloClient = (version: string, token?: string, onSessionExpire
     })
 }
 
-export const GET_RESOURCE = gql`query GetResource($id: Int!) {
+export const GET_RESOURCE = gql`query GetResource($id: UUID!) {
   resourceById(id: $id) {
-    accountByAccountId {
+    accountsPublicDatumByAccountId {
       id
       name
       imageByAvatarImageId {
@@ -131,12 +130,10 @@ export const GET_RESOURCE = gql`query GetResource($id: Int!) {
   }
 }`
 
-export const GET_ACCOUNT_PUBLIC_INFO = gql`query Account($id: Int!) {
+export const GET_ACCOUNT_PUBLIC_INFO = gql`query Account($id: UUID!) {
     getAccountPublicInfo(id: $id) {
-      email
       name
       id
-      language
       resourcesByAccountId(orderBy: CREATED_DESC) {
         nodes {
           id
@@ -158,7 +155,7 @@ export const GET_ACCOUNT_PUBLIC_INFO = gql`query Account($id: Int!) {
               resourceCategoryCode
             }
           }
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             id
           }
         }

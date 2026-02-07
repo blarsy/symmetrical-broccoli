@@ -9,13 +9,13 @@ import { View } from "react-native"
 import { gql, useMutation } from "@apollo/client"
 
 interface Props {
-    toAccount: number | undefined
+    toAccount: string | undefined
     accountName: string
     onDismiss: () => void
     testID?: string
 }
 
-const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: Int) {
+const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: UUID) {
     sendTokens(
       input: {amountToSend: $amountToSend, targetAccountId: $targetAccountId}
     ) {

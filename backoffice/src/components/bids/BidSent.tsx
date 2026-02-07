@@ -14,8 +14,9 @@ import dayjs from "dayjs"
 import { urlFromPublicId } from "@/lib/images"
 import Chat from '@/app/img/CHAT.svg?react'
 import { primaryColor } from "@/utils"
+import { v4 } from "uuid"
 
-export const DELETE_BID = gql`mutation DeleteBid($bidId: Int) {
+export const DELETE_BID = gql`mutation DeleteBid($bidId: UUID) {
   deleteBid(input: {bidId: $bidId}) {
     integer
   }
@@ -41,9 +42,9 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
         <CardContent sx={{ paddingBottom: 0 }}>
             <Stack direction="row" justifyContent="space-between">
                 <ResourceHeader sx={{ padding: 0 }} data={{
-                    id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
+                    id: bid.resource.id, resource: bid.resource, participantId: v4(), otherAccount: {
                         id: bid.resource.account!.id, name: bid.resource.account!.name,
-                        participantId: 0, avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
+                        participantId: v4(), avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
                     }
                 }}/>
                 <Link href={`/webapp/${uiContext.version}/chat/new/${bid.resource.id}?with=${bid.account.id}`}>

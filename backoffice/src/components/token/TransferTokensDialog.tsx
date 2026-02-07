@@ -10,7 +10,7 @@ import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import { AppContext } from "../scaffold/AppContextProvider"
 
-const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: Int) {
+const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: UUID) {
     sendTokens(
       input: {amountToSend: $amountToSend, targetAccountId: $targetAccountId}
     ) {
@@ -20,7 +20,7 @@ const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId
 
 export interface TokenTransferInfo {
     destinatorAccount: string
-    destinatorId: number
+    destinatorId: string
     defaultAmount?: number
 }
 

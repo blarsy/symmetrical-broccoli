@@ -135,7 +135,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                             <LoadingButton variant="contained" loading={settingCampaignBit} onClick={async() => {
                                 await setAccountKnowsAboutCampaigns()
                                 p.onClose!()
-                                router.push(`/webapp/${uiContext.version}/resources/0?campaign=1`)
+                                router.push(`/webapp/${uiContext.version}/resources/new?campaign=1`)
                             }}>{uiContext.i18n.translator('addResourceButton')}</LoadingButton>
                             :
                             <OnboardingActions />

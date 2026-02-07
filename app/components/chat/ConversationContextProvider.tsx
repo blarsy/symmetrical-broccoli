@@ -14,9 +14,9 @@ export const asIMessage = (msg: any): IMessage => {
     text: msg.text,
     createdAt: msg.created,
     user: {
-        id: msg.participantByParticipantId.accountByAccountId.id,
-        name: msg.participantByParticipantId.accountByAccountId.name,
-        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId?.publicId
+        id: msg.participantByParticipantId.accountsPublicDatumByAccountId.id,
+        name: msg.participantByParticipantId.accountsPublicDatumByAccountId.name,
+        avatar: msg.participantByParticipantId.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId
     },
     image: msg.imageByImageId?.publicId,
     received: !!msg.received,
@@ -24,7 +24,7 @@ export const asIMessage = (msg: any): IMessage => {
   }
 }
 
-export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: Int!, $otherAccountId: Int!, $after: Cursor, $first: Int!) {
+export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId: UUID!, $otherAccountId: UUID!, $after: Cursor, $first: Int!) {
   conversationMessages(
     resourceId: $resourceId
     otherAccountId: $otherAccountId
@@ -48,7 +48,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
         }
         participantByParticipantId {
           id
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             id
             name
             imageByAvatarImageId {
@@ -63,7 +63,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
       cursor
     }
   }
-  accountById(id: $otherAccountId) {
+  accountsPublicDatumById(id: $otherAccountId) {
     id
     name
     imageByAvatarImageId {
@@ -71,8 +71,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
     }
   }
   resourceById(id: $resourceId) {
-    accountByAccountId {
-      email
+    accountsPublicDatumByAccountId {
       id
       name
       imageByAvatarImageId {
@@ -111,12 +110,14 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($resourceId:
   }
 }`
 
-export interface ConversationState extends DataLoadState<{ 
-      id: number
-      participantId: number
-      resource?: Resource
-      otherAccount: { id: number, name: string } 
-} | undefined> {}
+interface ConversationData {
+  id: string,
+  participantId: string,
+  resource?: Resource, 
+  otherAccount: { id: string, name: string, avatarPublicId: string }
+}
+
+export interface ConversationState extends DataLoadState<ConversationData | undefined> {}
 
 export interface conversationMessagesState {
     endCursor: string
@@ -125,26 +126,24 @@ export interface conversationMessagesState {
 }
 
 interface ConversationActions {
-    load: (resourceId: number, otherAccountId: number, categories: Category[]) => Promise<void>
+    load: (resourceId: string, otherAccountId: string, categories: Category[]) => Promise<void>
     loadEarlier: () => Promise<void>
     setMessages: (fn: (prevMessages: IMessage[]) => IMessage[]) => void
 }
-
 interface ConversationContext {
     conversationState: ConversationState
     messagesState: conversationMessagesState
     actions: ConversationActions
 }
-
 interface Props {
     children: ReactNode
 }
 
 const blankConversationState: ConversationState = initial(true, {
-  id: 0,
-  participantId: 0,
+  id: '',
+  participantId: '',
   resource: undefined, 
-  otherAccount: { id: 0, name: '', avatarPublicId: '' }
+  otherAccount: { id: '', name: '', avatarPublicId: '' }
 })
 
 const blankMessagesState: conversationMessagesState = {
@@ -169,27 +168,27 @@ const ConversationContextProvider = ({ children }: Props) => {
     const [messagesState, setMessagesState] = useState(blankMessagesState)
     
     const actions: ConversationActions = {
-        load: async (resourceId: number, otherAccountId: number, categories: Category[]) => {
+        load: async (resourceId: string, otherAccountId: string, categories: Category[]) => {
           try {
-            const res = await getMessages({ variables: { resourceId: new Number(resourceId), otherAccountId: new Number(otherAccountId), first: MESSAGES_PER_PAGE }})
+            const res = await getMessages({ variables: { resourceId: resourceId, otherAccountId: otherAccountId, first: MESSAGES_PER_PAGE }})
             if(res.data) {
               const loadedMessages = fromData(asIMessages(res.data.conversationMessages.edges))
 
-              setConversationState(fromData({ 
+              setConversationState(fromData<ConversationData>({ 
                   id: res.data.conversationMessages.edges.length > 0 ? 
                     res.data.conversationMessages.edges[0].node.participantByParticipantId.conversationByConversationId.id :
-                    -1,
+                    '',
                   participantId: res.data.conversationMessages.edges.length > 0 ? 
                     res.data.conversationMessages.edges[0].node.participantByParticipantId.id :
-                    -1,
+                    '',
                   otherAccount: { 
-                    id: res.data.accountById.id, 
-                    name: res.data.accountById.name, 
-                    avatarPublicId: res.data.accountById.imageByAvatarImageId?.publicId
+                    id: res.data.accountsPublicDatumById.id, 
+                    name: res.data.accountsPublicDatumById.name, 
+                    avatarPublicId: res.data.accountsPublicDatumById.imageByAvatarImageId?.publicId
                   },
                   resource: fromServerGraphResource(res.data.resourceById, categories)
-                }
-              ))
+                })
+              )
               setMessagesState({
                 endCursor: res.data.conversationMessages.pageInfo.hasNextPage ? res.data.conversationMessages.pageInfo.endCursor : '',
                 messages: loadedMessages,

@@ -5,6 +5,7 @@ import { ChatHeader } from './Chat'
 import { paperProviderDecorator, conversationContextDecorator, gestureHandlerDecorator } from '@/lib/storiesUtil'
 import { conversationMessagesState, ConversationState } from '../chat/ConversationContextProvider'
 import { initial } from '@/lib/DataLoadState'
+import { v4 } from 'uuid';
 
 const meta: Meta<typeof ChatHeader> = {
   component: ChatHeader,
@@ -21,8 +22,8 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
     resourceTitle: string = 'Une super ressource' ): [ConversationState, conversationMessagesState] => [{
     loading,
     data: { 
-        id: 1,
-        participantId: 10,
+        id: v4(),
+        participantId: v4(),
         resource: { 
             canBeGifted, 
             canBeExchanged,
@@ -32,15 +33,15 @@ const makeConversationData = (loading: boolean, canBeGifted: boolean, canBeExcha
             price: 10,
             account: {
                 email: 'other@other.com',
-                id: 2,
+                id: v4(),
                 name: accountDeleted ? '' : accountName
             },
             deleted: resourceDeleted ? new Date() : null,
             specificLocation: null,
-            id: 1, images: [], description: 'description de la ressource', categories: [], isService: false, isProduct: false, created: new Date()
+            id: v4(), images: [], description: 'description de la ressource', categories: [], isService: false, isProduct: false, created: new Date(), inActiveCampaign: false
         },
         otherAccount: {
-            id: 2,
+            id: v4(),
             name: accountName
         }
     }

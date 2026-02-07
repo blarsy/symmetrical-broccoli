@@ -1,29 +1,18 @@
 import Images from "@/Images"
 import { t } from "i18next"
-import React, { FC, useState } from "react"
+import React, { useState } from "react"
 import { View, ViewStyle, StyleProp, ScrollView } from "react-native"
 import SwiperFlatList from "react-native-swiper-flatlist"
-import { Icon, Text } from "react-native-paper"
+import { Text } from "react-native-paper"
 import ChickenEgg from '@/assets/img/howitworks/chicken-egg.svg'
 import TopeValue from '@/assets/img/howitworks/Tope-value.svg'
-import { primaryColor } from "../layout/constants"
-import { SvgProps } from "react-native-svg"
+
 import { AnimatedSwipeHand } from "../layout/lib"
 
 const WinToken = () => <View style={{ flexDirection: 'row' }}>
     <Images.Check fill="#4BB543" height={50} width={50} />
     <Images.Tokens  height={50} width={50}/>
 </View>
-
-const NumberedImage = ({ numbers, Image, numberSize }: { numbers: number[], Image: FC<SvgProps>, numberSize?: number }) => {
-    const actualNumberSize = numberSize || 40
-    return <View style={{ position: 'relative' }}>
-        <Image />
-            { numbers.map((num, idx) => <View key={idx} style={{ position: 'absolute', top: -30, left: -10 + (idx * (actualNumberSize + 5)), transform: [{ rotate: '-20deg' }] }}>
-                <Icon size={actualNumberSize} source={`numeric-${num}-circle`} color={primaryColor} />
-            </View>)}
-    </View>
-}
 
 interface Props {
     width: number

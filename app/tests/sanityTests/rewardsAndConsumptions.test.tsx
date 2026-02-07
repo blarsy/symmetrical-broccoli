@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 import { checkAccountTokens } from "./datastoreCheck"
 
 let testAccounts: TestAccount[]
-let campaignId: number
+let campaignId: string
 
 beforeEach(async () => {
    testAccounts = await makeTestAccounts([{ confirm: true, contributor: true },{ confirm: true, contributor: true }, {confirm: true, contributor: true}])

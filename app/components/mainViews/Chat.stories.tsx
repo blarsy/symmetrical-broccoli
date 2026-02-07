@@ -5,9 +5,10 @@ import Chat from './Chat';
 import { apolloClientMocksDecorator, appContextDecorator, gestureHandlerDecorator, navigationContainerDecorator, paperProviderDecorator } from '@/lib/storiesUtil';
 import { CONVERSATION_MESSAGES } from '../chat/ConversationContextProvider';
 import { SET_PARTICIPANT_READ } from '../chat/Conversation';
+import { v4 } from 'react-native-uuid/dist/v4';
 
 let msgCounter = 1
-const makeConversationData = (resourceId: number, otherAccountId: number, resourceDeleted: boolean, otherAccountDeleted: boolean, endOfMessages : boolean = false) => (
+const makeConversationData = (resourceId: string, otherAccountId: string, resourceDeleted: boolean, otherAccountDeleted: boolean, endOfMessages : boolean = false) => (
     {
         conversationMessages: {
             pageInfo: {
@@ -28,7 +29,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                         },
                         participantByParticipantId: {
                             id: 1,
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
@@ -53,7 +54,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                         },
                         participantByParticipantId: {
                             id: 2,
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
@@ -78,7 +79,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                         },
                         participantByParticipantId: {
                             id: 3,
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: 1,
                                 name: 'Artisan incroyable',
                                 imageByAvatarImageId: {
@@ -103,7 +104,7 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                         },
                         participantByParticipantId: {
                             id: 3,
-                            accountByAccountId: {
+                            accountsPublicDatumByAccountId: {
                                 id: otherAccountId,
                                 name: 'Nouveau pote potentiel',
                                 imageByAvatarImageId: {
@@ -119,13 +120,13 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
                 },
             ]
         },
-        accountById: {
+        accountPublicDatumById: {
             id: otherAccountId,
             name: otherAccountDeleted ? '' : 'Mon association trop bien',
             imageByAvatarImageId: { publicId: '' }
         },
         resourceById: {
-            accountByAccountId: {
+            accountsPublicDatumByAccountId: {
                 email: 'other@other.com',
                 id: 2,
                 name: otherAccountDeleted ? '' : 'Mon association trop bien',
@@ -156,8 +157,8 @@ const makeConversationData = (resourceId: number, otherAccountId: number, resour
         }
     })
     
-const defaultResourceId = 1
-const defaultOtherAccountId = 2
+const defaultResourceId = v4()
+const defaultOtherAccountId = v4()
 
 const meta: Meta<typeof Chat> = {
   component: Chat,

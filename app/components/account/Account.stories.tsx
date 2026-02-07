@@ -4,6 +4,7 @@ import React  from 'react'
 import { apolloClientMocksDecorator, gestureHandlerDecorator, paperProviderDecorator } from '@/lib/storiesUtil'
 import Account from './Account'
 import { GraphQlLib } from '@/lib/backendFacade'
+import { v4 } from 'uuid';
 
 const accountId = 1
 
@@ -64,7 +65,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                         resourceCategoryCode: 'cat1'
                     }]
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -84,7 +85,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 resourcesResourceCategoriesByResourceId: {
                     nodes: []
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -104,7 +105,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 resourcesResourceCategoriesByResourceId: {
                     nodes: []
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -124,7 +125,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 resourcesResourceCategoriesByResourceId: {
                     nodes: []
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -144,7 +145,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 resourcesResourceCategoriesByResourceId: {
                     nodes: []
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -164,7 +165,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
                 resourcesResourceCategoriesByResourceId: {
                     nodes: []
                 },
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     id: accountId
                 },
                 deleted: null
@@ -178,7 +179,7 @@ const makeGetAccountOp = (noLinks: boolean = false, noResource: boolean = false,
             id: accountId
         },
         result: {
-            accountById: {
+            accountsPublicDatumByAccountId: {
                 id: 2,
                 email: 'me@me.com',
                 name: longContent ? 'Artisan trop super mais alors!' : 'Artisan trop super',
@@ -215,16 +216,16 @@ type Story = StoryObj<typeof Account>
 export const Simple: Story = {
     name: 'Simple Account view',
     decorators: [apolloClientMocksDecorator([makeGetAccountOp()])],
-    args: { id: 1 }
+    args: { id: v4() }
 }
 
 export const NoLinksNoResourceNoLogo: Story = {
     name: 'Minimum data account view',
     decorators: [apolloClientMocksDecorator([makeGetAccountOp(true, true, true, false)])],
-    args: { id: 1 },
+    args: { id: v4() },
 }
 
 export const WithLongContent: Story = {
     decorators: [apolloClientMocksDecorator([makeGetAccountOp(false, false, false, true, true)])],
-    args: { id: 1 } 
+    args: { id: v4() } 
 }

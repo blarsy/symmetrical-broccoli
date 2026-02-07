@@ -10,15 +10,15 @@ import ChatBackground from "./ChatBackground"
 import Chat from "./Chat"
 import LoadedZone from "../LoadedZone"
 
-export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
+export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: UUID, $otherAccountId: UUID, $imagePublicId: String) {
     createMessage(
       input: {imagePublicId: $imagePublicId, resourceId: $resourceId, otherAccountId: $otherAccountId, text: $text}
     ) {
-      integer
+      uuid
     }
   }`
 
-export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: Int!, $resourceId: Int!) {
+export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: UUID!, $resourceId: UUID!) {
   setParticipantRead(
     input: {resourceId: $resourceId, otherAccountId: $otherAccountId}
   ) {
@@ -48,13 +48,13 @@ const Conversation = ({ route }: RouteProps) => {
 
           await createMessage({ variables: { 
               text: newMessage, 
-              resourceId: new Number(conversationContext.conversationState.data?.resource?.id), 
-              otherAccountId: new Number(conversationContext.conversationState.data?.otherAccount.id),
+              resourceId: conversationContext.conversationState.data?.resource?.id, 
+              otherAccountId: conversationContext.conversationState.data?.otherAccount.id,
               imagePublicId: imagePublicId || undefined } })
 
           conversationContext.actions.setMessages(prevMessages => [{ 
             createdAt: new Date(), 
-            id: -1, 
+            id: undefined, 
             text: newMessage, 
             user: { id: appContext.account!.id, name: appContext.account!.name, avatar: appContext.account!.avatarPublicId },
             image: imagePublicId, 

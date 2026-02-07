@@ -16,14 +16,14 @@ export interface IAppState {
     chatMessagesSubscription?: { unsubscribe: () => void }
     notificationSubscription?: { unsubscribe: () => void }
     accountChangeSubscription?: { unsubscribe: () => void }
-    unreadConversations: number[]
+    unreadConversations: string[]
     categories: DataLoadState<Category[]>
     newChatMessage: any
     connecting: { message: string, subMessage: string, onConnected: () => void } | undefined
     messageReceivedHandler: ((msg: any) => void) | undefined
     notificationReceivedHandler: (() => void) | undefined
     lastConversationChangeTimestamp: number
-    unreadNotifications: number[]
+    unreadNotifications: string[]
     lastResourceChangedTimestamp: number
 }
 

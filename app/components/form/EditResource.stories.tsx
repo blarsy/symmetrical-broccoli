@@ -4,6 +4,7 @@ import React  from 'react'
 import EditResource from './EditResource'
 import { apolloClientMocksDecorator, appContextDecorator, editResourceContextDecorator, gestureHandlerDecorator, paperProviderDecorator, searchFilterContextDecorator } from '@/lib/storiesUtil'
 import { ACCOUNT_LOCATION } from '@/lib/useProfileAddress'
+import { v4 } from 'uuid';
 
 
 const meta: Meta<typeof EditResource> = {
@@ -23,7 +24,7 @@ export const EditNew: Story = {
         query: ACCOUNT_LOCATION,
         variables: { id: 1 },
         result: {
-            accountById: {
+            getAccountPublicInfo: {
                 id: 1,
                 locationByLocationId: {
                     address: 'Rue de la picole, 36, 7500 Tournai',
@@ -35,22 +36,22 @@ export const EditNew: Story = {
         }
     }])],
     args: {
-        route : { params: { isNew: true }}
+        route : { params: { isNew: true }, name: 'name'}
     }
 }
 
 export const EditExisting: Story = {
     name: 'Existing resource, connected account has an address, resource has an address',
     decorators: [appContextDecorator(), editResourceContextDecorator({
-        id: 1, canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, isProduct: true,
+        id: v4(), canBeDelivered: true, canBeExchanged: true, canBeGifted: true, canBeTakenAway: true, isProduct: true,
         isService: true, created: new Date(), deleted: null, categories: [], description: 'description de la ressource',
-        title: 'Titre de ressource alléchant', images: [], expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24),
+        title: 'Titre de ressource alléchant', images: [], expiration: new Date(new Date().valueOf() + 1000 * 60 * 60 * 24), inActiveCampaign: false,
         price: null, specificLocation: { address: `Rue de l'adresse spécifique, 1, 10000, Gloupgloup`, latitude: 51, longitude: 4 }
     }), apolloClientMocksDecorator([{
         query: ACCOUNT_LOCATION,
         variables: { id: 1 },
         result: {
-            accountById: {
+            getAccountPublicInfo: {
                 id: 1,
                 locationByLocationId: {
                     address: 'Rue de la picole, 36, 7500 Tournai',
@@ -72,7 +73,7 @@ export const EditNewWithoutAddress: Story = {
         query: ACCOUNT_LOCATION,
         variables: { id: 1 },
         result: {
-            accountById: {
+            getAccountPublicInfo: {
                 id: 1,
                 locationByLocationId: null
             }

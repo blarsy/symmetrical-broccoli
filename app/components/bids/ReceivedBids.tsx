@@ -35,13 +35,6 @@ export const GET_MY_RECEIVED_BIDS = gql`query bids($first: Int, $after: Cursor, 
         refused
         validUntil
         resourceByResourceId {
-          accountByAccountId {
-            id
-            imageByAvatarImageId {
-              publicId
-            }
-            name
-          }
           title
           price
           expiration
@@ -58,8 +51,15 @@ export const GET_MY_RECEIVED_BIDS = gql`query bids($first: Int, $after: Cursor, 
               campaignId
             }
           }
+          accountsPublicDatumByAccountId {
+            id
+            name
+            imageByAvatarImageId {
+              publicId
+            }
+          }
         }
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           imageByAvatarImageId {
             publicId
@@ -75,13 +75,13 @@ export const GET_MY_RECEIVED_BIDS = gql`query bids($first: Int, $after: Cursor, 
   }
 }`
 
-export const ACCEPT_BID = gql`mutation AcceptBid($bidId: Int) {
+export const ACCEPT_BID = gql`mutation AcceptBid($bidId: UUID) {
   acceptBid(input: {bidId: $bidId}) {
     integer
   }
 }`
 
-export const REFUSE_BID = gql`mutation RefuseBid($bidId: Int) {
+export const REFUSE_BID = gql`mutation RefuseBid($bidId: UUID) {
   refuseBid(input: {bidId: $bidId}) {
     integer
   }

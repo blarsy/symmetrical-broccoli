@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
       //In dev-only, allow dynamic scripts - necessary for hot reload
       `'unsafe-eval'`
       : ''};
-    connect-src 'self' https://maps.googleapis.com https://region1.google-analytics.com ${versions.map(v => v.apiUrl).join(' ')} ${versions.map(v => v.subscriptionsUrl).join(' ')};
+    connect-src 'self' https://api.cloudinary.com/ https://maps.googleapis.com https://region1.google-analytics.com ${versions.map(v => v.apiUrl).join(' ')} ${versions.map(v => v.subscriptionsUrl).join(' ')};
     img-src 'self' blob: data: https://res.cloudinary.com https://maps.gstatic.com https://maps.googleapis.com https://fonts.gstatic.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
 `

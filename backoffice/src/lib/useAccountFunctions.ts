@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation"
 
 export interface AccountInfo {
     name: string
-    id: number
+    id: string
     email: string
     avatarPublicId: string
     activated: Date
@@ -79,14 +79,11 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
       account {
         knowsAboutCampaigns
         name
-        language
         email
-        imageByAvatarImageId {
-            publicId
-        }
+        avatarPublicId
         amountOfTokens
         activated
-        id
+        accountId
       }
     }
 }`
@@ -99,55 +96,56 @@ const useAccountFunctions = (version: string) => {
 
     const connectWithToken = async (token: string) => {
         const client = getApolloClient(version, token, disconnect)
-        const res = await client.query({ query: GET_SESSION_DATA })
 
-        if(!res.data.getSessionDataWeb) {
-            localStorage.removeItem('token')
-            appDispatch({ type: AppReducerActionType.Login, payload: { 
-                token: '',
+        try {
+            const res = await client.query({ query: GET_SESSION_DATA })
+
+            if(!res.data.getSessionDataWeb) {
+                console.error('disconnecting user because of no session data found')
+                disconnect()
+            }
+
+            const subscriptions = [
+                client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
+                    const updatedAccount: AccountInfo = {
+                        activated: payload.data.accountChangeReceived.account.activated,
+                        amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
+                        lastChangeTimestamp: new Date(),
+                        avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
+                        email: payload.data.accountChangeReceived.account.email,
+                        id: payload.data.accountChangeReceived.account.accountId,
+                        name: payload.data.accountChangeReceived.account.name,
+                        knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns
+                    }
+                    appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
+                }}),
+                client.subscribe({query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
+                    appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
+                }})
+            ]
+
+            const account: AccountInfo = {
+                id: res.data.getSessionDataWeb.accountId, 
+                name: res.data.getSessionDataWeb.name, 
+                email: res.data.getSessionDataWeb.email, 
+                avatarPublicId: res.data.getSessionDataWeb.avatarPublicId,
+                activated: res.data.getSessionDataWeb.activated,
+                amountOfTokens: res.data.getSessionDataWeb.amountOfTokens,
+                lastChangeTimestamp: new Date(),
+                knowsAboutCampaigns: res.data.getSessionDataWeb.knowsAboutCampaigns
+            }
+
+            localStorage.setItem('token', token)
+            appDispatch({ type: AppReducerActionType.Login, payload: {
+                token,
                 unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
-                unreadNotifications: res.data.getSessionDataWeb.unreadNotifications, 
-                account: undefined
-            }})
+                unreadNotifications: res.data.getSessionDataWeb.unreadNotifications,
+                subscriptions,
+                account} })
+        } catch(e) {
+            console.error('disconnecting user because of', e)
+            disconnect()
         }
-
-        const subscriptions = [
-            client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
-                const updatedAccount: AccountInfo = {
-                    activated: payload.data.accountChangeReceived.account.activated,
-                    amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
-                    lastChangeTimestamp: new Date(),
-                    avatarPublicId: payload.data.accountChangeReceived.account.imageByAvatarImageId?.publicId,
-                    email: payload.data.accountChangeReceived.account.email,
-                    id: payload.data.accountChangeReceived.account.id,
-                    name: payload.data.accountChangeReceived.account.name,
-                    knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns
-                }
-                appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
-            }}),
-            client.subscribe({query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
-                appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
-            }})
-        ]
-
-        const account: AccountInfo = {
-            id: res.data.getSessionDataWeb.accountId, 
-            name: res.data.getSessionDataWeb.name, 
-            email: res.data.getSessionDataWeb.email, 
-            avatarPublicId: res.data.getSessionDataWeb.avatarPublicId,
-            activated: res.data.getSessionDataWeb.activated,
-            amountOfTokens: res.data.getSessionDataWeb.amountOfTokens,
-            lastChangeTimestamp: new Date(),
-            knowsAboutCampaigns: res.data.getSessionDataWeb.knowsAboutCampaigns
-        }
-
-        localStorage.setItem('token', token)
-        appDispatch({ type: AppReducerActionType.Login, payload: {
-            token,
-            unreadConversations: res.data.getSessionDataWeb.unreadConversations, 
-            unreadNotifications: res.data.getSessionDataWeb.unreadNotifications,
-            subscriptions,
-            account} })
     }
 
     const disconnect = () => {

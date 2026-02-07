@@ -17,7 +17,7 @@ export const MY_CONVERSATIONS = gql`query MyConversations {
       nodes {
         id
         created
-        messageByLastMessage {
+        messageByLastMessageId {
           text
           created
         }
@@ -27,10 +27,9 @@ export const MY_CONVERSATIONS = gql`query MyConversations {
             unreadMessagesByParticipantId {
               totalCount
             }
-            accountByAccountId {
+            accountsPublicDatumByAccountId {
               id
               name
-              email
               imageByAvatarImageId {
                 publicId
               }
@@ -42,10 +41,9 @@ export const MY_CONVERSATIONS = gql`query MyConversations {
           canBeGifted
           canBeExchanged
           title
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             name
             id
-            email
             imageByAvatarImageId {
               publicId
             }
@@ -63,7 +61,7 @@ export const MY_CONVERSATIONS = gql`query MyConversations {
   }`
 
 interface Props {
-    onConversationSelected: (resource: Resource, otherAccountId: number) => void
+    onConversationSelected: (resource: Resource, otherAccountId: string) => void
 }
 
 const PastConversations = ({ onConversationSelected }: Props) => {

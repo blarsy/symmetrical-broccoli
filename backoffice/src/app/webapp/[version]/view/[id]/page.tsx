@@ -1,7 +1,6 @@
 import ViewResourcePage from "@/components/resources/ViewResourcePage"
 import { GET_RESOURCE, getApolloClient } from "@/lib/apolloClient"
 import { urlFromPublicId } from "@/lib/images"
-import { width } from "@mui/system"
 
 import type { Metadata, ResolvingMetadata } from 'next'
  
@@ -13,12 +12,12 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-    try {
+    // try {
       // read route params
       const { id, version } = await params
 
       const client = getApolloClient(version)
-      const res = await client.query({ query: GET_RESOURCE, variables: { id: Number.parseInt(id) } })
+      const res = await client.query({ query: GET_RESOURCE, variables: { id } })
       
       return {
           title: res.data.resourceById.title,
@@ -32,10 +31,10 @@ export async function generateMetadata(
                   undefined
           }
       }
-    } catch (e) {
-        //console.log('Unexpected error while generating metadata', e)
-        throw e
-    }
+    // } catch (e) {
+    //     console.log('Unexpected error while generating metadata', e)
+    //     throw e
+    // }
 }
 
 const Page = async () => <ViewResourcePage />

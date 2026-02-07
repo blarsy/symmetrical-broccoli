@@ -5,7 +5,7 @@ import { fromToday } from "@/utils"
 import config from './config'
 
 let account : TestAccount
-let campaignId: number
+let campaignId: string
 
 jest.mock('next/navigation', () => ({
   usePathname() {

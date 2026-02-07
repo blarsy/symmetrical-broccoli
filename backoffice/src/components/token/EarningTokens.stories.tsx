@@ -44,7 +44,7 @@ export const NoCampaignVanillaAccount: Story = {
                 resourceCategoryCode: '1'
             }]
             },
-            accountByAccountId: {
+            accountsPublicDatumByAccountId: {
                 id: 123
             }
         }]},
@@ -89,7 +89,7 @@ export const NoCampaignAccountFilled: Story = {
                 resourceCategoryCode: '1'
             }]
             },
-            accountByAccountId: {
+            accountsPublicDatumByAccountId: {
                 id: 123
             }
         }]},
@@ -143,7 +143,7 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
                 resourceCategoryCode: '1'
             }]
             },
-            accountByAccountId: {
+            accountsPublicDatumByAccountId: {
                 id: 123
             }
         }, {
@@ -160,7 +160,7 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
                 resourceCategoryCode: '1'
             }]
             },
-            accountByAccountId: {
+            accountsPublicDatumByAccountId: {
                 id: 123
             }
         }]},

@@ -8,18 +8,18 @@ import { gql, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { UiContext } from "../scaffold/UiContextProvider"
 
-export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: Int, $otherAccountId: Int, $imagePublicId: String) {
+export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: UUID, $otherAccountId: UUID, $imagePublicId: String) {
     createMessage(
       input: {imagePublicId: $imagePublicId, resourceId: $resourceId, otherAccountId: $otherAccountId, text: $text}
     ) {
-      integer
+      uuid
     }
   }`
 
 
 interface Props {
     conversation: ResourceHeaderData
-    onMessageSent: (id: number, text: string, imagePublicId?: string) => void
+    onMessageSent: (id: string, text: string, imagePublicId?: string) => void
 }
 
 const MessageComposer = (p: Props) => {
@@ -41,7 +41,7 @@ const MessageComposer = (p: Props) => {
                 imagePublicId } })
             setSendMessageStatus(fromData(undefined))
             setDraftMessage('')
-            p.onMessageSent(res.data.createMessage.integer, message, imagePublicId)
+            p.onMessageSent(res.data.createMessage.uuid, message, imagePublicId)
         } catch(e) {
             setSendMessageStatus(fromError(e, uiContext.i18n.translator('requestError')))
         }

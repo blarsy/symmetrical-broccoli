@@ -12,12 +12,13 @@ import { gql, useMutation } from "@apollo/client"
 import { ErrorText } from "../misc"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
+import { v4 } from "uuid"
 
-export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: Int) {
+export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: UUID) {
   createBid(
     input: {amountOfTokens: $amountOfTokens, hoursValid: $hoursValid, resourceId: $resourceId}
   ) {
-    integer
+    uuid
   }
 }`
 
@@ -41,7 +42,7 @@ const CreateBidDialog = (p: Props) => {
             setBidStatus(initial(true))
             try {
                 const res = await createBid({ variables: { amountOfTokens: values.amountOfTokens, hoursValid: values.hoursValid, resourceId: p.resource!.id } })
-                if(res.data.createBid.integer && res.data.createBid.integer < 0) {
+                if(!res.data.createBid.uuid) {
                     throw new Error('Unexpected return value on bid creation')
                 } else {
                     setBidStatus(fromData(undefined))
@@ -62,10 +63,10 @@ const CreateBidDialog = (p: Props) => {
             <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <ResourceHeader data={{ id: p.resource!.id,
                     resource: p.resource,
-                    participantId: 0, // not used in this component's context
+                    participantId: v4(), // not used in this component's context
                     otherAccount: 
                         { 
-                            participantId: 0, // not used in this component's context
+                            participantId: v4(), // not used in this component's context
                             id: p.resource!.account!.id,
                             name: p.resource!.account!.name,
                             avatarImageUrl: p.resource!.account!.avatarImagePublicId && urlFromPublicId(p.resource!.account!.avatarImagePublicId)

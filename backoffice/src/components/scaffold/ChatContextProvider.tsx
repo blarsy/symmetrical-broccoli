@@ -3,8 +3,8 @@ import { ConversationData, NewMessage } from "../chat/lib"
 import { Account, Resource } from "@/lib/schema"
 
 export interface ChatStateData {
-  unreadConversations: number[]
-  currentConversationId?: number
+  unreadConversations: string[]
+  currentConversationId?: string
   newChatMessage?: NewMessage
   conversations: ConversationData[]
   chatMessageCustomHandler?: (msg: any) => void
@@ -23,7 +23,9 @@ const blankChatContext = {
 export enum ChatReducerActionType {
   SetConversationRead,
   SetCurrentConversationId,
+  SetConversationCreated,
   SetNewChatMessage,
+  DismissNewMessage,
   SetChatMessageCustomHandler,
   SetConversations,
   SetNewConversation
@@ -35,9 +37,26 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
     case ChatReducerActionType.SetConversationRead:
         newState = { unreadConversations: previousState.unreadConversations.filter(c => c !== action.payload) }
         break
+    case ChatReducerActionType.SetConversationCreated:
+            let newConversationList: ConversationData[] = []
+            if(previousState.newConversationState) {
+                const newConversationData = previousState.conversations.find(c => c.resourceId && c.resourceId === previousState.newConversationState?.resource.id)!
+                newConversationData.id = action.payload
+                newConversationList.push(newConversationData)
+            }
+            newState = {
+                currentConversationId: action.payload, 
+                newConversationState: undefined, 
+                conversations: [...newConversationList, ...previousState.conversations.filter(c => !c.resourceId || c.resourceId != previousState.newConversationState?.resource.id)]
+            }
+        break
     case ChatReducerActionType.SetCurrentConversationId:
         if(action.payload) {
-            newState = { currentConversationId: action.payload }
+            newState = {
+                currentConversationId: action.payload, 
+                newConversationState: undefined, 
+                conversations: previousState.conversations.filter(c => !c.resourceId || c.resourceId != previousState.newConversationState?.resource.id)
+            }
         } else {
             newState = { currentConversationId: undefined }
         }
@@ -45,9 +64,11 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
     case ChatReducerActionType.SetNewChatMessage:
         const message = action.payload as NewMessage
         const messageConversationId = message.conversationId
+        newState = {}
         if(messageConversationId != previousState.currentConversationId && !previousState.unreadConversations.find(c => c === messageConversationId)) {
-            newState = { newChatMessage: message, unreadConversations: [ ...previousState.unreadConversations, messageConversationId] }
+            newState.unreadConversations = [ ...previousState.unreadConversations, messageConversationId]
         }
+        newState.newChatMessage = message 
 
         let targetConversation = previousState.conversations.find(conv => conv.id === messageConversationId)
         if(!targetConversation) {
@@ -58,7 +79,7 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
                 numberOfUnreadMessages: 1,
                 resourceId: message.resourceId,
                 resourceName: message.resourceName,
-                imagePublicId: message.image,
+                imagePublicId: message.senderAvatarPublicId,
                 lastMessage: message.text || '<Image>',
                 lastMessageDate: message.created,
                 resourceImagePublicId: message.resourceImage
@@ -70,7 +91,11 @@ const chatReducer = (previousState: ChatStateData, action: { type: ChatReducerAc
             targetConversation.lastMessageDate = message.created
         }
         const newConversationsList = [targetConversation, ...previousState.conversations.filter(conv => conv.id != messageConversationId)]
-        newState = { ...newState, ...{conversations: newConversationsList } } 
+        newState.conversations = newConversationsList
+        //console.log('new message state', newState)
+        break
+    case ChatReducerActionType.DismissNewMessage:
+        newState = { ...newState, ...{ newChatMessage: undefined }  }
         break
     case ChatReducerActionType.SetChatMessageCustomHandler:
         newState = { chatMessageCustomHandler: action.payload }

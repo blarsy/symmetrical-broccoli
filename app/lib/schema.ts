@@ -2,8 +2,7 @@ import { urlFromPublicId } from "./images"
 
 export interface Account {
     name: string,
-    id: number,
-    email: string,
+    id: string,
     avatarImageUrl?: string
 }
 
@@ -15,7 +14,7 @@ export enum LinkTypes {
 }
 
 export interface Link {
-    id: number
+    id: string
     url: string
     label: string
     type: LinkTypes
@@ -29,12 +28,12 @@ export interface Location {
 
 export interface AccountInfo {
     name: string
-    id: number
+    id: string
     email: string
     avatarPublicId: string
     activated: Date
-    unreadConversations: number[]
-    unreadNotifications: number[]
+    unreadConversations: string[]
+    unreadNotifications: string[]
     amountOfTokens: number
     lastChangeTimestamp: Date
     numberOfExternalAuthProviders: number
@@ -53,16 +52,16 @@ export interface Category {
 
 export interface Message {
     text: string
-    id: number
+    id: string
     created: Date
     from: Account
     image?: ImageInfo
-    conversationId?: number
+    conversationId?: string
     received?: Date
 }
 
 export interface Resource {
-    id: number
+    id: string
     images: ImageInfo[]
     title: string
     description: string
@@ -85,8 +84,8 @@ export interface Resource {
 export interface ConversationData {
     withUser: Account
     conversation: {
-        id: number
-        participantId: number
+        id: string
+        participantId: string
         lastMessageExcerpt: string | undefined
         lastMessageTime: Date | undefined
         resource: Resource
@@ -104,7 +103,7 @@ export const parseLocationFromGraph = (raw: any): Location | null => {
     })
 }
 
-export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: number):Resource => {
+export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: string):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
         []
@@ -122,10 +121,9 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[], act
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
         account: { 
-            name: rawRes.accountByAccountId.name,
-            id: rawRes.accountByAccountId.id,
-            email: rawRes.accountByAccountId.email,
-            avatarImageUrl: rawRes.accountByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountByAccountId.imageByAvatarImageId.publicId)
+            name: rawRes.accountsPublicDatumByAccountId.name,
+            id: rawRes.accountsPublicDatumByAccountId.id,
+            avatarImageUrl: rawRes.accountsPublicDatumByAccountId.imageByAvatarImageId && urlFromPublicId(rawRes.accountsPublicDatumByAccountId.imageByAvatarImageId.publicId)
         },
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
@@ -134,22 +132,22 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[], act
 } as Resource
 }
 
-export const fromServerGraphResources = (data: any[], categories: Category[], activeCampaignId?: number): Resource[] => {
+export const fromServerGraphResources = (data: any[], categories: Category[], activeCampaignId?: string): Resource[] => {
     return data.map((rawRes: any) => fromServerGraphResource(rawRes, categories, activeCampaignId))
 }
 
-export const fromServerGraphConversations = (data: any[], loggedInAccountId: number): ConversationData[] => {
+export const fromServerGraphConversations = (data: any[], loggedInAccountId: string): ConversationData[] => {
     return data.map((rawConversation: any) => {
-        const meAsParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id === loggedInAccountId)
-        const otherParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountByAccountId.id != loggedInAccountId)
+        const meAsParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountsPublicDatumByAccountId.id === loggedInAccountId)
+        const otherParticipant = rawConversation.participantsByConversationId.nodes.find((participant: any) => participant.accountsPublicDatumByAccountId.id != loggedInAccountId)
 
         return ({
             conversation: {
                 hasUnread: meAsParticipant.unreadMessagesByParticipantId.totalCount > 0,
                 id: rawConversation.id,
-                lastMessageExcerpt: rawConversation.messageByLastMessage.text,
-                lastMessageTime: rawConversation.messageByLastMessage.created,
-                participantId: rawConversation.participantsByConversationId.nodes.find((part: any) => part.accountByAccountId.id === loggedInAccountId).id,
+                lastMessageExcerpt: rawConversation.messageByLastMessageId.text,
+                lastMessageTime: rawConversation.messageByLastMessageId.created,
+                participantId: rawConversation.participantsByConversationId.nodes.find((part: any) => part.accountsPublicDatumByAccountId.id === loggedInAccountId).id,
                 resource: {
                     title: rawConversation.resourceByResourceId.title,
                     id: rawConversation.resourceByResourceId.id,
@@ -160,10 +158,10 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                     })),
                     price: rawConversation.resourceByResourceId.price,
                     account: {
-                        id: rawConversation.resourceByResourceId.accountByAccountId.id,
-                        name: rawConversation.resourceByResourceId.accountByAccountId.name,
-                        email: rawConversation.resourceByResourceId.accountByAccountId.email,
-                        avatarImageUrl: rawConversation.resourceByResourceId.accountByAccountId.imageByAvatarImageId ? urlFromPublicId(rawConversation.resourceByResourceId.accountByAccountId.imageByAvatarImageId.publicId) : undefined
+                        id: rawConversation.resourceByResourceId.accountsPublicDatumByAccountId.id,
+                        name: rawConversation.resourceByResourceId.accountsPublicDatumByAccountId.name,
+                        email: rawConversation.resourceByResourceId.accountsPublicDatumByAccountId.email,
+                        avatarImageUrl: rawConversation.resourceByResourceId.accountsPublicDatumByAccountId.imageByAvatarImageId ? urlFromPublicId(rawConversation.resourceByResourceId.accountsPublicDatumByAccountId.imageByAvatarImageId.publicId) : undefined
                     },
                     //Following values are not used, so just give them some default values
                     canBeDelivered: false,
@@ -179,10 +177,10 @@ export const fromServerGraphConversations = (data: any[], loggedInAccountId: num
                 }
             },
             withUser: {
-                id: otherParticipant.accountByAccountId.id,
-                email: otherParticipant.accountByAccountId.email,
-                name: otherParticipant.accountByAccountId.name,
-                avatarImageUrl: otherParticipant.accountByAccountId.imageByAvatarImageId ? urlFromPublicId(otherParticipant.accountByAccountId.imageByAvatarImageId.publicId) : undefined
+                id: otherParticipant.accountsPublicDatumByAccountId.id,
+                email: otherParticipant.accountsPublicDatumByAccountId.email,
+                name: otherParticipant.accountsPublicDatumByAccountId.name,
+                avatarImageUrl: otherParticipant.accountsPublicDatumByAccountId.imageByAvatarImageId ? urlFromPublicId(otherParticipant.accountsPublicDatumByAccountId.imageByAvatarImageId.publicId) : undefined
             }
         })
     }).sort((a, b) => {
@@ -205,7 +203,7 @@ export const getIconForLink = (type: LinkTypes) => {
 }
 
 export interface Bid {
-    id: number
+    id: string
     amountOfTokens: number
     resource: Resource
     account: Account
@@ -219,7 +217,6 @@ export interface Bid {
 export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
     name: rawAccount.name,
     id: rawAccount.id,
-    email: rawAccount.email,
     avatarImageUrl: rawAccount.imageByAvatarImageId && urlFromPublicId(rawAccount.imageByAvatarImageId.publicId)
 })
 
@@ -227,6 +224,6 @@ export const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {
     return {
         id: bid.id, amountOfTokens: bid.amountOfTokens, created: bid.created, accepted: bid.accepted,
         refused: bid.refused, deleted: bid.deleted, resource: fromServerGraphResource(bid.resourceByResourceId, categories),
-        account: fromServerGraphAccount(bid.accountByAccountId), validUntil: bid.validUntil
+        account: fromServerGraphAccount(bid.accountsPublicDatumByAccountId), validUntil: bid.validUntil
     }
 }

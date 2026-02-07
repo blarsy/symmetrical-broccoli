@@ -15,7 +15,7 @@ import { Location } from '@/lib/schema'
 import { SUGGEST_RESOURCES } from "@/components/search/Search"
 import { UUID } from "crypto"
 
-const VERSION = 'v0_11'
+const VERSION = config.version
 
 export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
   createCampaign(
@@ -74,7 +74,7 @@ const confirmAccount = async (email: string) => {
 
 export interface NewAccountData {
     token: string,
-    id: number
+    id: string
 }
 
 export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false): Promise<NewAccountData> => {
@@ -83,7 +83,7 @@ export const createAndLogIn = async (email: string, name: string, password: stri
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
         client = getApolloClient(VERSION, res.data.registerAccount.jwtToken)
-        const idRow = await executeQuery('SELECT id from sb.accounts WHERE lower(email) = $1', [email])
+        const idRow = await executeQuery('SELECT account_id as id from sb.accounts_private_data WHERE lower(email) = $1', [email])
         return { token: (res.data.registerAccount.jwtToken as string), id: idRow.rows[0].id }
     } catch (e) {
         console.debug('Error while trying to login', e)
@@ -139,17 +139,17 @@ export const makeSearch = async (account: TestAccount, term: string) => {
 export const createResource = async (jwtToken: string, title: string, description: string,
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
     canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | undefined, 
-    categoryCodes: number[], campaignToJoin?: number, specificLocation?: Location): Promise<number> => {
+    categoryCodes: number[], campaignToJoin?: string, specificLocation?: Location): Promise<string> => {
     const loggedInClient = getApolloClient(VERSION, jwtToken)
     const res = await loggedInClient.mutate({ mutation: CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
         expiration, isProduct, isService, title, campaignToJoin, specificLocation
     } })
-    return res.data.createResource.integer
+    return res.data.createResource.uuid
 }
 
 interface ResourceRawData {
-    title: string, description?: string, expiration: Date, accountId: number, created?: Date, 
+    title: string, description?: string, expiration: Date, accountId: string, created?: Date, 
     isService?: boolean, isProduct?: boolean, canBeDelivered?: boolean, canBeTakenAway?: boolean, 
     canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date
 }
@@ -167,7 +167,7 @@ export const createResourceLowLevel = async (res: ResourceRawData): Promise<numb
 
 export const createResourceLowLevelWithAnImage = async (res: ResourceRawData, publicImageId: string): Promise<number> => {
     const resId = await createResourceLowLevel(res)
-    let imgId: number
+    let imgId: string
     const imgExistsRes = await executeQuery(`SELECT id FROM sb.images WHERE public_id = ($1)`, [publicImageId])
     if(imgExistsRes.rowCount && imgExistsRes.rowCount > 0) {
         imgId = imgExistsRes.rows[0].id
@@ -179,23 +179,23 @@ export const createResourceLowLevelWithAnImage = async (res: ResourceRawData, pu
     return resId
 }
 
-export const deleteResource = async (jwtToken: string, resourceId: number) => {
+export const deleteResource = async (jwtToken: string, resourceId: string) => {
     const loggedInClient = getApolloClient(VERSION, jwtToken)
     return await loggedInClient.mutate({ mutation: DELETE_RESOURCE, variables: { resourceId } })
 }
 
-const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesRewards($accountId: Int) {
+const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesRewards($accountId: UUID) {
     applyAccountResourcesRewards(input: {accountId: $accountId}) {
       clientMutationId
     }
   }`
 
-export const applyResourceRewards = async (jwtToken: string, accountId: number) => {
+export const applyResourceRewards = async (jwtToken: string, accountId: string) => {
     const loggedInClient = getApolloClient(VERSION, jwtToken)
     return loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
 }
 
-export const setResourceData = async (id: number, dates:{ deleted?: Date, created?: Date}) => {
+export const setResourceData = async (id: string, dates:{ deleted?: Date, created?: Date}) => {
     const sets = Object.entries(dates).map(([name, date], idx) => `${name} = $${idx + 2}`)
     const vals = Object.entries(dates).map(([name, date]) => date)
     await executeQuery(`update sb.resources r
@@ -257,7 +257,7 @@ export const makeTestAccounts = (inputs: TestAccountInput[]): Promise<TestAccoun
     return Promise.all(makeTestAccountInfo(inputs.length).map(async (accountInfo, idx) => {
         const accountData = await createAndLogIn(accountInfo.email, accountInfo.name, defaultPassword, inputs[idx].confirm)
         if(inputs[idx].initialTokenAmount) {
-            await executeQuery('update sb.accounts set amount_of_tokens = $1 where id = $2', [inputs[idx].initialTokenAmount, accountData.id])
+            await executeQuery('update sb.accounts_private_data set amount_of_tokens = $1 where account_id = $2', [inputs[idx].initialTokenAmount, accountData.id])
         }
         return {
             info: accountInfo,
@@ -275,7 +275,7 @@ interface SearchableResources {
         name: string;
         token: string;
     }[];
-    resourceIds: [number, number, number, number, number, number];
+    resourceIds: [string, string, string, string, string, string];
 }
 
 export const setupSearchableResources = async (testNum: string): Promise<SearchableResources> => {
@@ -312,33 +312,44 @@ export const cleanupSearchableResources = async (data: SearchableResources) => {
 }
 
 export const setAccountTokens = async (email: string, numberOfTokens: number) => {
-    await executeQuery(`update sb.accounts
+    await executeQuery(`update sb.accounts_private_data
         set amount_of_tokens = $1
         where email = lower($2)`, [numberOfTokens, email])
 }
 
 export const createCampaign = async (name: string, description: string,
     airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
-    ending: Date): Promise<number> => {
+    ending: Date): Promise<string> => {
     const res = await executeQuery(`INSERT INTO sb.campaigns(
         name, description, airdrop, airdrop_amount, resource_rewards_multiplier, beginning, ending)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
     return res.rows[0].id;
 }
 
-export const checkLastNotificationOnAccount = async(accountId: number, checkData: (parsed: any) => boolean) => {
+export const getLastNotificationOnAccount = async (accountId: string, checkData: (parsed: any) => boolean) => {
     const res = await executeQuery(`SELECT id, data FROM sb.notifications
         WHERE account_id = ($1) AND read IS NULL
         ORDER BY id desc 
         LIMIT 1`, [accountId])
+    if(res.rowCount == 0) {
+        return undefined
+    }
 
-    expect(checkData(res.rows[0].data)).toBeTruthy()
-
+    if(!checkData(res.rows[0].data)) {
+        return undefined
+    }
     return res.rows[0].id
 }
 
+export const checkLastNotificationOnAccount = async(accountId: string, checkData: (parsed: any) => boolean) => {
+    const notifId = await getLastNotificationOnAccount(accountId, checkData)
+
+    expect(notifId).toBeDefined()
+    return notifId
+}
+
 export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {
-    const result = await executeQuery(`select amount_of_tokens from sb.accounts
+    const result = await executeQuery(`select amount_of_tokens from sb.accounts_private_data
         where email = lower($1)`, [email])
     
     expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
@@ -346,7 +357,7 @@ export const checkAccountTokens = async (email: string, expectedAmountOfTokens: 
 
 export const checkLastTokenTransactionOnAccount = async (email: string, amount: number, transationType: number) => {
     const result = await executeQuery(`select * from sb.accounts_token_transactions 
-        where account_id = (SELECT id from sb.accounts WHERE email = $1) and
+        where account_id = (SELECT account_id as id from sb.accounts_private_data WHERE email = $1) and
         movement = $2 and
         token_transaction_type_id = $3`, [email, amount, transationType])
     
@@ -360,7 +371,7 @@ export const removeActiveCampaign = async () => {
     `)
 }
 
-export const createGrant = async (title: string, amount: number, expiration?: Date, maxNumberOfGrants?: number, whiteList?: string[], campaignId?: number): Promise<UUID> => {
+export const createGrant = async (title: string, amount: number, expiration?: Date, maxNumberOfGrants?: number, whiteList?: string[], campaignId?: string): Promise<UUID> => {
     let data = {} as any
     
     if(maxNumberOfGrants != undefined) data.maxNumberOfGrants = maxNumberOfGrants

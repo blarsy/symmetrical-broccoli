@@ -18,7 +18,7 @@ const SEARCH_MAILS = gql`query SearchMails($searchTerm: String, $last: Int, $fir
   ) {
     edges {
       node {
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           name
         }
         created
@@ -95,7 +95,7 @@ const Mails = () => {
                 { field: 'id', headerName: 'Id'},
                 { field: 'email', headerName: 'Target'},
                 { field: 'subject', headerName: 'Subject'},
-                { field: 'account', headerName: 'Account', valueGetter: (val: any, row: any) => row.accountByAccountId?.name},
+                { field: 'account', headerName: 'Account', valueGetter: (val: any, row: any) => row.accountsPublicDatumByAccountId?.name},
                 { field: 'created', headerName: 'Date Création'},
                 { field: 'action', headerName: 'Actions', renderCell: data => <Button variant="contained"
                     onClick={() => setMailToView({ to: data.row.email, from: data.row.sentFrom, 

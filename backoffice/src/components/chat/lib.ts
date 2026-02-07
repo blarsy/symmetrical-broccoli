@@ -2,15 +2,15 @@ import DataLoadState from "@/lib/DataLoadState"
 import { Resource } from "@/lib/schema"
 
 export interface ResourceHeaderData {
-    id: number
-    participantId: number
+    id: string
+    participantId: string
     resource?: Resource
     otherAccount: ConversationOtherAccountData
 }
 
 export interface ConversationOtherAccountData  { 
-    id: number
-    participantId: number
+    id: string
+    participantId: string
     name: string
     imagePublicId?: string
     avatarImageUrl?: string
@@ -22,11 +22,11 @@ export interface ConversationState extends DataLoadState<{
 } | undefined> {}
 
 export interface Message {
-    id: number
+    id: string
     text: string
     createdAt: Date
     user: {
-        id: number
+        id: string
         name: string
         avatar: string
     }
@@ -36,10 +36,10 @@ export interface Message {
 }
 
 export interface ConversationData {
-    id: number
+    id: string
     accountName: string
     imagePublicId?: string
-    resourceId: number
+    resourceId: string
     resourceName: string
     resourceImagePublicId?: string
     numberOfUnreadMessages: number
@@ -48,10 +48,12 @@ export interface ConversationData {
 }
 
 export interface NewMessage {
-    conversationId: number
+    conversationId: string
+    senderId: string
     senderName: string
+    senderAvatarPublicId: string
     senderImage?: string
-    resourceId: number
+    resourceId: string
     resourceName: string
     resourceImage?: string
     text: string

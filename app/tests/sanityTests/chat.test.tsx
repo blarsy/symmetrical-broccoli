@@ -12,7 +12,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
 let testAccounts: TestAccount[]
-let resourceId: number, resName: string
+let resourceId: string, resName: string
 
 beforeEach(async () => {
     testAccounts = await makeTestAccounts([{ confirm: true, contributor: true },{ confirm: true, contributor: true }])

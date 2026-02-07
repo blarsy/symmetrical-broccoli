@@ -4,7 +4,7 @@ import { createContext, Dispatch, JSX, useReducer } from "react"
 export interface AppStateData {
   token: string
   account?: AccountInfo
-  unreadNotifications: number[]
+  unreadNotifications: string[]
   notificationCustomHandler?: (notif: any) => void
   loading: boolean
   subscriptions: {unsubscribe: () => void}[]
@@ -70,7 +70,7 @@ const appReducer = (previousState: AppStateData, action: { type: AppReducerActio
         throw new Error(`Unexpected reducer action type ${action.type}`)
   }
 
-  //console.log('app dispatch', {...previousState, ...newState})
+  //console.log('action', action,'app dispatch', {...previousState, ...newState})
   return {...previousState, ...newState}
 }
 

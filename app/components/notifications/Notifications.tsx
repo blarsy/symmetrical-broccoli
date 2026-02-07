@@ -18,7 +18,7 @@ import { SvgProps } from "react-native-svg"
 import Images from "@/Images"
 
 interface NotificationData {
-    id: number
+    id: string
     read: boolean
     created: Date
     headline1: string
@@ -50,11 +50,10 @@ export const GET_NOTIFICATIONS = gql`query MyNotifications($first: Int, $after: 
     }
   }`
 
-export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
+export const GET_RESOURCES = gql`query GetResources($resourceIds: [UUID]) {
   getResources(resourceIds: $resourceIds) {
     nodes {
-      accountByAccountId {
-        email
+      accountsPublicDatumByAccountId {
         id
         name
         imageByAvatarImageId {
@@ -101,7 +100,7 @@ export const GET_RESOURCES = gql`query GetResources($resourceIds: [Int]) {
   }
 }`
 
-const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: Int) {
+const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: UUID) {
     setNotificationRead(input: {notificationId: $notificationId}) {
       integer
     }
@@ -140,7 +139,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
         const result = [] as NotificationData[]
 
         const resources = {} as {
-            [resourceId: number]: any
+            [resourceId: string]: any
         }
 
         resourcesData.getResources.nodes.forEach((rawRes: any) => resources[rawRes.id] = rawRes)
@@ -152,7 +151,7 @@ const useNotifications = ( navigation: NavigationHelpers<ParamListBase> ) => {
                     id: rawNotification.node.id,
                     created: rawNotification.node.created, 
                     headline1: t('newResourceFrom_notificationHeadline'),
-                    headline2: resources[rawNotification.node.data.resource_id].accountByAccountId.name,
+                    headline2: resources[rawNotification.node.data.resource_id].accountsPublicDatumByAccountId.name,
                     read: rawNotification.node.read,
                     text: resources[rawNotification.node.data.resource_id].title,
                     image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImageUrl: resource.account!.avatarImageUrl } },

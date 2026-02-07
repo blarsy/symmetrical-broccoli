@@ -36,7 +36,7 @@ interface ResourceSummaryData {
 interface EmailSummaryData {
     lang: string
     senders: SenderSummaryData
-    accountId: number
+    accountId: string
 }
 
 interface ChatMessageSummaryData {
@@ -45,10 +45,10 @@ interface ChatMessageSummaryData {
 
 interface AccountNotificationSummaryData {
     language: string
-    accountId: number
+    accountId: string
     notifications: {
         date: Date
-        id: number
+        id: string
         title: string
         summary: string
     }[]
@@ -117,7 +117,7 @@ const getAccountChatMessages = async (emailSummaryData: EmailSummaryData): Promi
 
 const getChatMessageSummaryData = async (pool: Pool, version: string): Promise<ChatMessageSummaryData> => {
     const messages = await runAndLog(`SELECT m.text as messagetext,
-            ad.id as destinatorid,
+            ad.account_id as destinatorid,
             ad.email as destinatoremail,
             aa.name as sendername,
             m.created,
@@ -129,10 +129,10 @@ const getChatMessageSummaryData = async (pool: Pool, version: string): Promise<C
         FROM sb.unread_messages um
         INNER JOIN sb.messages m ON m.id = um.message_id
         INNER JOIN sb.participants destinator ON destinator.id = um.participant_id
-        INNER JOIN sb.accounts ad ON ad.id = destinator.account_id
+        INNER JOIN sb.accounts_private_data ad ON ad.account_id = destinator.account_id
         INNER JOIN sb.conversations c ON c.id = destinator.conversation_id
         INNER JOIN sb.participants author ON author.id = m.participant_id
-        INNER JOIN sb.accounts aa ON aa.id = author.account_id
+        INNER JOIN sb.accounts_public_data aa ON aa.id = author.account_id
         INNER JOIN sb.resources r ON r.id = c.resource_id
         INNER JOIN sb.broadcast_prefs bp ON bp.account_id = destinator.account_id AND bp.event_type = 1 AND bp.days_between_summaries IS NOT NULL
         WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW())
@@ -194,7 +194,7 @@ const getChatMessageSummaryData = async (pool: Pool, version: string): Promise<C
 
 interface AccountNewResourcesData {
     language: string
-    id: number
+    id: string
     authors: {
         [authorId: string]: {
             name: string
@@ -264,22 +264,22 @@ const getNewResourcesSummaryData = async (pool: Pool, version: string): Promise<
         author.id as authorid, 
         r.created, 
         author.name as authorname, 
-        notified.id as notifiedid, 
+        notified.account_id as notifiedid, 
         notified.language,
         notified.email as notifiedemail
 	FROM sb.notifications n
 	INNER JOIN sb.resources r ON n.data::json->'resource_id' IS NOT NULL AND r.id = (n.data::json->>'resource_id')::integer
-    INNER JOIN sb.accounts author ON author.id = r.account_id
+    INNER JOIN sb.accounts_public_data author ON author.id = r.account_id
     INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
-    INNER JOIN sb.accounts notified ON notified.id = bp.account_id
+    INNER JOIN sb.accounts_private_data notified ON notified.account_id = bp.account_id
     WHERE (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
         n.read IS NULL AND
         n.created > NOW() - interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
         r.expiration > NOW() AND
         r.deleted IS NULL AND
-        author.id <> notified.id AND
+        author.id <> notified.account_id AND
         notified.email IS NOT NULL
-    ORDER BY notified.id, author.name, author.id, r.title, r.id, r.created DESC`, pool, `Querying new resources to notify`, version)
+    ORDER BY notified.account_id, author.name, author.id, r.title, r.id, r.created DESC`, pool, `Querying new resources to notify`, version)
 
     const resourcesSummaryData = {} as NewResourcesSummaryData
 
@@ -299,14 +299,14 @@ const getNewResourcesSummaryData = async (pool: Pool, version: string): Promise<
 }
 
 const getNotificationsSummaryData = async (pool: Pool, version: string): Promise<NotificationsSummaryData> => {
-    const notifications = await runAndLog(`SELECT a.language, a.id as account_id, n.id, n.created, n.data, a.email
+    const notifications = await runAndLog(`SELECT a.language, a.account_id, n.id, n.created, n.data, a.email
         FROM sb.notifications n
-        INNER JOIN sb.accounts a ON a.id = n.account_id
+        INNER JOIN sb.accounts_private_data a ON a.account_id = n.account_id
         INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 3 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
         WHERE n.data::json->>'resource_id' IS NULL AND (bp.last_summary_sent IS NULL OR bp.last_summary_sent + interval '1 day' * bp.days_between_summaries < NOW()) AND
             n.read IS NULL AND n.created > NOW() - interval '1 day' * LEAST( bp.days_between_summaries * 2.1, 7.0) AND
             a.email IS NOT NULL
-        ORDER BY a.id, n.created DESC`, pool, 'Querying notifications to notify', version)
+        ORDER BY a.account_id, n.created DESC`, pool, 'Querying notifications to notify', version)
     
         const notificationsSummaryData: NotificationsSummaryData = {} 
 
@@ -375,14 +375,14 @@ const getAccountNotifications = async (notificationsSummaryData: AccountNotifica
     return newNotificationsList.concat(`</table>`)
 }
 
-const makePostQuery = (eventType: number, accountId: number) => {
+const makePostQuery = (eventType: number, accountId: string) => {
     return `UPDATE sb.broadcast_prefs
         SET last_summary_sent = NOW()
         WHERE event_type = ${eventType} AND account_id = ${accountId};`
 }
 
 export const sendSummaries = async (pool: Pool, version: string): Promise<void> => {
-    const postQuerieInfos: { eventType: number, accountId: number, email: string }[] = []
+    const postQuerieInfos: { eventType: number, accountId: string, email: string }[] = []
 
     const [resourcesSummaryData, chatMessagesSummaryData, notificationsSummaryData] = await Promise.all([
         getNewResourcesSummaryData(pool, version),

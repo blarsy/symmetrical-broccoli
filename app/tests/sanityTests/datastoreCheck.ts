@@ -2,9 +2,9 @@ import { executeQuery } from './lib'
 
 export const checkAllAccountDataCreated = async (email: string) => {
     const result = await executeQuery(`select *
-        from sb.accounts a
-        inner join sb.broadcast_prefs bp on bp.account_id = a.id and bp.event_type = 2
-        inner join sb.notifications n on n.account_id = a.id
+        from sb.accounts_private_data a
+        inner join sb.broadcast_prefs bp on bp.account_id = a.account_id and bp.event_type = 2
+        inner join sb.notifications n on n.account_id = a.account_id
         where a.email = lower($1)`, [email])
 
     expect(result.rowCount).toBe(1)
@@ -12,23 +12,24 @@ export const checkAllAccountDataCreated = async (email: string) => {
 
 export const checkAccountData = async (email: string, name: string) => {
     const result = await executeQuery(`select *
-        from sb.accounts a
-        where a.email = lower($1) and a.name = $2`, [email, name])
+        from sb.accounts_private_data apr
+        INNER JOIN accounts_public_data apu ON apr.account_id = apu.id
+        where apr.email = lower($1) and apu.name = $2`, [email, name])
     
     expect(result.rowCount).toBe(1)
 }
 
-export const checkAccountAddress = async (address: string, latitude: number, longitude: number, accountId: number) => {
+export const checkAccountAddress = async (address: string, latitude: number, longitude: number, accountId: string) => {
     const result = await executeQuery(`select *
-        from sb.accounts a inner join sb.locations l on l.id = a.location_id
+        from sb.accounts_public_data a inner join sb.locations l on l.id = a.location_id
         where a.id = $1 and l.address = $2 and l.latitude = $3 and l.longitude = $4`, [accountId, address, latitude, longitude])
     
     expect(result.rowCount).toBe(1)
 }
 
-export const checkAccountLogo = async (publicId: string, accountId: number) => {
+export const checkAccountLogo = async (publicId: string, accountId: string) => {
     const result = await executeQuery(`select *
-        from sb.accounts a
+        from sb.accounts_public_data a
         inner join sb.images i on a.avatar_image_id = i.id
         where a.id = $1 and i.public_id = $2`, [accountId, publicId])
     
@@ -38,7 +39,7 @@ export const checkAccountLogo = async (publicId: string, accountId: number) => {
 export const checkLinksOnAccount = async (email: string, links: { label: string, url: string, type: number}[]) => {
     const result = await executeQuery(`select label, url, link_type_id
         from sb.accounts_links al
-        inner join sb.accounts a on a.id = al.account_id
+        inner join sb.accounts_private_data a on a.account_id = al.account_id
         where a.email = lower($1)`, [email])
 
     links.forEach(link => {
@@ -61,7 +62,7 @@ export const checkActivationEmailSent = async (email: string): Promise<string> =
 
 export const checkAccountActivated = async (email: string) => {
     const result = await executeQuery(`select *
-        from sb.accounts
+        from sb.accounts_private_data
         where email = lower($1) and activated is not null`, [email])
 
     return result.rowCount && result.rowCount > 0
@@ -69,7 +70,7 @@ export const checkAccountActivated = async (email: string) => {
 
 export const getActivationUrlFromMail = async (email: string) => {
     const result = await executeQuery(`select html_content
-        from sb.mails m inner join sb.accounts a on m.email = a.email
+        from sb.mails m inner join sb.accounts_private_data a on m.email = a.email
         where a.email = lower($1)`, [email])
 
     expect(result.rowCount).toBe(1)
@@ -81,7 +82,7 @@ export const checkResourcePresent = async (accountEmail: string, title: string, 
     canBeExchanged: boolean, canBeGifted: boolean, expiration: Date, categoryCodes: number[]
 ) => {
     const result = await executeQuery(`select r.id as resource_id, * from sb.resources r
-        inner join sb.accounts a on a.id = r.account_id
+        inner join sb.accounts_private_data a on a.account_id = r.account_id
         where a.email = lower($1) and r.title = $2`, [accountEmail, title])
     
     expect(result.rowCount).toBe(1)
@@ -103,9 +104,9 @@ export const checkResourcePresent = async (accountEmail: string, title: string, 
     categoryCodes.forEach(code => expect((cats.rows as any[]).some(row => row.code === code)).toBe(true))
 }
 
-export const checkHasNotifications = async (email: string, uniquePropNames: string[]): Promise<{ notifId: number, uniquePropName: string, uniquePropValue: any }[]> => {
+export const checkHasNotifications = async (email: string, uniquePropNames: string[]): Promise<{ notifId: string, uniquePropName: string, uniquePropValue: any }[]> => {
     const notifs = await executeQuery(`select n.id, n.account_id, n.data from sb.notifications n
-        inner join sb.accounts a on a.id = n.account_id
+        inner join sb.accounts_private_data a on a.account_id = n.account_id
         where a.email = lower($1)`, [email])
     
     expect(notifs.rowCount).toEqual(uniquePropNames.length)
@@ -121,7 +122,7 @@ export const checkHasNotifications = async (email: string, uniquePropNames: stri
 
 export const checkHasNoNotification = async (email: string) => {
     const notifs = await executeQuery(`select n.id from sb.notifications n
-        inner join sb.accounts a on a.id = n.account_id
+        inner join sb.accounts_private_data a on a.account_id = n.account_id
         where a.email = lower($1)`, [email])
     
     expect(notifs.rowCount).toEqual(0)
@@ -129,7 +130,7 @@ export const checkHasNoNotification = async (email: string) => {
 
 export const checkLastNotificationExists = async (email: string): Promise<any> => {
     const notif = await executeQuery(`select n.id, n.account_id from sb.notifications n
-        inner join sb.accounts a on a.id = n.account_id
+        inner join sb.accounts_private_data a on a.account_id = n.account_id
         where a.email = lower($1)
         limit 1`, [email])
 
@@ -141,7 +142,7 @@ export const checkLastNotificationExists = async (email: string): Promise<any> =
 export const checkANotificationExists = async (email: string, validateData: (data: any) => boolean) => {
     let retValue: boolean = false
     const result = await executeQuery(`select n.data from sb.notifications n
-            inner join sb.accounts a on a.id = n.account_id
+            inner join sb.accounts_private_data a on a.account_id = n.account_id
             where a.email = lower($1)
             order by n.created desc
             limit 1`, [email])
@@ -157,23 +158,23 @@ export const checkANotificationExists = async (email: string, validateData: (dat
 }
 
 export const checkAccountTokens = async (email: string, expectedAmountOfTokens: number) => {
-    const result = await executeQuery(`select amount_of_tokens from sb.accounts
+    const result = await executeQuery(`select amount_of_tokens from sb.accounts_private_data
         where email = lower($1)`, [email])
     
     expect(result.rows[0].amount_of_tokens).toBe(expectedAmountOfTokens)
 }
 
-export const getTokenAmounts = async (accountIds: number[]): Promise<{[accountId: number]: number}> => {
-    const result = await executeQuery(`select id, amount_of_tokens from sb.accounts where id in (${accountIds.join(',')})`)
+export const getTokenAmounts = async (accountIds: string[]): Promise<{[accountId: string]: number}> => {
+    const result = await executeQuery(`select account_id as id, amount_of_tokens from sb.accounts_private_data where account_id in (${accountIds.map(id => `'${id}'`).join(',')})`)
 
-    const returnValue: {[accountId: number]: number} = {}
+    const returnValue: {[accountId: string]: number} = {}
 
     result.rows.forEach(row => { returnValue[row.id] = row.amount_of_tokens })
 
     return returnValue
 }
 
-export const checkTokenTransactionExists = async (accountId: number, transactionType: number, movement: number, targetAccountId: number) => {
+export const checkTokenTransactionExists = async (accountId: string, transactionType: number, movement: number, targetAccountId: string) => {
     const result = await executeQuery(`select * from sb.accounts_token_transactions 
         where account_id = $1 AND token_transaction_type_id = $2 AND movement = $3 AND target_account_id = $4`,
         [accountId, transactionType, movement, targetAccountId]

@@ -32,8 +32,7 @@ export const parseLocationFromGraph = (raw: any): Location | null => {
 
 export interface Account {
     name: string,
-    id: number,
-    email: string,
+    id: string,
     avatarImagePublicId?: string
 }
 
@@ -48,7 +47,7 @@ export interface Category {
 }
 
 export interface Resource {
-    id: number
+    id: string
     images: ImageInfo[]
     title: string
     description: string
@@ -71,11 +70,10 @@ export interface Resource {
 export const fromServerGraphAccount = (rawAccount: any): Account => ({ 
     name: rawAccount.name,
     id: rawAccount.id,
-    email: rawAccount.email,
     avatarImagePublicId: rawAccount.imageByAvatarImageId ? rawAccount.imageByAvatarImageId.publicId : ''
 })
 
-export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: number):Resource => {
+export const fromServerGraphResource = (rawRes: any, categories: Category[], activeCampaignId?: string):Resource => {
     const resourceCategories: Category[] = rawRes.resourcesResourceCategoriesByResourceId && rawRes.resourcesResourceCategoriesByResourceId.nodes ?
         rawRes.resourcesResourceCategoriesByResourceId.nodes.map((cat: any) => categories.find(fullCat => fullCat.code == cat.resourceCategoryCode)) :
         []
@@ -86,22 +84,24 @@ export const fromServerGraphResource = (rawRes: any, categories: Category[], act
     if(activeCampaignId && rawRes.campaignsResourcesByResourceId && rawRes.campaignsResourcesByResourceId.nodes.length > 0) {
         inActiveCampaign = !!rawRes.campaignsResourcesByResourceId.nodes.find((cr: any) => cr.campaignId === activeCampaignId)
     }
-    return {
+    const result = {
         id: rawRes.id, title: rawRes.title, description: rawRes.description, 
         expiration: rawRes.expiration && new Date(rawRes.expiration), created: rawRes.created && new Date(rawRes.created),
         isProduct: rawRes.isProduct, isService: rawRes.isService, canBeDelivered: rawRes.canBeDelivered, canBeExchanged: rawRes.canBeExchanged,
         canBeGifted: rawRes.canBeGifted, canBeTakenAway: rawRes.canBeTakenAway,
         categories: resourceCategories, 
-        account: fromServerGraphAccount(rawRes.accountByAccountId),
+        account: fromServerGraphAccount(rawRes.accountsPublicDatumByAccountId),
         deleted: rawRes.deleted && new Date(rawRes.deleted),
         specificLocation: parseLocationFromGraph(rawRes.locationBySpecificLocationId),
         images, price: rawRes.price,
         inActiveCampaign
-} as Resource
+    } as Resource
+
+    return result
 }
 
 export interface Bid {
-    id: number
+    id: string
     amountOfTokens: number
     resource: Resource
     account: Account

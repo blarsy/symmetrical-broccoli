@@ -16,7 +16,7 @@ dayjs.extend(utc)
 let accounts: TestAccount[]
 
 afterEach( async () => {
-    await cleanupTestAccounts(accounts)
+    //await cleanupTestAccounts(accounts)
 })
 
 test('Create resource with unconfirmed account', async () => {
@@ -29,7 +29,8 @@ test('Create resource with unconfirmed account', async () => {
     const title = 'A title for this resource'
     const description = 'A description, potentially long.'
 
-    await createResourceThroughUI(title, description, someDate, screen)
+    await createResourceThroughUI(title, description, someDate, screen, true)
+    screen.debug()
 
     await checkResourcePresent(accounts[0].info.email, title, description, false, true, false, false, true, false, someDate, [2, 11])
     

@@ -13,7 +13,7 @@ const Page = () => {
           urlPieces.pop()
           window.history.replaceState({...window.history.state}, '', urlPieces.join('/'))
         }}
-        conversationId={Number(param)}
+        conversationId={param}
         onConversationSelected={id => {
           window.history.replaceState({...window.history.state}, '', `${id}`)
         }}/>

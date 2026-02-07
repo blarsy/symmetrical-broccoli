@@ -11,7 +11,7 @@ import dayjs from "dayjs"
 
 dayjs.extend(relativeTime)
 
-let account: TestAccount, account2: TestAccount, res1Id: number, resName: string
+let account: TestAccount, account2: TestAccount, res1Id: string, resName: string
 
 beforeEach(async () => {
     [account, account2] = await makeTestAccounts([{ confirm: true, contributor: true, initialTokenAmount: 10  }, { confirm: true, contributor: true, initialTokenAmount: 3}])

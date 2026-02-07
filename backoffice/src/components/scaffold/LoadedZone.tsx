@@ -24,7 +24,7 @@ function LoadedZone({ loading, error, children, containerStyle, onBottom, ref, t
     return <Stack data-testid={testID} ref={ref} sx={containerStyle || { flexDirection: 'column', justifyContent: 'center' }} onScroll={e => {
         if(onBottom && isBottom(e.currentTarget)) {
             onBottom()
-        } 
+        }
     }}>
         { loading && <Stack data-testid={`${testID}:Loading`} sx={{ flex: 1, alignItems: 'center', paddingTop: '2rem' }}>
             <CircularProgress color="primary" />

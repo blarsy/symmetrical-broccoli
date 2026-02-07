@@ -19,7 +19,7 @@ export const fromToday = (days: number) =>
 
 export const createCampaign = async (name: string, description: string,
     airdrop: Date, airdropAmount: number, resourceRewardsMultiplier: number, beginning: Date, 
-    ending: Date): Promise<number> => {
+    ending: Date): Promise<string> => {
     await executeQuery(`INSERT INTO sb.campaigns(
         name, description, airdrop, airdrop_amount, resource_rewards_multiplier, beginning, ending)
         VALUES ($1, $2, $3, $4, $5, $6, $7);`, [ name, description, airdrop, airdropAmount, resourceRewardsMultiplier, beginning, ending])
@@ -37,7 +37,7 @@ const confirmAccount = async (email: string) => {
 
 export interface NewAccountData {
     token: string,
-    id: number
+    id: string
 }
 
 export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false): Promise<NewAccountData> => {
@@ -46,7 +46,7 @@ export const createAndLogIn = async (email: string, name: string, password: stri
         const res = await client.mutate({ mutation: GraphQlLib.mutations.REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
         client = getApolloClient(res.data.registerAccount.jwtToken)
-        const idRow = await executeQuery('SELECT id from sb.accounts WHERE lower(email) = $1', [email])
+        const idRow = await executeQuery('SELECT account_id as id from sb.accounts_private_data WHERE lower(email) = $1', [email])
         return { token: (res.data.registerAccount.jwtToken as string), id: idRow.rows[0].id }
     } catch (e) {
         console.debug('Error while trying to login', e)
@@ -115,20 +115,20 @@ const deleteAccountByToken = async (token: string) => {
 export const createResource = async (jwtToken: string, title: string, description: string,
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
     canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | null, categoryCodes: number[], 
-    location: Location | null = null, campaignToJoin: number | null = null): Promise<number> => {
+    location: Location | null = null, campaignToJoin: string | null = null): Promise<string> => {
     const loggedInClient = getApolloClient(jwtToken)
     const res = await loggedInClient.mutate({ mutation: GraphQlLib.mutations.CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
         expiration, isProduct, isService, title, price: null, campaignToJoin, specificLocation: location
     } })
-    return res.data.createResource.integer
+    return res.data.createResource.uuid
 }
 
 interface ResourceRawData {
-    title: string, description?: string, expiration: Date, accountId: number, created?: Date, 
+    title: string, description?: string, expiration: Date, accountId: string, created?: Date, 
     isService?: boolean, isProduct?: boolean, canBeDelivered?: boolean, canBeTakenAway?: boolean, 
     canBeExchanged?: boolean, canBeGifted?: boolean, deleted?: Date,
-    campaignIdToJoin?: number
+    campaignIdToJoin?: string
 }
 
 export const createResourceLowLevel = async (res: ResourceRawData): Promise<number> => {
@@ -149,7 +149,7 @@ export const createResourceLowLevel = async (res: ResourceRawData): Promise<numb
 
 export const createResourceLowLevelWithAnImage = async (res: ResourceRawData, publicImageId: string): Promise<number> => {
     const resId = await createResourceLowLevel(res)
-    let imgId: number
+    let imgId: string
     const imgExistsRes = await executeQuery(`SELECT id FROM sb.images WHERE public_id = ($1)`, [publicImageId])
     if(imgExistsRes.rowCount && imgExistsRes.rowCount > 0) {
         imgId = imgExistsRes.rows[0].id
@@ -161,18 +161,18 @@ export const createResourceLowLevelWithAnImage = async (res: ResourceRawData, pu
     return resId
 }
 
-export const deleteResource = async (jwtToken: string, resourceId: number) => {
+export const deleteResource = async (jwtToken: string, resourceId: string) => {
     const loggedInClient = getApolloClient(jwtToken)
     return await loggedInClient.mutate({ mutation: GraphQlLib.mutations.DELETE_RESOURCE, variables: { resourceId } })
 }
 
-const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesRewards($accountId: Int) {
+const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesRewards($accountId: UUID) {
     applyAccountResourcesRewards(input: {accountId: $accountId}) {
       clientMutationId
     }
   }`
 
-export const applyResourceRewards = async (jwtToken: string, accountId: number) => {
+export const applyResourceRewards = async (jwtToken: string, accountId: string) => {
     const loggedInClient = getApolloClient(jwtToken)
     return loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
 }
@@ -232,7 +232,7 @@ export const makeTestAccounts = (inputs: TestAccountInput[]): Promise<TestAccoun
     return Promise.all(makeTestAccountInfo(inputs.length).map(async (accountInfo, idx) => {
         const accountData = await createAndLogIn(accountInfo.email, accountInfo.name, defaultPassword, inputs[idx].confirm)
         if(inputs[idx].initialTokenAmount) {
-            await executeQuery('update sb.accounts set amount_of_tokens = $1 where id = $2', [inputs[idx].initialTokenAmount, accountData.id])
+            await executeQuery('update sb.accounts_private_data set amount_of_tokens = $1 where account_id = $2', [inputs[idx].initialTokenAmount, accountData.id])
         }
         return {
             info: accountInfo,
@@ -250,7 +250,7 @@ export interface SearchableResources {
         name: string;
         token: string;
     }[];
-    resourceIds: [number, number, number, number, number, number];
+    resourceIds: [string, string, string, string, string, string];
 }
 
 export const searchableResourceTitles = [
@@ -291,7 +291,7 @@ export const cleanupSearchableResources = async (data: SearchableResources) => {
 }
 
 export const setAccountTokens = async (email: string, numberOfTokens: number) => {
-    await executeQuery(`update sb.accounts
+    await executeQuery(`update sb.accounts_private_data
         set amount_of_tokens = $1
         where email = lower($2)`, [numberOfTokens, email])
 }

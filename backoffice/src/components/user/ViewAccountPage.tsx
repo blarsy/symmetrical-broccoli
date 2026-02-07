@@ -6,7 +6,7 @@ import { usePagePath } from "@/lib/usePagePath"
 const ViewAccountPage = () => {
     const { version, param } = usePagePath()
     return <ConnectedLayout version={version} allowAnonymous>
-        <ViewAccount accountId={Number(param)} version={version} />
+        <ViewAccount accountId={param} version={version} />
     </ConnectedLayout>
 }
 

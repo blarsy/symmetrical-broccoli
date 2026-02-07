@@ -11,10 +11,10 @@ test('Notifications created on right accounts when new resource created', async 
     const campaignId = await createCampaign(`campaign${testNum}`, 'desc', fromToday(10), 4000, 5, fromToday(-1), fromToday(20))
 
     const [accountWithLocation, accountInCampaign, accountWithSearchTerm, creatorAccount] = await Promise.all([
-        createAndLogIn(`a1-${testNum}@test.com`, `a1${testNum}`, password, true, true, false),
-        createAndLogIn(`a2-${testNum}@test.com`, `a2${testNum}`, password, true, true, false),
-        createAndLogIn(`a3-${testNum}@test.com`, `a3${testNum}`, password, true, true, false),
-        createAndLogIn(`a4-${testNum}@test.com`, `a4${testNum}`, password, true, true, false),
+        createAndLogIn(`a1-${testNum}@test.com`, `a1${testNum}`, password, true),
+        createAndLogIn(`a2-${testNum}@test.com`, `a2${testNum}`, password, true),
+        createAndLogIn(`a3-${testNum}@test.com`, `a3${testNum}`, password, true),
+        createAndLogIn(`a4-${testNum}@test.com`, `a4${testNum}`, password, true),
     ])
 
     await Promise.all([

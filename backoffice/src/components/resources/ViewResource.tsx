@@ -22,7 +22,7 @@ import Feedback from "../scaffold/Feedback"
 import ConnectDialog from "../user/ConnectDialog"
 
 interface Props {
-    resourceId: number
+    resourceId: string
 }
 
 const ViewResource = (p: Props) => {
@@ -72,7 +72,7 @@ const ViewResource = (p: Props) => {
               }
             })}>
             { resource.data.images.length > 0 &&
-              <Stack flex="1" minHeight="0" alignItems="center">
+              <Stack minHeight="0" alignItems="center">
                 <img style={{ cursor: 'pointer', borderRadius: '25px', maxHeight:'100%', maxWidth: "100%"}} alt="" 
                   src={urlFromPublicId(resource.data.images[selectedImageIndex].publicId!)} 
                   onClick={() => setZoomedImg(urlFromPublicId(resource.data!.images[selectedImageIndex].publicId!))}/>
@@ -80,7 +80,7 @@ const ViewResource = (p: Props) => {
             }
             { resource.data.images.length > 1 && <Stack direction="row" gap="1rem" overflow="auto" flex="0 0 auto">
               { resource.data.images.map((img, idx) => 
-                <Stack key={idx} flex="1 0 0">
+                <Stack key={idx} flex="1 0 0" alignItems="center">
                   <ResponsiveImage baseSize={160} publicId={img.publicId} 
                     onClick={() => setSelectedImageIndex(idx)}
                     sx={{ 

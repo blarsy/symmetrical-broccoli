@@ -32,11 +32,11 @@ const GET_CAMPAIGNS = gql`query GetCampaigns {
   }
 }`
 
-const CampaignSelector = (p: { value: number | null, onSelected: (val?: number) => void }) => {
+const CampaignSelector = (p: { value: string | null, onSelected: (val?: string) => void }) => {
     const { data, loading, error } = useQuery(GET_CAMPAIGNS)
     return <LoadedZone loading={loading} error={error}>
         <InputLabel id="campaign-label">Campaign participation</InputLabel>
-        <Select labelId="campaign-label" value={p.value || ''} onChange={val => p.onSelected(val.target.value as number|undefined)}>
+        <Select labelId="campaign-label" value={p.value || ''} onChange={val => p.onSelected(val.target.value as string|undefined)}>
             { data && data.getCampaigns && data.getCampaigns.nodes.map((campaign: any) => (<MenuItem value={campaign.id}>{`${campaign.name} ${dayjs(campaign.beginning).format('DD/MM/YYYY')} - ${dayjs(campaign.ending).format('DD/MM/YYYY')}, created ${dayjs(campaign.created).format('DD/MM/YYYY')}`}</MenuItem>))}
         </Select>
     </LoadedZone>
@@ -45,7 +45,7 @@ const CampaignSelector = (p: { value: number | null, onSelected: (val?: number) 
 interface GrantConditions {
     emails?: string[],
     maxNumberOfGrants?: number,
-    activeInCampaign?: number,
+    activeInCampaign?: string,
 }
 
 interface Props {

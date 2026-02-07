@@ -6,7 +6,7 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Category, fromServerGraphResource } from "@/lib/schema"
 import ResourceHeader from "../resources/ResourceHeader"
-import { ResourceHeaderData, ConversationState, Message, NewMessage } from "./lib"
+import { ResourceHeaderData, ConversationState, Message } from "./lib"
 import ConversationMessages from "./ConversationMessages"
 import MessageComposer from "./MessageComposer"
 import { ChatContext, ChatDispatchContext, ChatReducerActionType } from "../scaffold/ChatContextProvider"
@@ -14,8 +14,9 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import { urlFromPublicId } from "@/lib/images"
 import { useRouter } from "next/navigation"
 import BackIcon from '@mui/icons-material/ArrowBack'
+import { v4 } from "uuid"
 
-export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $after: Cursor, $first: Int!) {
+export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: UUID!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
       pageInfo {
         hasNextPage
@@ -34,7 +35,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
           }
           participantByParticipantId {
             id
-            accountByAccountId {
+            accountsPublicDatumByAccountId {
               id
               name
               imageByAvatarImageId {
@@ -52,7 +53,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
         nodes {
             id
             accountId
-            accountByAccountId {
+            accountsPublicDatumByAccountId {
                 id
                 name
                 imageByAvatarImageId {
@@ -63,8 +64,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
         }
       }
       resourceByResourceId{
-        accountByAccountId {
-          email
+        accountsPublicDatumByAccountId {
           id
           name
           imageByAvatarImageId {
@@ -106,7 +106,7 @@ export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: Int!, $
     }
   }`
 
-export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: Int!, $resourceId: Int!) {
+export const SET_PARTICIPANT_READ = gql`mutation SetParticipantRead($otherAccountId: UUID!, $resourceId: UUID!) {
   setParticipantRead(
     input: {resourceId: $resourceId, otherAccountId: $otherAccountId}
   ) {
@@ -121,9 +121,9 @@ export const asMessage = (msg: any): Message => {
     text: msg.text,
     createdAt: msg.created,
     user: {
-        id: msg.participantByParticipantId.accountByAccountId.id,
-        name: msg.participantByParticipantId.accountByAccountId.name,
-        avatar: msg.participantByParticipantId.accountByAccountId.imageByAvatarImageId?.publicId
+        id: msg.participantByParticipantId.accountsPublicDatumByAccountId.id,
+        name: msg.participantByParticipantId.accountsPublicDatumByAccountId.name,
+        avatar: msg.participantByParticipantId.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId
     },
     image: msg.imageByImageId?.publicId,
     received: !!msg.received,
@@ -134,6 +134,7 @@ export const asMessage = (msg: any): Message => {
 interface Props {
     sx?: SxProps<Theme>
     onBackRequested: () => void
+    onConversationCreated: () => void
 }
 
 interface ConversationDisplayData { 
@@ -141,7 +142,7 @@ interface ConversationDisplayData {
     messages: Message[] 
 }
 
-const fromRawConversation = (rawConversation: any, currentAccountId: number, categories: Category[]): ConversationDisplayData => {
+const fromRawConversation = (rawConversation: any, currentAccountId: string, categories: Category[]): ConversationDisplayData => {
     const participantId = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId === currentAccountId)).id
     const otherParticipant = rawConversation.conversationById.participantsByConversationId.nodes.find(((part: any) => part.accountId != currentAccountId))
     const rawResource = rawConversation.conversationById.resourceByResourceId
@@ -151,10 +152,10 @@ const fromRawConversation = (rawConversation: any, currentAccountId: number, cat
             id: rawConversation.conversationById.id,
             participantId,
             otherAccount: {
-                id: otherParticipant.accountByAccountId.id,
+                id: otherParticipant.accountsPublicDatumByAccountId.id,
                 participantId: otherParticipant.id,
-                name: otherParticipant.accountByAccountId.name,
-                imagePublicId: otherParticipant.accountByAccountId.imageByAvatarImageId?.publicId
+                name: otherParticipant.accountsPublicDatumByAccountId.name,
+                imagePublicId: otherParticipant.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId
             },
             resource: fromServerGraphResource(rawResource, categories)
         },
@@ -174,7 +175,7 @@ const Conversation = (p: Props) => {
     const [conversationHasNewMessages, setConversationHasNewMessages] = useState(false)
     const router = useRouter()
 
-    const loadConversation = async (id: number) => {
+    const loadConversation = async (id: string) => {
         setConversationData(initial(true))
         try {
             const res = await getConversation({ variables: { id, first: 50 } })
@@ -207,14 +208,14 @@ const Conversation = (p: Props) => {
             const otherAccount = chatContext.newConversationState.withAccount || chatContext.newConversationState.resource.account!
             const newConversationState: ConversationDisplayData = {
               conversation: {
-                id: -1,
+                id: v4(),
                 otherAccount: {
                   id: otherAccount.id,
                   name: otherAccount.name,
                   imagePublicId: otherAccount.avatarImagePublicId,
-                  participantId: 0
+                  participantId: v4()
                 },
-                participantId: 0,
+                participantId: v4(),
                 resource: chatContext.newConversationState.resource
               },
               messages: []
@@ -227,6 +228,7 @@ const Conversation = (p: Props) => {
             chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: handleMessageOnCurrentConversation })
             
             return () => {
+              //console.log('removing chat custom handler')
               chatDispatch({ type: ChatReducerActionType.SetChatMessageCustomHandler, payload: undefined })
             }
           }
@@ -260,17 +262,21 @@ const Conversation = (p: Props) => {
                           id
                         }
                         setCurrentMessages(prev => ([ ...(prev || []), newMessage]))
-                        chatDispatch({ type: ChatReducerActionType.SetNewChatMessage, payload: {
-                          conversationId: conversationData.data?.conversation.id,
-                          created: new Date(),
-                          resourceId: conversationData.data?.conversation.resource?.id,
-                          resourceName: conversationData.data?.conversation.resource?.title,
-                          senderName: appContext.account!.name,
-                          text,
-                          resourceImage: (conversationData.data?.conversation.resource?.images && conversationData.data?.conversation.resource?.images.length > 0) ? conversationData.data?.conversation.resource?.images[0].publicId : '',
-                          image: imagePublicId,
-                          senderImage: appContext.account!.avatarPublicId
-                        } as NewMessage })
+                        if(chatContext.newConversationState) {
+                          p.onConversationCreated()
+                        }
+                        // console.log('setting new message from message composer')
+                        // chatDispatch({ type: ChatReducerActionType.SetNewChatMessage, payload: {
+                        //   conversationId: conversationData.data?.conversation.id,
+                        //   created: new Date(),
+                        //   resourceId: conversationData.data?.conversation.resource?.id,
+                        //   resourceName: conversationData.data?.conversation.resource?.title,
+                        //   senderName: appContext.account!.name,
+                        //   text,
+                        //   resourceImage: (conversationData.data?.conversation.resource?.images && conversationData.data?.conversation.resource?.images.length > 0) ? conversationData.data?.conversation.resource?.images[0].publicId : '',
+                        //   image: imagePublicId,
+                        //   senderImage: appContext.account!.avatarPublicId
+                        // } as NewMessage })
                         setConversationHasNewMessages(true)
                       }}/>
                 ]}

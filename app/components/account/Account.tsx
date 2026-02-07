@@ -24,7 +24,7 @@ import useUserConnectionFunctions from "@/lib/useUserConnectionFunctions"
 import SendTokensDialog from "./SendTokensDialog"
 
 interface Props {
-    id: number,
+    id: string,
     viewResourceRequested: (resource: Resource) => void
     chatOpenRequested: (resource: Resource) => void
 }
@@ -36,7 +36,7 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
     const [moreInfo, setMoreInfo] = useState(false)
     const appContext = useContext(AppContext)
     const { ensureConnected } = useUserConnectionFunctions()
-    const [sendingTokensTo, setSendingTokensTo] = useState<number | undefined>()
+    const [sendingTokensTo, setSendingTokensTo] = useState<string | undefined>()
 
     useEffect(() => {
         if(data && data.getAccountPublicInfo && data.getAccountPublicInfo.resourcesByAccountId.nodes) {

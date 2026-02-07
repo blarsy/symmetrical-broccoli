@@ -16,13 +16,13 @@ import { urlFromPublicId } from "@/lib/images"
 import Chat from '@/app/img/CHAT.svg?react'
 import { primaryColor } from "@/utils"
 
-export const ACCEPT_BID = gql`mutation AcceptBid($bidId: Int) {
+export const ACCEPT_BID = gql`mutation AcceptBid($bidId: UUID) {
   acceptBid(input: {bidId: $bidId}) {
     integer
   }
 }`
 
-export const REFUSE_BID = gql`mutation RefuseBid($bidId: Int, $notificationType: String) {
+export const REFUSE_BID = gql`mutation RefuseBid($bidId: UUID, $notificationType: String) {
   refuseBid(input: {bidId: $bidId, notificationType: $notificationType}) {
     integer
   }

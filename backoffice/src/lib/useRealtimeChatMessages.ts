@@ -16,7 +16,7 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
       }
       participantByParticipantId {
         id
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           name
           imageByAvatarImageId {
@@ -45,7 +45,7 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
 function useRealtimeChatMessages() {
     const chatDispatch = useContext(ChatDispatchContext)
     const chatContext = useContext(ChatContext)
-    const { data, loading, error } = useSubscription(MESSAGE_RECEIVED)
+    const { data } = useSubscription(MESSAGE_RECEIVED)
 
     useEffect(() => {
         if(data) {
@@ -59,16 +59,20 @@ function useRealtimeChatMessages() {
                 created: rawMessage.created,
                 resourceId: rawMessage.participantByParticipantId.conversationByConversationId.resourceByResourceId.id,
                 resourceName: rawMessage.participantByParticipantId.conversationByConversationId.resourceByResourceId.title,
-                senderName: rawMessage.participantByParticipantId.accountByAccountId.name,
+                senderId: rawMessage.participantByParticipantId.accountsPublicDatumByAccountId.id,
+                senderName: rawMessage.participantByParticipantId.accountsPublicDatumByAccountId.name,
+                senderAvatarPublicId: rawMessage.participantByParticipantId.accountsPublicDatumByAccountId.imageByAvatarImageId.publicId,
                 text: rawMessage.text,
                 image: rawMessage.imageByImageId?.publicId,
-                senderImage: rawMessage.participantByParticipantId.accountByAccountId.imageByAvatarImageId?.publicId
+                senderImage: rawMessage.participantByParticipantId.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId
             }
             if(rawMessage.participantByParticipantId.conversationByConversationId.resourceByResourceId.resourcesImagesByResourceId?.nodes.length > 0) {
                 newMessage.resourceImage = rawMessage.participantByParticipantId.conversationByConversationId.resourceByResourceId.resourcesImagesByResourceId?.nodes[0].imageByImageId.publicId
             }
-        
-            chatDispatch({ type: ChatReducerActionType.SetNewChatMessage, payload: newMessage })
+            if(newMessage.conversationId != chatContext.currentConversationId) {
+              //console.log('setting new message from subscription')
+              chatDispatch({ type: ChatReducerActionType.SetNewChatMessage, payload: newMessage })
+            }
         }
     }, [data])
 }

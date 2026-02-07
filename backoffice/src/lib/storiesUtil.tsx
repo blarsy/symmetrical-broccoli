@@ -15,6 +15,8 @@ import { ReactNode } from "react"
 import ChatContextProvider, { ChatStateData } from "@/components/scaffold/ChatContextProvider"
 import { AccountInfo } from "./useAccountFunctions"
 import { GET_CATEGORIES } from "./useCategories"
+import config from "@/tests/config"
+import { v4 } from "uuid"
 const { mapsApiKey } = getCommonConfig()
 
 export interface GraphQlOp {
@@ -24,7 +26,7 @@ export interface GraphQlOp {
 }
 
 export const defaultAccount: AccountInfo = {
-    id: 123, name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
+    id: v4(), name: 'Super artisan', activated: new Date(new Date().valueOf() - 10000),
     amountOfTokens: 20, email: 'arti@san.super', lastChangeTimestamp: new Date(),
     avatarPublicId: '', knowsAboutCampaigns: false
 }
@@ -43,7 +45,7 @@ export const makeDbRresource = (title: string, description: string, deleted: Dat
     canBeDelivered: true,
     deleted,
     price: 0,
-    accountByAccountId: {
+    accountsPublicDatumByAccountId: {
         id: new Date().valueOf(),
         name: creatorName,
         email: 'mail'
@@ -94,7 +96,7 @@ export const uiContextDecorator = (initial?: UiStateData) => {
         initial = {
             loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
             loadingLookupData: false,
-            version: 'v0_11',
+            version: 'v0_12',
             categories: fromData([])
         }
 
@@ -159,8 +161,8 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 
     return (Story: () => ReactNode) =>  <AppContextProvider initial={initialAppstate || { token: '', unreadNotifications: [], loading: false, subscriptions: []}}>
         <ChatContextProvider initial={initialChatState || { conversations: [], unreadConversations: [] }}>
-            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_11', categories: initial(false) }}>
-                <Translatable version="v0_11">
+            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_12', categories: initial(false) }}>
+                <Translatable version={config.version}>
                     <MockedProvider mocks={
                         actualOps.map(op => ({
                             delay: 2000,

@@ -10,7 +10,7 @@ const meta: Meta<typeof Preferences> = {
   decorators: [
     paperProviderDecorator, appContextDecorator(), navigationContainerDecorator(), gestureHandlerDecorator, apolloClientMocksDecorator([
         { query: GET_PREFERENCES, variables: { id: accountId }, result: {
-            accountById: { broadcastPrefsByAccountId: { nodes: [{ eventType: 1, id: 1, daysBetweenSummaries: 2 }] } }
+            me: { broadcastPrefsByAccountId: { nodes: [{ eventType: 1, id: 1, daysBetweenSummaries: 2 }] } }
         } }
     ])
   ]

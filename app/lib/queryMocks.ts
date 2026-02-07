@@ -4,8 +4,9 @@ import { GraphQlOp } from "./storiesUtil"
 import { SUGGEST_RESOURCES } from "@/components/SearchFilterContextProvider"
 import { ACCOUNT_LOCATION } from "./useProfileAddress"
 import { GraphQlLib } from "./backendFacade"
+import { v4 } from "uuid"
 
-const createRes = (id: number, account: Account, title: string, description: string, categories: Category[], imgPubIds: string[]): Resource => ({
+const createRes = (id: string, account: Account, title: string, description: string, categories: Category[], imgPubIds: string[]): Resource => ({
     account,
     created: new Date(),
     description,
@@ -22,18 +23,19 @@ const createRes = (id: number, account: Account, title: string, description: str
     canBeDelivered: true,
     deleted: null,
     specificLocation: null,
-    price: null
+    price: null,
+    inActiveCampaign: false
 })
 
-const account1 = { id: 1, name: 'Super artisan', email: 'me@me.com', avatarImageUrl: undefined, avatarPublicId: 'cwd3apntbv1z2jdf1ocf' } as Account & { avatarPublicId?: string }
-const account2 = { id: 2, name: 'Serial Jardinier', email: 'serial@jardin.com', avatarPublicId: 'zkuqb85k5v1xvjdx0yjv' } as Account & { avatarPublicId?: string }
+const account1 = { id: v4(), name: 'Super artisan', email: 'me@me.com', avatarImageUrl: undefined, avatarPublicId: 'cwd3apntbv1z2jdf1ocf' } as Account & { avatarPublicId?: string }
+const account2 = { id: v4(), name: 'Serial Jardinier', email: 'serial@jardin.com', avatarPublicId: 'zkuqb85k5v1xvjdx0yjv' } as Account & { avatarPublicId?: string }
 
-const resource1 = createRes(1, account1, 'Super ressource', 'Description de la super ressource', [], ['djuwsbgtuyhkp7yz3v1t'])
-const resource2 = createRes(2, account1, 'Un objet inutilisé', `Un objet que je n'utilise plus depuis des lustres, mais que quelqu'un adorera, c'est sûr !`, [], ['dcluoaiiblyuotymqitq','b1hpc5p1mgz1qmcfjghh'])
-const resource3 = createRes(3, account2, 'Ressource étonnante', `Avec cette ressource, vous allez faire parler de vous...`, [], ['jagfatfcf9e4oeu75d8s'])
+const resource1 = createRes(v4(), account1, 'Super ressource', 'Description de la super ressource', [], ['djuwsbgtuyhkp7yz3v1t'])
+const resource2 = createRes(v4(), account1, 'Un objet inutilisé', `Un objet que je n'utilise plus depuis des lustres, mais que quelqu'un adorera, c'est sûr !`, [], ['dcluoaiiblyuotymqitq','b1hpc5p1mgz1qmcfjghh'])
+const resource3 = createRes(v4(), account2, 'Ressource étonnante', `Avec cette ressource, vous allez faire parler de vous...`, [], ['jagfatfcf9e4oeu75d8s'])
 
 const makeSearchResourceResult = (resources: Resource[]) => resources.map(resource => ({
-    accountByAccountId: {
+    accountsPublicDatumByAccountId: {
         name: resource.account?.name,
         id: resource.account?.id
     },
@@ -68,8 +70,7 @@ const makeGetResourceGraphQlOp = (res: Resource) => ({
   variables: { id: res.id },
   result: {
       resourceById: {
-          accountByAccountId: {
-              email: res.account?.email,
+          accountsPublicDatumByAccountId: {
               id: res.account?.id,
               name: res.account?.name,
               imageByAvatarImageId: {
@@ -109,9 +110,8 @@ const makeGetAccountGraphQlOp = (resources: Resource[], account: Account & { ava
   query: GraphQlLib.queries.GET_ACCOUNT,
   variables: { id: account.id },
   result: {
-    accountById: {
-      email: account.email,
-      name: account.email,
+    getAccountPublicInfo: {
+      name: account.name,
       resourcesByAccountId: {
         nodes: resources.map(res => ({
           id: res.id,
@@ -130,7 +130,7 @@ const makeGetAccountGraphQlOp = (resources: Resource[], account: Account & { ava
               resourceCategoryCode: cat.code
             })) 
           },
-          accountByAccountId: {
+          accountsPublicDatumByAccountId: {
             id: account.id
           }
         }))
@@ -197,7 +197,7 @@ export default {
       query: ACCOUNT_LOCATION,
       variables: { id: 1 },
       result: {
-        accountById: {
+        getAccountPublicInfo: {
           id: 1,
           locationByLocationId: {
             address: 'Rue de la rue, 1',
@@ -212,7 +212,7 @@ export default {
       query: ACCOUNT_LOCATION,
       variables: { id: 1 },
       result: {
-        accountById: {
+        getAccountPublicInfo: {
           id: 1,
           locationByLocationId: null
         }

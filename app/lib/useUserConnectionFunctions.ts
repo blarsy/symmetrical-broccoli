@@ -1,6 +1,6 @@
 import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/AppContextProvider"
 import { useContext } from "react"
-import { setOrResetGlobalLogger, info, debug } from "./logger"
+import { setOrResetGlobalLogger, info, debug, error } from "./logger"
 import { ISecureStore } from "./secureStore"
 import { apolloTokenExpiredHandler } from "./utils"
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client"
@@ -56,7 +56,7 @@ export const MESSAGE_RECEIVED = gql`subscription MessageReceivedSubscription {
             }
             participantByParticipantId {
                 id
-                accountByAccountId {
+                accountsPublicDatumByAccountId {
                     name
                     id
                 }
@@ -77,14 +77,11 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
       account {
         knowsAboutCampaigns
         name
-        language
         email
-        imageByAvatarImageId {
-            publicId
-        }
+        avatarPublicId
         amountOfTokens
         activated
-        id
+        accountId
       }
     }
   }`
@@ -114,75 +111,81 @@ export default () => {
     const loadAccount = async (token: string) => {
         const client = clientGetter ? clientGetter(token) : getApolloClient(token)
 
-        const res = await client.query({ query: GET_SESSION_DATA })
-    
-        const account: AccountInfo = {
-            id: res.data.getSessionData.accountId, 
-            name: res.data.getSessionData.name, 
-            email: res.data.getSessionData.email, 
-            numberOfExternalAuthProviders: res.data.getSessionData.numberOfExternalAuthProviders,
-            avatarPublicId: res.data.getSessionData.avatarPublicId,
-            activated: res.data.getSessionData.activated,
-            unreadConversations: res.data.getSessionData.unreadConversations,
-            unreadNotifications: res.data.getSessionData.unreadNotifications,
-            amountOfTokens: res.data.getSessionData.amountOfTokens,
-            lastChangeTimestamp: new Date(),
-            knowsAboutCampaigns: res.data.getSessionData.knowsAboutCampaigns
-        }
+        try {
+            const res = await client.query({ query: GET_SESSION_DATA })
 
-        return { res, account, client }
+            const account: AccountInfo = {
+                id: res.data.getSessionData.accountId, 
+                name: res.data.getSessionData.name, 
+                email: res.data.getSessionData.email, 
+                numberOfExternalAuthProviders: res.data.getSessionData.numberOfExternalAuthProviders,
+                avatarPublicId: res.data.getSessionData.avatarPublicId,
+                activated: res.data.getSessionData.activated,
+                unreadConversations: res.data.getSessionData.unreadConversations,
+                unreadNotifications: res.data.getSessionData.unreadNotifications,
+                amountOfTokens: res.data.getSessionData.amountOfTokens,
+                lastChangeTimestamp: new Date(),
+                knowsAboutCampaigns: res.data.getSessionData.knowsAboutCampaigns
+            }
+    
+            return { res, account, client }
+        } catch(e) {
+            error({message: (e as Error).message }, true)
+            return { res: undefined, account: undefined, client }
+        }
     }
 
     const completeLogin = async (token: string) => {
         const { res, account, client } = await loadAccount(token)
-    
-        await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
+        if(res) {
+            await setOrResetGlobalLogger(res.data.getSessionData.logLevel)
 
-        apolloTokenExpiredHandler.handle = async () => { 
-            await logout()
+            apolloTokenExpiredHandler.handle = async () => { 
+                await logout()
+            }
+            registerForPushNotificationsAsync().then(token => {
+                if(token) {
+                    client.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
+                }
+            })
+            const messageSubscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
+                debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
+                appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
+            } })
+            const notificationSubscription = client.subscribe({ query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
+                debug({ message: `Received in-app notification: ${payload.data.notificationReceived.notification}` })
+                // Here comes the notification parsing
+                appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
+            } })
+            const accountChangeSubscription = client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
+                debug({ message: `Received in-app account change: ${payload.data.accountChangeReceived.account}` })
+                // Here comes the notification parsing
+                const updatedAccount: AccountInfo = {
+                    activated: payload.data.accountChangeReceived.account.activated,
+                    amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
+                    lastChangeTimestamp: new Date(),
+                    avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
+                    email: payload.data.accountChangeReceived.account.email,
+                    id: payload.data.accountChangeReceived.account.accountId,
+                    name: payload.data.accountChangeReceived.account.name,
+                    unreadConversations: [],
+                    unreadNotifications: [],
+                    knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns,
+                    // Does not change, so just repeat it from previous account value
+                    numberOfExternalAuthProviders: account.numberOfExternalAuthProviders
+                }
+
+                appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
+            }})
+            
+            appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, 
+                chatMessagesSubscription: messageSubscription, notificationSubscription, accountChangeSubscription,
+                unreadNotifications: account.unreadNotifications,
+                unreadConversations: account.unreadConversations
+            } })
+
+            info({ message: `Logged in with session: ${JSON.stringify(account)}` })
         }
-        registerForPushNotificationsAsync().then(token => {
-            if(token) {
-                client.mutate({ mutation: SYNC_PUSH_TOKEN, variables: { token } })
-            }
-        })
-        const messageSubscription = client.subscribe({ query: MESSAGE_RECEIVED }).subscribe({ next: payload => {
-            debug({ message: `Received in-app chat message notification: ${payload.data.messageReceived.message}` })
-            appDispatch({ type: AppReducerActionType.SetNewChatMessage, payload: payload.data.messageReceived.message })
-        } })
-        const notificationSubscription = client.subscribe({ query: NOTFICATION_RECEIVED }).subscribe({ next: payload => {
-            debug({ message: `Received in-app notification: ${payload.data.notificationReceived.notification}` })
-            // Here comes the notification parsing
-            appDispatch({ type: AppReducerActionType.NotificationReceived, payload: payload.data.notificationReceived.notification })
-        } })
-        const accountChangeSubscription = client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
-            debug({ message: `Received in-app account change: ${payload.data.accountChangeReceived.account}` })
-            // Here comes the notification parsing
-            const updatedAccount: AccountInfo = {
-                activated: payload.data.accountChangeReceived.account.activated,
-                amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
-                lastChangeTimestamp: new Date(),
-                avatarPublicId: payload.data.accountChangeReceived.account.imageByAvatarImageId?.publicId,
-                email: payload.data.accountChangeReceived.account.email,
-                id: payload.data.accountChangeReceived.account.id,
-                name: payload.data.accountChangeReceived.account.name,
-                unreadConversations: [],
-                unreadNotifications: [],
-                knowsAboutCampaigns: payload.data.accountChangeReceived.account.knowsAboutCampaigns,
-                // Does not change, so just repeat it from previous account value
-                numberOfExternalAuthProviders: account.numberOfExternalAuthProviders
-            }
-
-            appDispatch({ type: AppReducerActionType.AccountChanged, payload: updatedAccount })
-        }})
-        
-        appDispatch({ type: AppReducerActionType.Login, payload: { account, apolloClient: client, 
-            chatMessagesSubscription: messageSubscription, notificationSubscription, accountChangeSubscription,
-            unreadNotifications: account.unreadNotifications,
-            unreadConversations: account.unreadConversations
-        } })
-
-        info({ message: `Logged in with session: ${JSON.stringify(account)}` })
     }
 
     const logout = async () => {

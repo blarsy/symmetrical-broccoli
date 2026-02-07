@@ -39,10 +39,9 @@ export const RESOURCES = gql`query MyResources {
       canBeDelivered
       deleted
       price
-      accountByAccountId {
+      accountsPublicDatumByAccountId {
         id
         name
-        email
       }
       resourcesImagesByResourceId {
         nodes {
@@ -81,8 +80,8 @@ export const SEND_AGAIN = gql`mutation SendAgain {
 
 interface ResourceListProps {
   route: any
-  addRequested: (campaignId? : number) => void
-  viewRequested: (resourceId: number) => void
+  addRequested: (campaignId? : string) => void
+  viewRequested: (resourceId: string) => void
   editRequested: () => void
 }
 
@@ -92,7 +91,7 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
     const appAlertDispatch = useContext(AppAlertDispatchContext)
     const {data, loading, error, refetch} = useQuery(RESOURCES, { fetchPolicy: 'no-cache' })
     const [resources, setResources] = useState<Resource[]>([])
-    const [deletingResource, setDeletingResource] = useState(0)
+    const [deletingResource, setDeletingResource] = useState<string | undefined>()
     const editResourceContext = useContext(EditResourceContext)
     const searchFilterContext = useContext(SearchFilterContext)
     const [deleteResource] = useMutation(GraphQlLib.mutations.DELETE_RESOURCE)
@@ -195,11 +194,11 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
                 } })
                 await refetch()
                 searchFilterContext.actions.requery(appContext.categories.data!)
-                setDeletingResource(0)
+                setDeletingResource(undefined)
               } else {
-                setDeletingResource(0)
+                setDeletingResource(undefined)
               }
-            }} onDismiss={() => setDeletingResource(0)}/>
+            }} onDismiss={() => setDeletingResource(undefined)}/>
         <CampaignExplanationDialog onDismiss={() =>{
           showCampaignExplanationCallback.callback!()
           setShowCampaignExplanationCallback({ callback: undefined})

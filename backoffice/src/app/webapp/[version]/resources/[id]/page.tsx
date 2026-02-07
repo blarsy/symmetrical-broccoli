@@ -13,7 +13,7 @@ import useProfileAddress from "@/components/user/useProfileAddress"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 
-const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
+const Wrapped = (p: { resourceId?: string, inCampaign: boolean }) => {
     const [resource, setResource] = useState<DataLoadState<Resource | undefined>>(initial(true, undefined))
     const appContext = useContext(AppContext)
     const [getResource] = useLazyQuery(GET_RESOURCE)
@@ -23,9 +23,9 @@ const Wrapped = (p: { resourceId: number, inCampaign: boolean }) => {
 
     const loadResource = async () => {
         try {
-            if(p.resourceId != 0 && uiContext.categories.data) {
-                const rawRes = await getResource({ variables: { id: Number(p.resourceId) } })
-                if(rawRes.data.resourceById.accountByAccountId.id != appContext.account!.id) {
+            if(p.resourceId && uiContext.categories.data) {
+                const rawRes = await getResource({ variables: { id: p.resourceId } })
+                if(rawRes.data.resourceById.accountsPublicDatumByAccountId.id != appContext.account!.id) {
                     throw new Error('This resource cannot be edited')
                 }
                 setResource(fromData(fromServerGraphResource(rawRes.data.resourceById, uiContext.categories.data, activeCampaign.data?.id)))
@@ -53,7 +53,7 @@ const Page = () => {
     const { version, param, query } = usePagePath()
 
     return <ConnectedLayout version={version}>
-        <Wrapped resourceId={Number(param)} inCampaign={ !!query?.get('campaign') } />
+        <Wrapped resourceId={param === 'new' ? undefined : param} inCampaign={ !!query?.get('campaign') } />
     </ConnectedLayout>
 }
 

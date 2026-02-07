@@ -18,8 +18,8 @@ export async function generateMetadata(
         const { id, version } = await params
 
         const client = getApolloClient(version)
-        const res = await client.query({ query: GET_ACCOUNT_PUBLIC_INFO, variables: { id: Number.parseInt(id) } })
-        const tPromise = initTranslations(res.data.getAccountPublicInfo.language)
+        const res = await client.query({ query: GET_ACCOUNT_PUBLIC_INFO, variables: { id } })
+        const tPromise = initTranslations('fr')
 
         const images: { url: string, width: number, height: number }[] = []
         if(res.data.getAccountPublicInfo.imageByAvatarImageId) {

@@ -61,7 +61,7 @@ export const OneNewResourceNotification: Story = {
     { query: GET_RESOURCES, variables: { resourceIds: [123] }, result: {
         getResources: {
             nodes: [{
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     email: 'e@mail.be',
                     id: 12,
                     name: 'Tonton plafond',
@@ -121,7 +121,7 @@ export const EveryNotification: Story = {
     { query: GET_RESOURCES, variables: { resourceIds: [123] }, result: {
         getResources: {
             nodes: [{
-                accountByAccountId: {
+                accountsPublicDatumByAccountId: {
                     email: 'e@mail.be',
                     id: 12,
                     name: 'Tonton plafond',

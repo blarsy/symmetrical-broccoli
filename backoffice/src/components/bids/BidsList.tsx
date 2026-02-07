@@ -23,7 +23,7 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
         refused
         validUntil
         resourceByResourceId {
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             id
             imageByAvatarImageId {
               publicId
@@ -42,7 +42,7 @@ export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeI
           }
           id
         }
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           imageByAvatarImageId {
             publicId
@@ -74,7 +74,7 @@ export const GET_MY_RECEIVED_BIDS = gql`query bids($first: Int, $after: Cursor, 
         refused
         validUntil
         resourceByResourceId {
-          accountByAccountId {
+          accountsPublicDatumByAccountId {
             id
             imageByAvatarImageId {
               publicId
@@ -93,7 +93,7 @@ export const GET_MY_RECEIVED_BIDS = gql`query bids($first: Int, $after: Cursor, 
           }
           id
         }
-        accountByAccountId {
+        accountsPublicDatumByAccountId {
           id
           imageByAvatarImageId {
             publicId
@@ -113,7 +113,7 @@ const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {
     return {
         id: bid.id, amountOfTokens: bid.amountOfTokens, created: bid.created, accepted: bid.accepted,
         refused: bid.refused, deleted: bid.deleted, resource: fromServerGraphResource(bid.resourceByResourceId, categories),
-        account: fromServerGraphAccount(bid.accountByAccountId), validUntil: bid.validUntil
+        account: fromServerGraphAccount(bid.accountsPublicDatumByAccountId), validUntil: bid.validUntil
     }
 }
 

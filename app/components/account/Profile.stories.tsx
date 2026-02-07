@@ -13,7 +13,7 @@ const meta: Meta<typeof Profile> = {
       query: GET_ACCOUNT_INFO,
       variables: { id: 1 },
       result: {
-        accountById: {
+        me: {
           id: 1,
           accountsLinksByAccountId: {
             nodes: [{
@@ -44,7 +44,7 @@ const meta: Meta<typeof Profile> = {
       query: GET_PREFERENCES,
       variables: {id: 1},
       result: {
-        accountById: {
+        me: {
           broadcastPrefsByAccountId: {
             nodes: [{
               eventType: 1,

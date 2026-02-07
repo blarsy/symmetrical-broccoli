@@ -69,11 +69,11 @@ const BottomBar = ({ onSend, disabled, testID }: BottomBarProps) => {
 }
 
 export interface IMessage {
-    id: number
+    id: string | undefined
     text: string
     createdAt: Date
     user: {
-        id: number
+        id: string
         name: string
         avatar: string
     }
@@ -86,7 +86,7 @@ interface Props {
     onSend: (text: string, imagePublicId: string) => Promise<void>
     testID: string
     messages: DataLoadState<IMessage[]>
-    otherAccount: { id: number, name: string }
+    otherAccount: { id: string, name: string }
     onLoadEarlier: () => void
     canLoadEarlier? : boolean
     loadingEarlier: boolean

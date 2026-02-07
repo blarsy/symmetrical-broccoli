@@ -21,23 +21,27 @@ import ResourceAuthorHeader from "../resources/ResourceAuthorHeader"
 
 interface ChatHeaderProps extends NativeStackHeaderProps {
     goBack?: () => void
-    onResourceShowRequested: (id: number) => void
-    onAccountShowRequested: (id: number) => void
+    onResourceShowRequested: (id: string) => void
+    onAccountShowRequested: (id: string) => void
 }
 
 export const ChatHeader = (p: ChatHeaderProps) => {
     const appContext = useContext(AppContext)
     const conversationContext = useContext(ConversationContext)
-    const [sendingTokensTo, setSendingTokensTo] = useState<number | undefined>()
-    
+    const [sendingTokensTo, setSendingTokensTo] = useState<string | undefined>()
+
     return (<LoadedZone loading={conversationContext.conversationState.loading} error={conversationContext.conversationState.error}
-        containerStyle={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', 
+        containerStyle={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 0,
             backgroundColor: lightPrimaryColor, maxWidth: Dimensions.get('window').width, paddingVertical: 5 }} loadIndicatorColor={primaryColor}>
             { conversationContext.conversationState.data?.resource && <>
                 <BareIconButton testID="backToConversationList" Image="chevron-left" size={40} onPress={() => p.goBack ? p.goBack() : p.navigation.goBack() }/>
                 <ResourceAuthorHeader avatarAccountInfo={conversationContext.conversationState.data.otherAccount}
-                    onPress={() => p.onAccountShowRequested(conversationContext.conversationState.data!.otherAccount.id)} resource={conversationContext.conversationState.data.resource} />
-                <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => p.onResourceShowRequested(conversationContext.conversationState.data!.resource!.id)} />
+                    onPress={() => {
+                        p.onAccountShowRequested(conversationContext.conversationState.data!.otherAccount.id)
+                    }} resource={conversationContext.conversationState.data.resource} containerStyle={{ flexGrow: 0, flexShrink: 1 }} />
+                <IconButton style={{ borderRadius: 0 }} icon={Images.Search} onPress={() => {
+                    p.onResourceShowRequested(conversationContext.conversationState.data!.resource!.id)
+                }} />
                 { appContext.account && 
                     <IconButton style={{ borderRadius: 0 }} size={40} iconColor="#000" 
                         icon="hand-coin" 
@@ -67,8 +71,12 @@ const Chat = ({ route, navigation }: RouteProps) => {
             <StackNav.Screen name="conversationsList" key="conversationsList" component={ConversationsList} options={{ headerShown: false }} />
             <StackNav.Screen name="conversation" key="conversation" options={{ header: p => <ChatHeader {...p} 
                     goBack={() => p.navigation.navigate('conversationsList')} 
-                    onResourceShowRequested={id => p.navigation.navigate('viewResource', { resourceId: id })}
-                    onAccountShowRequested={id => p.navigation.navigate('viewAccount', { id })} /> }}
+                    onResourceShowRequested={id => {
+                        p.navigation.navigate('viewResource', { resourceId: id })
+                    }}
+                    onAccountShowRequested={id => {
+                        p.navigation.navigate('viewAccount', { id })
+                    }} /> }}
                 component={Conversation} />
             <StackNav.Screen name="viewAccount" key="viewAccount" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewAccount} />
             <StackNav.Screen name="viewResource" key="viewResource" options={{ headerShown: true, header: SimpleBackHeader }} component={ViewResource} />
