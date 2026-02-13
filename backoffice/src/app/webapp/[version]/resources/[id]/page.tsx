@@ -33,7 +33,7 @@ const Wrapped = (p: { resourceId?: string, inCampaign: boolean }) => {
                 setResource(fromData({
                     specificLocation: address || null, isService: false, isProduct: false, canBeDelivered: false, canBeExchanged: false,
                     canBeGifted: false, canBeTakenAway: false, created: new Date(), deleted: null, price: null,
-                    id: 0, images: [], title: '', description: '', categories: [], inActiveCampaign: p.inCampaign
+                    id: '', images: [], title: '', description: '', categories: [], inActiveCampaign: p.inCampaign
                 }))
             }
         } catch (e) {

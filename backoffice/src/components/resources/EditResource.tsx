@@ -52,7 +52,7 @@ const blankResource: Resource = {
     canBeTakenAway: false,
     categories: [],
     description: '',
-    id: 0,
+    id: '',
     isProduct: false,
     isService: false,
     images: [],

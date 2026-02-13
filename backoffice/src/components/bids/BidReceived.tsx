@@ -55,9 +55,9 @@ const BidReceived = ({ bid, onAction } : Props) => {
         <CardContent sx={{ paddingBottom: 0 }}>
             <Stack direction="row" justifyContent="space-between">
               <ResourceHeader data={{
-                  id: bid.resource.id, resource: bid.resource, participantId: 0, otherAccount: {
+                  id: bid.resource.id, resource: bid.resource, participantId: '', otherAccount: {
                       id: bid.account.id, name: bid.account.name,
-                      participantId: 0, avatarImageUrl: bid.account.avatarImagePublicId && urlFromPublicId(bid.account.avatarImagePublicId)
+                      participantId: '', avatarImageUrl: bid.account.avatarImagePublicId && urlFromPublicId(bid.account.avatarImagePublicId)
                   }
               }}/>
               <Link href={`/webapp/${uiContext.version}/chat/new/${bid.resource.id}?with=${bid.account.id}`}>

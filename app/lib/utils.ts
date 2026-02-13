@@ -238,7 +238,8 @@ export const versionChecker = (serverVersion: string) => {
   if(nativeApplicationVersion === 'mock') return true
 
   if(nativeApplicationVersion)
-    return compareVersions(nativeApplicationVersion, serverVersion) >= 0
+    console.log('nativeApplicationVersion, serverVersion', nativeApplicationVersion, serverVersion)
+    return compareVersions(nativeApplicationVersion!, serverVersion) >= 0
   
   return true
 }

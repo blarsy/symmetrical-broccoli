@@ -1,6 +1,6 @@
 import { createHttpLink, split, ApolloLink, ApolloClient, from, InMemoryCache } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
-import { ErrorLink, ErrorResponse, onError } from "@apollo/client/link/error"
+import { ErrorResponse, onError } from "@apollo/client/link/error"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { createClient } from "graphql-ws"

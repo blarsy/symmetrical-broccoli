@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import TopBar from './TopBar'
 import { clientComponentDecorator } from '@/lib/storiesUtil'
+import { v4 } from 'uuid';
 
 const meta = {
   component: TopBar,
@@ -32,7 +33,7 @@ export const LoggedIn: Story = {
   },
   decorators: [ clientComponentDecorator({
     loading: false, token: 'token', account: {
-      amountOfTokens: 20, name: 'Les patines de Christine', id: 234, email: 'mail@mail.com',
+      amountOfTokens: 20, name: 'Les patines de Christine', id: v4(), email: 'mail@mail.com',
       activated: new Date(new Date().valueOf() - 10000), lastChangeTimestamp: new Date(new Date().valueOf() - 10000),
       avatarPublicId: '', knowsAboutCampaigns: false
     }, unreadNotifications: [], subscriptions: []

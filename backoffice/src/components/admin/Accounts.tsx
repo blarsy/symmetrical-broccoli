@@ -71,7 +71,7 @@ const Accounts = () => {
         }}/>
         <LoadedZone loading={loading} error={error}>
             { data && <DataGrid paginationMode="server" paginationModel={paginationModel} rowCount={data.searchAccounts.totalCount} columns={[
-                { field: 'id', headerName: 'Id', valueGetter: (value, row) => row.accountsPublicDatumByAccountId && row.accountsPublicDatumByAccountId.id },
+                { field: 'id', headerName: 'Id', valueGetter: (value, row) => row.accountId },
                 { field: 'name', headerName: 'Name', valueGetter: (value, row) => row.accountsPublicDatumByAccountId && row.accountsPublicDatumByAccountId.name },
                 { field: 'email', headerName: 'Email'},
                 { field: 'language', headerName: 'Lang'},
@@ -79,9 +79,10 @@ const Accounts = () => {
                 { field: 'created', headerName: 'Date Création'},
                 { field: 'recoveryCode', headerName: 'Code récup'},
                 { field: 'recoveryCodeExpiration', headerName: 'Exp. code'},
-                { field: 'address', headerName: 'Address', valueGetter: (value, row) => row.accountsPublicDatumByAccountId.locationByLocationId && row.locationByLocationId.address }
+                { field: 'address', headerName: 'Address', valueGetter: (value, row) => row.accountsPublicDatumByAccountId.locationByLocationId && row.accountsPublicDatumByAccountId.locationByLocationId.address }
             ]}
             rows={data.searchAccounts.edges.map((sa: any) => sa.node)}
+            getRowId={row => row.accountId}
             onPaginationModelChange={(model, details) => {
                 if(model.page > paginationModel.page) {
                     if(!data.searchAccounts.pageInfo.hasNextPage) return

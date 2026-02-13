@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { apolloClientMocksDecorator, clientComponentDecorator, defaultCampaign } from '@/lib/storiesUtil'
 import EarningTokens, { GET_ACCOUNT, GET_RESOURCES_WITHOUT_PIC, GET_RESOURCES_WITHOUT_PRICE, NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN } from './EarningTokens'
 import { GET_ACTIVE_CAMPAIGN } from '@/lib/queries'
+import { v4 } from 'uuid';
 
 const meta = {
   component: EarningTokens,
@@ -117,7 +118,7 @@ export const NoCampaignAccountFilled: Story = {
   }, {
     query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
-    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
+    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: v4(), knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
 }
 export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
@@ -188,7 +189,7 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
   }, {
     query: GET_RESOURCES_WITHOUT_PRICE, result: { getMyResourcesWithoutPrice: { nodes: [1,2] } }, variables: {}
   }]), clientComponentDecorator({ loading: false, subscriptions: [], token: 'fkqme', unreadNotifications: [], account: {
-    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: 234, knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
+    activated: new Date(), amountOfTokens: 20, avatarPublicId: 'jyg9bnk5b8oyvp4trhvp', email: 'me@me.com', id: v4(), knowsAboutCampaigns: true, name: 'name', lastChangeTimestamp: new Date()
   } })]
 }
 export const NoResourceInCampaign: Story = {
