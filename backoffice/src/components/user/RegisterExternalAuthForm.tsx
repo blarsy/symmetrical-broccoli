@@ -9,6 +9,7 @@ import Feedback from "../scaffold/Feedback"
 import { ErrorText } from "../misc"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
 
 interface Props {
     suggestedName: string
@@ -51,6 +52,9 @@ const RegisterExternalAuthForm = (p: Props) => {
                     }
                 }
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setRegistrationStatus({ loading: false, error: e as Error})
             }
         }}>

@@ -33,7 +33,7 @@ GRANT SELECT ON TABLE sb.accounts_private_data TO admin;
 DO
 $body$
 BEGIN
-	UPDATE sb.system SET version = '0.12.0', minimum_client_version = '0.12.0';
+	UPDATE sb.system SET version = '0.12.1', minimum_client_version = '0.12.0';
 END;
 $body$
 LANGUAGE 'plpgsql'; 

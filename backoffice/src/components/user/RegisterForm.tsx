@@ -16,6 +16,7 @@ import { getCommonConfig } from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
 
 interface Props {
     onClose: () => void
@@ -40,6 +41,9 @@ const RegisterForm = (p: Props) => {
                 setRegistrationStatus({ loading: false })
                 if(done) p.onClose()
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setRegistrationStatus({ loading: false, error: e as Error })
             }
         }, flow: 'auth-code', select_account: true
@@ -67,6 +71,9 @@ const RegisterForm = (p: Props) => {
                 p.onClose()
             },
             onError: (e: any) => {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setRegistrationStatus(fromError(e as Error, uiContext.i18n.translator('requestError')))
             }
         })
@@ -89,6 +96,9 @@ const RegisterForm = (p: Props) => {
                 setRegistrationStatus({ loading: false })
                 p.onClose()
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setRegistrationStatus({ loading: false, error: e as Error})
             }
         }}>

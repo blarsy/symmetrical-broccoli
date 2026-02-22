@@ -2,6 +2,7 @@ import { gql, useLazyQuery } from "@apollo/client"
 import { useContext, useEffect } from "react"
 import { fromData, fromError, initial } from "./DataLoadState"
 import { UiContext, UiDispatchContext, UiReducerActionType } from "@/components/scaffold/UiContextProvider"
+import { error } from "./logger"
 
 export const GET_CATEGORIES = gql`query Categories($locale: String) {
     allResourceCategories(condition: {locale: $locale}) {
@@ -24,6 +25,9 @@ function useCategories () {
             const res = await getCategories({ variables: { locale: lang } })
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
+            error({
+                message: (e as Error).toString()
+            }, uiContext.version, true)
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
         }
     }

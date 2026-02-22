@@ -12,13 +12,14 @@ import { GET_RESOURCE } from "@/lib/apolloClient"
 import useProfileAddress from "@/components/user/useProfileAddress"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import useActiveCampaign from "@/lib/useActiveCampaign"
+import { error } from "@/lib/logger"
 
 const Wrapped = (p: { resourceId?: string, inCampaign: boolean }) => {
     const [resource, setResource] = useState<DataLoadState<Resource | undefined>>(initial(true, undefined))
     const appContext = useContext(AppContext)
     const [getResource] = useLazyQuery(GET_RESOURCE)
     const uiContext = useContext(UiContext)
-    const { data: address, loading, error } = useProfileAddress()
+    const { data: address, loading, error: profileError } = useProfileAddress()
     const { activeCampaign } = useActiveCampaign()
 
     const loadResource = async () => {
@@ -37,14 +38,15 @@ const Wrapped = (p: { resourceId?: string, inCampaign: boolean }) => {
                 }))
             }
         } catch (e) {
+            error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
             setResource(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
     useEffect(() => {
-        if(uiContext.categories.data && !error && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
-    }, [uiContext.categories.data, address, loading, error, activeCampaign])
+        if(uiContext.categories.data && !profileError && !loading && !activeCampaign.loading && !activeCampaign.error) loadResource()
+    }, [uiContext.categories.data, address, loading, profileError, activeCampaign])
 
-    return <LoadedZone loading={resource.loading || loading} error={resource.error || error} containerStyle={{ overflow: 'auto', alignItems: 'center', paddingLeft: '2rem', paddingRight: '2rem' }}>
+    return <LoadedZone loading={resource.loading || loading} error={resource.error || profileError} containerStyle={{ overflow: 'auto', alignItems: 'center', paddingLeft: '2rem', paddingRight: '2rem' }}>
         <EditResource value={resource.data}/>
     </LoadedZone>
 }

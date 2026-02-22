@@ -4,11 +4,13 @@ import { Formik } from "formik"
 import * as yup from 'yup'
 import RecoverIcon from '@mui/icons-material/LockReset'
 import Feedback from "@/components/scaffold/Feedback"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { isValidPassword } from "@/utils"
 import { gql, useMutation } from "@apollo/client"
 import i18n from '@/i18n'
 import { TFunction } from "i18next"
+import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
 
 const RECOVER = gql`mutation RecoverAccount($newPassword: String, $recoveryCode: String) {
     recoverAccount(input: {newPassword: $newPassword, recoveryCode: $recoveryCode}) {
@@ -21,8 +23,9 @@ interface Props {
 }
 
 const Recover = ({ recoveryId }: Props) => {
+    const uiContext = useContext(UiContext)
     const [uiState, setUiState] = useState({ loading: true, t: undefined } as { loading: boolean, success?: boolean, error?: { message: string, name: string }, t?: TFunction<"translation", undefined>})
-    const [recover, { error, reset }] = useMutation(RECOVER)
+    const [recover, { error: recoverError, reset }] = useMutation(RECOVER)
 
     useEffect(() => {
         const load = async () => {
@@ -47,6 +50,9 @@ const Recover = ({ recoveryId }: Props) => {
                     await recover({ variables: { newPassword: values.password, recoveryCode: recoveryId }})
                     setUiState({ loading: false, success: true, t: uiState.t})
                 } catch(e) {
+                    error({
+                        message: (e as Error).toString()
+                    }, uiContext.version, true)
                     setUiState({ loading: false, error: { name: uiState.t!('recovery_error'), message: (e as Error).message }, t: uiState.t })
                 } finally {
                     setSubmitting(false)
@@ -81,8 +87,8 @@ const Recover = ({ recoveryId }: Props) => {
                             startIcon={<RecoverIcon />}
                             type="submit"
                             variant="contained">{uiState.t!('recovery_title')}</LoadingButton>
-                        {error && <Feedback severity="error" message={error.name} 
-                            detail={error.message} 
+                        {recoverError && <Feedback severity="error" message={recoverError.name} 
+                            detail={recoverError.message} 
                             onClose={() => reset()}/>}
                     </Box>
                 </Box>

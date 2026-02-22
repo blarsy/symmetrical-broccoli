@@ -15,7 +15,7 @@ export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $begin
   createCampaign(
     input: {airdrop: $airdrop, defaultResourceCategories: $defaultResourceCategories, description: $description, ending: $ending, beginning: $beginning, name: $name, resourceRewardsMultiplier: $resourceRewardsMultiplier, airdropAmount: $airdropAmount, summary: $summary}
   ) {
-    integer
+    uuid
   }
 }`
 

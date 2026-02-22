@@ -1,9 +1,12 @@
 import { Box, Stack, Alert, CircularProgress } from "@mui/material"
 import Feedback from "@/components/scaffold/Feedback"
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode, useContext, useEffect, useState } from "react"
 import { gql, useMutation } from "@apollo/client"
 import i18n from "@/i18n"
 import { TFunction } from "i18next"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
+import { UiContext } from "../scaffold/UiContextProvider"
 
 const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
     activateAccount(input: {activationCode: $activationCode}) {
@@ -16,6 +19,8 @@ interface Props {
 }
 
 const Activation = ({ activationId }: Props) => {
+    const appContext = useContext(AppContext)
+    const uiContext = useContext(UiContext)
     const [uiState, setUiState] = useState({ loading: true, error: undefined, t: undefined } as { loading: boolean, error?: { name: string, message: string}, t?:  TFunction<"translation", undefined> })
     const [activate] = useMutation(ACTIVATE)
 
@@ -27,6 +32,7 @@ const Activation = ({ activationId }: Props) => {
                 const t = await i18n(res.data.activateAccount.string)
                 setUiState({ loading: false, error: undefined, t })
             } catch (e: any) {
+                error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
                 const t = await defaultTPromise
                 setUiState({ loading: false, error: {name: t('activation_error'), message: (e as Error).message }})
             }

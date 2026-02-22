@@ -20,6 +20,7 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import CreateBidDialog from "../bids/CreateBidDialog"
 import Feedback from "../scaffold/Feedback"
 import ConnectDialog from "../user/ConnectDialog"
+import { error } from "@/lib/logger"
 
 interface Props {
     resourceId: string
@@ -42,6 +43,7 @@ const ViewResource = (p: Props) => {
           const res = await getResource({ variables: { id: p.resourceId }})
           setResource(fromData(fromServerGraphResource(res.data.resourceById, categories.data!)))
         } catch (e) {
+          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
           setResource(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

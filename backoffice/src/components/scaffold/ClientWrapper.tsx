@@ -19,6 +19,7 @@ import ChatContextProvider from './ChatContextProvider'
 import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
 import Themed from './Themed'
 import { fromData, fromError, initial } from '@/lib/DataLoadState'
+import { error } from '@/lib/logger'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -79,6 +80,9 @@ export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
             try {
                 await connectWithToken(token)
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 // TODO: handle expired token
                 uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: uiContext.i18n, version, error: e as Error }})
                 appDispatch({ type: AppReducerActionType.Load, payload: undefined })
@@ -117,6 +121,9 @@ export const LookupDataProvider = (p: PropsWithChildren) => {
             const res = await getCategories({ variables: { locale: lang } })
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromData(res.data.allResourceCategories.nodes) })
         } catch(e) {
+            error({
+                message: (e as Error).toString()
+            }, uiContext.version, true)
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
         }
     }

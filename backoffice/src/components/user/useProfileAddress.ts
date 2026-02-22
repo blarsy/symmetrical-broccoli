@@ -4,6 +4,7 @@ import { AppContext } from "../scaffold/AppContextProvider"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { parseLocationFromGraph, Location } from "@/lib/schema"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
 
 export const ACCOUNT_LOCATION = gql`query AccountLocation {
     me {
@@ -30,6 +31,9 @@ export default () => {
 
             setState(fromData(defaultLocation))
         } catch(e) {
+            error({
+                message: (e as Error).toString(), accountId: appContext.account?.id
+            }, uiContext.version, true)
             setState(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

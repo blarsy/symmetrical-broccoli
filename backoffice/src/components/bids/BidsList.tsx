@@ -9,6 +9,8 @@ import { Bid, Category, fromServerGraphAccount, fromServerGraphResource } from "
 import { LoadingButton } from "@mui/lab"
 import BidSent from "./BidSent"
 import BidReceived from "./BidReceived"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 const PAGESIZE = 5
 export const GET_MY_BIDS = gql`query bids($first: Int, $after: Cursor, $includeInactive: Boolean) {
@@ -119,6 +121,7 @@ const bidFromServerGraph = (bid: any, categories: Category[]): Bid => {
 
 const BidsList = () => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [myBids, setMyBids] = useState<DataLoadState<Bid[]>>()
     const [myReceivedBids, setMyReceivedBids] = useState<DataLoadState<Bid[]>>()
     const [loadingMoreBids, setLoadingMoreBids] = useState(false)
@@ -134,6 +137,9 @@ const BidsList = () => {
           const res = await getMyBids({ variables: { first: PAGESIZE, includeInactive }})
           setMyBids(fromData(res.data.myBids.edges.map((d: any) => bidFromServerGraph(d.node, uiContext.categories.data!))))
       } catch(e) {
+          error({
+              message: (e as Error).toString(), accountId: appContext.account?.id
+          }, uiContext.version, true)
           setMyBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
     }
@@ -144,6 +150,9 @@ const BidsList = () => {
           const res = await getMyReceivedBids({ variables: { first: PAGESIZE, includeInactive }})
           setMyReceivedBids(fromData(res.data.myReceivedBids.edges.map((d: any) => bidFromServerGraph(d.node, uiContext.categories.data!))))
       } catch(e) {
+          error({
+              message: (e as Error).toString(), accountId: appContext.account?.id
+          }, uiContext.version, true)
           setMyReceivedBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
     }

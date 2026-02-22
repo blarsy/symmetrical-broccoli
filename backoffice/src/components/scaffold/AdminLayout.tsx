@@ -11,6 +11,7 @@ import Themed from "./Themed"
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { useRouter } from "next/navigation"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { error } from "@/lib/logger"
 
 declare global {
     interface Window {
@@ -95,8 +96,8 @@ const AdminLayout = (p : Props) => {
 
                 localStorage.setItem('adminToken', adminToken)
                 setConnectionStatus(fromData(adminToken))
-            } catch (ex) {
-                setConnectionStatus(fromError(ex, 'There was a failure connecting your wallet account.'))
+            } catch (e) {
+                setConnectionStatus(fromError(e, 'There was a failure connecting your wallet account.'))
             }
         } else {
             setConnectionStatus(fromError(new Error('Metamask not detected'), 'Could not detect Metamask, is it installed ?'))

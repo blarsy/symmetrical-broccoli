@@ -15,6 +15,7 @@ import { urlFromPublicId } from "@/lib/images"
 import { useRouter } from "next/navigation"
 import BackIcon from '@mui/icons-material/ArrowBack'
 import { v4 } from "uuid"
+import { error } from "@/lib/logger"
 
 export const CONVERSATION_MESSAGES = gql`query ConversationMessages($id: UUID!, $after: Cursor, $first: Int!) {
     conversationMessagesByConversationId(id: $id, first: $first, after: $after) {
@@ -190,7 +191,8 @@ const Conversation = (p: Props) => {
               chatDispatch({ type: ChatReducerActionType.SetConversationRead, payload: conversationData.conversation.id })
             }, 0)
         } catch (e) {
-            setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
+          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
+          setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
 

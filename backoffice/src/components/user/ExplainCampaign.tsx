@@ -80,14 +80,18 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
     useEffect(() => {
         if(activeCampaign.data) {
             const steps = [
-                { title: uiContext.i18n.translator("campaignSummaryTitle"), stepLabel: uiContext.i18n.translator("summaryStepLabel"),
+                { title: activeCampaign.data?.name, stepLabel: uiContext.i18n.translator("themeStepLabel"),
                     content: <>
-                        <Stack alignItems="center">
-                            <MoneyIn />
-                        </Stack>
-                        <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
-                        <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
-                        <Button target="_blank" href={`/campaign`} variant="text">{uiContext.i18n.translator('moreInfoOnCampaigns')}</Button>
+                        <Campaign />
+                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: activeCampaign.data.description }}/>
+                        {/* {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)} */}
+                        <Divider sx={{ alignSelf: 'stretch' }}/>
+                        <Typography variant="body1" textAlign="center" color="primary.contrastText">
+                            {uiContext.i18n.translator('createResourcesInCampaignExplanation')}
+                        </Typography>
+                        <Typography variant="h5" textAlign="center" color="primary.contrastText">
+                            {uiContext.i18n.translator('rewardsMultiplied', { multiplier: activeCampaign.data.resourceRewardsMultiplier })}
+                        </Typography>
                     </>},
                 { title: uiContext.i18n.translator("airdropTitle"), stepLabel: uiContext.i18n.translator("bonusStepLabel"),
                     content: <>
@@ -112,20 +116,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                                 <Typography variant="body1">{uiContext.i18n.translator('didYouGetIt')}</Typography>
                             </Stack>
                         }
-                    </>},
-                { title: activeCampaign.data?.name, stepLabel: uiContext.i18n.translator("themeStepLabel"),
-                    content: <>
-                        <Campaign />
-                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: activeCampaign.data.description }}/>
-                        {/* {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)} */}
-                        <Divider sx={{ alignSelf: 'stretch' }}/>
-                        <Typography variant="body1" textAlign="center" color="primary.contrastText">
-                            {uiContext.i18n.translator('createResourcesInCampaignExplanation')}
-                        </Typography>
-                        <Typography variant="h5" textAlign="center" color="primary.contrastText">
-                            {uiContext.i18n.translator('rewardsMultiplied', { multiplier: activeCampaign.data.resourceRewardsMultiplier })}
-                        </Typography>
-                    </>},
+                    </>}
             ]
 
             if(!p.explainOnly) {
@@ -142,6 +133,16 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                         }
                     </>})
             }
+
+            steps.push({ title: uiContext.i18n.translator("campaignSummaryTitle"), stepLabel: uiContext.i18n.translator("summaryStepLabel"),
+                content: <>
+                    <Stack alignItems="center">
+                        <MoneyIn />
+                    </Stack>
+                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('campaignAllowYouto')}</Typography>
+                    <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('forFree')}</Typography>
+                    <Button target="_blank" href={`/campaign`} variant="text">{uiContext.i18n.translator('moreInfoOnCampaigns')}</Button>
+                </>})
             setSteps(steps)
         }
     }, [activeCampaign.data])

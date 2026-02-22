@@ -6,6 +6,7 @@ import config from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
 import { useRouter } from "next/navigation"
+import { error } from "./logger"
 
 export interface AccountInfo {
     name: string
@@ -143,7 +144,9 @@ const useAccountFunctions = (version: string) => {
                 subscriptions,
                 account} })
         } catch(e) {
-            console.error('disconnecting user because of', e)
+            error({
+                message: (e as Error).toString()
+            }, version, true)
             disconnect()
         }
     }

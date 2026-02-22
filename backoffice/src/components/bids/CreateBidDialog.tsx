@@ -13,6 +13,7 @@ import { ErrorText } from "../misc"
 import { AppContext } from "../scaffold/AppContextProvider"
 import { urlFromPublicId } from "@/lib/images"
 import { v4 } from "uuid"
+import { error } from "@/lib/logger"
 
 export const CREATE_BID = gql`mutation CreateBid($amountOfTokens: Int, $hoursValid: Int, $resourceId: UUID) {
   createBid(
@@ -49,6 +50,9 @@ const CreateBidDialog = (p: Props) => {
                     p.onClose(true)
                 }
             } catch(e) {
+                error({
+                    message: (e as Error).toString(), accountId: appContext.account?.id
+                }, uiContext.version, true)
                 setBidStatus(fromError(e, t('requestError')))
             }
         }} validationSchema={yup.object().shape({

@@ -11,6 +11,8 @@ import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import DataLoadState, { beginOperation, fromData, fromError, initial } from "@/lib/DataLoadState"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 interface LinkIconEditProps {
     value: LinkTypes
@@ -78,6 +80,7 @@ interface Props {
 
 const EditLinks = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [editedLinks, setEditedLinks] = useState<number[]>([])
     const [currentLinks, setCurrentLinks] = useState<Link[]>(p.links)
     const [linkToDelete, setLinkToDelete] = useState<number | null>(null)
@@ -143,6 +146,9 @@ const EditLinks = (p: Props) => {
                                         try {
                                             p.onDone(newLinks)
                                         } catch(e) {
+                                            error({
+                                                message: (e as Error).toString(), accountId: appContext.account?.id
+                                            }, uiContext.version, true)
                                             setDeleteLinkState(fromError(e as Error, uiContext.i18n.translator('requestError')))
                                         } finally {
                                             setDeleteLinkState(fromData(undefined))

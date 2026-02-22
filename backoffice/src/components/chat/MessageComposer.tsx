@@ -7,6 +7,8 @@ import Send from '@mui/icons-material/Send'
 import { gql, useMutation } from "@apollo/client"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 export const CREATE_MESSAGE = gql`mutation CreateMessage($text: String, $resourceId: UUID, $otherAccountId: UUID, $imagePublicId: String) {
     createMessage(
@@ -23,6 +25,7 @@ interface Props {
 }
 
 const MessageComposer = (p: Props) => {
+    const appContext = useContext(AppContext)
     const [pickingImage, setPickingImage] = useState(false)
     const [draftMessage, setDraftMessage] = useState('')
     const theme = useTheme()
@@ -43,6 +46,9 @@ const MessageComposer = (p: Props) => {
             setDraftMessage('')
             p.onMessageSent(res.data.createMessage.uuid, message, imagePublicId)
         } catch(e) {
+            error({
+                message: (e as Error).toString(), accountId: appContext.account?.id
+            }, uiContext.version, true)
             setSendMessageStatus(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

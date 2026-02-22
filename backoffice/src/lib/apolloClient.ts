@@ -5,6 +5,7 @@ import { getMainDefinition } from "@apollo/client/utilities"
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 import { ErrorResponse, onError } from "@apollo/client/link/error"
+import { error } from './logger'
 
 export const getApolloClient = (version: string, token?: string, onSessionExpired? : () => void) => {
     const config = getConfig(version)
@@ -39,6 +40,13 @@ export const getApolloClient = (version: string, token?: string, onSessionExpire
       onError((e: ErrorResponse) => {
         if(e.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors.some(error => error.message === 'jwt expired' || error.message === 'invalid signature')){
           onSessionExpired && onSessionExpired()
+        }
+        try {
+          error({
+              message: JSON.stringify({ graphQLErrors: e.graphQLErrors, networkError: e.networkError, protocolErrors: e.protocolErrors })
+          }, version, true)
+        }
+        catch {
         }
       }),
       authLink,

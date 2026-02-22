@@ -9,6 +9,8 @@ import { uploadImage } from '@/lib/images'
 import Feedback from '../scaffold/Feedback'
 import { UiContext } from '../scaffold/UiContextProvider'
 import { primaryColor } from '@/utils'
+import { error } from '@/lib/logger'
+import { AppContext } from '../scaffold/AppContextProvider'
 
 const previewCroppedImage = async (canvas: HTMLCanvasElement, image: HTMLImageElement, crop: Crop) => {
     const ctx = canvas.getContext('2d')
@@ -118,6 +120,7 @@ interface Props {
 
 const ImageUpload = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [imageFile, setImageFile] = useState<File | undefined>()
     const [uploadState, setUploadState] = useState(initial(false, undefined))
     const [crop, setCrop] = useState<Crop>()
@@ -183,6 +186,9 @@ const ImageUpload = (p: Props) => {
                             p.onUploaded(publicId)
                             setUploadState(fromData(undefined))
                         } catch(e) {
+                            error({
+                                message: (e as Error).toString(), accountId: appContext.account?.id
+                            }, uiContext.version, true)
                             setUploadState(fromError(e as Error, (e as Error).message))
                         }
                     }

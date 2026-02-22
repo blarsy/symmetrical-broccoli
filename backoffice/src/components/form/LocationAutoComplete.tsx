@@ -7,6 +7,8 @@ import { Location } from "@/lib/schema"
 import LoadedZone from "../scaffold/LoadedZone"
 import { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 interface DebouncedTextFieldProps {
     params: AutocompleteRenderInputParams
@@ -45,6 +47,7 @@ interface Props {
 
 const LocationAutoComplete = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [suggestions, setSuggestions] = useState<google.maps.places.PlacePrediction[]>([])
     const [loadingState, setLoadingState] = useState(initial(true, undefined))
     
@@ -56,6 +59,9 @@ const LocationAutoComplete = (p: Props) => {
             }
             setLoadingState(fromData(undefined))
         } catch(e) {
+            error({
+                message: (e as Error).toString(), accountId: appContext.account?.id
+            }, uiContext.version, true)
             setLoadingState(fromError(e, uiContext.i18n.translator('reaquestError')))
         }
     }

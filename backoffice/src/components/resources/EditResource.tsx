@@ -23,6 +23,8 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import InfoIcon from '@mui/icons-material/Info'
 import ExplainCampaignDialog from "../user/ExplainCampaignDialog"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 interface Props {
     value?: Resource
@@ -66,6 +68,7 @@ const blankResource: Resource = {
 
 const EditResource = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const router = useRouter()
     const profileAddress = useProfileAddress()
     const categories = useCategories()
@@ -105,6 +108,9 @@ const EditResource = (p: Props) => {
                 await trySave(values)
                 router.push('.')
             } catch(e) {
+                error({
+                    message: (e as Error).toString(), accountId: appContext.account?.id
+                }, uiContext.version, true)
                 setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }} validationSchema={yup.object().shape({

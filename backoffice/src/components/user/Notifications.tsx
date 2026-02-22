@@ -28,6 +28,7 @@ import PrizeWon from '@/app/img/prize-won.svg?react'
 import Thanks from '@/app/img/thanks.svg?react'
 import ThumbUp from '@/app/img/thumb-up.svg?react'
 import TimeUp from '@/app/img/time-up.svg?react'
+import { error } from "@/lib/logger"
 
 interface NotificationData {
     id: string
@@ -142,6 +143,9 @@ const useNotifications = (version: string) => {
                     return { loading: false, data: { ...allNotifs, ...{ data: [...prev.data?.data || [], ...allNotifs.data] }}}
                 })
             } catch(e) {
+                error({
+                    message: (e as Error).toString(), accountId: appContext.account?.id
+                }, uiContext.version, true)
                 setNotificationData({ loading: false, error: e as Error, data: notificationData.data })
                 throw e
             } finally {
@@ -364,6 +368,9 @@ const useNotifications = (version: string) => {
             setNotificationData(fromData(notifs))
         }
         catch(e) {
+            error({
+                message: (e as Error).toString(), accountId: appContext.account?.id
+            }, uiContext.version, true)
             setNotificationData(prev => ({ loading: false, error: e as Error, data: prev.data }))
         }
     }

@@ -8,6 +8,7 @@ import { LoadingButton } from "@mui/lab"
 import Feedback from "../scaffold/Feedback"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { gql, useMutation } from "@apollo/client"
+import { error } from "@/lib/logger"
 
 const REQUEST_RECOVERY = gql`mutation RequestAccountRecovery($email: String) {
     requestAccountRecovery(input: {email: $email}) {
@@ -33,6 +34,9 @@ const TriggerPasswordRecovery = (p: Props) => {
                 await recoverAccount({ variables: { email: values.email } } )
                 setRecoveryStatus(fromData(true))
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setRecoveryStatus(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }}>

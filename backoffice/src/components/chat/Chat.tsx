@@ -10,6 +10,8 @@ import { fromServerGraphAccount, fromServerGraphResource } from "@/lib/schema"
 import { UiContext } from "../scaffold/UiContextProvider"
 import LoadedZone from "../scaffold/LoadedZone"
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($resourceId: UUID) {
   getConversationForResource(resourceId: $resourceId) {
@@ -31,6 +33,7 @@ const Chat = (p: Props) => {
     const chatContext = useContext(ChatContext)
     const chatDispatch = useContext(ChatDispatchContext)
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [getResource] = useLazyQuery(GET_RESOURCE)
     const [getAccountPublicInfo] =useLazyQuery(GET_ACCOUNT_PUBLIC_INFO)
     const [getConversationForResource] = useLazyQuery(GET_CONVERSATION_FOR_RESOURCE)
@@ -62,6 +65,9 @@ const Chat = (p: Props) => {
             }
             setLoadState(fromData(null))
         } catch(e) {
+            error({
+                message: (e as Error).toString(), accountId: appContext.account?.id
+            }, uiContext.version, true)
             setLoadState(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

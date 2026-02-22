@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react"
 import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
 import { GET_ACTIVE_CAMPAIGN } from "./queries"
+import { error } from "./logger"
 
 export interface Campaign {
     id: string
@@ -39,6 +40,9 @@ function useActiveCampaign () {
                  }))
             }
         } catch(e) {
+            error({
+                message: (e as Error).toString()
+            }, uiContext.version, true)
             setActiveCampaign(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

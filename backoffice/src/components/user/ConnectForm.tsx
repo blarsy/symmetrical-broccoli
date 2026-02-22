@@ -16,6 +16,7 @@ import { getCommonConfig } from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import { AuthProviders } from "@/lib/utils"
 import { UiContext } from "../scaffold/UiContextProvider"
+import { error } from "@/lib/logger"
 
 interface Props {
     onClose?: () => void
@@ -43,6 +44,9 @@ const ConnectForm = (p: Props) => {
                 setConnectionStatus({ loading: false })
                 if(done) p.onClose && p.onClose()
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setConnectionStatus({ loading: false, error: e as Error })
             }
         }, flow: 'auth-code', select_account: true
@@ -89,6 +93,9 @@ const ConnectForm = (p: Props) => {
                 setConnectionStatus({ loading: false })
                 p.onClose && p.onClose()
             } catch(e) {
+                error({
+                    message: (e as Error).toString()
+                }, uiContext.version, true)
                 setConnectionStatus({ loading: false, error: e as Error})
             }
         }}>

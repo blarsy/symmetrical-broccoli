@@ -9,6 +9,8 @@ import Feedback from "../scaffold/Feedback"
 import { ErrorMessage, Form, Formik } from "formik"
 import * as yup from 'yup'
 import { isValidPassword } from "@/utils"
+import { error } from "@/lib/logger"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 const CHANGE_PASSWORD = gql`mutation ChangePassword($newPassword: String, $oldPassword: String) {
     changePassword(input: {newPassword: $newPassword, oldPassword: $oldPassword}) {
@@ -23,6 +25,7 @@ interface Props {
 
 const ChangePasswordDialog = (p: Props) => {
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [changePassword] = useMutation(CHANGE_PASSWORD)
     const [confirming, setConfirming] = useState(false)
     const [changeStatus, setChangeStatus] = useState<DataLoadState<undefined>>(initial(false))
@@ -72,6 +75,9 @@ const ChangePasswordDialog = (p: Props) => {
                                             setChangeStatus(fromData(undefined))
                                             p.onClose && p.onClose(true)
                                         } catch(e) {
+                                            error({
+                                                message: (e as Error).toString(), accountId: appContext.account?.id
+                                            }, uiContext.version, true)
                                             setChangeStatus(fromError(e, uiContext.i18n.translator('requestError')))
                                         }
                                     } else {

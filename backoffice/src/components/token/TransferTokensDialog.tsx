@@ -9,6 +9,7 @@ import Feedback from "../scaffold/Feedback"
 import { ErrorMessage, Formik } from "formik"
 import * as yup from "yup"
 import { AppContext } from "../scaffold/AppContextProvider"
+import { error } from "@/lib/logger"
 
 const SEND_TOKENS = gql`mutation SendTokens($amountToSend: Int, $targetAccountId: UUID) {
     sendTokens(
@@ -51,6 +52,9 @@ const TransferTokensDialog = (p: Props) => {
                         p.onClose()
                     }
                 } catch(e) {
+                    error({
+                        message: (e as Error).toString(), accountId: appContext.account?.id
+                    }, uiContext.version, true)
                     setSendingStatus(fromError(e, t('requestError')))
                 }
             }} validationSchema={yup.object().shape({

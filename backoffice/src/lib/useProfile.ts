@@ -4,6 +4,7 @@ import { Link, Location, parseLocationFromGraph } from "@/lib/schema"
 import { AppContext } from "@/components/scaffold/AppContextProvider"
 import DataLoadState, { fromData, fromError, initial } from "./DataLoadState"
 import { UiContext } from "@/components/scaffold/UiContextProvider"
+import { error } from "./logger"
 
 export const GET_ACCOUNT_INFO = gql`query AccountInfoById {
     me {
@@ -58,6 +59,7 @@ function useProfile () {
             } })
             setUpdateStatePublicInfo({ loading: false })
         } catch (e) {
+            error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
             setUpdateStatePublicInfo({ loading: false, error: e as Error })
         }
     }
