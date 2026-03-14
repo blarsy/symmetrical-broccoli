@@ -42,7 +42,7 @@ const check1ActiveBidOnResource = async(resourceId: string) => {
 const checkLastTokenTransactionOnAccount = async(accountId: string, expectedMovement: number, expectedTypeId: number) => {
     const res = await executeQuery(`SELECT id FROM sb.accounts_token_transactions
         WHERE account_id = ($1) AND token_transaction_type_id = ($2) and movement = ($3)
-        ORDER BY id desc 
+        ORDER BY created desc 
         LIMIT 1`, [accountId, expectedTypeId, expectedMovement])
 
     return res.rows[0].id

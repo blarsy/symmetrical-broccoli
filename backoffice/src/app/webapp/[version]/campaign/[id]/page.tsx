@@ -17,7 +17,6 @@ export async function generateMetadata(
     try {
         // read route params
         const { id, version } = await params
-        const url = getCommonConfig().link1Url
 
         const client = getApolloClient(version)
         const res = await client.query({ query: GET_ACTIVE_CAMPAIGN, variables: {} })

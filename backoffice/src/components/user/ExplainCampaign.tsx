@@ -1,5 +1,5 @@
-import { LoadingButton } from "@mui/lab"
-import { Typography, Divider, Stack, Button, Stepper, Step, StepContent, StepButton, useTheme } from "@mui/material"
+import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab"
+import { Typography, Divider, Stack, Button, Stepper, Step, StepContent, StepButton, useTheme, Box, Tab } from "@mui/material"
 import Campaign from '@/app/img/campaign.svg?react'
 import Airdrop from '@/app/img/airdrop.svg?react'
 import MoneyIn from '@/app/img/money-in.svg?react'
@@ -17,41 +17,44 @@ import { fonts } from "@/theme"
 import { getCommonConfig } from "@/config"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
+import { AppContext } from "../scaffold/AppContextProvider"
 
 const OnboardingActions = () => {
     const uiContext = useContext(UiContext)
     const theme = useTheme()
+    const [currentTab, setCurrentTab] = useState('1')
     return <Stack gap="0.5rem" alignItems="flex-start">
-        <Stack direction="row" gap="1rem">
-            👉
-            <Typography variant="subtitle1">{uiContext.i18n.translator('optionalInstallAppOnboardingStep')}</Typography>
-        </Stack>
-
-        <AppDownloadButtons size={60} />
-        <Typography variant="body1">{uiContext.i18n.translator('webVersionAvailable')}</Typography>
-        <Stack direction="row" gap="1rem">
-            👉
-            <Typography variant="subtitle1">{uiContext.i18n.translator('createAnAccountOnboardingStep')}</Typography>
-        </Stack>
-        <Stack direction="row" gap="2rem" alignItems="center">
-            <Typography variant="body1">{uiContext.i18n.translator('findMobileConnectionIcon')}</Typography>
-            <MobileAppConnectIcon fill={theme.palette.primary.contrastText} width="2rem" height="2rem" />
-        </Stack>
-        <Typography variant="body1">{uiContext.i18n.translator('or')}</Typography>
-        <Button variant="outlined" target="_blank" href={`${window.location.protocol}//${window.location.host}/webapp/${getCommonConfig().mainVersion}/resources`}>
-            {t(uiContext.i18n.translator('registerButtonCaption'))}
-        </Button>
-        <Stack direction="row" gap="1rem">
-            👉
-            <Typography variant="subtitle1">{uiContext.i18n.translator('createResourcesOnboardingStep')}</Typography>
-        </Stack>
+        <Typography variant="subtitle1">{uiContext.i18n.translator('createAnAccountOnboardingStep')}</Typography>
+        <TabContext value={currentTab}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', alignSelf: 'stretch' }}>
+                <TabList onChange={(e, newVal) => setCurrentTab(newVal)}>
+                    <Tab sx={{ flex: 1 }} label={t('tabTitleMobile')} value="1" />
+                    <Tab sx={{ flex: 1 }} label={t('tabTitleWeb')} value="2" />
+                </TabList>
+            </Box>
+            <TabPanel value="1">
+                <Stack sx={{ gap: '1rem' }}>
+                    <AppDownloadButtons size={60} />
+                    <Stack direction="row" gap="2rem" alignItems="center">
+                        <Typography variant="body1">{uiContext.i18n.translator('findMobileConnectionIcon')}</Typography>
+                        <MobileAppConnectIcon fill={theme.palette.primary.contrastText} width="2rem" height="2rem" />
+                    </Stack>
+                </Stack>
+            </TabPanel>
+            <TabPanel value="2">
+                <Stack sx={{ gap: '1rem' }}>
+                    <Typography variant="body1">{uiContext.i18n.translator('webVersionAvailable')}</Typography>
+                    <Button variant="outlined" target="_blank" sx={{ alignSelf: 'center' }}
+                        href={`${window.location.protocol}//${window.location.host}/webapp/${getCommonConfig().mainVersion}/resources`}>
+                        {t(uiContext.i18n.translator('registerButtonCaption'))}
+                    </Button>
+                </Stack>
+            </TabPanel>
+        </TabContext>
+        <Typography variant="subtitle1">{uiContext.i18n.translator('createResourcesOnboardingStep')}</Typography>
         <Typography variant="body1">{uiContext.i18n.translator('2resourcesBeforeAirdrop')}</Typography>
-        <Stack direction="row" gap="1rem">
-            👉
-            <Typography variant="subtitle1">{uiContext.i18n.translator('getairdropOnboardingStep')}</Typography>
-        </Stack>
+        <Typography variant="subtitle1">{uiContext.i18n.translator('getairdropOnboardingStep')}</Typography>
         <Typography variant="body1">{uiContext.i18n.translator('getAirdropToImmediatelyBuy')}</Typography>
-        {/* <Button variant="text" href={`${window.location.protocol}//${window.location.host}/campaign`}>{uiContext.i18n.translator('infoOnCampaigns')}</Button> */}
     </Stack>
 }
 
@@ -64,6 +67,7 @@ interface StepInfo {
 const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explainOnly?: boolean }) => {
     const router = useRouter()
     const uiContext = useContext(UiContext)
+    const appContext = useContext(AppContext)
     const [setAccountKnowsAboutCampaigns, { loading: settingCampaignBit }] = useMutation(SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS)
     const [ steps, setSteps ] = useState<StepInfo[]>([])
     const [currentStep, setCurrentStep] = useState(0)
@@ -83,7 +87,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                 { title: activeCampaign.data?.name, stepLabel: uiContext.i18n.translator("themeStepLabel"),
                     content: <>
                         <Campaign />
-                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: activeCampaign.data.description }}/>
+                        <Stack dangerouslySetInnerHTML={{ __html: activeCampaign.data.description }}/>
                         {/* {activeCampaign.data.description.split('\n').map((t, idx) => <Typography key={idx} variant="body1" textAlign="center" color="primary.contrastText">{t}</Typography>)} */}
                         <Divider sx={{ alignSelf: 'stretch' }}/>
                         <Typography variant="body1" textAlign="center" color="primary.contrastText">
@@ -122,7 +126,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
             if(!p.explainOnly) {
                 steps.push({ title: uiContext.i18n.translator("onboardingInstructions"), stepLabel: uiContext.i18n.translator("onboardingStepLabel"),
                     content: <>
-                        { p.onClose ? 
+                        { p.onClose && appContext.account ? 
                             <LoadingButton variant="contained" loading={settingCampaignBit} onClick={async() => {
                                 await setAccountKnowsAboutCampaigns()
                                 p.onClose!()

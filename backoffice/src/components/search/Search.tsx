@@ -1,7 +1,8 @@
 import { gql, useMutation } from "@apollo/client"
 import LoadedZone from "../scaffold/LoadedZone"
 import { useContext, useEffect, useState } from "react"
-import { Checkbox, FormControlLabel, Stack, Typography } from "@mui/material"
+import { Alert, Checkbox, Stack, Typography } from "@mui/material"
+import SearchIcon from '@mui/icons-material/Search'
 import SearchFilter, { SearchParameters } from "./SearchFilter"
 import ResourceCard from "../resources/ResourceCard"
 import { DEFAULT_LOCATION } from "@/lib/constants"
@@ -127,6 +128,7 @@ const Search = (p: {version: string}) => {
                   avatarPublicId: res.accountsPublicDatumByAccountId.imageByAvatarImageId?.publicId, accountId: res.accountsPublicDatumByAccountId.id
                 }}/>)
             }
+            { suggestedResources.length > 49 && <Alert icon={<SearchIcon />} severity="info">{uiContext.i18n.translator('moreResultsPossible')}</Alert> }
         </LoadedZone>
         <ExplainCampaignDialog visible={explainingCampaign} onClose={() => setExplainingCampaign(false)} />
     </Stack> 

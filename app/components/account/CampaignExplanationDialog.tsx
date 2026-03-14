@@ -37,7 +37,8 @@ const AutoHeightWebView = (p: WebViewProps) => {
             
             if (!isNaN(parseInt(data))) {
                 // If "data" is a number, we can use that the set the height of the webview dynamically
-                setSectionHeight(parseInt(data))
+                // ... and we add it some pixels, because otherwise the bottom of the view is clipped
+                setSectionHeight(parseInt(data) + 12)
             }
         }}
         scalesPageToFit={false}

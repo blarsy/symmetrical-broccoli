@@ -45,6 +45,80 @@ BEGIN
 END;
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.request_account_recovery(
+	email character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE code TEXT;
+DECLARE language TEXT;
+begin
+	SELECT array_to_string(array(select substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
+	INTO code;
+	
+	SELECT a.language
+	INTO block.language
+	FROM sb.accounts_private_data a
+	WHERE a.email = LOWER(request_account_recovery.email);
+	
+	UPDATE sb.accounts_private_data SET recovery_code = code, recovery_code_expiration = NOW() + interval '15 minutes'
+	WHERE accounts.email = LOWER(request_account_recovery.email);
+	
+	IF FOUND THEN
+		PERFORM sb.add_job('mailPasswordRecovery', 
+			json_build_object('email', LOWER(request_account_recovery.email), 'code', code, 'lang', block.language));
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.is_password_valid(
+	password character varying)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+BEGIN
+	
+	RETURN LENGTH(password) >= 8 AND regexp_count(password, '[A-Z]') > 0 AND (regexp_count(password, '[0-9]') > 0 OR regexp_count(password, '^\w') > 0);
+END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION sb.request_account_recovery(
+	email character varying)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE code TEXT;
+DECLARE language TEXT;
+begin
+	SELECT array_to_string(array(select substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',((random()*(36-1)+1)::integer),1) FROM generate_series(1,32)),'')
+	INTO code;
+	
+	SELECT a.language
+	INTO block.language
+	FROM sb.accounts_private_data a
+	WHERE a.email = LOWER(request_account_recovery.email);
+	
+	UPDATE sb.accounts_private_data apr SET recovery_code = code, recovery_code_expiration = NOW() + interval '15 minutes'
+	WHERE apr.email = LOWER(request_account_recovery.email);
+	
+	IF FOUND THEN
+		PERFORM sb.add_job('mailPasswordRecovery', 
+			json_build_object('email', LOWER(request_account_recovery.email), 'code', code, 'lang', block.language));
+	END IF;
+	
+	RETURN 1;
+end;
+$BODY$;
 
 DO
 $body$

@@ -149,7 +149,7 @@ const TopBar = ({ version }: Props) => {
                 gap: '0.5rem'
             }
         })}>
-            { appContext.account &&  <Link style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
+            { appContext.account &&  <Link data-testid="ContributionLink" style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
                 <PriceTag testID="TokenCounter" value={appContext.account.amountOfTokens} big/>
             </Link> }
             <Stack direction="row" alignItems="center">
@@ -160,7 +160,7 @@ const TopBar = ({ version }: Props) => {
                 }}/>
                 <LightModeIcon color="primary" /> 
             </Stack>
-            <IconButton color="primary" onClick={e => {
+            <IconButton data-testid="userButton" color="primary" onClick={e => {
                 if(appContext.account) {
                     setUserMenuAnchorEl(e.currentTarget)
                 } else {

@@ -35,6 +35,9 @@ const ConnectForm = (p: Props) => {
     const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
 
     const triggerGoogleLogin = useGoogleLogin({
+        onError: (e) => {
+            setConnectionStatus({ loading: false, error: new Error(e.error) })
+        },
         onSuccess: async res => {
             setConnectionStatus({ loading: true })
             try {
@@ -103,9 +106,9 @@ const ConnectForm = (p: Props) => {
                 <Form onSubmit={handleSubmit}>
                     <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<GoogleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerGoogleLogin}>{uiContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
+                            data-testid="googleSigninButton" onClick={triggerGoogleLogin}>{uiContext.i18n.translator('conectWithGoogleButtonCaption')}</Button>
                         <Button color="primary" sx={{ alignSelf: 'center' }} startIcon={<AppleLogo width={'1.5rem'} height={'1.5rem'} />}
-                            onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
+                            data-testid="appleSigninButton" onClick={triggerAppleLogin}>{uiContext.i18n.translator('conectWithAppleButtonCaption')}</Button>
                         <TextField id="email" name="email" label="Email" onChange={handleChange('email')} onBlur={handleBlur('email')}/>
                         <ErrorMessage component={ErrorText} name="email"/>
                         <TextField type="password" id="password" name="password" label={t('passwordLabel')} onChange={handleChange('password')} onBlur={handleBlur('password')}/>

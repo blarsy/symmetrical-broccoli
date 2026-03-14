@@ -268,7 +268,7 @@ const getNewResourcesSummaryData = async (pool: Pool, version: string): Promise<
         notified.language,
         notified.email as notifiedemail
 	FROM sb.notifications n
-	INNER JOIN sb.resources r ON n.data::json->'resource_id' IS NOT NULL AND r.id = (n.data::json->>'resource_id')::integer
+	INNER JOIN sb.resources r ON n.data::json->'resource_id' IS NOT NULL AND r.id = (n.data::json->>'resource_id')::uuid
     INNER JOIN sb.accounts_public_data author ON author.id = r.account_id
     INNER JOIN sb.broadcast_prefs bp ON bp.event_type = 2 AND bp.account_id = n.account_id AND bp.days_between_summaries IS NOT NULL
     INNER JOIN sb.accounts_private_data notified ON notified.account_id = bp.account_id

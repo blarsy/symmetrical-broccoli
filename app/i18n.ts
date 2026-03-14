@@ -348,7 +348,9 @@ const resources = {
       "activeCampaign": "Ongoing campaign",
       "createResourceInCampaignButtonLabelMain": "Let's go !",
       "createResourceInCampaignButtonLabelSub": "Creating resources",
-      "topeTooltip": "1 Tope = 1 tiny contribution unit"
+      "topeTooltip": "1 Tope = 1 tiny contribution unit",
+      "moreResultsPossible": "Display limited to the first 50 results\nFeel free to refine your search",
+            
    }
   },
   fr: {
@@ -692,7 +694,8 @@ const resources = {
       "activeCampaign": "Campagne en cours",
       "createResourceInCampaignButtonLabelMain": "J'y vais !",
       "createResourceInCampaignButtonLabelSub": "Créer des ressources",
-      "topeTooltip": "1 Tope = 1 très petite unité de contribution"
+      "topeTooltip": "1 Tope = 1 très petite unité de contribution",
+      "moreResultsPossible": "Affichage limité aux 50 premiers résultats\nAffinez votre recherche ci-dessus",
     }
   }
 }

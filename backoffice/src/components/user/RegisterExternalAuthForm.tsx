@@ -35,7 +35,7 @@ const RegisterExternalAuthForm = (p: Props) => {
     const [registerAccount, { loading }] = useMutation(REGISTER_ACCOUNT_EXTERNAL_AUTH)
     const { completeExternalAuth } = useAccountFunctions(p.version)
     
-    return <Formik initialValues={{ name: '' }}
+    return <Formik initialValues={{ name: p.suggestedName }}
         validationSchema={yup.object().shape({
             name: yup.string().required(t('requiredField')).max(30, t('nameTooLong'))
         })} onSubmit={async values => {
@@ -58,15 +58,15 @@ const RegisterExternalAuthForm = (p: Props) => {
                 setRegistrationStatus({ loading: false, error: e as Error})
             }
         }}>
-            { ({ handleChange, handleBlur, handleSubmit }) =>
+            { ({ handleChange, handleBlur, handleSubmit, values }) =>
                 <Form onSubmit={handleSubmit}>
                     <Stack alignItems="stretch" gap="1rem" sx={{ colorScheme: uiContext.lightMode ? 'light': 'dark' }}>
-                        <TextField id="name" name="name" onChange={handleChange('name')} onBlur={handleBlur('name')} label={uiContext.i18n.translator('accountNameLabel')}/>
+                        <TextField data-testid="SuggestedName" id="name" name="name" value={values.name} onChange={handleChange('name')} onBlur={handleBlur('name')} label={uiContext.i18n.translator('accountNameLabel')}/>
                         <ErrorMessage component={ErrorText} name="name"/>
                         <Stack>
                             <Stack direction="row" alignSelf="flex-end">
                                 <Button color="secondary" onClick={() => p.onClose()}>{t('cancelButton')}</Button>
-                                <LoadingButton loading={registrationStatus.loading || loading} type="submit">{t('registerButton')}</LoadingButton>
+                                <LoadingButton data-testid="RegisterButton" loading={registrationStatus.loading || loading} type="submit">{t('registerButton')}</LoadingButton>
                             </Stack>
                         </Stack>
                         <Feedback visible={!!registrationStatus.error} onClose={() => {

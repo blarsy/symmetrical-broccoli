@@ -115,7 +115,7 @@ export const deleteAccount = async (email: string, password: string) => {
     }
 }
 
-const deleteAccountByToken = async (token: string) => {
+export const deleteAccountByToken = async (token: string) => {
     const loggedInClient = getApolloClient(VERSION, token)
     return await loggedInClient.mutate({ mutation: DELETE_ACCOUNT })
 }
@@ -329,7 +329,7 @@ export const createCampaign = async (name: string, description: string,
 export const getLastNotificationOnAccount = async (accountId: string, checkData: (parsed: any) => boolean) => {
     const res = await executeQuery(`SELECT id, data FROM sb.notifications
         WHERE account_id = ($1) AND read IS NULL
-        ORDER BY id desc 
+        ORDER BY created desc 
         LIMIT 1`, [accountId])
     if(res.rowCount == 0) {
         return undefined

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react"
 import LoadedList from "../LoadedList"
 import { Resource } from "@/lib/schema"
-import { ActivityIndicator, Icon, IconButton, Text, TextInput } from "react-native-paper"
+import { ActivityIndicator, Icon, IconButton, Snackbar, Text, TextInput } from "react-native-paper"
 import { t } from "@/i18n"
 import { TouchableOpacity, View } from "react-native"
 import { MAX_DISTANCE, RouteProps } from "@/lib/utils"
@@ -26,6 +26,7 @@ import { lightPrimaryColor, primaryColor } from "../layout/constants"
 import EditResource from "../form/EditResource"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
+import OperationFeedback, { InfoSnackbar } from "../OperationFeedback"
 
 const StackNav = createNativeStackNavigator()
 
@@ -195,6 +196,11 @@ export const SearchResults = ({ route, navigation }: RouteProps) => {
                         }}
                         onPress={() => navigation.navigate('viewResource', { resourceId: resource.id })} />
                 }} />
+            { searchFilterContext.results.data && searchFilterContext.results.data.length > 49 && <View
+                style={{ flexDirection: 'row', borderRadius: 10, gap: 15, padding: 10, backgroundColor: '#6bc2dabb' }}>
+                <Images.Search width={30} height={30} />
+                <Text variant="bodySmall" style={{ color: '#000' }}>{t('moreResultsPossible')}</Text>
+            </View>}
             <CampaignExplanationDialog campaign={explainingCampaign ? activeCampaign.data : undefined} onDismiss={() => {
                 setExplainingCampaign(false)
             }} onOnboardRequested={() => {
