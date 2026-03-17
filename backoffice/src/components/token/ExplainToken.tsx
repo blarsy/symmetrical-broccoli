@@ -80,7 +80,6 @@ const ExplainToken = (p: Props) => {
                 </Stack>
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep2Title")} sx={{ gap: '1rem' }}>
-                <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('barterIsCool')}</Typography>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue')}</Typography>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue2')}</Typography>
                 <Stack sx={theme => ({ 

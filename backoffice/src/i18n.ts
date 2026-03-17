@@ -133,9 +133,8 @@ const resources = {
             "weNeedToGrow": "For you to easily find tons of useful resources, Tope-là needs to grow.",
             "chickenOrEgg": "We need plenty of available resources, to attract many people, who will create ressource, ...",
             "howItWorksStep2Title": "Still easier swapping",
-            "barterIsCool": "We have everything we need for bartering: a resource search engine, a chat.",
-            "tokenToTheRescue": "To further ease the swapping of resources, Tope-là introduces the Tope: a tiny unit of contribution, allowing progressive exchanges.",
-            "tokenToTheRescue2":  "In practice, we use them to value contributions or exchanges of the daily life, without reference to a price or a currency.",
+            "tokenToTheRescue": "Tope-là introduces the Tope: a tiny unit of contribution, allowing progressive exchanges.",
+            "tokenToTheRescue2":  "How to use it to quantify one's gratitude during an exchange ? Tap several points of the bar below",
             "howItWorksStep4Title": "Earning Topes",
             "earnTokens": "Topes are earned by doing things good for Tope-là",
             "newResource": "Create resources",
@@ -319,7 +318,18 @@ const resources = {
             "grantSucceeded": "Even more Topes to swap for great resources !",
             "grantNotFound": "There is nothing here, please check the address of the page is correct.",
             "youWon": "You won ",
-            "topeTooltip": "1 Tope = 1 tiny contribution unit"
+            "topeTooltip": "1 Tope = 1 tiny contribution unit",
+            "priceLegUp": "A leg Up: lending a tool, 5 minutes counsel, donation of a surplus",
+            "priceFavor": "A favor: lending valuable equipment, one hour physical assistance",
+            "priceCommitment": "Commitment: transfer of know-how, long loan of a vehicle.",
+            "pricePrecious": "Valuable exchange: Provision of premises, rare expertise, precious object",
+            "priceLegUpRange": "1 to 100 Topes",
+            "priceFavorRange": "100 to 1000 Topes",
+            "priceCommitmentRange": "1000 to 5000 Topes",
+            "pricePreciousRange": "5000 Topes and more",
+            "topeValueTitle": "How to determine the value of a Tope ?",
+            "topeValueExplanation": "La valeur d'un Tope n'est pas fixe, elle dépend du contexte de l'échange. Elle est conçue pour permettre de nombreux échanges, pas vraiment pour stocker une valeur.",
+            "topeValueExplanation2": "Comment l'utiliser pour quantifier la gratitude lors d'un échange ? Touche différents endroits de la jauge ci-dessous."
         }
     },
     fr: { 
@@ -453,9 +463,8 @@ const resources = {
             "weNeedToGrow": "Pour te permettre de trouver plein de ressources intéressantes, Tope-là a besoin de grandir.",
             "chickenOrEgg": "Il nous faut un maximum de ressources disponibles, pour attirer un maximum de gens intéressés, qui vont eux-même créer des ressources, ...",
             "howItWorksStep2Title": "Des échanges encore plus simples",
-            "barterIsCool": "Il y a tout de qu'il faut pour faire du troc: une recherche de ressource, une messagerie instantanée pour négocier.",
-            "tokenToTheRescue": "Pour faciliter encore plus la circulation des ressources, Tope-là propose le Tope: une très petites unité de contribution, qui permet des échanges fins et progressifs.",
-            "tokenToTheRescue2": "Dans la pratique, on les emploie pour valoriser des contributions ou des échanges du quotidien, sans référence à un prix ou à une devise.",
+            "tokenToTheRescue": "Tope-là propose le Tope: une très petites unité de contribution, qui permet des échanges fins et progressifs.",
+            "tokenToTheRescue2": "Comment quantifier la gratitude dans un échange ? Touche différents endroits de la jauge ci-dessous",
             "howItWorksStep4Title": "Gagner des Topes",
             "earnTokens": "Pour gagner des Topes, on fait des choses qui sont bonnes pour Tope-là, tout simplement",
             "newResource": "Créer des ressources",
@@ -639,7 +648,18 @@ const resources = {
             "grantSucceeded": "Autant de Topes en plus pour faire des échanges !",
             "grantNotFound": "Il n'y a rien ici, l'adresse de la page est-elle correcte ?",
             "youWon": "Tu as gagné",
-            "topeTooltip": "1 Tope = 1 très petite unité de contribution"
+            "topeTooltip": "1 Tope = 1 très petite unité de contribution",
+            "priceLegUp": "Coup de pouce: prêt d'un outil, conseil de 5 minute, don de surplus",
+            "priceFavor": "Partage: prêt de matériel de valeur, aide physique d'une heure",
+            "priceCommitment": "Engagement: transmission de savoir-faire, prêt long d'un véhicule",
+            "pricePrecious": "Ressource rare: mise à disposition d'un local, expertise rare, objet précieux",
+            "priceLegUpRange": "1 à 100 Topes",
+            "priceFavorRange": "100 à 1000 Topes",
+            "priceCommitmentRange": "1000 à 5000 Topes",
+            "pricePreciousRange": "5000 Topes et plus",
+            "topeValueTitle": "Quelle valeur a un Tope ?",
+            "topeValueExplanation": "La valeur d'un Tope n'est pas fixe, elle dépend du contexte de l'échange. Elle est conçue pour permettre de nombreux échanges, pas vraiment pour stocker une valeur.",
+            "topeValueExplanation2": "Comment l'utiliser pour quantifier la gratitude lors d'un échange ? Touche différents endroits de la jauge ci-dessous.",
         }
     }
 }

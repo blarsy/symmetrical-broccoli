@@ -23,6 +23,7 @@ import useActiveCampaign from "@/lib/useActiveCampaign"
 import { IMAGE_BORDER_RADIUS } from "@/lib/images"
 import CampaignExplanationDialog from "../account/CampaignExplanationDialog"
 import BareIconButton from "../layout/BareIconButton"
+import PriceSetter from "../PriceSetter"
 
 export default ({ route, navigation }:RouteProps) => {
     const appContext = useContext(AppContext)
@@ -132,10 +133,11 @@ export default ({ route, navigation }:RouteProps) => {
                     }} />
                     <ErrorMessage component={ErrorText} name="isProduct" />
                     <Hr />
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TransparentTextInput style={{ flex: 1 }} testID="price" label={<StyledLabel label={t('PriceLabel')} />} value={values.price?.toString()}
-                            onChangeText={handleChange('price')} onBlur={handleBlur('price')} />
-                        <InfoIcon text={t('Tooltip')} />
+                    <View>
+                        <PriceSetter value={values.price} onChange={val => {
+                            setFieldValue('price', val)
+                            setTouched({ price: true })
+                        }} onBlur={() => { setTouched({ price: true })}} />
                     </View>
                     <ErrorMessage component={ErrorText} name="price" />
                     <DateTimePickerField testID="expiration" textColor="#000" value={values.expiration} onChange={async d => {

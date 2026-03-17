@@ -5,9 +5,8 @@ import { View, ViewStyle, StyleProp, ScrollView } from "react-native"
 import SwiperFlatList from "react-native-swiper-flatlist"
 import { Text } from "react-native-paper"
 import ChickenEgg from '@/assets/img/howitworks/chicken-egg.svg'
-import TopeValue from '@/assets/img/howitworks/Tope-value.svg'
-
 import { AnimatedSwipeHand } from "../layout/lib"
+import PriceInfo from "./PriceInfo"
 
 const WinToken = () => <View style={{ flexDirection: 'row' }}>
     <Images.Check fill="#4BB543" height={50} width={50} />
@@ -18,6 +17,7 @@ interface Props {
     width: number
     style?: StyleProp<ViewStyle>
 }
+
 
 const HowItWorksSwiper = ({ width, style }: Props) => {
     const childWidth = width, childPadding = 10, childActualSpace = childWidth - (childPadding * 2)
@@ -36,12 +36,9 @@ const HowItWorksSwiper = ({ width, style }: Props) => {
             </View>
             <ScrollView contentContainerStyle={childStyle}>
                 <Text variant="headlineLarge">{t('howItWorksStep2Title')}</Text>
-                <Text variant="bodyLarge">{t('barterIsCool')}</Text>
                 <Text variant="bodyLarge">{t('tokenToTheRescue')}</Text>
                 <Text variant="bodyLarge">{t('tokenToTheRescue2')}</Text>
-                <View style={{ flexDirection: 'row' }}>
-                    <TopeValue width="100%" height={childActualSpace / (502 / 400)} />
-                </View>
+                <PriceInfo />
             </ScrollView>
             <ScrollView contentContainerStyle={ { ...childStyle, ...{ alignItems: 'flex-start' } }}>
                 <Text variant="headlineLarge">{t('howItWorksStep4Title')}</Text>

@@ -1,10 +1,11 @@
 import React from "react"
 import { View } from "react-native"
-import { Text, Tooltip } from "react-native-paper"
+import { Icon, IconButton, Text, Tooltip } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import Images from "@/Images"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"
 import { t } from "@/i18n"
+import TokenValueDialog from "./TokenValueDialog"
 
 export enum PriceTagSizeEnum {
     small,
@@ -13,6 +14,8 @@ export enum PriceTagSizeEnum {
 }
 
 const PriceTag = ({ value, label, size }: { value: number, label?: string, size?: PriceTagSizeEnum }) => {
+    const [showingInfoDialog, setShowingInfoDialog] = React.useState(false)
+
     let iconSize: number, fontSize: number, variant: VariantProp<never>
     switch(size) {
         case PriceTagSizeEnum.big:
@@ -37,6 +40,14 @@ const PriceTag = ({ value, label, size }: { value: number, label?: string, size?
             { label && <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{label} </Text> }
             <Text style={{ color: primaryColor, fontSize, lineHeight: fontSize }} variant={variant}>{value} </Text>
             <Images.Tokens style={{ width: iconSize, height: iconSize }}/>
+            <IconButton icon="help-circle" size={20} onPress={() => {
+                setShowingInfoDialog(true)
+            }} />
+            <TokenValueDialog visible={showingInfoDialog} 
+                onDismiss={() => setShowingInfoDialog(false)} 
+                title={t('topeValueTitle')} 
+                tokenValue={value}
+            /> 
         </View>
     </Tooltip>
 }
