@@ -327,9 +327,12 @@ const resources = {
             "priceFavorRange": "100 to 1000 Topes",
             "priceCommitmentRange": "1000 to 5000 Topes",
             "pricePreciousRange": "5000 Topes and more",
+            "priceInformation": "Price information",
+            "priceSetterDescription": "Move on the bar below to choose a price range in Topes.",
+            "priceTagHelpLabel": "Open price details",
             "topeValueTitle": "How to determine the value of a Tope ?",
-            "topeValueExplanation": "La valeur d'un Tope n'est pas fixe, elle dépend du contexte de l'échange. Elle est conçue pour permettre de nombreux échanges, pas vraiment pour stocker une valeur.",
-            "topeValueExplanation2": "Comment l'utiliser pour quantifier la gratitude lors d'un échange ? Touche différents endroits de la jauge ci-dessous."
+            "topeValueExplanation": "The value of a Tope is not fixed, it depends on the context of the exchange. It is designed to allow many exchanges, not really to store value.",
+            "topeValueExplanation2": "How to use it to quantify one's gratitude during an exchange ? Tap several points of the bar below.",
         }
     },
     fr: { 
@@ -657,6 +660,9 @@ const resources = {
             "priceFavorRange": "100 à 1000 Topes",
             "priceCommitmentRange": "1000 à 5000 Topes",
             "pricePreciousRange": "5000 Topes et plus",
+            "priceInformation": "Informations sur le prix",
+            "priceSetterDescription": "Déplace le curseur pour choisir une fourchette de prix en Topes.",
+            "priceTagHelpLabel": "Ouvrir les détails du prix",
             "topeValueTitle": "Quelle valeur a un Tope ?",
             "topeValueExplanation": "La valeur d'un Tope n'est pas fixe, elle dépend du contexte de l'échange. Elle est conçue pour permettre de nombreux échanges, pas vraiment pour stocker une valeur.",
             "topeValueExplanation2": "Comment l'utiliser pour quantifier la gratitude lors d'un échange ? Touche différents endroits de la jauge ci-dessous.",

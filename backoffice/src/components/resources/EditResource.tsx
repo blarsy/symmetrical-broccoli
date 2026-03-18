@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation"
 import { UiContext } from "../scaffold/UiContextProvider"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import InfoIcon from '@mui/icons-material/Info'
+import { PriceSetter } from "../token/PriceControls"
 import ExplainCampaignDialog from "../user/ExplainCampaignDialog"
 import { error } from "@/lib/logger"
 import { AppContext } from "../scaffold/AppContextProvider"
@@ -159,9 +160,7 @@ const EditResource = (p: Props) => {
                                 <ErrorMessage component={ErrorText} name="description" />
                             </Stack>
                             <Stack>
-                                <TextField size="small" id="price" name="price" value={f.values.price || 0}
-                                    label={uiContext.i18n.translator('PriceLabel')}
-                                    onChange={f.handleChange('price')} onBlur={f.handleBlur('price')}/>
+                                <PriceSetter label={uiContext.i18n.translator('PriceLabel')} value={f.values.price || 0} onChange={price => f.setFieldValue('price', price)} onBlur={f.handleBlur('price')} />
                                 <ErrorMessage component={ErrorText} name="price" />
                             </Stack>
                             { activeCampaign.data && <Stack direction="row" gap="0.5rem" alignItems="center">

@@ -149,9 +149,7 @@ const TopBar = ({ version }: Props) => {
                 gap: '0.5rem'
             }
         })}>
-            { appContext.account &&  <Link data-testid="ContributionLink" style={{ display: 'inline-flex' }} href={`/webapp/${version}/profile/tokens`}>
-                <PriceTag testID="TokenCounter" value={appContext.account.amountOfTokens} big/>
-            </Link> }
+            { appContext.account && <PriceTag testID="TokenCounter" onClick={() => router.push(`/webapp/${version}/profile/tokens`)} value={appContext.account.amountOfTokens} big/> }
             <Stack direction="row" alignItems="center">
                 <DarkModeIcon color="primary" />
                 <Switch value={uiContext.lightMode} color="primary" onChange={e => {

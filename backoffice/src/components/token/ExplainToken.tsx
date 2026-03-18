@@ -1,10 +1,10 @@
 import { Dialog, Stack, SxProps, Theme, Typography, useTheme, useMediaQuery, IconButton } from "@mui/material"
 import React, { PropsWithChildren, useContext, useState } from 'react'
+import { PriceInfo } from './PriceControls'
 import 'keen-slider/keen-slider.min.css'
 import { useKeenSlider } from 'keen-slider/react'
 import { UiContext } from "../scaffold/UiContextProvider"
 import ChiclenOrEgg from '@/app/img/tokens/chicken-egg.svg?react'
-import TopeValue from '@/app/img/tokens/Tope-value.svg?react'
 import Arrow from '@/app/img/fleche.svg?react'
 import Close from '@/app/img/CROSS.svg?react'
 import Tokens from '@/app/img/TOKENS.svg?react'
@@ -82,17 +82,7 @@ const ExplainToken = (p: Props) => {
             <Slide title={uiContext.i18n.translator("howItWorksStep2Title")} sx={{ gap: '1rem' }}>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue')}</Typography>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('tokenToTheRescue2')}</Typography>
-                <Stack sx={theme => ({ 
-                    margin: 'auto', width: '450px',
-                    [theme.breakpoints.down('md')]: {
-                        width: '300px'
-                    },
-                    [theme.breakpoints.down('sm')]: {
-                        width: '200px'
-                    }
-                })}>
-                    <TopeValue width="100%" />
-                </Stack>
+                <PriceInfo tokenValue={250} />
             </Slide>
             <Slide title={uiContext.i18n.translator("howItWorksStep4Title")} sx={{ gap: '1rem' }}>
                 <Typography variant="body1" color="primary.contrastText">{uiContext.i18n.translator('earnTokens')}</Typography>

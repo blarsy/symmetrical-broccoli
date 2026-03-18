@@ -2,16 +2,19 @@ import Check from "@mui/icons-material/Check"
 import Close from "@mui/icons-material/Close"
 import Delete from "@mui/icons-material/Delete"
 import Edit from "@mui/icons-material/Edit"
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import EmptyImage from '@/app/img/PHOTOS.svg?react'
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContentText, DialogTitle, IconButton, Stack, SxProps, Theme, Tooltip, Typography, useTheme } from "@mui/material"
-import { JSX, PropsWithChildren, useContext } from "react"
+import { JSX, PropsWithChildren, useContext, useState } from "react"
 import { urlFromPublicId } from "@/lib/images"
+import { PriceInfo, PriceInfoDialog } from "./token/PriceControls"
 import Tokens from '@/app/img/TOKENS.svg?react'
 import ErrorIcon from '@mui/icons-material/Error'
 import Link from "next/link"
 import Googleplay from '@/app/img/google-play.svg?react'
 import AppStore from '@/app/img/app-store.svg?react'
 import { UiContext } from "./scaffold/UiContextProvider"
+import { lightPrimaryColor } from "@/utils"
 
 export const screenSizesCoefficients = [0.8, 0.7, 0.5]
 export const makePxSize = (baseSize: number, coeff?: number) => `${(baseSize * (coeff || 1)).toFixed(2)}px`
@@ -172,15 +175,34 @@ export const AccountAvatar = ({name, avatarImagePublicId, avatarImageUrl, sx, on
     return avatar
 }
 
-export const PriceTag = ({ value, label, big, testID }: { value: number, label?: string, big?: boolean, testID?: string }) => {
-    const uiContext = useContext(UiContext)
-    return <Tooltip title={uiContext.i18n.translator('topeTooltip')}>
-        <Stack direction="row" gap="0.5rem" alignItems="center">
-            { label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{label}</Typography> }
-            <Typography data-testid={testID} color="primary" sx={{ fontSize: big ? '1.5rem': '1rem' }} variant="h6">{value}</Typography>
-            <Tokens style={{ width: big ? '3rem' : '2rem', height: big ? '3rem' : '2rem' }}/>
+interface PriceTagProps {
+    value: number
+    label?: string
+    big?: boolean
+    testID?: string
+    onClick?: () => void
+}
+
+export const PriceTag = (p: PriceTagProps) => {
+    const [helpOpen, setHelpOpen] = useState(false)
+
+    return <Stack direction="row">
+        <Stack direction="row" onClick={p.onClick} sx={{ cursor: p.onClick && 'pointer' }}>
+            <Stack direction="row" gap="0.5rem" alignItems="center">
+                { p.label && <Typography color="primary" sx={{ fontWeight: 'bold' }} variant="body1">{p.label}</Typography> }
+                <Typography data-testid={p.testID} color="primary" sx={{ fontSize: p.big ? '1.5rem': '1rem' }} variant="h6">{p.value}</Typography>
+                <Tokens style={{ width: p.big ? '3rem' : '2rem', height: p.big ? '3rem' : '2rem' }}/>
+            </Stack>
         </Stack>
-    </Tooltip>
+        <IconButton size="small" onClick={e => {
+            e.preventDefault()
+            e.stopPropagation()
+            setHelpOpen(true)
+        }} sx={{ padding: 0 }}>
+            <QuestionMarkIcon fontSize="medium" sx={{ color: lightPrimaryColor }} />
+        </IconButton>
+        <PriceInfoDialog visible={helpOpen} value={p.value} onClose={() => setHelpOpen(false)}/>
+    </Stack>
 }
 
 export const ZoomedImageDialog = ({ zoomedImg, onClose }: { zoomedImg: string | undefined, onClose: () => void}) => 

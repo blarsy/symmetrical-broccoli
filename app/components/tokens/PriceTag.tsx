@@ -1,6 +1,6 @@
 import React from "react"
 import { View } from "react-native"
-import { Icon, IconButton, Text, Tooltip } from "react-native-paper"
+import { IconButton, Text, Tooltip } from "react-native-paper"
 import { primaryColor } from "../layout/constants"
 import Images from "@/Images"
 import { VariantProp } from "react-native-paper/lib/typescript/components/Typography/types"

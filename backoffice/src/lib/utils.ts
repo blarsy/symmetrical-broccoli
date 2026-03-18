@@ -20,6 +20,13 @@ export enum AuthProviders {
     apple = 1
 }
 
+export const getPercentFromValue = (value: number) => {
+    if (value <= 100) return value / 4
+    if (value <= 1000) return (((value - 100) * 100) / 900) / 4 + 25
+    if (value <= 5000) return (((value - 1000) * 100) / 4000) / 4 + 50
+    return Math.min((((value - 5000) * 100) / 5000) / 4 + 75, 100)
+}
+
 export const userFriendlyTime = (time: Date, shortDateFormat: string) => {
   const djTime = dayjs.utc(time)
   const millisecondsEllapsed = Math.abs(djTime.diff())
