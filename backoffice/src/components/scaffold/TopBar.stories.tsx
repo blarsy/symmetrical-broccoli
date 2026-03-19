@@ -39,3 +39,16 @@ export const LoggedIn: Story = {
     }, unreadNotifications: [], subscriptions: []
   }) ]
 }
+
+export const LoggedInNotActivated: Story = {
+  args: {
+    version: 'v0_10'
+  },
+  decorators: [ clientComponentDecorator({
+    loading: false, token: 'token', account: {
+      amountOfTokens: 20, name: 'Les patines de Christine', id: v4(), email: 'mail@mail.com',
+      lastChangeTimestamp: new Date(new Date().valueOf() - 10000),
+      avatarPublicId: '', knowsAboutCampaigns: false
+    }, unreadNotifications: [], subscriptions: []
+  }) ]
+}

@@ -333,6 +333,9 @@ const resources = {
             "topeValueTitle": "How to determine the value of a Tope ?",
             "topeValueExplanation": "The value of a Tope is not fixed, it depends on the context of the exchange. It is designed to allow many exchanges, not really to store value.",
             "topeValueExplanation2": "How to use it to quantify one's gratitude during an exchange ? Tap several points of the bar below.",
+            "activateaccount": "Your email address has not been validated. Your resources are currently not visible. Please click on the link in the email you received at {{email}}.",
+            "sendactivationmailagainbutton": "Send again",
+            "errorsendingagain": "An error occured whe sending the activation mail again."
         }
     },
     fr: { 
@@ -666,6 +669,9 @@ const resources = {
             "topeValueTitle": "Quelle valeur a un Tope ?",
             "topeValueExplanation": "La valeur d'un Tope n'est pas fixe, elle dépend du contexte de l'échange. Elle est conçue pour permettre de nombreux échanges, pas vraiment pour stocker une valeur.",
             "topeValueExplanation2": "Comment l'utiliser pour quantifier la gratitude lors d'un échange ? Touche différents endroits de la jauge ci-dessous.",
+            "activateAccount": "Ton adresse email n'est pas encore validée. Tes ressources ne sont pas visibles tant que tu n'as pas cliqué sur le lien reçu à {{email}}.",
+            "sendactivationmailagainbutton": "Envoyer de nouveau",
+            "errorsendingagain": "Une erreur est survenu pendant le réenvoi du mail d'activation.",
         }
     }
 }

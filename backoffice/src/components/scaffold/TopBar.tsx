@@ -1,9 +1,9 @@
-import { Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, SvgIconTypeMap, Switch } from "@mui/material"
+import { Alert, Badge, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, SvgIconTypeMap, Switch, Typography } from "@mui/material"
 import { Stack } from "@mui/system"
 import Link from "next/link"
 import { useContext, useState } from "react"
 import ConnectDialog from "../user/ConnectDialog"
-import { AppContext } from "./AppContextProvider"
+import { AppContext, AppDispatchContext } from "./AppContextProvider"
 import Account from '@mui/icons-material/AccountCircle'
 import ConnectedAccount from '@mui/icons-material/ManageAccounts'
 import EditNotifications from '@mui/icons-material/EditNotifications'
@@ -20,6 +20,9 @@ import MiniLogo from '@/app/img/minilogo.svg?react'
 import { useRouter } from "next/navigation"
 import { PriceTag } from "../misc"
 import { primaryColor } from "@/utils"
+import { gql, useMutation } from "@apollo/client"
+import Feedback from "./Feedback"
+import { LoadingButton } from "@mui/lab"
 
 interface LinkMenuProps {
     url: string
@@ -53,6 +56,12 @@ const LinkMenu = (p: LinkMenuProps) => {
     }
 } 
 
+export const SEND_AGAIN = gql`mutation SendAgain {
+  sendActivationAgain(input: {}) {
+      integer
+  }
+}`
+
 interface Props {
     version: string
 }
@@ -60,6 +69,7 @@ interface Props {
 
 const TopBar = ({ version }: Props) => {
     const appContext = useContext(AppContext)
+    const appDispatch = useContext(AppDispatchContext)
     const uiContext = useContext(UiContext)
     const chatContext = useContext(ChatContext)
     const uiDispatcher = useContext(UiDispatchContext)
@@ -68,6 +78,7 @@ const TopBar = ({ version }: Props) => {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null)
     const { disconnect } = useAccountFunctions(version)
     const router = useRouter()
+    const [sendAgain, { loading, error }] = useMutation(SEND_AGAIN)
 
     const linksInfo = [
         { url: `/webapp/${uiContext.version}`, textI18n: 'searchButtonCaption', needsLogin: false , testID: 'SearchMenuLink'},
@@ -114,98 +125,107 @@ const TopBar = ({ version }: Props) => {
         })
     }
 
-    return <Stack direction="row" justifyContent="space-between">
-        <Stack sx={theme => ({ 
-            [theme.breakpoints.down('sm')]: {
-                display: 'none'
-            }
-         })} direction="row">
-            <Link href="/" style={{ margin: '6px 8px', width: '3rem', height: '3rem' }}>
-                <MiniLogo width="100%" height="100%" fill={primaryColor}/>
-            </Link>
-            {makeButtonsMenu()}
-        </Stack>
-        <IconButton color="primary" sx={theme => ({
-                [theme.breakpoints.up('sm')]: {
+    return <>
+        <Stack direction="row" justifyContent="space-between">
+            <Stack sx={theme => ({ 
+                [theme.breakpoints.down('sm')]: {
                     display: 'none'
                 }
-            })} onClick={e => {
-            setMenuAnchorEl(e.currentTarget)
-        }}>
-            <MenuIcon />
-        </IconButton>
-        <Menu
-            id="menu"
-            anchorEl={menuAnchorEl}
-            open={!!menuAnchorEl}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            disableScrollLock
-            onClose={() => setMenuAnchorEl(null)}>
-            {makeItemsMenu()}
-        </Menu>
-        <Stack direction="row" sx={theme => ({
-            gap: '2rem',
-            [theme.breakpoints.down('md')]: {
-                gap: '0.5rem'
-            }
-        })}>
-            { appContext.account && <PriceTag testID="TokenCounter" onClick={() => router.push(`/webapp/${version}/profile/tokens`)} value={appContext.account.amountOfTokens} big/> }
-            <Stack direction="row" alignItems="center">
-                <DarkModeIcon color="primary" />
-                <Switch value={uiContext.lightMode} color="primary" onChange={e => {
-                    localStorage.setItem('lightMode', uiContext.lightMode ? '': 'Y')
-                    uiDispatcher({ type: UiReducerActionType.SwitchLightMode, payload: undefined })
-                }}/>
-                <LightModeIcon color="primary" /> 
+            })} direction="row">
+                <Link href="/" style={{ margin: '6px 8px', width: '3rem', height: '3rem' }}>
+                    <MiniLogo width="100%" height="100%" fill={primaryColor}/>
+                </Link>
+                {makeButtonsMenu()}
             </Stack>
-            <IconButton data-testid="userButton" color="primary" onClick={e => {
-                if(appContext.account) {
-                    setUserMenuAnchorEl(e.currentTarget)
-                } else {
-                    setConnecting(true)
-                }
+            <IconButton color="primary" sx={theme => ({
+                    [theme.breakpoints.up('sm')]: {
+                        display: 'none'
+                    }
+                })} onClick={e => {
+                setMenuAnchorEl(e.currentTarget)
             }}>
-                { appContext.account ? <ConnectedAccount/>  : <Account /> }
+                <MenuIcon />
             </IconButton>
+            <Menu
+                id="menu"
+                anchorEl={menuAnchorEl}
+                open={!!menuAnchorEl}
+                anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                disableScrollLock
+                onClose={() => setMenuAnchorEl(null)}>
+                {makeItemsMenu()}
+            </Menu>
+            <Stack direction="row" sx={theme => ({
+                gap: '2rem',
+                [theme.breakpoints.down('md')]: {
+                    gap: '0.5rem'
+                }
+            })}>
+                { appContext.account && <PriceTag testID="TokenCounter" onClick={() => router.push(`/webapp/${version}/profile/tokens`)} value={appContext.account.amountOfTokens} big/> }
+                <Stack direction="row" alignItems="center">
+                    <DarkModeIcon color="primary" />
+                    <Switch value={uiContext.lightMode} color="primary" onChange={e => {
+                        localStorage.setItem('lightMode', uiContext.lightMode ? '': 'Y')
+                        uiDispatcher({ type: UiReducerActionType.SwitchLightMode, payload: undefined })
+                    }}/>
+                    <LightModeIcon color="primary" /> 
+                </Stack>
+                <IconButton data-testid="userButton" color="primary" onClick={e => {
+                    if(appContext.account) {
+                        setUserMenuAnchorEl(e.currentTarget)
+                    } else {
+                        setConnecting(true)
+                    }
+                }}>
+                    { appContext.account ? <ConnectedAccount/>  : <Account /> }
+                </IconButton>
+            </Stack>
+            <Menu
+                id="user-menu"
+                anchorEl={userMenuAnchorEl}
+                open={!!userMenuAnchorEl}
+                anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+                disableScrollLock
+                onClose={() => setUserMenuAnchorEl(null)}>
+                <MenuItem onClick={() => {
+                    setUserMenuAnchorEl(null)
+                }}>
+                    <LinkMenu text={appContext.account?.name || ''} Icon={ConnectedAccount}
+                        url={ `/webapp/${version}/profile`} />
+                </MenuItem>
+                <MenuItem onClick={() => {
+                    setUserMenuAnchorEl(null)
+                }}>
+                    <LinkMenu text={uiContext.i18n.translator('preferencesMenuCaption')} Icon={EditNotifications}
+                        url={`/webapp/${version}/profile/prefs`} />
+                </MenuItem>
+                <MenuItem onClick={() => {
+                    setUserMenuAnchorEl(null)
+                }}>
+                    <LinkMenu text={uiContext.i18n.translator('tokensMenuCaption')} Icon={TokensIcon}
+                        url={`/webapp/${version}/profile/tokens`} />
+                </MenuItem>
+                <MenuItem onClick={() => {
+                    disconnect()
+                    setUserMenuAnchorEl(null)
+                    router.push(`/webapp/${uiContext.version}`)
+                }}>
+                    <ListItemIcon>
+                        <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{uiContext.i18n.translator('logoutMenuCaption')}</ListItemText>
+                </MenuItem>
+            </Menu>
+            <ConnectDialog visible={connecting} onClose={ () => setConnecting(false) } version={version}/>
         </Stack>
-        <Menu
-            id="user-menu"
-            anchorEl={userMenuAnchorEl}
-            open={!!userMenuAnchorEl}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            disableScrollLock
-            onClose={() => setUserMenuAnchorEl(null)}>
-            <MenuItem onClick={() => {
-                setUserMenuAnchorEl(null)
-            }}>
-                <LinkMenu text={appContext.account?.name || ''} Icon={ConnectedAccount}
-                    url={ `/webapp/${version}/profile`} />
-            </MenuItem>
-            <MenuItem onClick={() => {
-                setUserMenuAnchorEl(null)
-            }}>
-                <LinkMenu text={uiContext.i18n.translator('preferencesMenuCaption')} Icon={EditNotifications}
-                    url={`/webapp/${version}/profile/prefs`} />
-            </MenuItem>
-            <MenuItem onClick={() => {
-                setUserMenuAnchorEl(null)
-            }}>
-                <LinkMenu text={uiContext.i18n.translator('tokensMenuCaption')} Icon={TokensIcon}
-                    url={`/webapp/${version}/profile/tokens`} />
-            </MenuItem>
-            <MenuItem onClick={() => {
-                disconnect()
-                setUserMenuAnchorEl(null)
-                router.push(`/webapp/${uiContext.version}`)
-            }}>
-                <ListItemIcon>
-                    <LogoutIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{uiContext.i18n.translator('logoutMenuCaption')}</ListItemText>
-            </MenuItem>
-        </Menu>
-        <ConnectDialog visible={connecting} onClose={ () => setConnecting(false) } version={version}/>
-    </Stack>
+         { appContext.account && !appContext.account.activated && <Alert severity="warning">
+             <Typography variant="caption" color="text.secondary">{uiContext.i18n.translator('activateAccount', { email: appContext.account.email })}</Typography>
+             <LoadingButton size="small" loading={loading} disabled={loading} onClick={async () => {
+                await sendAgain()
+             }} sx={{ marginLeft: '1rem' }} variant="outlined">{uiContext.i18n.translator('sendactivationmailagainbutton')}</LoadingButton>
+             <Feedback severity="error" message={uiContext.i18n.translator('errorsendingagain')} onClose={() => {}} visible={error !== undefined} />
+        </Alert>}
+    </>
 }
 
 export default TopBar

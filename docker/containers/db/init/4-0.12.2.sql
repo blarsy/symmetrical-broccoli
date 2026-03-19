@@ -120,6 +120,38 @@ begin
 end;
 $BODY$;
 
+
+CREATE OR REPLACE FUNCTION sb.send_activation_again(
+	)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE SECURITY DEFINER PARALLEL UNSAFE
+AS $BODY$
+<<block>>
+DECLARE activation_code character varying;
+DECLARE activated_email character varying;
+DECLARE account_language character varying;
+begin
+	SELECT ea.activation_code, ea.email, a.language
+	INTO block.activation_code, block.activated_email, block.account_language
+	FROM sb.email_activations ea 
+	INNER JOIN sb.accounts_private_data a ON a.account_id = ea.account_id
+	WHERE a.account_id = current_account_id() AND ea.activated IS NULL
+	ORDER BY ea.created DESC
+	LIMIT 1;
+	
+	IF block.activation_code IS NULL THEN
+		RETURN 2;
+	END IF;
+	
+	PERFORM sb.add_job('mailActivation',
+		json_build_object('email', LOWER(block.activated_email), 'code', block.activation_code, 'lang', block.account_language));
+	
+	RETURN 1;
+end;
+$BODY$;
+
 DO
 $body$
 BEGIN

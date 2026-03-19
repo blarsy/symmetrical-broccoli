@@ -13,7 +13,7 @@ export interface AccountInfo {
     id: string
     email: string
     avatarPublicId: string
-    activated: Date
+    activated?: Date
     amountOfTokens: number
     lastChangeTimestamp: Date
     knowsAboutCampaigns: boolean

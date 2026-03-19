@@ -137,16 +137,16 @@ export const ResourcesList = ({ route, addRequested, viewRequested, editRequeste
             actions={[ {
               label: t('refreshButton'), onPress: () => {
                 reloadAccount()
-            } }, { label: t('send_activation_mail_again_button'), onPress: async () => {
+            } }, { label: t('sendactivationmailagainbutton'), onPress: async () => {
                 try {
                     await sendAgain()
                 } catch(e) {
-                  appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('error_sending_again') } })
+                  appAlertDispatch({ type: AppAlertReducerActionType.DisplayNotification, payload: { error: e as Error, message: t('errorsendingagain') } })
                 }
             } }, { label: t('hide_button'), onPress: () => {
                 setHideBanner(true)  
             }} ]}>
-            {t('activate_account', { email: appContext.account?.email })}
+            {t('activateaccount', { email: appContext.account?.email })}
         </Banner>
         { appContext.account ? <>
           { activeCampaign.data && <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', margin: 6, gap: 6 }}>
