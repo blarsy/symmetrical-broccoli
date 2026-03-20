@@ -23,7 +23,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const NoCampaignVanillaAccount: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null }, variables: {}
   }, {
@@ -62,7 +61,6 @@ export const NoCampaignVanillaAccount: Story = {
   }]), clientComponentDecorator()]
 }
 export const NoCampaignAccountFilled: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null }, variables: {}
   }, {
@@ -122,7 +120,6 @@ export const NoCampaignAccountFilled: Story = {
   } })]
 }
 export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: null }, variables: {}
   }, {
@@ -193,7 +190,6 @@ export const NoCampaignAccountFilled1ResourceWithoutPic: Story = {
   } })]
 }
 export const NoResourceInCampaign: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: defaultCampaign }, variables: {}
   }, {
@@ -215,7 +211,6 @@ export const NoResourceInCampaign: Story = {
   }]), clientComponentDecorator()]
 }
 export const EligibleToFutureAirdrop: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: defaultCampaign }, variables: {}
   }, {
@@ -237,7 +232,6 @@ export const EligibleToFutureAirdrop: Story = {
   }]), clientComponentDecorator()]
 }
 export const AirdropDone: Story = {
-  args: { version: 'V0_10' },
   decorators: [apolloClientMocksDecorator([{
     query: GET_ACTIVE_CAMPAIGN, result: { getActiveCampaign: { ...defaultCampaign, ...{ airdropDone: true, airdrop: new Date(new Date().valueOf() - 1000) }} }, variables: {}
   }, {

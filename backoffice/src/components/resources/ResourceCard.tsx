@@ -18,7 +18,6 @@ const limitTextLength = (text: string, maxLength: number) => {
 }
 
 interface Props {
-    version: string
     resource: {
         id: string
         avatarPublicId?: string
@@ -47,7 +46,7 @@ const ResourceCard = (p: Props) => {
               height: '3.5rem',
             }
           })} name={p.resource.accountName || ''} onClick={() => {
-            router.push(`/webapp/${p.version}/account/${p.resource.accountId}`)
+            router.push(`/webapp/account/${p.resource.accountId}`)
           }}
           avatarImagePublicId={p.resource.avatarPublicId} />
     } else if(p.resource.images.length === 0) {
@@ -56,7 +55,7 @@ const ResourceCard = (p: Props) => {
         avatar = <img style={{ borderRadius: '25px', width: '5rem', height: '5rem' }} alt="image" src={urlFromPublicId(p.resource.images[0])} />
     }
     return <Card data-testid={p.testId} key={p.resource.id} onClick={e => {
-        router.push(`/webapp/${p.version}/view/${p.resource.id}`)
+        router.push(`/webapp/view/${p.resource.id}`)
     }} sx={theme => ({
         display: 'flex',
         flexDirection: 'column',

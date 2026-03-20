@@ -39,9 +39,6 @@ const meta = {
   argTypes: {
     //backgroundColor: { control: 'color' },
   },
-  args: { 
-    version: 'v0_9'
-   },
   decorators: [apolloClientMocksDecorator([{ query: SUGGEST_RESOURCES, variables: DEFAULT_SEARCH_PARAMETERS, result: {
     suggestedResources: {
       resources: [ 

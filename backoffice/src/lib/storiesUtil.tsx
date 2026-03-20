@@ -1,5 +1,5 @@
 import AppContextProvider, { AppStateData } from "@/components/scaffold/AppContextProvider"
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { DocumentNode } from "@apollo/client"
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { APIProvider } from "@vis.gl/react-google-maps"
@@ -17,7 +17,7 @@ import { AccountInfo } from "./useAccountFunctions"
 import { GET_CATEGORIES } from "./useCategories"
 import config from "@/tests/config"
 import { v4 } from "uuid"
-const { mapsApiKey } = getCommonConfig()
+const { mapsApiKey } = cfg
 
 export interface GraphQlOp {
     query: DocumentNode,
@@ -96,7 +96,6 @@ export const uiContextDecorator = (initial?: UiStateData) => {
         initial = {
             loading: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` },
             loadingLookupData: false,
-            version: 'v0_12',
             categories: fromData([])
         }
 
@@ -161,8 +160,8 @@ export const clientComponentDecorator = (initialAppstate?: AppStateData, initial
 
     return (Story: () => ReactNode) =>  <AppContextProvider initial={initialAppstate || { token: '', unreadNotifications: [], loading: false, subscriptions: []}}>
         <ChatContextProvider initial={initialChatState || { conversations: [], unreadConversations: [] }}>
-            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, version: 'v0_12', categories: initial(false) }}>
-                <Translatable version={config.version}>
+            <UiContextProvider initial={ initialUiState || { loading: false, loadingLookupData: false, i18n: { lang: 'fr', translator: (str, opts?) => `tr-${str}` }, categories: initial(false) }}>
+                <Translatable>
                     <MockedProvider mocks={
                         actualOps.map(op => ({
                             delay: 2000,

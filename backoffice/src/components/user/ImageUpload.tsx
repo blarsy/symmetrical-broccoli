@@ -188,7 +188,7 @@ const ImageUpload = (p: Props) => {
                         } catch(e) {
                             error({
                                 message: (e as Error).toString(), accountId: appContext.account?.id
-                            }, uiContext.version, true)
+                            }, true)
                             setUploadState(fromError(e as Error, (e as Error).message))
                         }
                     }

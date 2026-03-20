@@ -101,7 +101,7 @@ const Profile = () => {
     const [deletionConfirmed, setDeletionConfirmed] = useState(false)
     const [deleteAccount] = useMutation(DELETE_ACCOUNT)
     const t = uiContext.i18n.translator
-    const { disconnect } = useAccountFunctions(uiContext.version)
+    const { disconnect } = useAccountFunctions()
     const [ passwordChanged, setPasswordChanged ] = useState(false)
     const router = useRouter()
 
@@ -182,7 +182,7 @@ const Profile = () => {
                     await deleteAccount()
                     disconnect()
                     setDeletingAccount(false)
-                    router.push(`/webapp/${uiContext.version}`)
+                    router.push(`/webapp`)
                 }}>{t('okButton')}</Button>
             </DialogActions>
         </Dialog>

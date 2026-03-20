@@ -54,7 +54,7 @@ export const DEFAULT_SEARCH_PARAMETERS: SearchParameters = { canBeDelivered: fal
   excludeUnlocated: false, distanceToReferenceLocation: 50, searchTerm: '', referenceLocation: DEFAULT_LOCATION,
   inCurrentCampaign: false }
 
-const Search = (p: {version: string}) => {
+const Search = () => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const { profileData } = useProfile()
@@ -121,7 +121,7 @@ const Search = (p: {version: string}) => {
             { (suggestedResources.length === 0 && !initialLoading) ?
                 <Typography variant="subtitle1" textAlign="center">{uiContext.i18n.translator('noResultFound')}</Typography>
               :
-              suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx} version={p.version}
+              suggestedResources.map((res: any, idx)=> <ResourceCard testId={`SearchResult:${res.id}`} key={idx}
                 resource={{
                   id: res.id, accountName: res.accountsPublicDatumByAccountId.name, description: res.description,
                   title: res.title, expiration: res.expiration, images: res.resourcesImagesByResourceId.nodes.map((img: any) => img.imageByImageId.publicId),

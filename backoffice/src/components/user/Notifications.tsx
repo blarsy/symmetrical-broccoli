@@ -116,7 +116,7 @@ const SET_NOTIFICATION_READ = gql`mutation setNotificationRead($notificationId: 
 
 const NOTIFICATIONS_PAGE_SIZE = 15
 
-const useNotifications = (version: string) => {
+const useNotifications = () => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     useCategories()
@@ -145,7 +145,7 @@ const useNotifications = (version: string) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString(), accountId: appContext.account?.id
-                }, uiContext.version, true)
+                }, true)
                 setNotificationData({ loading: false, error: e as Error, data: notificationData.data })
                 throw e
             } finally {
@@ -178,7 +178,7 @@ const useNotifications = (version: string) => {
                     image: { resource, account: { id: resource.account!.id, name: resource.account!.name, avatarImagePublicId: resource.account!.avatarImagePublicId } },
                     onClick: async () => {
                         setNotificationRead({ variables: { notificationId: rawNotification.node.id } })
-                        router.push(`/webapp/${version}/view/${rawNotification.node.data.resource_id}`)
+                        router.push(`/webapp/view/${rawNotification.node.data.resource_id}`)
                         setNotificationData(previous => ({ ...previous, ...{ data: { endCursor: previous.data?.endCursor, data: previous.data!.data.map(notif => {
                             if (notif.id === rawNotification.node.id) {
                                 return { ...notif, ...{ read: true } }
@@ -241,112 +241,112 @@ const useNotifications = (version: string) => {
                 case 'COMPLETE_PROFILE':
                     otherNotifs.push(
                         createOtherNotification(t('welcomeNotificationHeadline'), t('completeProcessNotificationHeadline'), 
-                            t('completeProcessNotificationDetails'), `/webapp/${version}/profile`, rawNotification, Hey)
+                            t('completeProcessNotificationDetails'), `/webapp/profile`, rawNotification, Hey)
                         )
                     break
                 case 'TOKENS_RECEIVED':
                     otherNotifs.push(
                         createOtherNotification(t('tokensReceivedHeadline1'), t('tokensReceivedHeadline2'), 
                             t('tokensReceivedDetails', { fromAccount: rawNotification.node.data.fromAccount, amountReceived: rawNotification.node.data.amountReceived }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, MoneyIn)
+                            `/webapp/profile/tokens`, rawNotification, MoneyIn)
                         )
                     break
                 case 'TOKENS_SENT':
                     otherNotifs.push(
                         createOtherNotification(t('tokensSentHeadline1'), t('tokensSentHeadline2'), 
                             t('tokensSentDetails', { toAccount: rawNotification.node.data.toAccount, amountSent: rawNotification.node.data.amountSent }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, GiftSent)
+                            `/webapp/profile/tokens`, rawNotification, GiftSent)
                         )
                     break
                 case 'WELCOME_TOKEN_USER':
                     otherNotifs.push(
                         createOtherNotification(t('welcomeTokenUserHeadline1'), t('welcomeTokenUserHeadline2'), 
                             t('welcomeTokenUserDetails'), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, Thanks)
+                            `/webapp/profile/tokens`, rawNotification, Thanks)
                         )
                     break
                 case 'BID_RECEIVED':
                     otherNotifs.push(
                          createOtherNotification(t('bidReceivedHeadline1'), t('bidReceivedHeadline2', { sender: rawNotification.node.data.receivedFrom }), 
                             t('bidReceivedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, BidReceived)
+                            `/webapp/bids`, rawNotification, BidReceived)
                         )
                     break
                 case 'BID_REFUSED':
                     otherNotifs.push(
                         createOtherNotification(t('bidRefusedHeadline1'), t('bidRefusedHeadline2', { refuser: rawNotification.node.data.refusedBy }), 
                             t('bidRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, Denied)
+                            `/webapp/bids`, rawNotification, Denied)
                         )
                     break
                 case 'BID_ACCEPTED':
                     otherNotifs.push(
                         createOtherNotification(t('bidAcceptedHeadline1'), t('bidAcceptedHeadline2', { accepter: rawNotification.node.data.acceptedBy }), 
                             t('bidAcceptedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, PrizeWon)
+                            `/webapp/bids`, rawNotification, PrizeWon)
                         )
                     break
                 case 'BID_EXPIRED':
                     otherNotifs.push(
                         createOtherNotification(t('bidExpiredHeadline1'), t('bidExpiredHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, Gone)
+                            `/webapp/bids`, rawNotification, Gone)
                         )
                     break
                 case 'BID_CANCELLED':
                     otherNotifs.push(
                         createOtherNotification(t('bidDeletedHeadline1'), t('bidDeletedHeadline2', { cancelledBy: rawNotification.node.data.cancelledBy }), 
                             t('bidDeletedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, TimeUp)
+                            `/webapp/bids`, rawNotification, TimeUp)
                         )                    
                     break
                 case 'BID_AUTO_DELETED_AFTER_RESOURCE_EXPIRED':
                     otherNotifs.push(
                         createOtherNotification(t('bidExpiredWithResourceHeadline1'), t('bidExpiredWithResourceHeadline2', { resourceAuthor: rawNotification.node.data.resourceAuthor }), 
                             t('bidDExpiredWithResourceDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, TimeUp)
+                            `/webapp/bids`, rawNotification, TimeUp)
                         )
                     break
                 case 'BID_AUTO_REFUSED_AFTER_RESOURCE_DELETED':
                     otherNotifs.push(
                         createOtherNotification(t('bidAutoRefusedHeadline1'), t('bidAutoRefusedHeadline2', { resourceAuthor: rawNotification.node.data.refusedBy }), 
                             t('bidAutoRefusedDetails', { resourceTitle: rawNotification.node.data.resourceTitle }), 
-                            `/webapp/${version}/bids`, rawNotification, Denied)
+                            `/webapp/bids`, rawNotification, Denied)
                         )
                     break
                 case 'TOKEN_GRANTED':
                     otherNotifs.push(
                         createOtherNotification(t('tokenGrantedHeadline1'), t('tokenGrantedHeadline2', { grantorName: rawNotification.node.data.grantorName }), 
                             t('tokenGrantedDetails', { amountOfTokens: rawNotification.node.data.amountOfTokens }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, GotGift)
+                            `/webapp/profile/tokens`, rawNotification, GotGift)
                         )
                     break
                 case 'AIRDROP_RECEIVED':
                     otherNotifs.push(
                         createOtherNotification(t('airdropHeadline1'), t('airdropHeadline2', { campaignName: rawNotification.node.data.campaignName }), 
                             t('airdropDetails', { amountOfTokens: rawNotification.node.data.amount }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, ThumbUp)
+                            `/webapp/profile/tokens`, rawNotification, ThumbUp)
                         )
                     break
                 case 'CAMPAIGN_BEGUN':
                     otherNotifs.push(
                         createOtherNotification(t('campaignBegunHeadline1'), t('campaignBegunHeadline2', { name: rawNotification.node.data.campaignName }), 
                             t('campaignBegunDetails', { airdropAmount: rawNotification.node.data.airdropAmount, multiplier: rawNotification.node.data.multiplier, airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, Campaign)
+                            `/webapp/profile/tokens`, rawNotification, Campaign)
                         )
                     break
                 case 'AIRDROP_SOON':
                     otherNotifs.push(
                         createOtherNotification(t('airdropSoonHeadline1', { airdropAmount: rawNotification.node.data.airdropAmount }), t('airdropSoonHeadline2', { airdrop: dayjs(rawNotification.node.data.airdrop).format(t('dateTimeFormat')) }), 
                             t('airdropSoonDetails', { name: rawNotification.node.data.campaignName }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, Airdrop)
+                            `/webapp/profile/tokens`, rawNotification, Airdrop)
                         )
                     break
                 case 'GRANT_RECEIVED':
                     otherNotifs.push(
                         createOtherNotification(t('grantReceivedHeadline1'), t('grantReceivedHeadline2', { amount: rawNotification.node.data.amount }), 
                             t('grantReceivedDetails', { title: rawNotification.node.data.title }), 
-                            `/webapp/${version}/profile/tokens`, rawNotification, GotGift)
+                            `/webapp/profile/tokens`, rawNotification, GotGift)
                         )
                     break
             }
@@ -370,7 +370,7 @@ const useNotifications = (version: string) => {
         catch(e) {
             error({
                 message: (e as Error).toString(), accountId: appContext.account?.id
-            }, uiContext.version, true)
+            }, true)
             setNotificationData(prev => ({ loading: false, error: e as Error, data: prev.data }))
         }
     }
@@ -423,10 +423,10 @@ const NotificationImage = ({ image } : { image: string | {
     }
 }
 
-const Notifications = ({ version }: { version: string }) => {
+const Notifications = () => {
     const uiContext = useContext(UiContext)
     const appDispatch = useContext(AppDispatchContext)
-    const { data, loading, loadEarlier, error, refetch } = useNotifications(version)
+    const { data, loading, loadEarlier, error, refetch } = useNotifications()
     const ref = useRef<HTMLDivElement>(null)
 
     const loadEarlierIfNotOverflowing = () => {

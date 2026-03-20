@@ -33,7 +33,7 @@ export default () => {
         } catch(e) {
             error({
                 message: (e as Error).toString(), accountId: appContext.account?.id
-            }, uiContext.version, true)
+            }, true)
             setState(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

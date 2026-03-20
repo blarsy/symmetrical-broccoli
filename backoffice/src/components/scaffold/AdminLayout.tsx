@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState"
 import { Button, CircularProgress, Container, Stack } from "@mui/material"
 import Feedback from "./Feedback"
-import config from "@/config"
+import cfg from "@/config"
 import Link from "next/link"
 import { ApolloProvider, gql } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
@@ -11,7 +11,6 @@ import Themed from "./Themed"
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { useRouter } from "next/navigation"
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { error } from "@/lib/logger"
 
 declare global {
     interface Window {
@@ -19,13 +18,9 @@ declare global {
     }
 }
 
-interface Props extends PropsWithChildren {
-    version: string
-}
-
-const AdminLayout = (p : Props) => {
+const AdminLayout = (p : PropsWithChildren) => {
     const [connectionStatus, setConnectionStatus] = useState<DataLoadState<string>>(initial(true))
-    const { apiUrl } = config(p.version)
+    const { apiUrl } = cfg
     const router = useRouter()
 
     const getChallengeFromServer = async (publicKey: string) => {
@@ -84,7 +79,7 @@ const AdminLayout = (p : Props) => {
                 // send the code, and get the token as a return
                 const exchangeToken = await getAdminTokenFromResponse(tokenRequestString, signature, signer.address)
 
-                const client = getApolloClient(p.version)
+                const client = getApolloClient()
 
                 const exchangeRes = await client.mutate({ mutation: gql`mutation GetAdminToken($exchangeToken: String) {
                     getAdminToken(input: {exchangeToken: $exchangeToken}) {
@@ -122,24 +117,24 @@ const AdminLayout = (p : Props) => {
                 { connectionStatus.data && [
                     <Stack direction="row" key="bar" paddingTop="1rem">
                         <Button>
-                            <Link href={`/webapp/${p.version}/admin/accounts`}>Accounts</Link>
+                            <Link href={`/webapp/admin/accounts`}>Accounts</Link>
                         </Button>
                         <Button>
-                            <Link href={`/webapp/${p.version}/admin/mails`}>Mails</Link>
+                            <Link href={`/webapp/admin/mails`}>Mails</Link>
                         </Button>
                         <Button>
-                            <Link href={`/webapp/${p.version}/admin/campaigns`}>Campaigns</Link>
+                            <Link href={`/webapp/admin/campaigns`}>Campaigns</Link>
                         </Button>
                         <Button>
-                            <Link href={`/webapp/${p.version}/admin/logs`}>Logs</Link>
+                            <Link href={`/webapp/admin/logs`}>Logs</Link>
                         </Button>
                         <Button>
-                            <Link href={`/webapp/${p.version}/admin/grants`}>Grants</Link>
+                            <Link href={`/webapp/admin/grants`}>Grants</Link>
                         </Button>
                     </Stack>,
-                    <ApolloProvider key="content" client={getApolloClient(p.version, connectionStatus.data, () => {
+                    <ApolloProvider key="content" client={getApolloClient(connectionStatus.data, () => {
                         localStorage.removeItem('adminToken')
-                        router.push(`/webapp/${p.version}/admin`)
+                        router.push(`/webapp/admin`)
                     })}>
                         {p.children}
                     </ApolloProvider>

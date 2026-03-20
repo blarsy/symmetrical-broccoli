@@ -47,7 +47,7 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
                         participantId: v4(), avatarImageUrl: bid.resource.account!.avatarImagePublicId && urlFromPublicId(bid.resource.account!.avatarImagePublicId)
                     }
                 }}/>
-                <Link href={`/webapp/${uiContext.version}/chat/new/${bid.resource.id}?with=${bid.account.id}`}>
+                <Link href={`/webapp/chat/new/${bid.resource.id}?with=${bid.account.id}`}>
                     <IconButton color="primary">
                         <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
                     </IconButton>
@@ -64,7 +64,7 @@ const BidSent = ({ bid, onCancel } : {bid: Bid, onCancel: () => void}) => {
             { inactiveMessage && <Typography variant="body1" color="primary">{inactiveMessage}</Typography> }
         </CardContent>
         <CardActions sx={{ justifyContent: 'space-around' }}>
-            <Button LinkComponent={Link} href={`/webapp/${uiContext.version}/view/${bid.resource.id}`} endIcon={<OpenInNewIcon />}>{uiContext.i18n.translator('viewResourceButton')}</Button>
+            <Button LinkComponent={Link} href={`/webapp/view/${bid.resource.id}`} endIcon={<OpenInNewIcon />}>{uiContext.i18n.translator('viewResourceButton')}</Button>
             { !inactiveMessage && <LoadingButton data-testid={`BidSent:${bid.id}:DeleteButton`} loading={loading} endIcon={<DeleteIcon />} onClick={async () => {
                 await deleteBid({ variables: { bidId: bid.id } })
                 onCancel()

@@ -111,7 +111,7 @@ const EditResource = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString(), accountId: appContext.account?.id
-                }, uiContext.version, true)
+                }, true)
                 setSaveState(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }} validationSchema={yup.object().shape({

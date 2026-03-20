@@ -52,7 +52,7 @@ const Recover = ({ recoveryId }: Props) => {
                 } catch(e) {
                     error({
                         message: (e as Error).toString()
-                    }, uiContext.version, true)
+                    }, true)
                     setUiState({ loading: false, error: { name: uiState.t!('recovery_error'), message: (e as Error).message }, t: uiState.t })
                 } finally {
                     setSubmitting(false)

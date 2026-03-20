@@ -89,7 +89,7 @@ export const sendEmailActivationCode = async (email: string, code: string, lang:
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('activate_email_subject')
-    const link = `${config.webAppUrl}${version}/activate/${code}`
+    const link = `${config.webAppUrl}activate/${code}`
     const text = t('activate_email_text', { productName: config.productName})
 
     await preparePartials()
@@ -111,7 +111,7 @@ export const sendAccountRecoveryMail = async (email: string, code: string, lang:
     const config = await getCommonConfig()
     const t = await initTranslations(lang)
     const heading = t('recover_account_subject')
-    const link = `${config.webAppUrl}${version}/recover/${code}`
+    const link = `${config.webAppUrl}recover/${code}`
     const text = t('recover_account_text', { productName: config.productName})
 
     await preparePartials()

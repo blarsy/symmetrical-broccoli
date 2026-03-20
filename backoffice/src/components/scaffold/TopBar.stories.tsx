@@ -21,16 +21,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const LoggedOut: Story = {
-  args: {
-    version: 'v0_10'
-  },
   decorators: [clientComponentDecorator() ]
 }
 
 export const LoggedIn: Story = {
-  args: {
-    version: 'v0_10'
-  },
   decorators: [ clientComponentDecorator({
     loading: false, token: 'token', account: {
       amountOfTokens: 20, name: 'Les patines de Christine', id: v4(), email: 'mail@mail.com',
@@ -41,9 +35,6 @@ export const LoggedIn: Story = {
 }
 
 export const LoggedInNotActivated: Story = {
-  args: {
-    version: 'v0_10'
-  },
   decorators: [ clientComponentDecorator({
     loading: false, token: 'token', account: {
       amountOfTokens: 20, name: 'Les patines de Christine', id: v4(), email: 'mail@mail.com',

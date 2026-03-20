@@ -61,7 +61,7 @@ const LocationAutoComplete = (p: Props) => {
         } catch(e) {
             error({
                 message: (e as Error).toString(), accountId: appContext.account?.id
-            }, uiContext.version, true)
+            }, true)
             setLoadingState(fromError(e, uiContext.i18n.translator('reaquestError')))
         }
     }

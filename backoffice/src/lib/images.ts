@@ -1,7 +1,7 @@
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { Cloudinary } from "@cloudinary/url-gen"
 
-const { cloudinaryCloud, cloudinaryRestUrl, cloudinaryUploadPreset } = getCommonConfig()
+const { cloudinaryCloud, cloudinaryRestUrl, cloudinaryUploadPreset } = cfg
 
 const cld = new Cloudinary({
     cloud: {

@@ -17,7 +17,6 @@ interface Props {
     token: string
     provider: AuthProviders
     onClose: () => void
-    version: string
 }
 
 const REGISTER_ACCOUNT_EXTERNAL_AUTH = gql`mutation RegisterAccountExternalAuth($accountName: String, $email: String, $language: String, $token: String, $authProvider: Int) {
@@ -33,7 +32,7 @@ const RegisterExternalAuthForm = (p: Props) => {
     const t = uiContext.i18n.translator
     const [registrationStatus, setRegistrationStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const [registerAccount, { loading }] = useMutation(REGISTER_ACCOUNT_EXTERNAL_AUTH)
-    const { completeExternalAuth } = useAccountFunctions(p.version)
+    const { completeExternalAuth } = useAccountFunctions()
     
     return <Formik initialValues={{ name: p.suggestedName }}
         validationSchema={yup.object().shape({
@@ -54,7 +53,7 @@ const RegisterExternalAuthForm = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setRegistrationStatus({ loading: false, error: e as Error})
             }
         }}>

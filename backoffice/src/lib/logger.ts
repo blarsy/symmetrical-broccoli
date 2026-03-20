@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, createHttpLink, gql } from '@apollo/client'
 import { v4 } from 'uuid'
-import getConfig from '@/config'
+import cfg from '@/config'
 
 export const activityId = v4()
 
@@ -27,13 +27,12 @@ const CREATE_CLIENT_LOG = gql`mutation CreateClientLog($accountId: UUID, $data: 
 
 const getDeviceDescriptor = () => window.navigator.userAgent
 
-const log = async (level: LogLevel, logData: ClientLogMessage, version: string, includeDeviceInfo: boolean = false) => {
+const log = async (level: LogLevel, logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
     try {
         if(includeDeviceInfo)
             logData.device = getDeviceDescriptor()
-        const config = getConfig(version)
         const data = includeDeviceInfo ? `${logData.message}\Navigator ${getDeviceDescriptor()}` : logData.message
-        const httpLink = createHttpLink({ uri: config.graphqlUrl })
+        const httpLink = createHttpLink({ uri: cfg.graphqlUrl })
         const client = new ApolloClient({ link: httpLink , cache: new InMemoryCache() })
         
         client.mutate({ mutation: CREATE_CLIENT_LOG, variables: {
@@ -47,19 +46,19 @@ const log = async (level: LogLevel, logData: ClientLogMessage, version: string, 
     }
 }
 
-export const info = async (logData: ClientLogMessage, version: string, includeDeviceInfo: boolean = false) => {
+export const info = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
     //console.log('info', logData)
-    log(LogLevel.info, logData, version, includeDeviceInfo)
+    log(LogLevel.info, logData, includeDeviceInfo)
 }
-export const error = async (logData: ClientLogMessage, version: string, includeDeviceInfo: boolean = false) => {
+export const error = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
     //console.log('error', logData)
-    log(LogLevel.error, logData, version, includeDeviceInfo)
+    log(LogLevel.error, logData, includeDeviceInfo)
 }
-export const debug = async (logData: ClientLogMessage, version: string, includeDeviceInfo: boolean = false) => {
+export const debug = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
     //console.log('debug', logData)
-    log(LogLevel.debug, logData, version, includeDeviceInfo)
+    log(LogLevel.debug, logData, includeDeviceInfo)
 }
-export const warn = async (logData: ClientLogMessage, version: string, includeDeviceInfo: boolean = false) => {
+export const warn = async (logData: ClientLogMessage, includeDeviceInfo: boolean = false) => {
     //console.log('warn', logData)
-    log(LogLevel.warn, logData, version, includeDeviceInfo)
+    log(LogLevel.warn, logData, includeDeviceInfo)
 }

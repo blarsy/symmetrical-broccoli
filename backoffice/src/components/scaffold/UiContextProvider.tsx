@@ -6,7 +6,6 @@ export interface UiStateData {
   loading: boolean
   loadingLookupData: boolean
   error?: Error
-  version: string
   i18n: {
     translator: (str: string | Key | string[] | Key[], opts?: any) => string
     lang: string
@@ -19,7 +18,6 @@ const blankUiContext = {
     loading: true,
     loadingLookupData: true,
     categories: initial<Category[]>(false, undefined),
-    version: '',
     i18n: {
       translator: (code) => `tr-${code}`,
       lang: ''
@@ -37,7 +35,7 @@ const uiReducer = (previousState: UiStateData, action: { type: UiReducerActionTy
   let newState : any
   switch(action.type) {
       case UiReducerActionType.Load:
-        newState = { loading: false, i18n: action.payload.i18n, error: action.payload.error, version: action.payload.version, lightMode: action.payload.lightMode }
+        newState = { loading: false, i18n: action.payload.i18n, error: action.payload.error, lightMode: action.payload.lightMode }
         break
       case UiReducerActionType.SwitchLightMode:
         newState = { lightMode: !previousState.lightMode }

@@ -139,7 +139,7 @@ const BidsList = () => {
       } catch(e) {
           error({
               message: (e as Error).toString(), accountId: appContext.account?.id
-          }, uiContext.version, true)
+          }, true)
           setMyBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
     }
@@ -152,7 +152,7 @@ const BidsList = () => {
       } catch(e) {
           error({
               message: (e as Error).toString(), accountId: appContext.account?.id
-          }, uiContext.version, true)
+          }, true)
           setMyReceivedBids(fromError(e, uiContext.i18n.translator('requestError')))
       }
     }

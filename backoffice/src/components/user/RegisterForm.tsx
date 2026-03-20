@@ -12,7 +12,7 @@ import { AuthProviders } from "@/lib/utils"
 import { useGoogleLogin } from "@react-oauth/google"
 import { v4 as uuid } from 'uuid'
 import { appleAuthHelpers } from "react-apple-signin-auth"
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import useAccountFunctions from "@/lib/useAccountFunctions"
 import { UiContext } from "../scaffold/UiContextProvider"
@@ -21,15 +21,14 @@ import { error } from "@/lib/logger"
 interface Props {
     onClose: () => void
     onRegisterExternalAuthProviderRequested: (suggestedName: string, email: string, token: string, provider: AuthProviders) => void
-    version: string
 }
 
 const RegisterForm = (p: Props) => {
     const uiContext = useContext(UiContext)
     const [registrationStatus, setRegistrationStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const t = uiContext.i18n.translator
-    const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
-    const { connectGoogleWithAccessCode, connectApple, registerAccount } = useAccountFunctions(p.version)
+    const { appleServiceId, appleAuthRedirectUri } = cfg
+    const { connectGoogleWithAccessCode, connectApple, registerAccount } = useAccountFunctions()
 
     const triggerGoogleLogin = useGoogleLogin({
         onSuccess: async res => {
@@ -43,7 +42,7 @@ const RegisterForm = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setRegistrationStatus({ loading: false, error: e as Error })
             }
         }, flow: 'auth-code', select_account: true
@@ -73,7 +72,7 @@ const RegisterForm = (p: Props) => {
             onError: (e: any) => {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setRegistrationStatus(fromError(e as Error, uiContext.i18n.translator('requestError')))
             }
         })
@@ -98,7 +97,7 @@ const RegisterForm = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setRegistrationStatus({ loading: false, error: e as Error})
             }
         }}>

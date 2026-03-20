@@ -59,7 +59,7 @@ function useProfile () {
             } })
             setUpdateStatePublicInfo({ loading: false })
         } catch (e) {
-            error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
+            error({ message: (e as Error).toString(), accountId: appContext.account?.id }, true)
             setUpdateStatePublicInfo({ loading: false, error: e as Error })
         }
     }

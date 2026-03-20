@@ -191,7 +191,7 @@ const Conversation = (p: Props) => {
               chatDispatch({ type: ChatReducerActionType.SetConversationRead, payload: conversationData.conversation.id })
             }, 0)
         } catch (e) {
-          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
+          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, true)
           setConversationData(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
@@ -251,8 +251,8 @@ const Conversation = (p: Props) => {
                       </IconButton>
                       <ResourceHeader
                         data={conversationData.data!.conversation}
-                        onAccountClicked={() => router.push(`/webapp/${uiContext.version}/account/${conversationData.data!.conversation.otherAccount!.id}`)}
-                        onResourceClicked={() => router.push(`/webapp/${uiContext.version}/view/${conversationData.data!.conversation.resource!.id}`)} />
+                        onAccountClicked={() => router.push(`/webapp/account/${conversationData.data!.conversation.otherAccount!.id}`)}
+                        onResourceClicked={() => router.push(`/webapp/view/${conversationData.data!.conversation.resource!.id}`)} />
                     </Stack>,
                     <ConversationMessages hasNew={conversationHasNewMessages} key="messages" data={currentMessages!} 
                       onBottom={() => setConversationHasNewMessages(false)}/>,

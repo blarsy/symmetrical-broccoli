@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import cfg, { getVersions } from '@/config'
+import cfg from '@/config'
  
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
-  const versions = getVersions().map(v => cfg(v))
+  const { apiUrl, subscriptionsUrl } = cfg
 
   const cspHeader = `
     script-src 'self' 'nonce-${nonce}' https://accounts.google.com/ https://www.googletagmanager.com https://appleid.cdn-apple.com ${!!process.env.DEV ? 
       //In dev-only, allow dynamic scripts - necessary for hot reload
       `'unsafe-eval'`
       : ''};
-    connect-src 'self' https://api.cloudinary.com/ https://maps.googleapis.com https://region1.google-analytics.com ${versions.map(v => v.apiUrl).join(' ')} ${versions.map(v => v.subscriptionsUrl).join(' ')};
+    connect-src 'self' https://api.cloudinary.com/ https://maps.googleapis.com https://region1.google-analytics.com ${apiUrl} ${subscriptionsUrl};
     img-src 'self' blob: data: https://res.cloudinary.com https://maps.gstatic.com https://maps.googleapis.com https://fonts.gstatic.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
 `

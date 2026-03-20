@@ -22,7 +22,7 @@ import QuestionIcon from "@mui/icons-material/QuestionMark"
 import QAIcon from "@mui/icons-material/QuestionAnswer"
 import { ApolloProvider } from "@apollo/client"
 import { getApolloClient } from "@/lib/apolloClient"
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { keyframes, SxProps } from '@mui/system'
 import ResourcesGallery from "@/components/showcase/ResourcesGallery"
 import { ReactNode } from "react"
@@ -33,7 +33,7 @@ import CampaignImg from '@/app/img/campaign.svg?react'
 import { AppDownloadButtons } from "@/components/misc"
 import AdsClick from '@mui/icons-material/AdsClick'
 
-const { mainVersion, link2Url } = getCommonConfig()
+const { link2Url } = cfg
 
 const ToppersBar = () => {
     const theme= useTheme()
@@ -171,7 +171,7 @@ const OngoingCampaignAnnouncement = ({ sx }: { sx: SxProps<Theme> }) => {
         return undefined
     }
 
-    return <Stack component={Link} href={`webapp/${getCommonConfig().mainVersion}/campaign/${activeCampaign.data.id}`} 
+    return <Stack component={Link} href={`webapp/campaign/${activeCampaign.data.id}`} 
         direction="row" alignItems="center" sx={sx} position="relative">
         <CampaignImg style={{ transform: 'rotate(20deg)' }}/>
         <Stack alignItems="center">
@@ -188,7 +188,7 @@ const Page = () => {
     const dark = useMediaQuery('(prefers-color-scheme: dark)')
     const theme = createTheme(dark)
     
-    return <ApolloProvider client={getApolloClient(mainVersion)}>
+    return <ApolloProvider client={getApolloClient()}>
         <ThemeProvider theme={theme}>
             <Stack sx={{ backgroundColor: primaryColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
                 <Stack alignItems="center" marginBottom="50px" position="relative">
@@ -269,7 +269,7 @@ const Page = () => {
                                 transform: 'rotate(-15deg)', backgroundColor: lightPrimaryColor,
                                 borderRadius: '0.5rem', borderColor: '#000', borderWidth: 2, 
                                 borderStyle: 'solid', lineHeight: 1.8 } }>Nouveau</Typography>
-                        <Link target="_blank" href={`webapp/${mainVersion}`} style={{ color: '#000', fontSize: '1.7rem', fontFamily: fonts.general.style.fontFamily, fontWeight: 900 }}>
+                        <Link target="_blank" href={`webapp`} style={{ color: '#000', fontSize: '1.7rem', fontFamily: fonts.general.style.fontFamily, fontWeight: 900 }}>
                             <Box sx={{ backgroundImage: `url('/FOND-180.svg')`, height: 80, display: 'flex', alignItems: 'center', padding: '0 2rem' }}>
                                 Connexion
                             </Box>

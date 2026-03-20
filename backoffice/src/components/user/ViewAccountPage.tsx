@@ -4,9 +4,9 @@ import ViewAccount from "@/components/user/ViewAccount"
 import { usePagePath } from "@/lib/usePagePath"
 
 const ViewAccountPage = () => {
-    const { version, param } = usePagePath()
-    return <ConnectedLayout version={version} allowAnonymous>
-        <ViewAccount accountId={param} version={version} />
+    const { param } = usePagePath()
+    return <ConnectedLayout allowAnonymous>
+        <ViewAccount accountId={param} />
     </ConnectedLayout>
 }
 

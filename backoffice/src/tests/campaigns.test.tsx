@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react"
 import { checkLastNotificationOnAccount, cleanupTestAccounts, createCampaign, executeQuery, makeTestAccounts, removeActiveCampaign, TestAccount } from "./datastoreSetupLib"
-import NotificationsPage from "@/app/webapp/[version]/notifications/page"
+import NotificationsPage from "@/app/webapp/notifications/page"
 import { fromToday } from "@/utils"
 import config from './config'
 
@@ -9,7 +9,7 @@ let campaignId: string
 
 jest.mock('next/navigation', () => ({
   usePathname() {
-    return `/webapp/${config.version}/notifications`
+    return `/webapp/notifications`
   },
   useRouter() {
     return {}

@@ -1,4 +1,4 @@
-import { getCommonConfig } from '@/config'
+import cfg from '@/config'
 import {APIProvider, Map, Marker, useMarkerRef} from '@vis.gl/react-google-maps'
 import { Location } from '@/lib/schema'
 import { useContext, useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import Feedback from '../scaffold/Feedback'
 import LocationAutoComplete from './LocationAutoComplete'
 import { UiContext } from '../scaffold/UiContextProvider'
 
-const { mapsApiKey } = getCommonConfig()
+const { mapsApiKey } = cfg
 
 setDefaults({
     language: 'fr', key: mapsApiKey, outputFormat: OutputFormat.JSON

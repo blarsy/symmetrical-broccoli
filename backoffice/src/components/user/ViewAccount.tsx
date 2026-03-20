@@ -19,7 +19,6 @@ import { AppContext } from "../scaffold/AppContextProvider"
 
 interface Props {
     accountId: string
-    version: string
 }
 
 const ViewAccount = (p: Props) => {
@@ -45,7 +44,9 @@ const ViewAccount = (p: Props) => {
             <Stack direction="row" gap="1rem" alignItems="center">
                 <AccountAvatar sx={{ width: '3rem', height: '3rem' }} name={data.getAccountPublicInfo.name}
                     avatarImagePublicId={data.getAccountPublicInfo.imageByAvatarImageId?.publicId} />
-                <Typography flex="1" color="primary" textTransform="uppercase" fontWeight="bold" fontFamily={fonts.title.style.fontFamily} fontSize="3rem" textAlign="center">{data.getAccountPublicInfo.name}</Typography>
+                <Typography flex="1" color="primary" textTransform="uppercase" 
+                    fontWeight="bold" fontFamily={fonts.title.style.fontFamily} 
+                    fontSize="3rem" textAlign="center">{data.getAccountPublicInfo.name}</Typography>
                 {appContext.account?.id != data.getAccountPublicInfo.id && <IconButton color="primary" onClick={() => {
                   setTokenTransferInfo({ destinatorAccount: data.getAccountPublicInfo.name, 
                     destinatorId: data.getAccountPublicInfo.id
@@ -80,7 +81,7 @@ const ViewAccount = (p: Props) => {
                 :
                 <Stack direction="row" flexWrap="wrap" gap="1rem" justifyContent="center">
                     { accountResources.map((res, idx) => <ResourceCard testId={`ResCard${res.id}`}
-                        key={idx} version={p.version} resource={{
+                        key={idx} resource={{
                             id: res.id, title: res.title, description: res.description, expiration: res.expiration,
                             images: res.images.map((img) => img.publicId!), accountName: data.getAccountPublicInfo.name, 
                             avatarPublicId: data.getAccountPublicInfo.imageByAvatarImageId?.publicId

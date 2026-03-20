@@ -27,7 +27,7 @@ function useCategories () {
         } catch(e) {
             error({
                 message: (e as Error).toString()
-            }, uiContext.version, true)
+            }, true)
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
         }
     }

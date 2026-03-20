@@ -54,7 +54,7 @@ const TransferTokensDialog = (p: Props) => {
                 } catch(e) {
                     error({
                         message: (e as Error).toString(), accountId: appContext.account?.id
-                    }, uiContext.version, true)
+                    }, true)
                     setSendingStatus(fromError(e, t('requestError')))
                 }
             }} validationSchema={yup.object().shape({

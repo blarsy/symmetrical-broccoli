@@ -74,7 +74,7 @@ export const getActivationUrlFromMail = async (email: string) => {
         where a.email = lower($1)`, [email])
 
     expect(result.rowCount).toBe(1)
-    return result.rows[0].html_content.match(/http:\/\/localhost:.*\/webapp\/v.*\/activate\/\w*/g)
+    return result.rows[0].html_content.match(/http:\/\/localhost:.*\/webapp\/activate\/\w*/g)
 }
 
 export const checkResourcePresent = async (accountEmail: string, title: string, description: string,

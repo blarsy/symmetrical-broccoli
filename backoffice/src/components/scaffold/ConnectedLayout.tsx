@@ -1,6 +1,6 @@
 import ClientWrapper from "./ClientWrapper"
 import TopBar from "./TopBar"
-import { maxLength, PropsWithVersion } from "@/lib/utils"
+import { maxLength } from "@/lib/utils"
 import { PropsWithChildren, useContext } from "react"
 import { AppContext } from "./AppContextProvider"
 import Login from "../user/Login"
@@ -13,7 +13,7 @@ import MarkChatUnreadIcon from '@mui/icons-material/MarkChatUnread'
 import Close from '@/app/img/CROSS.svg?react'
 import { primaryColor } from "@/utils"
 
-interface Props extends PropsWithVersion {
+interface Props extends PropsWithChildren {
     allowAnonymous?: boolean
 }
 
@@ -35,20 +35,20 @@ export const ConnectContent = (p: Props) => {
 
     if(!appContext.account && !p.allowAnonymous) {
         return <>
-            <TopBar version={ p.version }/>
+            <TopBar/>
             <Typography variant="h2" textAlign="center">{uiContext.i18n.translator('pleaseConnectTitle')}</Typography>
             <Container maxWidth="lg" sx={{ padding: '1rem' }}>
-                <Login version={p.version} />
+                <Login />
             </Container>
         </>
     } else if(!appContext.account) {
         return <>
-            <TopBar version={ p.version }/>
+            <TopBar/>
             {p.children}
         </>
     } else {
         return <Connected>
-            <TopBar version={ p.version }/>
+            <TopBar/>
             {p.children}
             <ChatMessageSnackbar />
         </Connected>
@@ -67,7 +67,7 @@ const ChatMessageSnackbar = () => {
             borderRadius="1rem">
             <MarkChatUnreadIcon color="primary" />
             <Stack flexDirection="column"
-                onClick={() => router.push(`/webapp/${uiContext.version}/chat/${chatContext.newChatMessage!.conversationId}`) }>
+                onClick={() => router.push(`/webapp/chat/${chatContext.newChatMessage!.conversationId}`) }>
                 <Typography color="primary" variant="body1">{chatContext.newChatMessage.senderName || uiContext.i18n.translator('deletedAccount')}</Typography>
                 <Typography color="primary" variant="body2">{maxLength(chatContext.newChatMessage.text, 150) || '<Image>'}</Typography>
             </Stack>
@@ -79,8 +79,8 @@ const ChatMessageSnackbar = () => {
 }
 
 export const ConnectedLayout = (p: Props) => {
-    return <ClientWrapper version={ p.version }>
-        <ConnectContent version={p.version} allowAnonymous={p.allowAnonymous}>
+    return <ClientWrapper>
+        <ConnectContent allowAnonymous={p.allowAnonymous}>
             {p.children}
         </ConnectContent>
     </ClientWrapper>

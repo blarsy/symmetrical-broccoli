@@ -4,9 +4,8 @@ import ConnectedLayout from "@/components/scaffold/ConnectedLayout"
 import { usePagePath } from "@/lib/usePagePath"
 
 const ViewResourcePage = () => {
-    const { version, param } = usePagePath()
-
-    return <ConnectedLayout version={version} allowAnonymous>
+    const { param } = usePagePath()
+    return <ConnectedLayout allowAnonymous>
         <ViewResource resourceId={param} />
     </ConnectedLayout>
 }

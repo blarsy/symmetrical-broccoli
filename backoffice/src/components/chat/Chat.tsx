@@ -13,8 +13,8 @@ import DataLoadState, { fromData, fromError, initial } from "@/lib/DataLoadState
 import { error } from "@/lib/logger"
 import { AppContext } from "../scaffold/AppContextProvider"
 
-const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($resourceId: UUID) {
-  getConversationForResource(resourceId: $resourceId) {
+const GET_CONVERSATION_FOR_RESOURCE = gql`query GetConversationForResource($resourceId: UUID, $otherAccountId: UUID) {
+  getConversationForResource(resourceId: $resourceId, otherAccountId: $otherAccountId) {
     id
   }
 }`
@@ -42,7 +42,7 @@ const Chat = (p: Props) => {
     const loadNewConversation = async () => {
         try {
             setLoadState(initial(true))
-            const conv = await getConversationForResource({ variables: { resourceId: p.resourceId } })
+            const conv = await getConversationForResource({ variables: { resourceId: p.resourceId, otherAccountId: p.withAccountId } })
             if(conv.data.getConversationForResource) {
                 chatDispatch({ type: ChatReducerActionType.SetCurrentConversationId, payload: conv.data.getConversationForResource.id })
             } else {
@@ -67,7 +67,7 @@ const Chat = (p: Props) => {
         } catch(e) {
             error({
                 message: (e as Error).toString(), accountId: appContext.account?.id
-            }, uiContext.version, true)
+            }, true)
             setLoadState(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

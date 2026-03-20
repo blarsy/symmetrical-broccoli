@@ -7,7 +7,7 @@ let account1: TestAccount, account2: TestAccount, account3: TestAccount
 
 jest.mock('next/navigation', () => ({
   usePathname() {
-    return `/webapp/${config.version}/notifications`
+    return `/webapp/notifications`
   },
   useRouter() {
     return {}

@@ -12,7 +12,7 @@ import AppleLogo from '../../app/img/apple-logo.svg?react'
 import Feedback from "../scaffold/Feedback"
 import { appleAuthHelpers } from 'react-apple-signin-auth'
 import { v4 as uuid } from 'uuid'
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { fromError } from "@/lib/DataLoadState"
 import { AuthProviders } from "@/lib/utils"
 import { UiContext } from "../scaffold/UiContextProvider"
@@ -20,7 +20,6 @@ import { error } from "@/lib/logger"
 
 interface Props {
     onClose?: () => void
-    version: string
     onRegisterRequested: () => void
     onPasswordRecoveryRequested: () => void
     onRegisterExternalAuthProviderRequested: (suggestedName: string, email: string, token: string, provider: AuthProviders) => void
@@ -29,10 +28,10 @@ interface Props {
 
 const ConnectForm = (p: Props) => {
     const uiContext = useContext(UiContext)
-    const { connectGoogleWithAccessCode, login, connectApple } = useAccountFunctions(p.version)
+    const { connectGoogleWithAccessCode, login, connectApple } = useAccountFunctions()
     const [connectionStatus, setConnectionStatus] = useState<{ loading: boolean, error?: Error  }>({ loading: false })
     const t = uiContext.i18n.translator
-    const { appleServiceId, appleAuthRedirectUri } = getCommonConfig()
+    const { appleServiceId, appleAuthRedirectUri } = cfg
 
     const triggerGoogleLogin = useGoogleLogin({
         onError: (e) => {
@@ -49,7 +48,7 @@ const ConnectForm = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setConnectionStatus({ loading: false, error: e as Error })
             }
         }, flow: 'auth-code', select_account: true
@@ -98,7 +97,7 @@ const ConnectForm = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setConnectionStatus({ loading: false, error: e as Error})
             }
         }}>

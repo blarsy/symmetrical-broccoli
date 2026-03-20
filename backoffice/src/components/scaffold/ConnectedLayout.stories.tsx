@@ -5,10 +5,10 @@ import { ConnectContent } from './ConnectedLayout';
 import { Typography } from '@mui/material';
 import config from '@/tests/config';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { getCommonConfig } from '@/config';
+import cfg from '@/config';
 import { v4 } from 'uuid';
 
-const { googleApiKey } = getCommonConfig()
+const { googleApiKey } = cfg
 
 const meta = {
   component: ConnectContent,
@@ -29,7 +29,7 @@ type Story = StoryObj<typeof meta>
 
 export const NewChatMessage: Story = {
   args: {
-    version: config.version, children: <Typography>Content</Typography>,
+    children: <Typography>Content</Typography>,
     allowAnonymous: true
   },
   decorators: [clientComponentDecorator({ token: 'token', unreadNotifications: [], 
@@ -48,7 +48,7 @@ export const NewChatMessage: Story = {
 
 export const HugeMessage: Story = {
   args: {
-    version: config.version, children: <Typography>Content</Typography>,
+    children: <Typography>Content</Typography>,
     allowAnonymous: true
   },
   decorators: [clientComponentDecorator({ token: 'token', unreadNotifications: [], 

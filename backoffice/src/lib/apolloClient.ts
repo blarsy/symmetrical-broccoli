@@ -1,4 +1,4 @@
-import getConfig from '@/config/index'
+import cfg from '@/config/index'
 import { createHttpLink, split, ApolloClient, from, InMemoryCache, gql, ApolloLink } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { getMainDefinition } from "@apollo/client/utilities"
@@ -7,9 +7,7 @@ import { createClient } from 'graphql-ws'
 import { ErrorResponse, onError } from "@apollo/client/link/error"
 import { error } from './logger'
 
-export const getApolloClient = (version: string, token?: string, onSessionExpired? : () => void) => {
-    const config = getConfig(version)
-    
+export const getApolloClient = (token?: string, onSessionExpired? : () => void) => {
     const isSsr = typeof window === 'undefined'
 
     let webSocketImpl
@@ -23,7 +21,7 @@ export const getApolloClient = (version: string, token?: string, onSessionExpire
       customFetch = require('cross-fetch')
     }
 
-    const httpLink = createHttpLink({ uri: isSsr ? config.graphqlSsrUrl : config.graphqlUrl, fetch: customFetch || undefined })
+    const httpLink = createHttpLink({ uri: isSsr ? cfg.graphqlSsrUrl : cfg.graphqlUrl, fetch: customFetch || undefined })
     const authLink = setContext(async (_, { headers }) => {
       if(token) {
         return {
@@ -44,7 +42,7 @@ export const getApolloClient = (version: string, token?: string, onSessionExpire
         try {
           error({
               message: JSON.stringify({ graphQLErrors: e.graphQLErrors, networkError: e.networkError, protocolErrors: e.protocolErrors })
-          }, version, true)
+          }, true)
         }
         catch {
         }
@@ -55,7 +53,7 @@ export const getApolloClient = (version: string, token?: string, onSessionExpire
     if(!isSsr) {
       const wsLink = new GraphQLWsLink(
         createClient({ 
-          url: config.subscriptionsUrl,
+          url: cfg.subscriptionsUrl,
           shouldRetry: e => true, 
           retryAttempts: 5, 
           webSocketImpl,

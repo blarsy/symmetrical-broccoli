@@ -2,7 +2,7 @@ import { gql } from "@apollo/client"
 import { getApolloClient } from "./apolloClient"
 import { useContext } from "react"
 import { AppContext, AppDispatchContext, AppReducerActionType } from "@/components/scaffold/AppContextProvider"
-import config from "@/config"
+import cfg from "@/config"
 import { jwtDecode } from "jwt-decode"
 import { AuthProviders } from "./utils"
 import { useRouter } from "next/navigation"
@@ -89,14 +89,14 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     }
 }`
 
-const useAccountFunctions = (version: string) => {
+const useAccountFunctions = () => {
     const appDispatch = useContext(AppDispatchContext)
     const appContext = useContext(AppContext)
-    const { apiUrl } = config(version)
+    const { apiUrl } = cfg
     const router = useRouter()
 
     const connectWithToken = async (token: string) => {
-        const client = getApolloClient(version, token, disconnect)
+        const client = getApolloClient(token, disconnect)
 
         try {
             const res = await client.query({ query: GET_SESSION_DATA })
@@ -146,7 +146,7 @@ const useAccountFunctions = (version: string) => {
         } catch(e) {
             error({
                 message: (e as Error).toString()
-            }, version, true)
+            }, true)
             disconnect()
         }
     }
@@ -155,11 +155,11 @@ const useAccountFunctions = (version: string) => {
         appContext.subscriptions.forEach(s => s.unsubscribe())
         localStorage.removeItem('token')
         appDispatch({ type: AppReducerActionType.Logout, payload: undefined })
-        router.push(`/webapp/${version}`)
+        router.push(`/webapp`)
     }
 
     const login = async (email: string, password: string) => {
-        const client = getApolloClient(version)
+        const client = getApolloClient()
         const tokenRes = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } })
         return connectWithToken(tokenRes.data.authenticate.jwtToken)
     }
@@ -171,7 +171,7 @@ const useAccountFunctions = (version: string) => {
     }
 
     const registerViaAuthProvider = async (accountName: string, email: string, language: string, gauthToken: string, authProvider: AuthProviders) => {
-        const client = getApolloClient(version)
+        const client = getApolloClient()
 
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT_EXTERNAL_AUTH, variables: { accountName, email, language, token: gauthToken, authProvider } })
         
@@ -180,7 +180,7 @@ const useAccountFunctions = (version: string) => {
 
     const completeExternalAuth = async (email: string, idToken: string, authProvider: AuthProviders) => {
         //Important to use the imperative form of Apollo here (no useQuery, useMutation, ...), otherwise some page prerenders fail during the NextJs build, trying to create an Apollo client prematurely
-        const client = getApolloClient(version)
+        const client = getApolloClient()
         const authenticateRes = await client.mutate({ mutation: AUTHENTICATE_EXTERNAL_AUTH, variables: { email, token: idToken, authProvider } })
         return connectWithToken(authenticateRes.data.authenticateExternalAuth.jwtToken)
     }
@@ -243,7 +243,7 @@ const useAccountFunctions = (version: string) => {
     }
 
     const registerAccount = async (email: string, password: string, name: string, language: string) => {
-        const client = getApolloClient(version)
+        const client = getApolloClient()
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT, variables: { email, password, name, language } })
         return connectWithToken(res.data.registerAccount.jwtToken)
     }

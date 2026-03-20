@@ -42,7 +42,7 @@ function useActiveCampaign () {
         } catch(e) {
             error({
                 message: (e as Error).toString()
-            }, uiContext.version, true)
+            }, true)
             setActiveCampaign(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }

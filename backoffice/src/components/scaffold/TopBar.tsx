@@ -62,12 +62,7 @@ export const SEND_AGAIN = gql`mutation SendAgain {
   }
 }`
 
-interface Props {
-    version: string
-}
-
-
-const TopBar = ({ version }: Props) => {
+const TopBar = () => {
     const appContext = useContext(AppContext)
     const appDispatch = useContext(AppDispatchContext)
     const uiContext = useContext(UiContext)
@@ -76,16 +71,16 @@ const TopBar = ({ version }: Props) => {
     const [connecting, setConnecting] = useState(false)
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
     const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<null | HTMLElement>(null)
-    const { disconnect } = useAccountFunctions(version)
+    const { disconnect } = useAccountFunctions()
     const router = useRouter()
     const [sendAgain, { loading, error }] = useMutation(SEND_AGAIN)
 
     const linksInfo = [
-        { url: `/webapp/${uiContext.version}`, textI18n: 'searchButtonCaption', needsLogin: false , testID: 'SearchMenuLink'},
-        { url: `/webapp/${uiContext.version}/resources`, textI18n: 'resourcesButtonCaption', needsLogin: true , testID: 'ResourcesMenuLink' },
-        { url: `/webapp/${uiContext.version}/bids`, textI18n: 'bidsButtonCaption', needsLogin: true , testID: 'BidsMenuLink' },
-        { url: `/webapp/${uiContext.version}/chat`, textI18n: 'chatButtonCaption', badgeContent: chatContext.unreadConversations.length, needsLogin: true, testID: 'ChatMenuLink' },
-        { url: `/webapp/${uiContext.version}/notifications`, textI18n: 'notificationsButtonCaption', badgeContent: appContext.unreadNotifications.length, needsLogin: true, testID: 'NotificationsMenuLink' },
+        { url: `/webapp`, textI18n: 'searchButtonCaption', needsLogin: false , testID: 'SearchMenuLink'},
+        { url: `/webapp/resources`, textI18n: 'resourcesButtonCaption', needsLogin: true , testID: 'ResourcesMenuLink' },
+        { url: `/webapp/bids`, textI18n: 'bidsButtonCaption', needsLogin: true , testID: 'BidsMenuLink' },
+        { url: `/webapp/chat`, textI18n: 'chatButtonCaption', badgeContent: chatContext.unreadConversations.length, needsLogin: true, testID: 'ChatMenuLink' },
+        { url: `/webapp/notifications`, textI18n: 'notificationsButtonCaption', badgeContent: appContext.unreadNotifications.length, needsLogin: true, testID: 'NotificationsMenuLink' },
     ]
 
     const makeButtonsMenu = () => {
@@ -161,7 +156,7 @@ const TopBar = ({ version }: Props) => {
                     gap: '0.5rem'
                 }
             })}>
-                { appContext.account && <PriceTag testID="TokenCounter" onClick={() => router.push(`/webapp/${version}/profile/tokens`)} value={appContext.account.amountOfTokens} big/> }
+                { appContext.account && <PriceTag testID="TokenCounter" onClick={() => router.push(`/webapp/profile/tokens`)} value={appContext.account.amountOfTokens} big/> }
                 <Stack direction="row" alignItems="center">
                     <DarkModeIcon color="primary" />
                     <Switch value={uiContext.lightMode} color="primary" onChange={e => {
@@ -191,24 +186,24 @@ const TopBar = ({ version }: Props) => {
                     setUserMenuAnchorEl(null)
                 }}>
                     <LinkMenu text={appContext.account?.name || ''} Icon={ConnectedAccount}
-                        url={ `/webapp/${version}/profile`} />
+                        url={ `/webapp/profile`} />
                 </MenuItem>
                 <MenuItem onClick={() => {
                     setUserMenuAnchorEl(null)
                 }}>
                     <LinkMenu text={uiContext.i18n.translator('preferencesMenuCaption')} Icon={EditNotifications}
-                        url={`/webapp/${version}/profile/prefs`} />
+                        url={`/webapp/profile/prefs`} />
                 </MenuItem>
                 <MenuItem onClick={() => {
                     setUserMenuAnchorEl(null)
                 }}>
                     <LinkMenu text={uiContext.i18n.translator('tokensMenuCaption')} Icon={TokensIcon}
-                        url={`/webapp/${version}/profile/tokens`} />
+                        url={`/webapp/profile/tokens`} />
                 </MenuItem>
                 <MenuItem onClick={() => {
                     disconnect()
                     setUserMenuAnchorEl(null)
-                    router.push(`/webapp/${uiContext.version}`)
+                    router.push(`/webapp`)
                 }}>
                     <ListItemIcon>
                         <LogoutIcon fontSize="small" />
@@ -216,7 +211,7 @@ const TopBar = ({ version }: Props) => {
                     <ListItemText>{uiContext.i18n.translator('logoutMenuCaption')}</ListItemText>
                 </MenuItem>
             </Menu>
-            <ConnectDialog visible={connecting} onClose={ () => setConnecting(false) } version={version}/>
+            <ConnectDialog visible={connecting} onClose={ () => setConnecting(false) }/>
         </Stack>
          { appContext.account && !appContext.account.activated && <Alert severity="warning">
              <Typography variant="caption" color="text.secondary">{uiContext.i18n.translator('activateAccount', { email: appContext.account.email })}</Typography>

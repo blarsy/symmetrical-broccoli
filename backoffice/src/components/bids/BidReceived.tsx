@@ -60,7 +60,7 @@ const BidReceived = ({ bid, onAction } : Props) => {
                       participantId: '', avatarImageUrl: bid.account.avatarImagePublicId && urlFromPublicId(bid.account.avatarImagePublicId)
                   }
               }}/>
-              <Link href={`/webapp/${uiContext.version}/chat/new/${bid.resource.id}?with=${bid.account.id}`}>
+              <Link href={`/webapp/chat/new/${bid.resource.id}?with=${bid.account.id}`}>
                 <IconButton color="primary">
                   <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
                 </IconButton>
@@ -77,7 +77,7 @@ const BidReceived = ({ bid, onAction } : Props) => {
             { inactiveMessage &&  <Typography variant="body1" color="primary">{inactiveMessage}</Typography> }
         </CardContent>
         <CardActions sx={{ justifyContent: 'space-around' }}>
-            <Button LinkComponent={Link} href={`/webapp/${uiContext.version}/view/${bid.resource.id}`} endIcon={<OpenInNewIcon />}>{uiContext.i18n.translator('viewResourceButton')}</Button>
+            <Button LinkComponent={Link} href={`/webapp/view/${bid.resource.id}`} endIcon={<OpenInNewIcon />}>{uiContext.i18n.translator('viewResourceButton')}</Button>
             { !inactiveMessage && <LoadingButton data-testid={`${testId}:AcceptButton`} loading={accepting} endIcon={<AcceptIcon />} onClick={() => {
               setConfirmingAcceptation(true)
             }}>{uiContext.i18n.translator('acceptBidButton')}</LoadingButton>}

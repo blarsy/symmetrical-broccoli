@@ -14,7 +14,6 @@ import { useMutation } from "@apollo/client"
 import { SET_ACCOUNT_KNOW_ABOUT_CAMPAIGNS } from "./ExplainCampaignDialog"
 import useActiveCampaign from "@/lib/useActiveCampaign"
 import { fonts } from "@/theme"
-import { getCommonConfig } from "@/config"
 import { t } from "i18next"
 import { useRouter } from "next/navigation"
 import { AppContext } from "../scaffold/AppContextProvider"
@@ -45,7 +44,7 @@ const OnboardingActions = () => {
                 <Stack sx={{ gap: '1rem' }}>
                     <Typography variant="body1">{uiContext.i18n.translator('webVersionAvailable')}</Typography>
                     <Button variant="outlined" target="_blank" sx={{ alignSelf: 'center' }}
-                        href={`${window.location.protocol}//${window.location.host}/webapp/${getCommonConfig().mainVersion}/resources`}>
+                        href={`${window.location.protocol}//${window.location.host}/webapp/resources`}>
                         {t(uiContext.i18n.translator('registerButtonCaption'))}
                     </Button>
                 </Stack>
@@ -77,7 +76,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
     if(!activeCampaign.loading && !activeCampaign.error && !activeCampaign.data) {
         return <Stack>
             <Typography variant="h1" textAlign="center" alignItems="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={30}>{uiContext.i18n.translator('noActiveCampaign')}</Typography>
-            <Button variant="contained" href={`${window.location.protocol}//${window.location.host}/webapp/${getCommonConfig().mainVersion}`}>{uiContext.i18n.translator('seeItInAction')}</Button>
+            <Button variant="contained" href={`${window.location.protocol}//${window.location.host}/webapp`}>{uiContext.i18n.translator('seeItInAction')}</Button>
         </Stack>
     }
 
@@ -130,7 +129,7 @@ const ExplainCampaign = (p: { onClose?: () => void, fullscreen?: boolean, explai
                             <LoadingButton variant="contained" loading={settingCampaignBit} onClick={async() => {
                                 await setAccountKnowsAboutCampaigns()
                                 p.onClose!()
-                                router.push(`/webapp/${uiContext.version}/resources/new?campaign=1`)
+                                router.push(`/webapp/resources/new?campaign=1`)
                             }}>{uiContext.i18n.translator('addResourceButton')}</LoadingButton>
                             :
                             <OnboardingActions />

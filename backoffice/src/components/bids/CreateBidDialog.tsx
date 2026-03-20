@@ -52,7 +52,7 @@ const CreateBidDialog = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString(), accountId: appContext.account?.id
-                }, uiContext.version, true)
+                }, true)
                 setBidStatus(fromError(e, t('requestError')))
             }
         }} validationSchema={yup.object().shape({

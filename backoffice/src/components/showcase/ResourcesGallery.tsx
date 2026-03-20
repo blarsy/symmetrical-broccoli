@@ -5,7 +5,6 @@ import { urlFromPublicId } from "@/lib/images"
 import { fonts } from "@/theme"
 import { lightPrimaryColor } from "@/utils"
 import Link from "next/link"
-import { getCommonConfig } from '@/config'
 
 const TOP_RESOURCES = gql`query TopResources {
   topResources {
@@ -32,7 +31,6 @@ const TOP_RESOURCES = gql`query TopResources {
 const ResourcesGallery = () => {
     const { loading, data, error } = useQuery(TOP_RESOURCES)
     const theme = useTheme()
-    const { mainVersion } = getCommonConfig()
 
     return <LoadedZone loading={loading} error={error} 
       containerStyle={{ alignSelf: 'stretch', flexDirection: 'row', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
@@ -52,7 +50,7 @@ const ResourcesGallery = () => {
                 flex: '0 1 100%'
             }
         }}>
-            <Link href={`/webapp/${mainVersion}/view/${rawRes.id}`}>
+            <Link href={`/webapp/view/${rawRes.id}`}>
               <Typography textAlign="center" fontFamily={fonts.sugar.style.fontFamily} fontSize={14}
                   color="#000" borderBottom="2px solid #000"
                   sx={{

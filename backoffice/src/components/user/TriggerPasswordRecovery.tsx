@@ -36,7 +36,7 @@ const TriggerPasswordRecovery = (p: Props) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 setRecoveryStatus(fromError(e, uiContext.i18n.translator('requestError')))
             }
         }}>

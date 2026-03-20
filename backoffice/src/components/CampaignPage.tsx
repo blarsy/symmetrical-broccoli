@@ -1,13 +1,11 @@
 "use client"
 import ClientWrapper from "@/components/scaffold/ClientWrapper"
 import ExplainCampaign from "@/components/user/ExplainCampaign"
-import { usePagePath } from "@/lib/usePagePath"
-import { Stack } from "@mui/system"
+import { Stack } from "@mui/material"
 
 const CampaignPage = () => {
-    const { version } = usePagePath()
 
-    return <ClientWrapper version={version}>
+    return <ClientWrapper>
         <Stack sx={{ overflow: 'auto' }}>
             <ExplainCampaign fullscreen />
         </Stack>

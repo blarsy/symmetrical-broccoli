@@ -11,9 +11,8 @@ import { ApolloProvider, gql, useLazyQuery } from '@apollo/client'
 import { getApolloClient } from '@/lib/apolloClient'
 import i18n from '@/i18n'
 import LoadedZone from './LoadedZone'
-import { PropsWithVersion } from '@/lib/utils'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { getCommonConfig } from '@/config'
+import cfg from '@/config'
 import useAccountFunctions from '@/lib/useAccountFunctions'
 import ChatContextProvider from './ChatContextProvider'
 import UiContextProvider, { UiContext, UiDispatchContext, UiReducerActionType } from './UiContextProvider'
@@ -32,9 +31,9 @@ const getNavigatorLanguage = () => {
     return 'fr'
 }
 
-const { googleApiKey } = getCommonConfig()
+const { googleApiKey } = cfg
 
-export const Translatable = ({ children, version }: PropsWithVersion) => {
+export const Translatable = ({ children }: PropsWithChildren) => {
     const uiContext= useContext(UiContext)
     const uiDispatcher = useContext(UiDispatchContext)
 
@@ -48,7 +47,7 @@ export const Translatable = ({ children, version }: PropsWithVersion) => {
         const translator = await i18n(uiLanguage)
         dayjs.locale(uiLanguage)
         
-        uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, version, lightMode: !!lightMode }})
+        uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: { translator, lang: uiLanguage }, lightMode: !!lightMode }})
     }
 
     useEffect(() => {
@@ -66,9 +65,9 @@ export const Translatable = ({ children, version }: PropsWithVersion) => {
     </LoadedZone>
 }
 
-export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
+export const ApolloWrapped = ({ children }: PropsWithChildren) => {
     const appContext = useContext(AppContext)
-    const { connectWithToken, disconnect } = useAccountFunctions(version)
+    const { connectWithToken, disconnect } = useAccountFunctions()
     const uiDispatcher = useContext(UiDispatchContext)
     const appDispatch = useContext(AppDispatchContext)
     const uiContext = useContext(UiContext)
@@ -82,9 +81,9 @@ export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
             } catch(e) {
                 error({
                     message: (e as Error).toString()
-                }, uiContext.version, true)
+                }, true)
                 // TODO: handle expired token
-                uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: uiContext.i18n, version, error: e as Error }})
+                uiDispatcher({ type: UiReducerActionType.Load, payload: { i18n: uiContext.i18n, error: e as Error }})
                 appDispatch({ type: AppReducerActionType.Load, payload: undefined })
             }
         } else {
@@ -96,7 +95,7 @@ export const ApolloWrapped = ({ children, version }: PropsWithVersion) => {
         load()
     }, [])
 
-    return <ApolloProvider client={getApolloClient(version, appContext.token, disconnect)}>
+    return <ApolloProvider client={getApolloClient(appContext.token, disconnect)}>
         { children }
     </ApolloProvider>
 }
@@ -123,7 +122,7 @@ export const LookupDataProvider = (p: PropsWithChildren) => {
         } catch(e) {
             error({
                 message: (e as Error).toString()
-            }, uiContext.version, true)
+            }, true)
             uiDispatch({ type: UiReducerActionType.SetCategoriesState, payload: fromError(e, uiContext.i18n.translator('requestError')) })
         }
     }
@@ -139,13 +138,13 @@ export const LookupDataProvider = (p: PropsWithChildren) => {
     </LoadedZone>
 }
 
-export const ClientWrapper = ({ children, version }: PropsWithVersion) => <AppContextProvider>
+export const ClientWrapper = ({ children }: PropsWithChildren) => <AppContextProvider>
     <ChatContextProvider>
         <UiContextProvider>
             <GoogleOAuthProvider clientId={googleApiKey}>
                 <Themed>
-                    <Translatable version={version}>
-                        <ApolloWrapped version={version}>
+                    <Translatable>
+                        <ApolloWrapped>
                             <LookupDataProvider>
                                 { children }
                             </LookupDataProvider>

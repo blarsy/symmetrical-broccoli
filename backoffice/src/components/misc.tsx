@@ -194,12 +194,12 @@ export const PriceTag = (p: PriceTagProps) => {
                 <Tokens style={{ width: p.big ? '3rem' : '2rem', height: p.big ? '3rem' : '2rem' }}/>
             </Stack>
         </Stack>
-        <IconButton size="small" onClick={e => {
+        <IconButton size="small" sx={{ paddingTop: '0.5rem', alignSelf: 'flex-start' }} onClick={e => {
             e.preventDefault()
             e.stopPropagation()
             setHelpOpen(true)
-        }} sx={{ padding: 0 }}>
-            <QuestionMarkIcon fontSize="medium" sx={{ color: lightPrimaryColor }} />
+        }}>
+            <QuestionMarkIcon fontSize="small" sx={theme => ({ color: theme.palette.primary.contrastText })} />
         </IconButton>
         <PriceInfoDialog visible={helpOpen} value={p.value} onClose={() => setHelpOpen(false)}/>
     </Stack>

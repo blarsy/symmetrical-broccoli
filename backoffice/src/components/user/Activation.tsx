@@ -32,7 +32,7 @@ const Activation = ({ activationId }: Props) => {
                 const t = await i18n(res.data.activateAccount.string)
                 setUiState({ loading: false, error: undefined, t })
             } catch (e: any) {
-                error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
+                error({ message: (e as Error).toString(), accountId: appContext.account?.id }, true)
                 const t = await defaultTPromise
                 setUiState({ loading: false, error: {name: t('activation_error'), message: (e as Error).message }})
             }

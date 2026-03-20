@@ -1,9 +1,4 @@
 import dayjs from "dayjs"
-import { PropsWithChildren } from "react"
-
-export interface PropsWithVersion extends PropsWithChildren {
-    version: string
-}
 
 export const maxLength = (text: string | undefined, maxLength: number) => {
     if(!text) return ''

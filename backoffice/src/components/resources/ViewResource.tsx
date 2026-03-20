@@ -3,7 +3,7 @@ import LoadedZone from "../scaffold/LoadedZone"
 import { JSX, useContext, useEffect, useState } from "react"
 import { fromServerGraphResource, Resource } from "@/lib/schema"
 import useCategories from "@/lib/useCategories"
-import { Chip, Dialog, IconButton, Stack, Tooltip, Typography } from "@mui/material"
+import { Chip, IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import Hourglass from "@mui/icons-material/HourglassTop"
 import dayjs from "dayjs"
 import Link from "next/link"
@@ -43,7 +43,7 @@ const ViewResource = (p: Props) => {
           const res = await getResource({ variables: { id: p.resourceId }})
           setResource(fromData(fromServerGraphResource(res.data.resourceById, categories.data!)))
         } catch (e) {
-          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, uiContext.version, true)
+          error({ message: (e as Error).toString(), accountId: appContext.account?.id }, true)
           setResource(fromError(e, uiContext.i18n.translator('requestError')))
         }
     }
@@ -123,7 +123,7 @@ const ViewResource = (p: Props) => {
                                 <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
                               </IconButton>
                               : resource.data!.account!.id != appContext.account.id &&
-                              <Link href={`/webapp/${uiContext.version}/chat/new/${resource.data!.id}`}>
+                              <Link href={`/webapp/chat/new/${resource.data!.id}`}>
                                 <IconButton color="primary">
                                   <Chat fill={ primaryColor } width="2.5rem" height="2.5rem"/>
                                 </IconButton>
@@ -192,7 +192,7 @@ const ViewResource = (p: Props) => {
         <DisplayLocation key="loc" value={resource.data.specificLocation}/>
       }
       <ZoomedImageDialog zoomedImg={zoomedImg} onClose={() => setZoomedImg(undefined)} />
-      <ConnectDialog onClose={() => setConnecting(false)} version={uiContext.version} visible={connecting} />
+      <ConnectDialog onClose={() => setConnecting(false)} visible={connecting} />
     </LoadedZone>
 }
 

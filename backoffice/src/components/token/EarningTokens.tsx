@@ -172,7 +172,7 @@ export const NUMBER_ACTIVE_RESOURCES_ON_ACTIVE_CAMPAIGN = gql`query GetNumberOfA
   getNumberOfActiveResourcesOnActiveCampaign
 }`
 
-const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSomeTaskClicked?: () => void }) => {
+const EarningTokens = ({ onSomeTaskClicked }: { onSomeTaskClicked?: () => void }) => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const router = useRouter()
@@ -191,21 +191,21 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
         <OneTimeTask text={t('howToGet_addLogo')} 
             checked={!!appContext.account?.avatarPublicId} 
             onClick={() => {
-                router.push(`/webapp/${version}/profile`)
+                router.push(`/webapp/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LOGO_REWARD}/>
         <Divider />
         <OneTimeTask text={t('howToGet_addLocation')} 
             checked={data && data.me?.locationByLocationId?.address} 
             loading={loading} onClick={() => {
-                router.push(`/webapp/${version}/profile`)
+                router.push(`/webapp/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LOCATION_REWARD}/>
         <Divider />
         <OneTimeTask text={t('howToGet_addLink')} 
             checked={data && data.me?.accountsLinksByAccountId?.nodes && data.me.accountsLinksByAccountId.nodes.length > 0} 
             loading={loading} onClick={() => {
-                router.push(`/webapp/${version}/profile`)
+                router.push(`/webapp/profile`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} reward={ADD_LINK_REWARD}/>
         <Divider />
@@ -213,7 +213,7 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
             remainingAmount={resWithoutPics?.getMyResourcesWithoutPicture?.nodes.length} 
             remainingText={ t('resourcesWithoutPic') } reward={ADD_RESOURCE_PICTURE_REWARD} loading={resWithoutPicsLoading} 
             onClick={() => {
-                router.push(`/webapp/${version}/resources`)
+                router.push(`/webapp/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />
         <Divider />
@@ -221,14 +221,14 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
             remainingAmount={resWithoutPrice?.getMyResourcesWithoutPrice?.nodes.length} 
             remainingText={ t('resourcesWithoutPrice') } reward={ADD_RESOURCE_PRICE_REWARD} loading={resWithoutPriceLoading} 
             onClick={() => {
-                router.push(`/webapp/${version}/resources`)
+                router.push(`/webapp/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />
         <Divider />
         <PermanentTask text={t('howToGet_addNewResource')} 
             reward={CREATE_RESOURCE_REWARD}
             onClick={() => {
-                router.push(`/webapp/${version}/resources`)
+                router.push(`/webapp/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />
         <Divider />
@@ -237,14 +237,14 @@ const EarningTokens = ({ version, onSomeTaskClicked }: { version: string, onSome
             [<AirdropTask key="airdropTask" airdrop={activeCampaign.data.airdrop} loading={resOnCampaignLoading} reward={activeCampaign.data.airdropAmount}
                 numberOfResources={resOnCampaign?.getNumberOfActiveResourcesOnActiveCampaign}
                 onClick={() => {
-                    router.push(`/webapp/${version}/resources`)
+                    router.push(`/webapp/resources`)
                     onSomeTaskClicked && onSomeTaskClicked()
                 }} />,
             <Divider key="airdropTaskHR" />]}
         { activeCampaign.data && [<PermanentTask key="rewardMultiplier" 
             reward={CREATE_RESOURCE_REWARD * activeCampaign.data.resourceRewardsMultiplier} 
             text={t('howToGet_createResourcesOnCampaign')} onClick={() => {
-                router.push(`/webapp/${version}/resources`)
+                router.push(`/webapp/resources`)
                 onSomeTaskClicked && onSomeTaskClicked()
             }} />,
              <Divider key="rewardMultiplierHr" />]}

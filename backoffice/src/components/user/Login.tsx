@@ -6,7 +6,6 @@ import { AuthProviders } from "@/lib/utils"
 import TriggerPasswordRecovery from "./TriggerPasswordRecovery"
 
 interface Props {
-    version: string
     onClose?: () => void
 }
 
@@ -17,18 +16,18 @@ const Login = (p: Props) => {
     const [recoveringPassword, setRecoveringPassword] = useState(false)
 
     if(registering) {
-        return <RegisterForm onClose={() => setRegistering(false)} version={p.version} 
+        return <RegisterForm onClose={() => setRegistering(false)}
             onRegisterExternalAuthProviderRequested={(name, email, token, provider) => {
                 setRegisteringExternalAuth({ suggestedName: name, email, token, provider })
             }}
         />
     } else if(registeringExternalAuth) {
-        return <RegisterExternalAuthForm {...registeringExternalAuth} version={p.version}
+        return <RegisterExternalAuthForm {...registeringExternalAuth}
             onClose={() => setRegisteringExternalAuth(undefined)} />
     } else if(recoveringPassword) {
         return <TriggerPasswordRecovery onCancel={() => setRecoveringPassword(false)}/>
     } else {
-        return <ConnectForm onClose={p.onClose} version={p.version}
+        return <ConnectForm onClose={p.onClose}
             onRegisterRequested={() => setRegistering(true)} 
             onRegisterExternalAuthProviderRequested={(name, email, token, provider) => {
                 setRegisteringExternalAuth({ suggestedName: name, email, token, provider })

@@ -26,7 +26,7 @@ export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $begin
 }`
 
 export const getToken = async (email: string, password: string) => {
-    const client = getApolloClient(VERSION, '')
+    const client = getApolloClient('')
     const res = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } } )
     return res.data.authenticate.jwtToken as string
 }
@@ -78,11 +78,11 @@ export interface NewAccountData {
 }
 
 export const createAndLogIn = async (email: string, name: string, password: string, confirm: boolean = false): Promise<NewAccountData> => {
-    let client = getApolloClient(VERSION, '')
+    let client = getApolloClient('')
     try {
         const res = await client.mutate({ mutation: REGISTER_ACCOUNT, variables: { email, name, password, language: 'fr' } } )
         if(confirm) await confirmAccount(email)
-        client = getApolloClient(VERSION, res.data.registerAccount.jwtToken)
+        client = getApolloClient(res.data.registerAccount.jwtToken)
         const idRow = await executeQuery('SELECT account_id as id from sb.accounts_private_data WHERE lower(email) = $1', [email])
         return { token: (res.data.registerAccount.jwtToken as string), id: idRow.rows[0].id }
     } catch (e) {
@@ -92,7 +92,7 @@ export const createAndLogIn = async (email: string, name: string, password: stri
 }
 
 export const authenticate = async (email: string, password: string) => {
-    const client = getApolloClient(VERSION, '')
+    const client = getApolloClient('')
     try {
         const res = await client.mutate({ mutation: AUTHENTICATE, variables: { email, password } } )
         return res.data.authenticate.jwtToken
@@ -116,17 +116,17 @@ export const deleteAccount = async (email: string, password: string) => {
 }
 
 export const deleteAccountByToken = async (token: string) => {
-    const loggedInClient = getApolloClient(VERSION, token)
+    const loggedInClient = getApolloClient(token)
     return await loggedInClient.mutate({ mutation: DELETE_ACCOUNT })
 }
 
 export const setAccountLocation = async (account: TestAccount, location: Location) => {
-    const loggedInClient = getApolloClient(VERSION, account.data.token)
+    const loggedInClient = getApolloClient(account.data.token)
     loggedInClient.mutate({ mutation: UPDATE_ACCOUNT_PUBLIC_INFO, variables: { links: [], location } })
 }
 
 export const makeSearch = async (account: TestAccount, term: string) => {
-    const loggedInClient = getApolloClient(VERSION, account.data.token)
+    const loggedInClient = getApolloClient(account.data.token)
     return loggedInClient.mutate({ mutation: SUGGEST_RESOURCES, variables: { 
         canBeDelivered: false, canBeExchanged: false, canBeGifted: false, 
         canBeTakenAway: false, categoryCodes: [], distanceToReferenceLocation: 50,
@@ -140,7 +140,7 @@ export const createResource = async (jwtToken: string, title: string, descriptio
     isProduct: boolean, isService: boolean, canBeDelivered: boolean, canBeTakenAway: boolean, 
     canBeExchanged: boolean, canBeGifted: boolean, expiration: Date | undefined, 
     categoryCodes: number[], campaignToJoin?: string, specificLocation?: Location): Promise<string> => {
-    const loggedInClient = getApolloClient(VERSION, jwtToken)
+    const loggedInClient = getApolloClient(jwtToken)
     const res = await loggedInClient.mutate({ mutation: CREATE_RESOURCE, variables: {
         canBeDelivered, canBeExchanged, canBeGifted, canBeTakenAway, categoryCodes, description, 
         expiration, isProduct, isService, title, campaignToJoin, specificLocation
@@ -180,7 +180,7 @@ export const createResourceLowLevelWithAnImage = async (res: ResourceRawData, pu
 }
 
 export const deleteResource = async (jwtToken: string, resourceId: string) => {
-    const loggedInClient = getApolloClient(VERSION, jwtToken)
+    const loggedInClient = getApolloClient(jwtToken)
     return await loggedInClient.mutate({ mutation: DELETE_RESOURCE, variables: { resourceId } })
 }
 
@@ -191,7 +191,7 @@ const APPLY_ACCOUNT_RESOURCES_REWARDS = gql`mutation ApplyAccountResourcesReward
   }`
 
 export const applyResourceRewards = async (jwtToken: string, accountId: string) => {
-    const loggedInClient = getApolloClient(VERSION, jwtToken)
+    const loggedInClient = getApolloClient(jwtToken)
     return loggedInClient.mutate({ mutation: APPLY_ACCOUNT_RESOURCES_REWARDS, variables: { accountId } })
 }
 
@@ -210,7 +210,7 @@ const ACTIVATE = gql`mutation ActivateAccount($activationCode: String) {
 }`
 
 export const simulateActivation = async (activationCode: string) => {
-    return getApolloClient(VERSION).mutate({ mutation: ACTIVATE, variables: { activationCode } })   
+    return getApolloClient().mutate({ mutation: ACTIVATE, variables: { activationCode } })   
 }
 
 function makeid(length: number) {

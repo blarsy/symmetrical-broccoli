@@ -12,9 +12,6 @@ const meta = {
     },
   },
   tags: ['autodocs'],
-  args: { 
-    version: 'v0_10'
-   },
 } satisfies Meta<typeof Notifications>
 
 export default meta

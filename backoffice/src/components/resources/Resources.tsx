@@ -110,7 +110,7 @@ const ResourceCard = (p: ResourceCardProps) => {
       </CardContent>
       <CardActions sx={{ justifyContent: 'space-around' }}>
           <Button startIcon={<EditIcon/>}>
-            { p.isExample ? uiContext.i18n.translator('modifyButtonCaption') : <Link href={{ pathname: `/webapp/${uiContext.version}/resources/${p.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link> }
+            { p.isExample ? uiContext.i18n.translator('modifyButtonCaption') : <Link href={{ pathname: `/webapp/resources/${p.id}` }}>{uiContext.i18n.translator('modifyButtonCaption')}</Link> }
           </Button>
           <Button onClick={() => {
             p.onDeleteRequested && p.onDeleteRequested()
@@ -157,7 +157,7 @@ const Resources = () => {
     return <Stack gap="1rem" overflow="auto">
         { activeCampaign.data && <Stack direction="row" justifyContent="center" alignItems="center" gap="0.25rem">
             <Button variant="contained" startIcon={<PlusIcon/>} endIcon={<CampaignIcon height="3rem" width="3rem"/>} >
-              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/new`, query: 'campaign=1' }}>
+              <Link href={{ pathname: `/webapp/resources/new`, query: 'campaign=1' }}>
                 <Stack>
                   <Typography variant="subtitle1">{activeCampaign.data.name}</Typography>
                   <Typography variant="body1">{`${uiContext.i18n.translator('rewards')} X ${activeCampaign.data.resourceRewardsMultiplier}`}</Typography>
@@ -170,7 +170,7 @@ const Resources = () => {
         </Stack>}
         <Stack direction="row" justifyContent="center" alignItems="center" gap="1rem">
             <Button variant="outlined" startIcon={<PlusIcon/>}>
-              <Link href={{ pathname: `/webapp/${uiContext.version}/resources/new` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
+              <Link href={{ pathname: `/webapp/resources/new` }}>{uiContext.i18n.translator('addResourceButtonCaption')}</Link>
             </Button>
             <IconButton color="primary" onClick={() => refetch()}>
                 <RefreshIcon/>

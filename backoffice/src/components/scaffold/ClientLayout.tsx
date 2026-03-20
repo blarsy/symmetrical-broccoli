@@ -5,11 +5,10 @@ import { JSX } from "react"
 
 interface Props {
     title?: string,
-    children: JSX.Element | '' | undefined,
-    version: string
+    children: JSX.Element | '' | undefined
 }
 
-const ClientLayout = ({ title, children, version }: Props) => <ClientWrapper version={version}>
+const ClientLayout = ({ title, children }: Props) => <ClientWrapper>
     <Container maxWidth="xl" sx={{ height: '100vh'}}>
         <Box display="flex" flexDirection="column" flex="1" justifyContent="flex-start">
             <Box display="flex" flexDirection="column" justifyContent="space-between" flex="1">

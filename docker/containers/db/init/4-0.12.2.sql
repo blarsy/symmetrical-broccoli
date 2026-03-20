@@ -152,6 +152,35 @@ begin
 end;
 $BODY$;
 
+DROP FUNCTION IF EXISTS sb.get_conversation_for_resource(uuid);
+
+CREATE OR REPLACE FUNCTION sb.get_conversation_for_resource(
+	resource_id uuid,
+	other_account_id uuid DEFAULT null)
+    RETURNS conversations
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+AS $BODY$
+	SELECT c.*
+  	FROM sb.conversations c
+	INNER JOIN sb.resources r ON
+		c.resource_id = r.id
+  	WHERE c.resource_id = get_conversation_for_resource.resource_id AND
+	EXISTS (SELECT * FROM sb.participants WHERE conversation_id = c.id AND account_id = COALESCE(get_conversation_for_resource.other_account_id ,r.account_id)) AND
+	EXISTS (SELECT * FROM sb.participants WHERE conversation_id = c.id AND account_id = sb.current_account_id())
+ 
+$BODY$;
+
+ALTER FUNCTION sb.get_conversation_for_resource(uuid, uuid)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.get_conversation_for_resource(uuid, uuid) TO identified_account;
+
+GRANT EXECUTE ON FUNCTION sb.get_conversation_for_resource(uuid, uuid) TO sb;
+
+REVOKE ALL ON FUNCTION sb.get_conversation_for_resource(uuid, uuid) FROM PUBLIC;
+
 DO
 $body$
 BEGIN

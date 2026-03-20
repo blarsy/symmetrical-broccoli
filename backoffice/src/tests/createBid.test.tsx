@@ -3,10 +3,10 @@ import { render, waitFor } from '@testing-library/react'
 import userEvent, { UserEvent } from '@testing-library/user-event'
 import dayjs from "dayjs"
 import { cleanupTestAccounts, createResource, executeQuery, getLastNotificationOnAccount, makeTestAccounts, TestAccount, waitForAndClick } from "./datastoreSetupLib"
-import BidsPage from "@/app/webapp/[version]/bids/page"
+import BidsPage from "@/app/webapp/bids/page"
 import ViewResourcePage from "@/components/resources/ViewResourcePage"
-import NotifsPage from "@/app/webapp/[version]/notifications/page"
-import ContribPage from "@/app/webapp/[version]/profile/tokens/page"
+import NotifsPage from "@/app/webapp/notifications/page"
+import ContribPage from "@/app/webapp/profile/tokens/page"
 import config from './config'
 
 let resourceId: string
@@ -76,7 +76,7 @@ const checkNotifCreatedAndDisplayed = async (accountId: string, checkData: (pars
 
 const createBidUsingUi = async (token: string, event: UserEvent) => {
     //create bid on resource from account 2
-    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/view/${resourceId}`)
+    mockUsePathname.mockImplementation(() => `/view/${resourceId}`)
     localStorage.setItem('token', token)
     const viewResPage = render(<ViewResourcePage/>)
 
@@ -99,7 +99,7 @@ test('create a bid', async () => {
 
     //Check tokens amount updated
     await waitFor(() => expect(viewResPage.getByTestId('TokenCounter')).toHaveTextContent('10'))
-    mockUsePathname.mockImplementation(() => `/webapp/${config.version}/bids`)
+    mockUsePathname.mockImplementation(() => `/webapp/bids`)
     
     const bidId = await check1ActiveBidOnResource(resourceId)
     const transactionId = await checkLastTokenTransactionOnAccount(accounts[1].data.id, -20, 10)

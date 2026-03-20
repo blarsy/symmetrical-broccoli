@@ -1,12 +1,12 @@
 import { OutputFormat, setDefaults } from "react-geocode"
 import {APIProvider, Map, Marker} from '@vis.gl/react-google-maps'
 import { Location } from '@/lib/schema'
-import { getCommonConfig } from "@/config"
+import cfg from "@/config"
 import { IconButton, Stack, Typography } from "@mui/material"
 import Edit from "@mui/icons-material/Edit"
 import Delete from "@mui/icons-material/Delete"
 
-const { mapsApiKey } = getCommonConfig()
+const { mapsApiKey } = cfg
 
 setDefaults({
     language: 'fr', key: mapsApiKey, outputFormat: OutputFormat.JSON

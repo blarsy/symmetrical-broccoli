@@ -6,7 +6,7 @@ import ExplainToken from "../token/ExplainToken"
 import TransactionsHistory from "../token/TransactionsHistory"
 import EarningTokens from "../token/EarningTokens"
 
-const Tokens = ({version} : { version: string }) => {
+const Tokens = () => {
     const appContext = useContext(AppContext)
     const uiContext = useContext(UiContext)
     const [explainingToken, setExplainingToken] = useState(false)
@@ -23,7 +23,7 @@ const Tokens = ({version} : { version: string }) => {
         <Typography color="primary" variant="h4">{uiContext.i18n.translator('howTokensWork')}</Typography>
         <Button variant="contained" color="primary" onClick={() => setExplainingToken(true)}>{uiContext.i18n.translator('showMeButtonLabel')}</Button>
         <Typography color="primary" variant="h4">{uiContext.i18n.translator('howToEarnTitle')}</Typography>
-        <EarningTokens version={version} />
+        <EarningTokens />
         <Typography color="primary" variant="h4">{uiContext.i18n.translator('tokenHistoryTitle')}</Typography>
         <TransactionsHistory />
         <ExplainToken visible={explainingToken} onClose={() => setExplainingToken(false)} />
