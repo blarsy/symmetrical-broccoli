@@ -15,8 +15,6 @@ import { Location } from '@/lib/schema'
 import { SUGGEST_RESOURCES } from "@/components/search/Search"
 import { UUID } from "crypto"
 
-const VERSION = config.version
-
 export const CREATE_CAMPAIGN = gql`mutation CreateCampaign($name: String, $beginning: Datetime, $ending: Datetime, $description: String, $defaultResourceCategories: [Int], $airdrop: Datetime, $resourceRewardsMultiplier: Int, $airdropAmount: Int) {
   createCampaign(
     input: {airdrop: $airdrop, defaultResourceCategories: $defaultResourceCategories, description: $description, ending: $ending, beginning: $beginning, name: $name, resourceRewardsMultiplier: $resourceRewardsMultiplier, airdropAmount: $airdropAmount}

@@ -76,12 +76,12 @@ const checkNotifCreatedAndDisplayed = async (accountId: string, checkData: (pars
 
 const createBidUsingUi = async (token: string, event: UserEvent) => {
     //create bid on resource from account 2
-    mockUsePathname.mockImplementation(() => `/view/${resourceId}`)
+    mockUsePathname.mockImplementation(() => `/webapp/view/${resourceId}`)
+    
     localStorage.setItem('token', token)
     const viewResPage = render(<ViewResourcePage/>)
 
     await waitForAndClick('BidButton', event, viewResPage)
-
     await waitFor(() => expect(viewResPage.getByTestId('AmountOfTokenField')).toBeInTheDocument())
     await event.type(viewResPage.getByTestId('AmountOfTokenField'), '20')
     
@@ -279,7 +279,7 @@ test('create a bid, let it expire', async () => {
     const notifId = await checkNotifCreatedAndDisplayed(accounts[1].data.id, 
         parsed => parsed.info === 'BID_EXPIRED' && parsed.resourceId === resourceId && 
                 parsed.resourceTitle === resourceTitle && parsed.resourceAuthor === accounts[0].info.name)
-    console.log('notifid', notifId)
+
     const account1NotifPage = render(<NotifsPage />)
 
     await waitFor(() => expect(account1NotifPage.getByTestId(`Notification:${notifId}`)).toBeInTheDocument())

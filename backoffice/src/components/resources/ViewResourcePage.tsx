@@ -5,6 +5,7 @@ import { usePagePath } from "@/lib/usePagePath"
 
 const ViewResourcePage = () => {
     const { param } = usePagePath()
+    
     return <ConnectedLayout allowAnonymous>
         <ViewResource resourceId={param} />
     </ConnectedLayout>
