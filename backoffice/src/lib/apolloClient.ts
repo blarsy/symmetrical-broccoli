@@ -139,6 +139,7 @@ export const GET_RESOURCE = gql`query GetResource($id: UUID!) {
 export const GET_ACCOUNT_PUBLIC_INFO = gql`query Account($id: UUID!) {
     getAccountPublicInfo(id: $id) {
       name
+      bio
       id
       resourcesByAccountId(orderBy: CREATED_DESC) {
         nodes {

@@ -22,6 +22,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
     amountOfTokens
     numberOfExternalAuthProviders
     knowsAboutCampaigns
+    bio
   }
 }`
 

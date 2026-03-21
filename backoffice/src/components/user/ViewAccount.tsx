@@ -66,6 +66,12 @@ const ViewAccount = (p: Props) => {
                     {data.getAccountPublicInfo.accountsLinksByAccountId.nodes.map((link: any, idx: number) => <Link key={idx} href={link.url}>{link.label || link.url}</Link>) }
                 </Stack>
             }
+            { data.getAccountPublicInfo.bio && (
+                <Stack>
+                    <Typography variant="caption" color="primary">{uiContext.i18n.translator('bioFieldLabel')}</Typography>
+                    <Typography variant="body1" color="primary">{data.getAccountPublicInfo.bio}</Typography>
+                </Stack>
+            )}
             { data.getAccountPublicInfo.locationByLocationId &&
                 <Stack>
                     <Typography variant="caption" color="primary">{uiContext.i18n.translator('accountLocationLabel')}</Typography>
@@ -84,6 +90,7 @@ const ViewAccount = (p: Props) => {
                         key={idx} resource={{
                             id: res.id, title: res.title, description: res.description, expiration: res.expiration,
                             images: res.images.map((img) => img.publicId!), accountName: data.getAccountPublicInfo.name, 
+                            accountId: data.getAccountPublicInfo.id,
                             avatarPublicId: data.getAccountPublicInfo.imageByAvatarImageId?.publicId
                         }}/>)}
                 </Stack>

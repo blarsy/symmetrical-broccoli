@@ -17,12 +17,12 @@ import { UiContext } from "../scaffold/UiContextProvider"
 import ChangePasswordDialog from "./ChangePasswordDialog"
 import { useRouter } from "next/navigation"
 
-const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
-    updateAccount(
-      input: {name: $name, avatarPublicId: $avatarPublicId}
-    ) {
-      integer
-    }
+const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String, $newBio: String) {
+  updateAccount(
+    input: {name: $name, avatarPublicId: $avatarPublicId, newBio: $newBio}
+  ) {
+    integer
+  }
 }`
 
 export const DELETE_ACCOUNT = gql`mutation DeleteAccount {
@@ -118,7 +118,7 @@ const Profile = () => {
                 const updatedAccount = { ...appContext.account }
                 updatedAccount.avatarPublicId = newPublicId
                 appDispatch({ type: AppReducerActionType.UpdateAccount, payload: updatedAccount })
-                await updateAccount({ variables: { name: appContext.account?.name, avatarPublicId: newPublicId } })
+                await updateAccount({ variables: { name: appContext.account?.name, newBio: appContext.account?.bio, avatarPublicId: newPublicId } })
             }}/>
             <InlineFormTextInput initialValue={ appContext.account!.name } 
                 label={t('nameFieldLabel')} textContentType="text"
@@ -127,7 +127,7 @@ const Profile = () => {
                     const updatedAccount = { ...appContext.account }
                     updatedAccount.name = newVal
                     appDispatch({ type: AppReducerActionType.UpdateAccount, payload: updatedAccount })
-                    updateAccount({ variables: { name: newVal, avatarPublicId: appContext.account?.avatarPublicId } })
+                    updateAccount({ variables: { name: newVal, bio: appContext.account?.bio, avatarPublicId: appContext.account?.avatarPublicId, newBio: appContext.account?.bio } })
                 }} />
             <InlineFormTextInput initialValue={ appContext.account!.email } 
                 label={t('emailFieldLabel')} textContentType="text"
@@ -135,6 +135,15 @@ const Profile = () => {
                 onSave={async (newEmail) => {
                     updateAccountEmail({ variables: { newEmail } })
                     setNewEmailMustBeActivated(true)
+                }} />
+            <InlineFormTextInput initialValue={ appContext.account!.bio } 
+                label={t('bioFieldLabel')} textContentType="text"
+                validationSchema={yup.string().max(200, t('bioTooLong'))}
+                onSave={async (newBio) => {
+                    const updatedAccount = { ...appContext.account }
+                    updatedAccount.bio = newBio
+                    appDispatch({ type: AppReducerActionType.UpdateAccount, payload: updatedAccount })
+                    updateAccount({ variables: { name: appContext.account?.name, avatarPublicId: appContext.account?.avatarPublicId, newBio } })
                 }} />
             <Feedback visible={!!newEmailMustBeActivated} severity="success" detail={t('newEmailMustBeActivated')} />
             <EditLinks onDone={newLinks => publicInfo.updatePublicInfo(newLinks, publicInfo.profileData.data!.location)} 

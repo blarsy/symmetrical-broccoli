@@ -12,6 +12,7 @@ export interface AccountInfo {
     name: string
     id: string
     email: string
+    bio: string
     avatarPublicId: string
     activated?: Date
     amountOfTokens: number
@@ -30,6 +31,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
       unreadConversations
       unreadNotifications
       amountOfTokens
+      bio
     }
   }`
 
@@ -81,6 +83,7 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
         knowsAboutCampaigns
         name
         email
+        bio
         avatarPublicId
         amountOfTokens
         activated
@@ -110,6 +113,7 @@ const useAccountFunctions = () => {
                 client.subscribe({ query: ACCOUNT_CHANGE }).subscribe({ next: payload => {
                     const updatedAccount: AccountInfo = {
                         activated: payload.data.accountChangeReceived.account.activated,
+                        bio: payload.data.accountChangeReceived.account.bio,
                         amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
                         lastChangeTimestamp: new Date(),
                         avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
@@ -127,6 +131,7 @@ const useAccountFunctions = () => {
 
             const account: AccountInfo = {
                 id: res.data.getSessionDataWeb.accountId, 
+                bio: res.data.getSessionDataWeb.bio,
                 name: res.data.getSessionDataWeb.name, 
                 email: res.data.getSessionDataWeb.email, 
                 avatarPublicId: res.data.getSessionDataWeb.avatarPublicId,
