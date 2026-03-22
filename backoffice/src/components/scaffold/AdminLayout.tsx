@@ -120,6 +120,9 @@ const AdminLayout = (p : PropsWithChildren) => {
                             <Link href={`/webapp/admin/accounts`}>Accounts</Link>
                         </Button>
                         <Button>
+                            <Link href={`/webapp/admin/bids`}>Bids</Link>
+                        </Button>
+                        <Button>
                             <Link href={`/webapp/admin/mails`}>Mails</Link>
                         </Button>
                         <Button>

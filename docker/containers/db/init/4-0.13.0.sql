@@ -113,6 +113,37 @@ AS $BODY$
 	WHERE apu.id = sb.current_account_id()
 $BODY$;
 
+CREATE OR REPLACE FUNCTION sb.search_bids(
+	bidder_search character varying DEFAULT '',
+	receiver_search character varying DEFAULT '',
+	resource_search character varying DEFAULT '')
+    RETURNS SETOF bids
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT DISTINCT b.*
+FROM sb.bids b
+INNER JOIN sb.accounts_public_data bidder_account ON b.account_id = bidder_account.id
+INNER JOIN sb.resources r ON b.resource_id = r.id
+INNER JOIN sb.accounts_public_data receiver_account ON r.account_id = receiver_account.id
+WHERE (bidder_search = '' OR bidder_account.name ILIKE '%' || bidder_search || '%')
+  AND (receiver_search = '' OR receiver_account.name ILIKE '%' || receiver_search || '%')
+  AND (resource_search = '' OR r.title ILIKE '%' || resource_search || '%')
+ORDER BY b.created DESC;
+
+$BODY$;
+
+ALTER FUNCTION sb.search_bids(character varying, character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.search_bids(character varying, character varying, character varying) TO admin;
+
+REVOKE ALL ON FUNCTION sb.search_bids(character varying, character varying, character varying) FROM PUBLIC;
+
 DO
 $body$
 BEGIN
