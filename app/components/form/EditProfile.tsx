@@ -20,12 +20,12 @@ import EditLinkModal from "../account/EditLinkModal"
 import { TouchableOpacity } from "../layout/lib"
 import { lightPrimaryColor } from "../layout/constants"
 
-const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String) {
-    updateAccount(
-      input: {name: $name, avatarPublicId: $avatarPublicId}
-    ) {
-      integer
-    }
+const UPDATE_ACCOUNT = gql`mutation UpdateAccount($name: String, $avatarPublicId: String, $newBio: String) {
+  updateAccount(
+    input: {name: $name, avatarPublicId: $avatarPublicId, newBio: $newBio}
+  ) {
+    integer
+  }
 }`
 
 const UPDATE_ACCOUNT_EMAIL = gql`mutation UpdateAccountEmail($newEmail: String) {
@@ -125,6 +125,10 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
     const changeName = async (name: string) => {
         return handleUpdateAccount({ name })
     }
+
+    const changeBio = async (bio: string) => {
+        return handleUpdateAccount({ bio })
+    }
     
     const changeEmail = async (email: string) => {
         await updateAccountEmail({ variables: { newEmail: email } })
@@ -136,11 +140,16 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
         return handleUpdateAccount({ avatarPublicId })
     }
 
-    const handleUpdateAccount = async ({name, avatarPublicId}: { name?: string, avatarPublicId?: string }) => {
+    const handleUpdateAccount = async ({name, bio, avatarPublicId}: { name?: string, bio?: string, avatarPublicId?: string }) => {
         const currentAccount = {...account}
 
         if(name) {
             currentAccount.name = name
+        }
+        if(bio != undefined) {
+            currentAccount.bio = bio
+        } else if(bio === '') {
+            currentAccount.bio = ''
         }
         if(avatarPublicId) {
             currentAccount.avatarPublicId = avatarPublicId
@@ -148,7 +157,9 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
 
         await updateAccount({ variables: {
             avatarPublicId: avatarPublicId || currentAccount.avatarPublicId, 
-            name: name || currentAccount.name } })
+            name: name || currentAccount.name,
+            newBio: bio || currentAccount.bio
+        } })
 
         appDispatch({ type: AppReducerActionType.UpdateAccount, payload: currentAccount })
     }
@@ -178,6 +189,9 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
         <InlineFormTextInput testID="name" label={t('organization_name_label')}  textContentType="name" 
             initialValue={account.name} validationSchema={yup.string().required(t('field_required')).max(30, t('name_too_long'))}
             onSave={changeName}/>
+        <InlineFormTextInput testID="bio" label={t('bioFieldLabel')} textContentType="none"
+            initialValue={account.bio} validationSchema={yup.string().max(200, t('bio_too_long'))}
+            onSave={changeBio}/>
         <Hr color="#fff"/>
         { account.numberOfExternalAuthProviders === 0 && <>
             <InlineFormTextInput testID="email" label={t('email_label')} textContentType="emailAddress" 
@@ -229,24 +243,15 @@ export default function EditProfile ({ account }: { account: AccountInfo }) {
         <OperationFeedback testID="publicInfoFeedback" success={!!publicInfoUpdateData} onDismissSuccess={resetPublicInfo} error={publicInfoUpdateError} onDismissError={reset} />
         <EditLinkModal testID="editLinkModal" visible={!!editedLink} initial={editedLink} onDismiss={async link => {
             if(link) {
-                let newLinks: Link[]
-                if(link.id === 0) {
-                    const newLinkInternalId = profileData!.links.reduce<number>((prev, current) => {
-                        if(current.id < prev)
-                            return current.id
-
-                        return prev
-                    }, 0)
-                    profileData!.links.push({ ...link, ...{ id: newLinkInternalId - 1 }})
-                    newLinks = [...profileData!.links]
+                const idx = profileData!.links.findIndex(l => l.id === link.id)
+                if(idx === -1) {
+                    profileData!.links.push(link)
                 } else {
-                    const idx = profileData!.links.findIndex(l => l.id === link.id)
                     profileData!.links.splice(idx, 1, link)
-                    newLinks = [...profileData!.links]
                 }
                 
                 await updateAccountPublicInfo({ variables: { 
-                    links: newLinks.map(link => ({ label: link.label, linkTypeId: link.type , url: link.url })), 
+                    links: profileData!.links.map(link => ({ label: link.label, linkTypeId: link.type , url: link.url })), 
                     location: profileData!.location}})
             }
             setEditedLink(undefined)

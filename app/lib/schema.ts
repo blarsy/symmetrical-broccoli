@@ -30,6 +30,7 @@ export interface AccountInfo {
     name: string
     id: string
     email: string
+    bio: string
     avatarPublicId: string
     activated: Date
     unreadConversations: string[]

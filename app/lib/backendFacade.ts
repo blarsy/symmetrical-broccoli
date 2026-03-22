@@ -5,6 +5,7 @@ export const GraphQlLib = {
       GET_ACCOUNT: gql`query Account($id: UUID!) {
         getAccountPublicInfo(id: $id) {
           name
+          bio
           id
           resourcesByAccountId(orderBy: CREATED_DESC) {
             nodes {

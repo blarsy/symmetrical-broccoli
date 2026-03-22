@@ -9,6 +9,7 @@ import { ErrorMessage, Formik } from "formik"
 import LinkTypeSelect from "../form/LinkTypeSelect"
 import { ErrorSnackbar } from "../OperationFeedback"
 import * as yup from 'yup'
+import { v4 } from "uuid"
 
 interface EditLinkModalProps {
     initial?: Link
@@ -21,7 +22,7 @@ export default ({ initial, visible, onDismiss, testID }: EditLinkModalProps) => 
     const [error, setError] = useState<Error | undefined>(undefined)
     return <Portal>
         <Modal testID={testID} visible={visible} onDismiss={onDismiss} contentContainerStyle={{ padding: 20, backgroundColor: lightPrimaryColor, margin: 10, borderRadius: 15 }}>
-            <Formik initialValues={initial || { id: 0, url: '', label: '', type: 4 }} 
+            <Formik initialValues={initial || { id: v4(), url: '', label: '', type: 4 }} 
                 validationSchema={yup.object().shape({
                     url: yup.string().required(t('field_required')).url(t('not_a_valid_url')),
                     label: yup.string().max(30, t('link_label_too_long'))

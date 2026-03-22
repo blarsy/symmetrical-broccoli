@@ -73,7 +73,10 @@ export const Account = ({ id, chatOpenRequested, viewResourceRequested }: Props)
                       <WhiteButton icon={moreInfo ? 'chevron-up' : 'chevron-right'} textColor="#000" style={{ paddingVertical: 15 }}
                         onPress={() => setMoreInfo(!moreInfo)}><Text variant="titleMedium">{moreInfo ? t('lessInfo') : t('moreInfo')}</Text></WhiteButton>
                       { moreInfo && 
-                        <View style={{ backgroundColor: lightPrimaryColor, padding: 5, borderRadius: IMAGE_BORDER_RADIUS }}>
+                        <View style={{ backgroundColor: lightPrimaryColor, padding: 5, borderRadius: IMAGE_BORDER_RADIUS, gap: 10 }}>
+                          { data.getAccountPublicInfo.bio && <ViewField title={t('bioFieldLabel')} titleOnOwnLine>
+                                <Text variant="bodySmall">{data.getAccountPublicInfo.bio}</Text>
+                          </ViewField> }
                           { data.getAccountPublicInfo.accountsLinksByAccountId.nodes && data.getAccountPublicInfo.accountsLinksByAccountId.nodes.length > 0 &&
                             <ViewField title={t('links')} titleOnOwnLine>
                               <LinkList values={ data.getAccountPublicInfo.accountsLinksByAccountId.nodes.map((link: any) => ({

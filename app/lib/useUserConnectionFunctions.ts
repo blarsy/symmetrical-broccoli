@@ -14,6 +14,7 @@ export const GET_SESSION_DATA = gql`query GetSessionData {
     accountId
     email
     name
+    bio
     avatarPublicId
     activated
     logLevel
@@ -77,6 +78,7 @@ export const ACCOUNT_CHANGE = gql`subscription AccountChange {
     accountChangeReceived {
       account {
         knowsAboutCampaigns
+        bio
         name
         email
         avatarPublicId
@@ -118,6 +120,7 @@ export default () => {
             const account: AccountInfo = {
                 id: res.data.getSessionData.accountId, 
                 name: res.data.getSessionData.name, 
+                bio: res.data.getSessionData.bio,
                 email: res.data.getSessionData.email, 
                 numberOfExternalAuthProviders: res.data.getSessionData.numberOfExternalAuthProviders,
                 avatarPublicId: res.data.getSessionData.avatarPublicId,
@@ -163,6 +166,7 @@ export default () => {
                 // Here comes the notification parsing
                 const updatedAccount: AccountInfo = {
                     activated: payload.data.accountChangeReceived.account.activated,
+                    bio: payload.data.accountChangeReceived.account.bio,
                     amountOfTokens: payload.data.accountChangeReceived.account.amountOfTokens,
                     lastChangeTimestamp: new Date(),
                     avatarPublicId: payload.data.accountChangeReceived.account.avatarPublicId,
