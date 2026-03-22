@@ -110,7 +110,7 @@ const AdminLayout = (p : PropsWithChildren) => {
 
     return <Themed>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
-            <Container maxWidth="xl" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem'}}>
+            <Container maxWidth="xl" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', gap: '1rem', overflow: 'auto'}}>
                 { connectionStatus.loading && <CircularProgress/> }
                 { connectionStatus.error && <Feedback severity="error" message="Error connecting" 
                     detail={connectionStatus.error.detail} onClose={() => setConnectionStatus(initial(false))} /> }
@@ -121,6 +121,12 @@ const AdminLayout = (p : PropsWithChildren) => {
                         </Button>
                         <Button>
                             <Link href={`/webapp/admin/bids`}>Bids</Link>
+                        </Button>
+                        <Button>
+                            <Link href={`/webapp/admin/resources`}>Resources</Link>
+                        </Button>
+                        <Button>
+                            <Link href={`/webapp/admin/notifications`}>Notifications</Link>
                         </Button>
                         <Button>
                             <Link href={`/webapp/admin/mails`}>Mails</Link>

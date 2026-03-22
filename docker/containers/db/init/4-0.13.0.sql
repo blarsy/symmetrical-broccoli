@@ -144,6 +144,60 @@ GRANT EXECUTE ON FUNCTION sb.search_bids(character varying, character varying, c
 
 REVOKE ALL ON FUNCTION sb.search_bids(character varying, character varying, character varying) FROM PUBLIC;
 
+CREATE OR REPLACE FUNCTION sb.search_resources(
+	resource_search character varying DEFAULT '',
+	owner_search character varying DEFAULT '')
+    RETURNS SETOF resources
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT DISTINCT r.*
+FROM sb.resources r
+INNER JOIN sb.accounts_public_data owner_account ON r.account_id = owner_account.id
+WHERE (resource_search = '' OR r.title ILIKE '%' || resource_search || '%')
+  AND (owner_search = '' OR owner_account.name ILIKE '%' || owner_search || '%')
+ORDER BY r.created DESC;
+
+$BODY$;
+
+ALTER FUNCTION sb.search_resources(character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.search_resources(character varying, character varying) TO admin;
+
+REVOKE ALL ON FUNCTION sb.search_resources(character varying, character varying) FROM PUBLIC;
+
+CREATE OR REPLACE FUNCTION sb.search_notifications(
+	account_search character varying DEFAULT '',
+	data_search character varying DEFAULT '')
+    RETURNS SETOF notifications
+    LANGUAGE 'sql'
+    COST 100
+    STABLE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+SELECT n.*
+FROM sb.notifications n
+INNER JOIN sb.accounts_public_data account ON n.account_id = account.id
+WHERE (account_search = '' OR account.name ILIKE '%' || account_search || '%')
+  AND (data_search = '' OR n.data::text ILIKE '%' || data_search || '%')
+ORDER BY n.created DESC;
+
+$BODY$;
+
+ALTER FUNCTION sb.search_notifications(character varying, character varying)
+    OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.search_notifications(character varying, character varying) TO admin;
+
+REVOKE ALL ON FUNCTION sb.search_notifications(character varying, character varying) FROM PUBLIC;
+
 DO
 $body$
 BEGIN
