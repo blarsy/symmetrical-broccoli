@@ -129,6 +129,9 @@ const AdminLayout = (p : PropsWithChildren) => {
                             <Link href={`/webapp/admin/notifications`}>Notifications</Link>
                         </Button>
                         <Button>
+                            <Link href={`/webapp/admin/messages`}>Messages</Link>
+                        </Button>
+                        <Button>
                             <Link href={`/webapp/admin/mails`}>Mails</Link>
                         </Button>
                         <Button>

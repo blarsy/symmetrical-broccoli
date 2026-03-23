@@ -198,10 +198,45 @@ GRANT EXECUTE ON FUNCTION sb.search_notifications(character varying, character v
 
 REVOKE ALL ON FUNCTION sb.search_notifications(character varying, character varying) FROM PUBLIC;
 
+DROP FUNCTION IF EXISTS sb.search_messages(character varying, character varying, character varying);
+CREATE OR REPLACE FUNCTION sb.search_messages(
+		resource_search character varying DEFAULT '',
+		account_search character varying DEFAULT '',
+		text_search character varying DEFAULT '')
+		RETURNS SETOF messages
+		LANGUAGE 'sql'
+		COST 100
+		STABLE PARALLEL UNSAFE
+		ROWS 1000
+
+AS $BODY$
+
+SELECT DISTINCT m.*
+FROM sb.messages m
+INNER JOIN sb.participants p ON m.participant_id = p.id
+INNER JOIN sb.accounts_public_data author ON p.account_id = author.id
+INNER JOIN sb.conversations c ON p.conversation_id = c.id
+INNER JOIN sb.resources r ON c.resource_id = r.id
+INNER JOIN sb.participants otherp ON otherp.conversation_id = c.id AND otherp.account_id <> p.account_id
+INNER JOIN sb.accounts_public_data destinator ON otherp.account_id = destinator.id
+WHERE (resource_search = '' OR r.title ILIKE '%' || resource_search || '%')
+	AND (text_search = '' OR m.text ILIKE '%' || text_search || '%')
+	AND (account_search = '' OR author.name ILIKE '%' || account_search || '%' OR destinator.name ILIKE '%' || account_search || '%')
+ORDER BY m.created DESC;
+
+$BODY$;
+
+ALTER FUNCTION sb.search_messages(character varying, character varying, character varying)
+		OWNER TO sb;
+
+GRANT EXECUTE ON FUNCTION sb.search_messages(character varying, character varying, character varying) TO admin;
+
+REVOKE ALL ON FUNCTION sb.search_messages(character varying, character varying, character varying) FROM PUBLIC;
+
 DO
 $body$
 BEGIN
 	UPDATE sb.system SET version = '0.13.0', minimum_client_version = '0.13.0';
 END;
 $body$
-LANGUAGE 'plpgsql'; 
+LANGUAGE 'plpgsql';
