@@ -198,7 +198,6 @@ GRANT EXECUTE ON FUNCTION sb.search_notifications(character varying, character v
 
 REVOKE ALL ON FUNCTION sb.search_notifications(character varying, character varying) FROM PUBLIC;
 
-DROP FUNCTION IF EXISTS sb.search_messages(character varying, character varying, character varying);
 CREATE OR REPLACE FUNCTION sb.search_messages(
 		resource_search character varying DEFAULT '',
 		account_search character varying DEFAULT '',
